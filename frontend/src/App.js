@@ -177,16 +177,19 @@ const TrendingTicker = ({ celebrities }) => {
     <div className="ticker-container" data-testid="trending-ticker">
       <div className="ticker-content">
         {doubled.map((celeb, idx) => (
-          <span key={idx} className="ticker-item flex items-center gap-2">
+          <span key={idx} className="ticker-item flex items-center gap-3">
             <img 
-              src={celeb.image || `https://ui-avatars.com/api/?name=${celeb.name}&size=32&background=FF0099&color=fff`}
+              src={celeb.image || `https://ui-avatars.com/api/?name=${celeb.name}&size=40&background=FF0099&color=fff`}
               alt={celeb.name}
-              className="w-8 h-8 rounded-full object-cover border-2 border-black"
+              className="w-10 h-10 rounded-full object-cover border-2 border-black shadow-lg"
               onError={(e) => {
-                e.target.src = `https://ui-avatars.com/api/?name=${celeb.name}&size=32&background=FF0099&color=fff`;
+                e.target.src = `https://ui-avatars.com/api/?name=${celeb.name}&size=40&background=FF0099&color=fff`;
               }}
             />
-            {celeb.name} <TrendingUp className="inline w-4 h-4 mx-1" /> {celeb.buzz_score?.toFixed(1)}
+            <span className="font-bold">{celeb.name}</span>
+            <ChevronUp className="w-4 h-4 text-green-400" />
+            <span className="text-[#FFD700]">{celeb.buzz_score?.toFixed(1)}</span>
+            {celeb.tier && <TierBadge tier={celeb.tier} />}
           </span>
         ))}
       </div>
