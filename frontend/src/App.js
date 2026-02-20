@@ -1561,7 +1561,8 @@ function App() {
     fetchTodaysNews();
     fetchTopPicked();
     fetchBrownBreadWatch();
-  }, [fetchCategories, fetchTrending, initTeam, fetchLeaderboard, fetchStats, fetchTodaysNews, fetchTopPicked, fetchBrownBreadWatch]);
+    fetchHotCelebs();
+  }, [fetchCategories, fetchTrending, initTeam, fetchLeaderboard, fetchStats, fetchTodaysNews, fetchTopPicked, fetchBrownBreadWatch, fetchHotCelebs]);
 
   return (
     <div className="App">
