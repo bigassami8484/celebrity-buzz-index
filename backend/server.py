@@ -278,22 +278,25 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
         headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (contact@example.com)"}
         async with httpx.AsyncClient() as client:
             # Use Wikipedia search API for better results with descriptions
-            url = f"https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={query}&srlimit=15&format=json"
+            url = f"https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={query}&srlimit=20&format=json"
             response = await client.get(url, timeout=5.0, headers=headers)
             if response.status_code == 200:
                 data = response.json()
                 search_results = data.get("query", {}).get("search", [])
                 
-                # Keywords that indicate this is NOT a person - FILTER OUT
-                non_person_keywords = [
+                # Keywords that indicate this is NOT a person - FILTER OUT from title
+                non_person_title_keywords = [
                     "filmography", "discography", "bibliography", "awards", "album", 
                     "song", "band", "tv series", "television series", "movie", "film",
                     "list of", "category:", "template:", "wikipedia:", "soundtrack",
                     "video game", "book", "novel", "tour", "concert", "episode",
                     "podcast", "show", "series", "programme", "program", "season",
-                    "city", "town", "village", "municipality", "district",
+                    "city", "town", "village", "municipality", "district", "commune",
                     "company", "single", "ep", "videography", "christmas special",
-                    "fc", "cf", "afc", "united", "club", "team", "stadium", "records"
+                    "fc", "cf", "afc", "united", "club", "team", "stadium", "records",
+                    "child", "montana", "potter", "etc", "good girl", "sasha fierce",
+                    "cowboy carter", "future nostalgia", "radical optimism", "gimme more",
+                    "jean", "is paris", "this is"
                 ]
                 
                 results = []
@@ -305,7 +308,7 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     title_lower = title.lower()
                     
                     # Skip if title contains non-person keywords
-                    if any(kw in title_lower for kw in non_person_keywords):
+                    if any(kw in title_lower for kw in non_person_title_keywords):
                         continue
                     
                     # Skip if title has parentheses (usually disambiguation or albums)
@@ -320,12 +323,16 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     if title_lower.startswith("the "):
                         continue
                     
-                    # Skip single word titles (usually not specific celebrities)
+                    # Skip if same word repeated (like "Paris Paris", "Simon Simon")
                     words = title.split()
-                    if len(words) < 2 or len(words) > 5:
+                    if len(words) >= 2 and words[0].lower() == words[1].lower():
                         continue
                     
-                    # Name should look like a proper name (each word capitalized, reasonable length)
+                    # Skip single word or too many words
+                    if len(words) < 2 or len(words) > 4:
+                        continue
+                    
+                    # Name should look like a proper name (each word capitalized)
                     if not all(word[0].isupper() for word in words if word):
                         continue
                     
