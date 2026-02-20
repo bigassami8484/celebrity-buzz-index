@@ -112,7 +112,108 @@ TRENDING_CELEBRITIES = {
     "other": ["David Beckham", "Gordon Ramsay", "Bear Grylls", "Jeremy Clarkson", "James Corden"],
 }
 
+# A-list indicators (keywords that suggest high fame)
+A_LIST_INDICATORS = ["oscar", "grammy", "emmy", "golden globe", "bafta", "world cup winner", 
+                      "billion", "legendary", "iconic", "superstar", "megastar", "one of the most",
+                      "best-selling", "highest-paid", "most famous", "world record"]
+B_LIST_INDICATORS = ["award-winning", "acclaimed", "successful", "popular", "well-known", 
+                      "million", "chart-topping", "hit", "starring", "lead role"]
+C_LIST_INDICATORS = ["known for", "appeared in", "featured", "contestant", "participant"]
+
 # ==================== HELPER FUNCTIONS ====================
+
+async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
+    """Search Wikipedia for celebrity suggestions"""
+    try:
+        headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (contact@example.com)"}
+        async with httpx.AsyncClient() as client:
+            # Use Wikipedia opensearch API
+            url = f"https://en.wikipedia.org/w/api.php?action=opensearch&search={query}&limit=10&namespace=0&format=json"
+            response = await client.get(url, timeout=5.0, headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                names = data[1] if len(data) > 1 else []
+                descriptions = data[2] if len(data) > 2 else []
+                
+                results = []
+                for i, name in enumerate(names):
+                    desc = descriptions[i] if i < len(descriptions) else ""
+                    # Estimate tier based on description
+                    tier = estimate_tier_from_description(desc)
+                    price = get_price_for_tier(tier)
+                    
+                    # Try to get thumbnail
+                    image = ""
+                    try:
+                        thumb_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{name.replace(' ', '_')}"
+                        thumb_response = await client.get(thumb_url, timeout=3.0, headers=headers)
+                        if thumb_response.status_code == 200:
+                            thumb_data = thumb_response.json()
+                            image = thumb_data.get("thumbnail", {}).get("source", "")
+                    except:
+                        pass
+                    
+                    results.append({
+                        "name": name,
+                        "description": desc[:150] + "..." if len(desc) > 150 else desc,
+                        "image": image or f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&size=64&background=FF0099&color=fff",
+                        "estimated_tier": tier,
+                        "estimated_price": price
+                    })
+                return results
+    except Exception as e:
+        logger.error(f"Wikipedia autocomplete error: {e}")
+    return []
+
+def estimate_tier_from_description(description: str) -> str:
+    """Estimate celebrity tier from Wikipedia description"""
+    desc_lower = description.lower()
+    
+    # Check for A-list indicators
+    if any(ind in desc_lower for ind in A_LIST_INDICATORS):
+        return "A"
+    
+    # Check for B-list indicators  
+    if any(ind in desc_lower for ind in B_LIST_INDICATORS):
+        return "B"
+    
+    # Check for C-list indicators
+    if any(ind in desc_lower for ind in C_LIST_INDICATORS):
+        return "C"
+    
+    return "D"
+
+def get_price_for_tier(tier: str) -> int:
+    """Get price based on celebrity tier"""
+    prices = {
+        "A": 18,  # £18M for A-list
+        "B": 12,  # £12M for B-list
+        "C": 7,   # £7M for C-list
+        "D": 3    # £3M for D-list
+    }
+    return prices.get(tier, 5)
+
+async def calculate_celebrity_tier(bio: str, name: str) -> tuple:
+    """Calculate celebrity tier based on bio content and return (tier, price)"""
+    bio_lower = bio.lower()
+    
+    # A-list: Major awards, billions in earnings, legendary status
+    a_list_score = sum(1 for ind in A_LIST_INDICATORS if ind in bio_lower)
+    if a_list_score >= 2:
+        return ("A", 18)
+    
+    # B-list: Award-winning, millions, chart-topping
+    b_list_score = sum(1 for ind in B_LIST_INDICATORS if ind in bio_lower)
+    if a_list_score >= 1 or b_list_score >= 2:
+        return ("B", 12)
+    
+    # C-list: Known for appearances, contestants
+    c_list_score = sum(1 for ind in C_LIST_INDICATORS if ind in bio_lower)
+    if b_list_score >= 1 or c_list_score >= 1:
+        return ("C", 7)
+    
+    # D-list: Everyone else
+    return ("D", 3)
 
 async def fetch_wikipedia_info(name: str) -> dict:
     """Fetch celebrity info from Wikipedia API"""
