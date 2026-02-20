@@ -410,6 +410,9 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             skip_start_phrases = [
                                 "is a fictional character", "is a character in",
                                 "is an album", "is the album", "is a studio album",
+                                "is the debut", "is the second", "is the third", "is the fourth",
+                                "is the fifth", "is the sixth", "is the seventh", "is the eighth",
+                                "is the ninth", "is the tenth", "is the eleventh", "is the twelfth",
                                 "is a single", "is a song", "is an ep",
                                 "is a soundtrack", "is an ost",
                                 "is a television series", "is a tv series", "is a sitcom",
@@ -421,7 +424,8 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                 "is a district", "is a beach", "is an island", "is a resort",
                                 "is a hotel", "is an airport", "is located in",
                                 "was a fictional", "was a character", "was an album",
-                                "was a television", "was a film", "was a band"
+                                "was a television", "was a film", "was a band",
+                                "studio album by", "collaborative album", "compilation album"
                             ]
                             
                             # Check if description starts with any skip phrase
