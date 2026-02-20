@@ -1048,6 +1048,10 @@ function App() {
   const [selectedLeague, setSelectedLeague] = useState(null);
   const [leagueLeaderboard, setLeagueLeaderboard] = useState([]);
   
+  // Hall of Fame state
+  const [showHallOfFame, setShowHallOfFame] = useState(false);
+  const [hallOfFame, setHallOfFame] = useState([]);
+  
   // Mobile tab state
   const [mobileTab, setMobileTab] = useState('home');
 
