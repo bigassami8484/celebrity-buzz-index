@@ -1111,6 +1111,17 @@ function App() {
   const [todaysNews, setTodaysNews] = useState([]);
   const [topPicked, setTopPicked] = useState([]);
   const [brownBreadWatch, setBrownBreadWatch] = useState([]);
+  
+  // League state
+  const [leagues, setLeagues] = useState([]);
+  const [selectedLeague, setSelectedLeague] = useState(null);
+  const [leagueLeaderboard, setLeagueLeaderboard] = useState([]);
+  
+  // Mini game state
+  const [bets, setBets] = useState([]);
+  
+  // Mobile tab state
+  const [mobileTab, setMobileTab] = useState('home');
 
   // Fetch stats
   const fetchStats = useCallback(async () => {
