@@ -62,6 +62,17 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - **Minimum Buzz Score: 5 points** (no celebrity scores below 5)
 - **Tier Multipliers**: A=1.0x, B=1.2x, C=1.5x, D=2.0x
 
+### Pricing (Updated)
+- **A-list: £9M** (celebrities with major awards, billions in earnings)
+- **B-list: £6M** (award-winning, chart-topping)
+- **C-list: £4M** (TV appearances, reality stars)
+- **D-list: £2M** (everyone else)
+
+### Team Rules
+- **Budget: £50M**
+- **Max team size: 10 players**
+- **1 transfer per week**
+
 ### Features
 - **Player Count Banner**: Shows total players, celebrities, transfer window
 - **Today's News**: Real celebrity news from TMZ, Daily Mail, BBC, People, E! News, US Weekly, Page Six
