@@ -397,6 +397,8 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 results = []
                 seen_base_names = set()
                 
+                logger.info(f"Wikipedia returned {len(search_results)} initial results")
+                
                 for item in search_results:
                     title = item.get("title", "")
                     snippet = item.get("snippet", "").lower()
@@ -411,14 +413,17 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                         for qpart in query_parts
                     )
                     if not query_in_name:
+                        logger.info(f"Skipping {title}: query not in name")
                         continue
                     
                     # Skip if title contains non-person keywords
                     if any(kw in title_lower for kw in non_person_title_keywords):
+                        logger.info(f"Skipping {title}: non-person keyword in title")
                         continue
                     
                     # Skip if title has dashes with location patterns (Paris–Brest–Paris)
                     if "–" in title or "—" in title:
+                        logger.info(f"Skipping {title}: has dash")
                         continue
                     
                     # Skip if title has parentheses UNLESS it's a role descriptor like (musician), (actor)
@@ -429,23 +434,28 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                         "politician", "presenter", "comedian", "director", "writer",
                                         "athlete", "businessman", "model", "chef", "host", "dancer"]
                         if not any(role in paren_content for role in allowed_roles):
+                            logger.info(f"Skipping {title}: has parentheses without role")
                             continue
                     
                     # Skip titles with colons (usually shows, specials, etc.)
                     if ":" in title:
+                        logger.info(f"Skipping {title}: has colon")
                         continue
                     
                     # Skip titles starting with "The" (usually shows, bands, etc.)
                     if title_lower.startswith("the "):
+                        logger.info(f"Skipping {title}: starts with The")
                         continue
                     
                     # Skip if same word repeated (like "Paris Paris", "Simon Simon")
                     words = title.split()
                     if len(words) >= 2 and words[0].lower() == words[1].lower():
+                        logger.info(f"Skipping {title}: repeated word")
                         continue
                     
                     # Skip single word or too many words
                     if len(words) < 1 or len(words) > 4:
+                        logger.info(f"Skipping {title}: word count {len(words)}")
                         continue
                     
                     # Allow single-word names if they have accents (like Beyoncé, Rihanna)
@@ -453,24 +463,30 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     if len(words) > 1:
                         # Name should look like a proper name (each word capitalized)
                         if not all(word[0].isupper() for word in words if word and word[0].isalpha()):
+                            logger.info(f"Skipping {title}: capitalization issue")
                             continue
                     
                     # Check for duplicates - use first two words as base name
                     words = title.split()
                     base_name = " ".join(words[:2]).lower() if len(words) >= 2 else title.lower()
                     if base_name in seen_base_names:
+                        logger.info(f"Skipping {title}: duplicate base name")
                         continue
                     seen_base_names.add(base_name)
+                    
+                    logger.info(f"Fetching summary for: {title}")
                     
                     # Get full page summary for this person
                     try:
                         summary_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{title.replace(' ', '_')}"
                         summary_response = await client.get(summary_url, timeout=3.0, headers=headers)
+                        logger.info(f"Summary status for {title}: {summary_response.status_code}")
                         if summary_response.status_code == 200:
                             summary_data = summary_response.json()
                             desc = summary_data.get("extract", "")
                             image = summary_data.get("thumbnail", {}).get("source", "")
                             page_type = summary_data.get("type", "")
+                            logger.info(f"Page type for {title}: {page_type}")
                             
                             # Skip if not a standard article (could be disambiguation)
                             if page_type != "standard":
