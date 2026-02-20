@@ -307,11 +307,8 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     snippet = item.get("snippet", "").lower()
                     title_lower = title.lower()
                     
-                    logger.info(f"Processing: {title}")
-                    
                     # Skip if title contains non-person keywords
                     if any(kw in title_lower for kw in non_person_title_keywords):
-                        logger.info(f"  Skipped: non-person keyword")
                         continue
                     
                     # Skip if title has parentheses UNLESS it's a role descriptor like (musician), (actor)
@@ -322,28 +319,23 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                         "politician", "presenter", "comedian", "director", "writer",
                                         "athlete", "businessman", "model", "chef", "host", "dancer"]
                         if not any(role in paren_content for role in allowed_roles):
-                            logger.info(f"  Skipped: parentheses (not a role)")
                             continue
                     
                     # Skip titles with colons (usually shows, specials, etc.)
                     if ":" in title:
-                        logger.info(f"  Skipped: colon")
                         continue
                     
                     # Skip titles starting with "The" (usually shows, bands, etc.)
                     if title_lower.startswith("the "):
-                        logger.info(f"  Skipped: starts with The")
                         continue
                     
                     # Skip if same word repeated (like "Paris Paris", "Simon Simon")
                     words = title.split()
                     if len(words) >= 2 and words[0].lower() == words[1].lower():
-                        logger.info(f"  Skipped: repeated word")
                         continue
                     
                     # Skip single word or too many words
                     if len(words) < 1 or len(words) > 4:
-                        logger.info(f"  Skipped: word count {len(words)}")
                         continue
                     
                     # Allow single-word names if they have accents (like Beyoncé, Rihanna)
