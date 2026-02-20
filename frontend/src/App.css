@@ -197,7 +197,7 @@
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 60px;
   background: rgba(0, 0, 0, 0.95);
   padding: 20px;
   opacity: 0;
@@ -205,6 +205,7 @@
   transition: opacity 0.3s ease, transform 0.3s ease;
   pointer-events: none;
   overflow-y: auto;
+  z-index: 5;
 }
 
 .celebrity-card:hover .news-panel {
