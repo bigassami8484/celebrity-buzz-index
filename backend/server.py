@@ -296,7 +296,8 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     "fc", "cf", "afc", "united", "club", "team", "stadium", "records",
                     "child", "montana", "potter", "etc", "good girl", "sasha fierce",
                     "cowboy carter", "future nostalgia", "radical optimism", "gimme more",
-                    "jean", "is paris", "this is"
+                    "jean", "is paris", "this is", "agreement", "métro", "metro",
+                    "dua", "nusa", "beach", "island", "resort", "hotel"
                 ]
                 
                 results = []
