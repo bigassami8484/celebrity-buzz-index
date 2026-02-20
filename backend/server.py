@@ -12,7 +12,15 @@ from datetime import datetime, timezone, timedelta
 import httpx
 import json
 import re
+import unicodedata
 from emergentintegrations.llm.chat import LlmChat, UserMessage
+
+def normalize_text(text: str) -> str:
+    """Remove accents and normalize text for matching"""
+    # Normalize to decomposed form (separate base characters from accents)
+    normalized = unicodedata.normalize('NFD', text)
+    # Remove combining characters (accents)
+    return ''.join(c for c in normalized if not unicodedata.combining(c)).lower()
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
