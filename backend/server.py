@@ -277,13 +277,12 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
     try:
         headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (contact@example.com)"}
         async with httpx.AsyncClient() as client:
-            # Use Wikipedia opensearch API
-            url = f"https://en.wikipedia.org/w/api.php?action=opensearch&search={query}&limit=20&namespace=0&format=json"
+            # Use Wikipedia search API for better results with descriptions
+            url = f"https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={query}&srlimit=15&format=json"
             response = await client.get(url, timeout=5.0, headers=headers)
             if response.status_code == 200:
                 data = response.json()
-                names = data[1] if len(data) > 1 else []
-                descriptions = data[2] if len(data) > 2 else []
+                search_results = data.get("query", {}).get("search", [])
                 
                 # Keywords that indicate this is NOT a person - FILTER OUT
                 non_person_keywords = [
@@ -292,87 +291,81 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     "list of", "category:", "template:", "wikipedia:", "soundtrack",
                     "video game", "book", "novel", "tour", "concert", "episode",
                     "podcast", "show", "series", "programme", "program", "season",
-                    "(", "city", "town", "village", "municipality", "district",
-                    "company", "album", "single", "ep", "discography", "videography"
-                ]
-                
-                # Keywords that MUST be in description to confirm it's a person
-                person_keywords = [
-                    "actor", "actress", "singer", "musician", "footballer", "athlete",
-                    "politician", "presenter", "model", "chef", "comedian", "director",
-                    "writer", "author", "rapper", "host", "personality", "prince", 
-                    "princess", "duke", "duchess", "royal", "businessman", "businesswoman",
-                    "entrepreneur", "influencer", "youtuber", "celebrity", "star",
-                    "born", "american", "british", "english", "australian", "canadian",
-                    "irish", "scottish", "welsh", "french", "german", "italian", "spanish",
-                    "player", "manager", "coach", "producer", "composer", "dancer"
+                    "city", "town", "village", "municipality", "district",
+                    "company", "single", "ep", "videography", "christmas special"
                 ]
                 
                 results = []
-                seen_base_names = set()  # Track base names to avoid ANY duplicates
+                seen_base_names = set()
                 
-                for i, name in enumerate(names):
-                    desc = descriptions[i] if i < len(descriptions) else ""
-                    name_lower = name.lower()
-                    desc_lower = desc.lower()
+                for item in search_results:
+                    title = item.get("title", "")
+                    snippet = item.get("snippet", "").lower()
+                    title_lower = title.lower()
                     
-                    # STRICT: Skip if name contains ANY non-person keywords
-                    if any(kw in name_lower for kw in non_person_keywords):
+                    # Skip if title contains non-person keywords
+                    if any(kw in title_lower for kw in non_person_keywords):
                         continue
                     
-                    # STRICT: Skip if name has parentheses (usually disambiguation pages)
-                    if "(" in name:
+                    # Skip if title has parentheses (usually disambiguation or albums)
+                    if "(" in title:
                         continue
                     
-                    # STRICT: Must have a person keyword in description
-                    if not desc or not any(kw in desc_lower for kw in person_keywords):
+                    # Skip single word titles (usually not specific celebrities)
+                    if " " not in title and len(title) < 15:
                         continue
                     
-                    # STRICT: Get clean base name and check for duplicates
-                    # This ensures "Mariah Carey" only appears once
-                    base_name = name.strip().lower()
+                    # Check for duplicates - use first two words as base name
+                    words = title.split()
+                    base_name = " ".join(words[:2]).lower() if len(words) >= 2 else title.lower()
                     if base_name in seen_base_names:
                         continue
                     seen_base_names.add(base_name)
                     
-                    # Also check if this is a substring duplicate (e.g., if we have "Gemma Collins", skip "Gemma Collins Show")
-                    is_duplicate = False
-                    for seen in seen_base_names:
-                        if seen != base_name and (base_name.startswith(seen) or seen.startswith(base_name)):
-                            is_duplicate = True
-                            break
-                    if is_duplicate:
-                        continue
-                    
-                    # Estimate tier based on description
-                    tier = estimate_tier_from_description(desc)
-                    price = get_price_for_tier(tier)
-                    
-                    # Try to get thumbnail
-                    image = ""
+                    # Get full page summary for this person
                     try:
-                        thumb_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{name.replace(' ', '_')}"
-                        thumb_response = await client.get(thumb_url, timeout=3.0, headers=headers)
-                        if thumb_response.status_code == 200:
-                            thumb_data = thumb_response.json()
-                            image = thumb_data.get("thumbnail", {}).get("source", "")
+                        summary_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{title.replace(' ', '_')}"
+                        summary_response = await client.get(summary_url, timeout=3.0, headers=headers)
+                        if summary_response.status_code == 200:
+                            summary_data = summary_response.json()
+                            desc = summary_data.get("extract", "")
+                            image = summary_data.get("thumbnail", {}).get("source", "")
+                            page_type = summary_data.get("type", "")
+                            
+                            # Skip if not a standard article (could be disambiguation)
+                            if page_type != "standard":
+                                continue
+                            
+                            # Check description for person keywords
+                            desc_lower = desc.lower()
+                            person_indicators = ["born", "is a", "was a", "singer", "actor", "actress", 
+                                                "musician", "footballer", "athlete", "politician", 
+                                                "presenter", "model", "chef", "comedian", "director",
+                                                "rapper", "personality", "celebrity", "star"]
+                            
+                            if not any(ind in desc_lower for ind in person_indicators):
+                                continue
+                            
+                            # Estimate tier and price
+                            tier = estimate_tier_from_description(desc)
+                            price = get_price_for_tier(tier)
+                            
+                            # Ensure valid image
+                            final_image = image if image else f"https://ui-avatars.com/api/?name={title.replace(' ', '+')}&size=64&background=FF0099&color=fff"
+                            
+                            results.append({
+                                "name": title,
+                                "description": desc[:150] + "..." if len(desc) > 150 else desc,
+                                "image": final_image,
+                                "estimated_tier": tier,
+                                "estimated_price": price
+                            })
+                            
+                            # Limit to 5 clean results
+                            if len(results) >= 5:
+                                break
                     except:
-                        pass
-                    
-                    # Always ensure a valid image URL
-                    final_image = image if image and len(image) > 0 else f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&size=64&background=FF0099&color=fff"
-                    
-                    results.append({
-                        "name": name,
-                        "description": desc[:150] + "..." if len(desc) > 150 else desc,
-                        "image": final_image,
-                        "estimated_tier": tier,
-                        "estimated_price": price
-                    })
-                    
-                    # Limit to 6 clean results
-                    if len(results) >= 6:
-                        break
+                        continue
                         
                 return results
     except Exception as e:
