@@ -82,6 +82,7 @@ class TeamCelebrity(BaseModel):
     price: int
     buzz_score: float
     tier: str = "D"
+    added_at: str = ""
 
 class UserTeam(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -89,7 +90,10 @@ class UserTeam(BaseModel):
     team_name: str = "My Team"
     budget_remaining: int = 50
     total_points: float = 0.0
+    brown_bread_bonus: float = 0.0  # Points from deceased celebs
     celebrities: List[TeamCelebrity] = []
+    transfers_this_week: int = 0
+    last_transfer_reset: str = ""
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class TeamCreate(BaseModel):
@@ -99,11 +103,17 @@ class AddToTeam(BaseModel):
     team_id: str
     celebrity_id: str
 
+class TransferRequest(BaseModel):
+    team_id: str
+    sell_celebrity_id: str
+    buy_celebrity_id: str
+
 class LeaderboardEntry(BaseModel):
     team_id: str
     team_name: str
     total_points: float
     celebrity_count: int
+    brown_bread_bonus: float = 0.0
 
 class AutocompleteResult(BaseModel):
     name: str
@@ -111,6 +121,32 @@ class AutocompleteResult(BaseModel):
     image: str
     estimated_tier: str
     estimated_price: int
+
+# ==================== HELPER FUNCTIONS ====================
+
+def contains_banned_words(text: str) -> bool:
+    """Check if text contains banned/offensive words"""
+    text_lower = text.lower()
+    # Remove spaces and special chars for checking
+    text_clean = re.sub(r'[^a-z0-9]', '', text_lower)
+    
+    for word in BANNED_WORDS:
+        if word in text_lower or word in text_clean:
+            return True
+    return False
+
+def get_week_number() -> str:
+    """Get current week identifier for transfer window"""
+    now = datetime.now(timezone.utc)
+    return f"{now.year}-W{now.isocalendar()[1]}"
+
+def get_controversial_price_boost(name: str) -> int:
+    """Get price boost for controversial/newsworthy celebs"""
+    name_lower = name.lower()
+    for celeb, boost in CONTROVERSIAL_CELEBS.items():
+        if celeb in name_lower:
+            return boost
+    return 0
 
 # ==================== CELEBRITY CATEGORIES ====================
 CATEGORIES = [
