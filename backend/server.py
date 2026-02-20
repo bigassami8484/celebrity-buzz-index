@@ -334,6 +334,18 @@ TRENDING_CELEBRITIES = {
     "other": ["David Beckham", "Gordon Ramsay", "Bear Grylls", "Jeremy Clarkson", "James Corden"],
 }
 
+# HOT CELEBS - Big names consistently in major news (rotate weekly)
+HOT_CELEBS_THIS_WEEK = [
+    {"name": "Prince Andrew", "reason": "Royal scandal & legal battles", "tier": "A", "category": "royals"},
+    {"name": "Meghan Markle", "reason": "Netflix & Royal drama", "tier": "A", "category": "royals"},
+    {"name": "Kanye West", "reason": "Controversy & headlines", "tier": "A", "category": "musicians"},
+    {"name": "Taylor Swift", "reason": "Eras Tour & awards", "tier": "A", "category": "musicians"},
+    {"name": "Elon Musk", "reason": "Tech & politics headlines", "tier": "A", "category": "other"},
+    {"name": "Donald Trump", "reason": "Political & legal news", "tier": "A", "category": "other"},
+    {"name": "Katie Price", "reason": "Tabloid regular", "tier": "B", "category": "reality_tv"},
+    {"name": "Holly Willoughby", "reason": "TV drama", "tier": "B", "category": "tv_actors"},
+]
+
 # A-list indicators (keywords that suggest high fame)
 A_LIST_INDICATORS = ["oscar", "grammy", "emmy", "golden globe", "bafta", "world cup winner", 
                       "billion", "legendary", "iconic", "superstar", "megastar", "one of the most",
