@@ -257,6 +257,311 @@ const BrownBreadWatch = ({ watchList, onSelect }) => {
   );
 };
 
+// League Panel Component
+const LeaguePanel = ({ team, leagues, onCreateLeague, onJoinLeague, onViewLeague }) => {
+  const [showCreate, setShowCreate] = useState(false);
+  const [showJoin, setShowJoin] = useState(false);
+  const [newLeagueName, setNewLeagueName] = useState("");
+  const [joinCode, setJoinCode] = useState("");
+  
+  const handleCreate = () => {
+    if (newLeagueName.trim()) {
+      onCreateLeague(newLeagueName.trim());
+      setNewLeagueName("");
+      setShowCreate(false);
+    }
+  };
+  
+  const handleJoin = () => {
+    if (joinCode.trim()) {
+      onJoinLeague(joinCode.trim().toUpperCase());
+      setJoinCode("");
+      setShowJoin(false);
+    }
+  };
+  
+  return (
+    <div className="bg-[#0A0A0A] border border-[#262626] p-4 mb-4" data-testid="league-panel">
+      <h4 className="font-anton text-lg uppercase tracking-tight text-[#00F0FF] mb-3 flex items-center gap-2">
+        <Trophy className="w-5 h-5" />
+        Friends Leagues
+      </h4>
+      
+      {/* League Actions */}
+      <div className="flex gap-2 mb-4">
+        <button
+          onClick={() => { setShowCreate(true); setShowJoin(false); }}
+          className="flex-1 bg-[#FF0099] text-white py-2 px-3 text-xs font-bold uppercase hover:bg-[#e6008a] transition-colors"
+          data-testid="create-league-btn"
+        >
+          Create
+        </button>
+        <button
+          onClick={() => { setShowJoin(true); setShowCreate(false); }}
+          className="flex-1 bg-[#1A1A1A] border border-[#262626] text-white py-2 px-3 text-xs font-bold uppercase hover:border-[#00F0FF] transition-colors"
+          data-testid="join-league-btn"
+        >
+          Join
+        </button>
+      </div>
+      
+      {/* Create League Form */}
+      {showCreate && (
+        <div className="bg-[#1A1A1A] p-3 mb-4">
+          <input
+            type="text"
+            value={newLeagueName}
+            onChange={(e) => setNewLeagueName(e.target.value)}
+            placeholder="League name..."
+            className="w-full bg-[#0A0A0A] border border-[#262626] p-2 text-sm mb-2 text-white"
+            data-testid="league-name-input"
+          />
+          <button
+            onClick={handleCreate}
+            className="w-full bg-[#FFD700] text-black py-2 text-xs font-bold uppercase"
+            data-testid="confirm-create-league"
+          >
+            Create League
+          </button>
+        </div>
+      )}
+      
+      {/* Join League Form */}
+      {showJoin && (
+        <div className="bg-[#1A1A1A] p-3 mb-4">
+          <input
+            type="text"
+            value={joinCode}
+            onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+            placeholder="Enter code..."
+            className="w-full bg-[#0A0A0A] border border-[#262626] p-2 text-sm mb-2 text-white uppercase tracking-widest text-center font-mono"
+            maxLength={6}
+            data-testid="join-code-input"
+          />
+          <button
+            onClick={handleJoin}
+            className="w-full bg-[#00F0FF] text-black py-2 text-xs font-bold uppercase"
+            data-testid="confirm-join-league"
+          >
+            Join League
+          </button>
+        </div>
+      )}
+      
+      {/* My Leagues List */}
+      {leagues.length > 0 ? (
+        <div className="space-y-2">
+          {leagues.map((league) => (
+            <div
+              key={league.id}
+              onClick={() => onViewLeague(league)}
+              className="league-card cursor-pointer"
+              data-testid={`league-${league.id}`}
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="font-bold text-sm">{league.name}</p>
+                  <p className="text-xs text-[#A1A1AA]">{league.team_ids?.length || 0} teams</p>
+                </div>
+                <div className="league-code text-sm">{league.code}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-xs text-[#666] text-center py-4">
+          Create a league or join one with a code!
+        </p>
+      )}
+    </div>
+  );
+};
+
+// League Detail Modal
+const LeagueDetailModal = ({ league, leaderboard, onClose, onShare, teamId }) => {
+  const [copied, setCopied] = useState(false);
+  
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(league.code);
+      setCopied(true);
+      toast.success("Code copied!");
+      setTimeout(() => setCopied(false), 2000);
+    } catch (e) {
+      toast.error("Failed to copy");
+    }
+  };
+  
+  const handleWhatsAppShare = () => {
+    const text = `Join my Celebrity Buzz league "${league.name}"! Use code: ${league.code} 🌟`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+  
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-[#0A0A0A] border border-[#262626] max-w-lg w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-anton text-2xl uppercase text-[#FFD700]">{league.name}</h3>
+            <button onClick={onClose} className="text-[#A1A1AA] hover:text-white">
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+          
+          {/* League Code */}
+          <div className="bg-[#1A1A1A] p-4 mb-4 text-center">
+            <p className="text-xs text-[#A1A1AA] mb-2">INVITE CODE</p>
+            <div className="league-code text-2xl mb-3">{league.code}</div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleCopyCode}
+                className="flex-1 bg-[#262626] text-white py-2 text-xs font-bold uppercase flex items-center justify-center gap-2"
+              >
+                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {copied ? "Copied!" : "Copy"}
+              </button>
+              <button
+                onClick={handleWhatsAppShare}
+                className="flex-1 bg-[#25D366] text-white py-2 text-xs font-bold uppercase"
+              >
+                WhatsApp
+              </button>
+            </div>
+          </div>
+          
+          {/* League Leaderboard */}
+          <h4 className="font-anton text-lg uppercase text-[#00F0FF] mb-3">League Standings</h4>
+          {leaderboard.length > 0 ? (
+            <div className="space-y-2">
+              {leaderboard.map((entry, idx) => (
+                <div
+                  key={entry.team_id}
+                  className={`flex items-center gap-3 p-3 ${entry.team_id === teamId ? 'bg-[#FF0099]/20 border border-[#FF0099]' : 'bg-[#1A1A1A]'}`}
+                >
+                  <span className={`font-anton text-xl w-8 ${idx === 0 ? 'text-[#FFD700]' : idx === 1 ? 'text-[#C0C0C0]' : idx === 2 ? 'text-[#CD7F32]' : 'text-[#666]'}`}>
+                    #{idx + 1}
+                  </span>
+                  <div className="flex-1">
+                    <p className="font-bold text-sm flex items-center gap-2">
+                      {entry.team_name}
+                      {entry.is_owner && <Crown className="w-3 h-3 text-[#FFD700]" />}
+                    </p>
+                    <p className="text-xs text-[#A1A1AA]">{entry.celebrity_count} celebs</p>
+                  </div>
+                  <span className="font-space font-bold text-[#FF0099]">{entry.total_points?.toFixed(1)}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-[#666] py-4">No teams yet!</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Brown Bread Mini Game Component
+const BrownBreadMiniGame = ({ watchList, team, bets, onPlaceBet }) => {
+  const [selectedCeleb, setSelectedCeleb] = useState(null);
+  const [betAmount, setBetAmount] = useState(10);
+  
+  const handlePlaceBet = () => {
+    if (selectedCeleb) {
+      onPlaceBet(selectedCeleb.id, betAmount);
+      setSelectedCeleb(null);
+      setBetAmount(10);
+    }
+  };
+  
+  const activeBets = bets.filter(b => !b.resolved);
+  
+  return (
+    <div className="bg-[#0A0A0A] border border-[#262626] p-4 mb-4" data-testid="mini-game">
+      <h4 className="font-anton text-lg uppercase tracking-tight text-[#888] mb-2 flex items-center gap-2">
+        <Gamepad2 className="w-5 h-5" />
+        Brown Bread Mini Game
+      </h4>
+      <p className="text-xs text-[#666] mb-4">Bet on who goes next - 10x payout! 💀</p>
+      
+      {/* Place Bet Section */}
+      {!selectedCeleb ? (
+        <div className="space-y-2 mb-4">
+          <p className="text-xs text-[#A1A1AA]">Select from Watch List:</p>
+          {watchList.slice(0, 4).map((celeb) => {
+            const hasBet = bets.some(b => b.celebrity_id === celeb.id && !b.resolved);
+            return (
+              <button
+                key={celeb.id}
+                onClick={() => !hasBet && setSelectedCeleb(celeb)}
+                disabled={hasBet}
+                className={`w-full flex items-center gap-2 p-2 text-left ${hasBet ? 'opacity-50 cursor-not-allowed bg-[#1A1A1A]' : 'bg-[#1A1A1A] hover:bg-[#252525]'}`}
+              >
+                <img src={celeb.image} alt={celeb.name} className="w-8 h-8 rounded-full grayscale object-cover" />
+                <div className="flex-1">
+                  <p className="text-sm">{celeb.name}</p>
+                  <p className="text-xs text-[#666]">Age {celeb.age}</p>
+                </div>
+                {hasBet && <span className="text-xs text-[#00F0FF]">Bet Active</span>}
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="bg-[#1A1A1A] p-4 mb-4">
+          <p className="text-sm mb-2">Betting on: <span className="text-[#FFD700] font-bold">{selectedCeleb.name}</span></p>
+          <div className="flex items-center gap-2 mb-3">
+            <button onClick={() => setBetAmount(Math.max(5, betAmount - 5))} className="bg-[#262626] px-3 py-1">-</button>
+            <span className="font-bold text-lg">{betAmount} pts</span>
+            <button onClick={() => setBetAmount(Math.min(50, betAmount + 5))} className="bg-[#262626] px-3 py-1">+</button>
+          </div>
+          <p className="text-xs text-[#A1A1AA] mb-3">Potential win: <span className="text-[#FFD700]">{betAmount * 10} pts</span></p>
+          <div className="flex gap-2">
+            <button onClick={() => setSelectedCeleb(null)} className="flex-1 bg-[#262626] py-2 text-xs font-bold uppercase">Cancel</button>
+            <button onClick={handlePlaceBet} className="flex-1 bg-[#FF0099] py-2 text-xs font-bold uppercase">Place Bet</button>
+          </div>
+        </div>
+      )}
+      
+      {/* Active Bets */}
+      {activeBets.length > 0 && (
+        <div>
+          <p className="text-xs text-[#A1A1AA] mb-2">Your Active Bets:</p>
+          {activeBets.map((bet) => (
+            <div key={bet.id} className="bet-card pending">
+              <Skull className="w-4 h-4 text-[#666]" />
+              <span className="text-sm flex-1">{bet.celebrity_name}</span>
+              <span className="text-xs text-[#00F0FF]">{bet.bet_amount} pts</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Mobile Navigation Component
+const MobileNav = ({ activeTab, onTabChange }) => (
+  <div className="mobile-nav" data-testid="mobile-nav">
+    <div className={`mobile-nav-item ${activeTab === 'home' ? 'active' : ''}`} onClick={() => onTabChange('home')}>
+      <Home className="w-5 h-5" />
+      <span>Home</span>
+    </div>
+    <div className={`mobile-nav-item ${activeTab === 'team' ? 'active' : ''}`} onClick={() => onTabChange('team')}>
+      <Users className="w-5 h-5" />
+      <span>Team</span>
+    </div>
+    <div className={`mobile-nav-item ${activeTab === 'leagues' ? 'active' : ''}`} onClick={() => onTabChange('leagues')}>
+      <Trophy className="w-5 h-5" />
+      <span>Leagues</span>
+    </div>
+    <div className={`mobile-nav-item ${activeTab === 'game' ? 'active' : ''}`} onClick={() => onTabChange('game')}>
+      <Gamepad2 className="w-5 h-5" />
+      <span>Game</span>
+    </div>
+  </div>
+);
+
 // How It Works Component
 const HowItWorks = ({ onShowMethodology }) => (
   <div className="bg-[#0A0A0A] border border-[#262626] p-6 mb-8" data-testid="how-it-works">
