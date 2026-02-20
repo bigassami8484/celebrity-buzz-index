@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-02-20T18:27:46.517213",
+  "timestamp": "2026-02-20T18:28:53.489288",
   "summary": {
-    "tests_run": 10,
-    "tests_passed": 10,
+    "tests_run": 17,
+    "tests_passed": 17,
     "success_rate": 100.0
   },
   "results": [
@@ -369,6 +369,368 @@
       }
     },
     {
+      "test": "Autocomplete - Short Query",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "suggestions": []
+      }
+    },
+    {
+      "test": "Autocomplete - Celebrity Search",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "suggestions": [
+          {
+            "name": "Brad Pitt",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Brad_Pitt-69858.jpg/330px-Brad_Pitt-69858.jpg",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Pitt filmography",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Brad_Pitt_2019_by_Glenn_Francis.jpg/330px-Brad_Pitt_2019_by_Glenn_Francis.jpg",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Pitt's Cousin",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/en/0/05/Macklemore_and_Ryan_Lewis_-_Brad_Pitt%27s_Cousin.jpg",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Pitt (boxer)",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Brad_Pitt_boxing.jpg/330px-Brad_Pitt_boxing.jpg",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Pitt (song)",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/en/f/fd/M%C3%98_-_Brad_Pitt%2C_Goosebumps.png",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Pitt Cousin",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/en/4/46/This_Unruly_Mess_I%27ve_Made_%28Front_Cover%29.png",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Pitt (M\u00d8 song)",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/en/5/56/M%C3%98_-_Motordrome.png",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Pitt (disambiguation)",
+            "description": "",
+            "image": "https://ui-avatars.com/api/?name=Brad+Pitt+(disambiguation)&size=64&background=FF0099&color=fff",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Little",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Brad_Little_official_photo.jpg/330px-Brad_Little_official_photo.jpg",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Pickett",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Brad_Pickett_WEC_53.jpg",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          }
+        ]
+      }
+    },
+    {
+      "test": "Get Points Methodology",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "description": "Celebrity Buzz Points are calculated based on media coverage and public interest",
+        "factors": [
+          {
+            "name": "News Mentions",
+            "description": "Each news article mentioning the celebrity",
+            "points_per_unit": 1.0,
+            "unit": "article"
+          },
+          {
+            "name": "Tabloid Coverage",
+            "description": "Coverage in tabloids (Daily Mail, The Sun, TMZ) - higher weight due to engagement",
+            "points_per_unit": 3.0,
+            "unit": "article"
+          },
+          {
+            "name": "Broadsheet Coverage",
+            "description": "Coverage in quality press (BBC, Guardian, Times)",
+            "points_per_unit": 2.0,
+            "unit": "article"
+          },
+          {
+            "name": "Controversy Bonus",
+            "description": "Negative/scandal news generates more buzz",
+            "points_per_unit": 1.0,
+            "unit": "per negative article"
+          },
+          {
+            "name": "Social Media Trending",
+            "description": "When celebrity trends on social platforms",
+            "points_per_unit": 5.0,
+            "unit": "trending event"
+          }
+        ],
+        "tier_multipliers": {
+          "A": "1.0x (baseline - already high visibility)",
+          "B": "1.2x (needs more buzz to match A-list)",
+          "C": "1.5x (buzz matters more for rising stars)",
+          "D": "2.0x (buzz can rapidly elevate D-listers)"
+        },
+        "example": "A D-list celebrity with 10 tabloid mentions = 10 \u00d7 3.0 \u00d7 2.0 = 60 points"
+      }
+    },
+    {
+      "test": "Search Leonardo DiCaprio for Tier Test",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "celebrity": {
+          "id": "9499b007-246c-4d77-a77a-18883c60c3d7",
+          "name": "Leonardo DiCaprio",
+          "bio": "Leonardo Wilhelm DiCaprio is an American actor and film producer. Known for his work in biographical and period films, he is the recipient of numerous accolades, including an Academy Award, a British Academy Film Award, an Actor Award, a Silver Bear and three Golden Globe Awards. His films as a leading actor have grossed $7 billion worldwide, and he has been placed eight times in annual rankings of the world's highest-paid actors.",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/LeoPTABFI191125-28_%28cropped%29.jpg/330px-LeoPTABFI191125-28_%28cropped%29.jpg",
+          "category": "movie_stars",
+          "wiki_url": "https://en.wikipedia.org/wiki/Leonardo_DiCaprio",
+          "buzz_score": 22.5,
+          "price": 19,
+          "tier": "A",
+          "news": [
+            {
+              "title": "Leonardo DiCaprio to Star in New Martin Scorsese Film",
+              "summary": "Leonardo DiCaprio is set to take on a lead role in Martin Scorsese's upcoming thriller, which promises to be a gripping addition to both their filmographies.",
+              "source": "Deadline",
+              "date": "Jan 15, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "DiCaprio's Generous Donation Boosts Conservation Efforts",
+              "summary": "Leonardo DiCaprio has donated $10 million to wildlife conservation projects, further cementing his status as a leading environmental advocate.",
+              "source": "The Hollywood Reporter",
+              "date": "Jan 12, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Leonardo DiCaprio's Mystery Date Spotted in LA",
+              "summary": "Leonardo DiCaprio was seen enjoying an intimate dinner with a mystery woman at a high-end Los Angeles restaurant, sparking rumors about his dating life.",
+              "source": "TMZ",
+              "date": "Jan 13, 2026",
+              "sentiment": "neutral"
+            },
+            {
+              "title": "Behind the Scenes: DiCaprio and De Niro's Onset Rivalry",
+              "summary": "Tensions reportedly arose between Leonardo DiCaprio and Robert De Niro during the filming of their latest project, as both actors sought to outshine each other.",
+              "source": "Daily Mail",
+              "date": "Jan 14, 2026",
+              "sentiment": "negative"
+            },
+            {
+              "title": "DiCaprio-Produced Documentary Nominated for an Oscar",
+              "summary": "The documentary 'Guardians of the Reef', produced by Leonardo DiCaprio, has earned an Oscar nomination for its powerful depiction of ocean conservation.",
+              "source": "Variety",
+              "date": "Jan 14, 2026",
+              "sentiment": "positive"
+            }
+          ],
+          "page_views": 0,
+          "created_at": "2026-02-20T18:28:33.262259+00:00"
+        }
+      }
+    },
+    {
+      "test": "Search Emma Stone for Tier Test",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "celebrity": {
+          "id": "052c06b6-760e-4566-abb3-4f1c5bd6d1bd",
+          "name": "Emma Stone",
+          "bio": "Emily Jean \"Emma\" Stone is an American actress and film producer. Her accolades include two Academy Awards, two British Academy Film Awards, two Golden Globe Awards and a Volpi Cup. In 2017, she was the world's highest-paid actress and named by Time magazine as one of the 100 most influential people in the world.",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/BugoniaBFILFF101025-27_%2854848940897%29_%28cropped%29.jpg/330px-BugoniaBFILFF101025-27_%2854848940897%29_%28cropped%29.jpg",
+          "category": "movie_stars",
+          "wiki_url": "https://en.wikipedia.org/wiki/Emma_Stone",
+          "buzz_score": 22.0,
+          "price": 19,
+          "tier": "A",
+          "news": [
+            {
+              "title": "Emma Stone Stuns in New Fashion Campaign with Gucci",
+              "summary": "Emma Stone has been unveiled as the face of Gucci's latest fashion collection, captivating fans with her graceful presence and chic style in a stunning new campaign.",
+              "source": "Vogue",
+              "date": "Jan 12, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Emma Stone and Husband Welcome Second Child",
+              "summary": "Emma Stone and her husband, Dave McCary, have joyfully announced the birth of their second child, expanding their family to four and sharing delight with fans over their new addition.",
+              "source": "People",
+              "date": "Jan 14, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Emma Stone's Latest Role in 'Marble Heart' Earns Early Oscar Buzz",
+              "summary": "Critics are praising Emma Stone's powerful performance in the upcoming drama 'Marble Heart', with many predicting an Oscar nomination for her compelling role.",
+              "source": "Entertainment Weekly",
+              "date": "Jan 13, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Behind the Scenes: Emma Stone's Producing Debut in 'City Lights'",
+              "summary": "Emma Stone steps into a new role as producer for the romantic comedy 'City Lights'. Fans and industry insiders are eager to see her influence on the project coming this fall.",
+              "source": "Variety",
+              "date": "Jan 10, 2026",
+              "sentiment": "neutral"
+            },
+            {
+              "title": "Fans React to Emma Stone's Surprise Appearance at Film Festival",
+              "summary": "Emma Stone made a surprise appearance at the Sundance Film Festival, delighting attendees and sparking rumors about her latest film ventures.",
+              "source": "TMZ",
+              "date": "Jan 11, 2026",
+              "sentiment": "positive"
+            }
+          ],
+          "page_views": 0,
+          "created_at": "2026-02-20T18:28:39.920478+00:00"
+        }
+      }
+    },
+    {
+      "test": "Search Chris Pratt for Tier Test",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "celebrity": {
+          "id": "eb9d3b61-8295-4b11-8d31-0da5cb7219cd",
+          "name": "Chris Pratt",
+          "bio": "Christopher Michael Pratt is an American actor and film producer. His films as a leading actor have grossed over $14.1\u00a0billion worldwide, making him one of the highest-grossing film stars of all time. Pratt was one of the world's highest-paid actors annually from 2015 to 2017. Through starring in blockbuster franchises and big-budget films, he has established himself as one of Hollywood's most bankable stars.",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Chris_Pratt_Jurassic_World_Fallen_Kingdom_Japan_Premiere_Red_Carpet_%283x4_cropped%29.jpg/330px-Chris_Pratt_Jurassic_World_Fallen_Kingdom_Japan_Premiere_Red_Carpet_%283x4_cropped%29.jpg",
+          "category": "movie_stars",
+          "wiki_url": "https://en.wikipedia.org/wiki/Chris_Pratt",
+          "buzz_score": 24.0,
+          "price": 19,
+          "tier": "A",
+          "news": [
+            {
+              "title": "Chris Pratt Set to Star in New Sci-Fi Thriller 'Galactic Divide'",
+              "summary": "Chris Pratt has signed on to star in 'Galactic Divide', a science fiction thriller that explores the themes of time travel and parallel universes, set to release in 2026.",
+              "source": "Entertainment Weekly",
+              "date": "Jan 12, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Chris Pratt and Katherine Schwarzenegger Welcome Their Third Child",
+              "summary": "Chris Pratt and Katherine Schwarzenegger announced the arrival of their third child, a baby girl, bringing joyous news to fans around the world.",
+              "source": "People",
+              "date": "Jan 10, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Chris Pratt Faces Backlash Over Controversial Remarks at Recent Interview",
+              "summary": "Chris Pratt is under fire after making controversial comments during a promotional interview, which have sparked widespread criticism on social media.",
+              "source": "TMZ",
+              "date": "Jan 14, 2026",
+              "sentiment": "negative"
+            },
+            {
+              "title": "Chris Pratt Joins Conservation Campaign for Endangered Species",
+              "summary": "The actor and environmental advocate has partnered with a global conservation organization to raise awareness and funds for endangered species.",
+              "source": "BBC News",
+              "date": "Jan 9, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Fans Speculate Chris Pratt's Return as Star-Lord in Upcoming Marvel Project",
+              "summary": "Rumors are swirling that Chris Pratt could be reprising his role as Star-Lord in a new, yet-to-be-announced Marvel installment, thrilling fans of the Guardians of the Galaxy series.",
+              "source": "Daily Mail",
+              "date": "Jan 13, 2026",
+              "sentiment": "neutral"
+            }
+          ],
+          "page_views": 0,
+          "created_at": "2026-02-20T18:28:45.372080+00:00"
+        }
+      }
+    },
+    {
+      "test": "Search Joey Essex for Tier Test",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "celebrity": {
+          "id": "c080c382-c3b0-441f-881d-f69e8a7fcf65",
+          "name": "Joey Essex",
+          "bio": "Joey Don Essex is an English television personality. He came to prominence for his appearances on the ITV reality series The Only Way is Essex (2011\u20132013). He went on to appear on various reality shows, including Splash! (2013), I'm a Celebrity...Get Me Out of Here! (2013), The Jump (2015), Celebs Go Dating, Celebrity Ex on the Beach (2020), Dancing on Ice (2023), and Love Island (2024).",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Joey_Essex_at_Ullswater_Community_College.jpg/330px-Joey_Essex_at_Ullswater_Community_College.jpg",
+          "category": "reality_tv",
+          "wiki_url": "https://en.wikipedia.org/wiki/Joey_Essex",
+          "buzz_score": 23.0,
+          "price": 4,
+          "tier": "D",
+          "news": [
+            {
+              "title": "Joey Essex Triumphs in Celebrity Dance-off Finale!",
+              "summary": "Joey Essex wowed the judges and audience with his energetic salsa routine, securing a triumphant win in the latest celebrity dance-off competition.",
+              "source": "BBC News",
+              "date": "Jan 15, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Joey Essex Joins Forces with Fashion Giant for New Collection",
+              "summary": "The reality TV star has announced an exciting collaboration with a top fashion brand, set to release a trendy new apparel line targeting millennials and Gen Z.",
+              "source": "People",
+              "date": "Jan 10, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Joey Essex Spotted in Heated Discussion Outside London Hotspot",
+              "summary": "Joey Essex was seen in a seemingly tense conversation with a close friend, sparking rumors about possible personal drama.",
+              "source": "Daily Mail",
+              "date": "Jan 12, 2026",
+              "sentiment": "neutral"
+            },
+            {
+              "title": "Reality Star Joey Essex Denies Rumors of New Romance",
+              "summary": "Joey Essex has taken to social media to refute the swirling rumors about a potential new love interest, insisting he is currently single.",
+              "source": "TMZ",
+              "date": "Jan 14, 2026",
+              "sentiment": "neutral"
+            },
+            {
+              "title": "Joey Essex Declares New Year Resolutions on Instagram Live",
+              "summary": "Kicking off 2026, Joey Essex shared his hopes and plans with fans, focusing on personal growth and exploring new career opportunities.",
+              "source": "Entertainment Weekly",
+              "date": "Jan 9, 2026",
+              "sentiment": "positive"
+            }
+          ],
+          "page_views": 0,
+          "created_at": "2026-02-20T18:28:52.400634+00:00"
+        }
+      }
+    },
+    {
       "test": "Search Celebrity: Taylor Swift",
       "success": true,
       "details": "Status: 200",
@@ -540,12 +902,12 @@
       "details": "Status: 200",
       "response_data": {
         "team": {
-          "id": "0558ae56-1063-4ab5-98c3-d483c40f549f",
+          "id": "a0e63153-2cad-4a3e-92fa-86d51bfa5a48",
           "team_name": "Test Buzz Team",
           "budget_remaining": 50,
           "total_points": 0.0,
           "celebrities": [],
-          "created_at": "2026-02-20T18:27:45.537388+00:00"
+          "created_at": "2026-02-20T18:28:52.960895+00:00"
         }
       }
     },
@@ -555,12 +917,12 @@
       "details": "Status: 200",
       "response_data": {
         "team": {
-          "id": "0558ae56-1063-4ab5-98c3-d483c40f549f",
+          "id": "a0e63153-2cad-4a3e-92fa-86d51bfa5a48",
           "team_name": "Test Buzz Team",
           "budget_remaining": 50,
           "total_points": 0.0,
           "celebrities": [],
-          "created_at": "2026-02-20T18:27:45.537388+00:00"
+          "created_at": "2026-02-20T18:28:52.960895+00:00"
         }
       }
     },
@@ -570,7 +932,7 @@
       "details": "Status: 200",
       "response_data": {
         "team": {
-          "id": "0558ae56-1063-4ab5-98c3-d483c40f549f",
+          "id": "a0e63153-2cad-4a3e-92fa-86d51bfa5a48",
           "team_name": "Test Buzz Team",
           "budget_remaining": 37,
           "total_points": 21.5,
@@ -585,7 +947,7 @@
               "tier": "B"
             }
           ],
-          "created_at": "2026-02-20T18:27:45.537388+00:00"
+          "created_at": "2026-02-20T18:28:52.960895+00:00"
         }
       }
     },
@@ -595,12 +957,12 @@
       "details": "Status: 200",
       "response_data": {
         "team": {
-          "id": "0558ae56-1063-4ab5-98c3-d483c40f549f",
+          "id": "a0e63153-2cad-4a3e-92fa-86d51bfa5a48",
           "team_name": "Test Buzz Team",
           "budget_remaining": 50,
           "total_points": 0,
           "celebrities": [],
-          "created_at": "2026-02-20T18:27:45.537388+00:00"
+          "created_at": "2026-02-20T18:28:52.960895+00:00"
         }
       }
     },
