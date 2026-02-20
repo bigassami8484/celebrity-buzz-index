@@ -363,6 +363,8 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
         query_lower = query.lower().strip()
         query_parts = query_lower.split()  # Split query into words for matching
         
+        logger.info(f"Autocomplete search for: {query}, parts: {query_parts}")
+        
         async with httpx.AsyncClient() as client:
             # Use Wikipedia search API for better results with descriptions
             url = f"https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={query}&srlimit=25&format=json"
