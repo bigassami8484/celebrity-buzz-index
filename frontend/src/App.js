@@ -1068,6 +1068,7 @@ function App() {
               onShare={() => setShowShareModal(true)}
             />
             <TopPickedCelebs celebs={topPicked} onSelect={searchCelebrity} />
+            <BrownBreadWatch watchList={brownBreadWatch} onSelect={searchCelebrity} />
             <Leaderboard entries={leaderboard} />
           </div>
         </div>
