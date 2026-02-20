@@ -1287,6 +1287,231 @@ async def get_share_data(team_id: str):
         "celebrity_count": len(team.get("celebrities", []))
     }
 
+# ==================== LEAGUE ENDPOINTS ====================
+
+@api_router.post("/league/create")
+async def create_league(data: LeagueCreate):
+    """Create a new friends league"""
+    # Check for banned words
+    if contains_banned_words(data.name):
+        raise HTTPException(status_code=400, detail="League name contains inappropriate language")
+    
+    # Verify team exists
+    team = await db.teams.find_one({"id": data.team_id})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    # Create league
+    league = League(
+        name=data.name,
+        owner_team_id=data.team_id,
+        team_ids=[data.team_id]
+    )
+    
+    doc = league.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.leagues.insert_one(doc)
+    
+    if '_id' in doc:
+        del doc['_id']
+    
+    return {"league": doc}
+
+@api_router.post("/league/join")
+async def join_league(data: LeagueJoin):
+    """Join an existing league with code"""
+    # Find league by code
+    league = await db.leagues.find_one({"code": data.code.upper()})
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found. Check your code!")
+    
+    # Verify team exists
+    team = await db.teams.find_one({"id": data.team_id})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    # Check if already in league
+    if data.team_id in league.get("team_ids", []):
+        raise HTTPException(status_code=400, detail="Already in this league!")
+    
+    # Check max teams
+    if len(league.get("team_ids", [])) >= league.get("max_teams", 20):
+        raise HTTPException(status_code=400, detail="League is full!")
+    
+    # Add team to league
+    await db.leagues.update_one(
+        {"id": league["id"]},
+        {"$push": {"team_ids": data.team_id}}
+    )
+    
+    updated_league = await db.leagues.find_one({"id": league["id"]}, {"_id": 0})
+    return {"league": updated_league, "message": f"Welcome to {league['name']}!"}
+
+@api_router.get("/league/{league_id}")
+async def get_league(league_id: str):
+    """Get league details"""
+    league = await db.leagues.find_one({"id": league_id}, {"_id": 0})
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    return {"league": league}
+
+@api_router.get("/league/code/{code}")
+async def get_league_by_code(code: str):
+    """Get league by invite code"""
+    league = await db.leagues.find_one({"code": code.upper()}, {"_id": 0})
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    return {"league": league}
+
+@api_router.get("/league/{league_id}/leaderboard")
+async def get_league_leaderboard(league_id: str):
+    """Get leaderboard for a specific league"""
+    league = await db.leagues.find_one({"id": league_id}, {"_id": 0})
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    
+    # Get all teams in this league
+    team_ids = league.get("team_ids", [])
+    teams = await db.teams.find({"id": {"$in": team_ids}}, {"_id": 0}).to_list(100)
+    
+    leaderboard = []
+    for team in teams:
+        leaderboard.append({
+            "team_id": team["id"],
+            "team_name": team.get("team_name", "Unknown"),
+            "total_points": team.get("total_points", 0),
+            "celebrity_count": len(team.get("celebrities", [])),
+            "brown_bread_bonus": team.get("brown_bread_bonus", 0),
+            "is_owner": team["id"] == league.get("owner_team_id")
+        })
+    
+    # Sort by points
+    leaderboard.sort(key=lambda x: x["total_points"], reverse=True)
+    
+    return {
+        "league_name": league["name"],
+        "league_code": league["code"],
+        "leaderboard": leaderboard
+    }
+
+@api_router.get("/team/{team_id}/leagues")
+async def get_team_leagues(team_id: str):
+    """Get all leagues a team belongs to"""
+    leagues = await db.leagues.find(
+        {"team_ids": team_id},
+        {"_id": 0}
+    ).to_list(20)
+    return {"leagues": leagues}
+
+@api_router.post("/league/{league_id}/leave")
+async def leave_league(league_id: str, team_id: str):
+    """Leave a league"""
+    league = await db.leagues.find_one({"id": league_id})
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    
+    # Can't leave if you're the owner
+    if league.get("owner_team_id") == team_id:
+        raise HTTPException(status_code=400, detail="Owner cannot leave. Delete the league instead.")
+    
+    await db.leagues.update_one(
+        {"id": league_id},
+        {"$pull": {"team_ids": team_id}}
+    )
+    
+    return {"message": "Left league successfully"}
+
+# ==================== BROWN BREAD MINI GAME ENDPOINTS ====================
+
+@api_router.post("/minigame/bet")
+async def place_brown_bread_bet(data: PlaceBet):
+    """Place a bet on which celebrity will 'go brown bread' next"""
+    # Verify team exists
+    team = await db.teams.find_one({"id": data.team_id})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    # Verify celebrity exists and is on the watch list (elderly, alive)
+    celebrity = await db.celebrities.find_one({"id": data.celebrity_id})
+    if not celebrity:
+        raise HTTPException(status_code=404, detail="Celebrity not found")
+    
+    if celebrity.get("is_deceased"):
+        raise HTTPException(status_code=400, detail="Can't bet on someone already brown bread!")
+    
+    if celebrity.get("age", 0) < 60:
+        raise HTTPException(status_code=400, detail="Celebrity must be on the Brown Bread Watch (60+)")
+    
+    # Check if already has an active bet on this celeb
+    existing_bet = await db.bets.find_one({
+        "team_id": data.team_id,
+        "celebrity_id": data.celebrity_id,
+        "resolved": False
+    })
+    if existing_bet:
+        raise HTTPException(status_code=400, detail="Already have an active bet on this celebrity!")
+    
+    # Check bet amount (min 5, max 50)
+    bet_amount = max(5, min(50, data.bet_amount))
+    
+    # Create bet
+    bet = BrownBreadBet(
+        team_id=data.team_id,
+        celebrity_id=data.celebrity_id,
+        celebrity_name=celebrity["name"],
+        bet_amount=bet_amount
+    )
+    
+    doc = bet.model_dump()
+    doc['placed_at'] = doc['placed_at'].isoformat()
+    await db.bets.insert_one(doc)
+    
+    if '_id' in doc:
+        del doc['_id']
+    
+    return {"bet": doc, "message": f"Bet placed on {celebrity['name']}! 💀"}
+
+@api_router.get("/minigame/bets/{team_id}")
+async def get_team_bets(team_id: str):
+    """Get all bets for a team"""
+    bets = await db.bets.find(
+        {"team_id": team_id},
+        {"_id": 0}
+    ).sort("placed_at", -1).to_list(50)
+    
+    return {"bets": bets}
+
+@api_router.get("/minigame/leaderboard")
+async def get_minigame_leaderboard():
+    """Get leaderboard for the brown bread mini game"""
+    # Aggregate wins by team
+    pipeline = [
+        {"$match": {"resolved": True, "won": True}},
+        {"$group": {
+            "_id": "$team_id",
+            "wins": {"$sum": 1},
+            "total_winnings": {"$sum": {"$multiply": ["$bet_amount", 10]}}  # 10x payout
+        }},
+        {"$sort": {"wins": -1}},
+        {"$limit": 20}
+    ]
+    
+    results = await db.bets.aggregate(pipeline).to_list(20)
+    
+    # Get team names
+    leaderboard = []
+    for result in results:
+        team = await db.teams.find_one({"id": result["_id"]}, {"_id": 0, "team_name": 1})
+        if team:
+            leaderboard.append({
+                "team_id": result["_id"],
+                "team_name": team.get("team_name", "Unknown"),
+                "wins": result["wins"],
+                "total_winnings": result["total_winnings"]
+            })
+    
+    return {"leaderboard": leaderboard}
+
 # Include router
 app.include_router(api_router)
 
