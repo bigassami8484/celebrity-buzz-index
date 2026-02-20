@@ -1241,6 +1241,7 @@ function App() {
   const [todaysNews, setTodaysNews] = useState([]);
   const [topPicked, setTopPicked] = useState([]);
   const [brownBreadWatch, setBrownBreadWatch] = useState([]);
+  const [hotCelebs, setHotCelebs] = useState([]);
   
   // League state
   const [leagues, setLeagues] = useState([]);
