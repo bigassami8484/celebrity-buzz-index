@@ -1595,6 +1595,7 @@ function App() {
               team={team} 
               onRemove={removeFromTeam}
               onShare={() => setShowShareModal(true)}
+              onCustomize={() => { fetchCustomOptions(); setShowCustomize(true); }}
             />
             <LeaguePanel
               team={team}
