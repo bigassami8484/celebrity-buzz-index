@@ -524,10 +524,22 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             # Check if description starts with any skip phrase
                             should_skip = False
                             for phrase in skip_start_phrases:
-                                if desc_lower.startswith(phrase) or f" {phrase}" in desc_lower[:100]:
+                                # Check if description starts with the phrase
+                                if desc_lower.startswith(phrase):
                                     should_skip = True
                                     break
+                                # Check if phrase appears early but as complete words (not substring)
+                                phrase_with_space = f" {phrase}"
+                                if phrase_with_space in desc_lower[:150]:
+                                    # Make sure it's not part of a larger word
+                                    idx = desc_lower[:150].find(phrase_with_space)
+                                    end_idx = idx + len(phrase_with_space)
+                                    # Check if it ends at a word boundary (space, period, comma, or end)
+                                    if end_idx >= len(desc_lower[:150]) or desc_lower[end_idx] in ' .,;:!?)':
+                                        should_skip = True
+                                        break
                             if should_skip:
+                                logger.info(f"Skipping {title}: starts with skip phrase")
                                 continue
                             
                             # Additional filter for non-person entities (plants, animals, objects, etc.)
