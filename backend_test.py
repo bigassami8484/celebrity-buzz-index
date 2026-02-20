@@ -248,6 +248,141 @@ class CelebrityBuzzTester:
             return True
         return success
 
+    def test_autocomplete(self):
+        """Test Wikipedia autocomplete endpoint"""
+        print("\n🔍 Testing Wikipedia Autocomplete...")
+        
+        # Test with short query (should return empty)
+        success, data = self.run_test(
+            "Autocomplete - Short Query", 
+            "GET", 
+            "autocomplete?q=a"
+        )
+        if success and data:
+            suggestions = data.get("suggestions", [])
+            if len(suggestions) == 0:
+                print("   ✓ Short query returns empty suggestions")
+            else:
+                print(f"   ⚠ Short query returned {len(suggestions)} suggestions (expected 0)")
+        
+        # Test with celebrity name
+        success, data = self.run_test(
+            "Autocomplete - Celebrity Search", 
+            "GET", 
+            "autocomplete?q=Brad%20Pitt",
+            timeout=10
+        )
+        
+        if success and data:
+            suggestions = data.get("suggestions", [])
+            print(f"   ✓ Found {len(suggestions)} autocomplete suggestions")
+            
+            if suggestions:
+                first_suggestion = suggestions[0]
+                print(f"   ✓ First suggestion: {first_suggestion.get('name')}")
+                print(f"   ✓ Estimated tier: {first_suggestion.get('estimated_tier')}")
+                print(f"   ✓ Estimated price: £{first_suggestion.get('estimated_price')}M")
+                print(f"   ✓ Has image: {'Yes' if first_suggestion.get('image') else 'No'}")
+                print(f"   ✓ Has description: {'Yes' if first_suggestion.get('description') else 'No'}")
+                
+                # Verify tier pricing
+                tier = first_suggestion.get('estimated_tier')
+                price = first_suggestion.get('estimated_price')
+                expected_prices = {"A": 18, "B": 12, "C": 7, "D": 3}
+                expected_price = expected_prices.get(tier, 5)
+                
+                if price == expected_price:
+                    print(f"   ✓ Tier pricing correct: {tier}-list = £{price}M")
+                    return True
+                else:
+                    print(f"   ✗ Tier pricing incorrect: {tier}-list should be £{expected_price}M, got £{price}M")
+                    return False
+            else:
+                print("   ⚠ No suggestions returned")
+                return True  # Still success if API works
+        return success
+
+    def test_points_methodology(self):
+        """Test points methodology endpoint"""
+        success, data = self.run_test("Get Points Methodology", "GET", "points-methodology")
+        if success and data:
+            print(f"   ✓ Description: {data.get('description', 'N/A')[:50]}...")
+            
+            factors = data.get("factors", [])
+            print(f"   ✓ Found {len(factors)} scoring factors")
+            
+            if factors:
+                for factor in factors[:3]:  # Show first 3
+                    print(f"   ✓ Factor: {factor.get('name')} (+{factor.get('points_per_unit')} per {factor.get('unit')})")
+            
+            tier_multipliers = data.get("tier_multipliers", {})
+            print(f"   ✓ Tier multipliers: {len(tier_multipliers)} tiers")
+            
+            if "A" in tier_multipliers and "D" in tier_multipliers:
+                print(f"   ✓ A-list: {tier_multipliers['A']}")
+                print(f"   ✓ D-list: {tier_multipliers['D']}")
+                return True
+            else:
+                print("   ✗ Missing tier multipliers")
+                return False
+        return success
+
+    def test_tier_system(self):
+        """Test A/B/C/D tier system with different celebrities"""
+        print("\n🔍 Testing Tier System with Multiple Celebrities...")
+        
+        # Test celebrities that should have different tiers
+        test_celebrities = [
+            ("Leonardo DiCaprio", "A"),  # Oscar winner, should be A-list
+            ("Emma Stone", "B"),         # Award-winning, should be B-list  
+            ("Chris Pratt", "C"),        # Known for roles, should be C-list
+            ("Joey Essex", "D")          # Reality TV, should be D-list
+        ]
+        
+        tier_results = {}
+        
+        for name, expected_tier in test_celebrities:
+            success, data = self.run_test(
+                f"Search {name} for Tier Test", 
+                "POST", 
+                "celebrity/search",
+                200,
+                {"name": name},
+                timeout=25
+            )
+            
+            if success and data:
+                celebrity = data.get("celebrity", {})
+                if celebrity:
+                    actual_tier = celebrity.get("tier", "D")
+                    price = celebrity.get("price", 0)
+                    
+                    tier_results[name] = {
+                        "expected": expected_tier,
+                        "actual": actual_tier,
+                        "price": price
+                    }
+                    
+                    print(f"   ✓ {name}: {actual_tier}-list (£{price}M)")
+        
+        # Verify tier pricing is correct
+        expected_prices = {"A": 18, "B": 12, "C": 7, "D": 3}
+        pricing_correct = True
+        
+        for name, result in tier_results.items():
+            tier = result["actual"]
+            price = result["price"]
+            base_price = expected_prices.get(tier, 3)
+            
+            # Price can be base price + buzz bonus (up to +4)
+            if price < base_price or price > base_price + 4:
+                print(f"   ✗ {name} pricing error: {tier}-list should be £{base_price}M-£{base_price+4}M, got £{price}M")
+                pricing_correct = False
+            else:
+                print(f"   ✓ {name} pricing correct: {tier}-list £{price}M (base £{base_price}M + buzz bonus)")
+        
+        return pricing_correct and len(tier_results) > 0
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Celebrity Buzz Index Backend Tests")
