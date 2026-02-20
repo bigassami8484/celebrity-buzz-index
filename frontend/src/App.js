@@ -420,6 +420,8 @@ const LeaguePanel = ({ team, leagues, onCreateLeague, onJoinLeague, onViewLeague
 // League Detail Modal
 const LeagueDetailModal = ({ league, leaderboard, onClose, onShare, teamId }) => {
   const [copied, setCopied] = useState(false);
+  const shareUrl = `${window.location.origin}?joinLeague=${league.code}`;
+  const shareText = `Join my Celebrity Buzz league "${league.name}"! Use code: ${league.code} 🌟`;
   
   const handleCopyCode = async () => {
     try {
@@ -433,8 +435,15 @@ const LeagueDetailModal = ({ league, leaderboard, onClose, onShare, teamId }) =>
   };
   
   const handleWhatsAppShare = () => {
-    const text = `Join my Celebrity Buzz league "${league.name}"! Use code: ${league.code} 🌟`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+  };
+  
+  const handleXShare = () => {
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
+  };
+  
+  const handleFacebookShare = () => {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`, '_blank');
   };
   
   return (
@@ -452,19 +461,35 @@ const LeagueDetailModal = ({ league, leaderboard, onClose, onShare, teamId }) =>
           <div className="bg-[#1A1A1A] p-4 mb-4 text-center">
             <p className="text-xs text-[#A1A1AA] mb-2">INVITE CODE</p>
             <div className="league-code text-2xl mb-3">{league.code}</div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <button
                 onClick={handleCopyCode}
-                className="flex-1 bg-[#262626] text-white py-2 text-xs font-bold uppercase flex items-center justify-center gap-2"
+                className="flex-1 min-w-[80px] bg-[#262626] text-white py-2 text-xs font-bold uppercase flex items-center justify-center gap-2"
               >
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 {copied ? "Copied!" : "Copy"}
               </button>
               <button
                 onClick={handleWhatsAppShare}
-                className="flex-1 bg-[#25D366] text-white py-2 text-xs font-bold uppercase"
+                className="flex-1 min-w-[80px] bg-[#25D366] text-white py-2 text-xs font-bold uppercase"
+                data-testid="league-share-whatsapp"
               >
                 WhatsApp
+              </button>
+              <button
+                onClick={handleXShare}
+                className="flex-1 min-w-[80px] bg-black border border-white text-white py-2 text-xs font-bold uppercase"
+                data-testid="league-share-x"
+              >
+                𝕏
+              </button>
+              <button
+                onClick={handleFacebookShare}
+                className="flex-1 min-w-[80px] bg-[#1877F2] text-white py-2 text-xs font-bold uppercase flex items-center justify-center gap-1"
+                data-testid="league-share-facebook"
+              >
+                <Facebook className="w-3 h-3" />
+                FB
               </button>
             </div>
           </div>
