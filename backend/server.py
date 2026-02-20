@@ -707,7 +707,7 @@ async def get_top_picked():
 
 @api_router.get("/todays-news")
 async def get_todays_news():
-    """Get today's top REAL celebrity news using web search"""
+    """Get today's top REAL celebrity news from RSS feeds"""
     # Check cache (15 min cache for real news)
     cached = await db.news_cache.find_one(
         {"type": "todays_news_real"},
@@ -719,51 +719,91 @@ async def get_todays_news():
         if (datetime.now(timezone.utc) - cache_time).seconds < 900:  # 15 min cache
             return {"news": cached.get("news", [])}
     
-    # Fetch real news using web search
+    # Fetch real news from RSS feeds
+    news_items = []
+    headers = {"User-Agent": "CelebrityBuzzIndex/1.0"}
+    
+    # News sources with RSS feeds
+    rss_sources = [
+        ("https://www.dailymail.co.uk/tvshowbiz/index.rss", "Daily Mail"),
+        ("https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "BBC News"),
+        ("https://www.theguardian.com/lifeandstyle/celebrities/rss", "The Guardian"),
+    ]
+    
     try:
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"real-news-{uuid.uuid4()}",
-            system_message="""You are a news aggregator. Search the web for TODAY's real celebrity news headlines.
-            Find ACTUAL recent news articles from real sources.
-            Return a JSON array with 8 items. Each MUST have:
-            - celebrity: Name of the celebrity in the news
-            - headline: The ACTUAL headline from the article
-            - summary: Brief summary of the story
-            - source: The actual publication name (Daily Mail, BBC, TMZ, The Sun, etc.)
-            - url: The ACTUAL URL to the article (must be a real working link)
-            - category: royals/reality_tv/musicians/athletes/movie_stars/tv_actors/other
-            
-            Focus on UK celebrities and international stars. Include royals, reality TV stars, musicians.
-            ONLY return valid JSON array with real URLs."""
-        ).with_model("openai", "gpt-4o").with_web_search()
+        async with httpx.AsyncClient() as client:
+            for rss_url, source_name in rss_sources:
+                try:
+                    response = await client.get(rss_url, timeout=10.0, headers=headers)
+                    if response.status_code == 200:
+                        # Parse RSS (simple parsing)
+                        content = response.text
+                        # Extract items using simple string parsing
+                        items = content.split("<item>")[1:6]  # Get first 5 items
+                        
+                        for item in items:
+                            try:
+                                # Extract title
+                                title_start = item.find("<title>") + 7
+                                title_end = item.find("</title>")
+                                title = item[title_start:title_end].replace("<![CDATA[", "").replace("]]>", "").strip()
+                                
+                                # Extract link
+                                link_start = item.find("<link>") + 6
+                                link_end = item.find("</link>")
+                                link = item[link_start:link_end].strip()
+                                if not link or link_start < 6:
+                                    # Try alternate link format
+                                    link_start = item.find("<link/>") 
+                                    if link_start > 0:
+                                        link_end = item.find("<", link_start + 7)
+                                        link = item[link_start+7:link_end].strip()
+                                
+                                # Extract description
+                                desc_start = item.find("<description>") + 13
+                                desc_end = item.find("</description>")
+                                description = item[desc_start:desc_end].replace("<![CDATA[", "").replace("]]>", "").strip()
+                                # Clean HTML tags from description
+                                import re
+                                description = re.sub(r'<[^>]+>', '', description)[:200]
+                                
+                                if title and len(title) > 10:
+                                    # Try to extract celebrity name from title
+                                    celebrity = title.split(":")[0] if ":" in title else title.split(" - ")[0] if " - " in title else "Celebrity"
+                                    celebrity = celebrity[:50]
+                                    
+                                    news_items.append({
+                                        "celebrity": celebrity,
+                                        "headline": title[:150],
+                                        "summary": description[:200] if description else title,
+                                        "source": source_name,
+                                        "url": link,
+                                        "category": "other"
+                                    })
+                            except Exception as e:
+                                logger.error(f"Error parsing RSS item: {e}")
+                                continue
+                except Exception as e:
+                    logger.error(f"Error fetching RSS from {source_name}: {e}")
+                    continue
         
-        message = UserMessage(text="Search for today's top 8 REAL celebrity news stories from UK tabloids and news sites. Include actual article URLs. Return ONLY JSON array.")
-        response = await chat.send_message(message)
+        # Limit to 8 items
+        news_items = news_items[:8]
         
-        clean_response = response.strip()
-        if clean_response.startswith("```"):
-            clean_response = clean_response.split("```")[1]
-            if clean_response.startswith("json"):
-                clean_response = clean_response[4:]
-        clean_response = clean_response.strip()
+        if news_items:
+            # Cache it
+            await db.news_cache.update_one(
+                {"type": "todays_news_real"},
+                {"$set": {
+                    "news": news_items,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }},
+                upsert=True
+            )
         
-        news = json.loads(clean_response)
-        
-        # Cache it
-        await db.news_cache.update_one(
-            {"type": "todays_news_real"},
-            {"$set": {
-                "news": news,
-                "updated_at": datetime.now(timezone.utc).isoformat()
-            }},
-            upsert=True
-        )
-        
-        return {"news": news if isinstance(news, list) else []}
+        return {"news": news_items}
     except Exception as e:
         logger.error(f"Real news fetch error: {e}")
-        # Fallback to cached if available
         if cached:
             return {"news": cached.get("news", [])}
         return {"news": []}
