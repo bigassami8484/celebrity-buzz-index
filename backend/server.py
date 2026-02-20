@@ -339,17 +339,37 @@ async def fetch_wikipedia_info(name: str) -> dict:
                 data = response.json()
                 bio = data.get("extract", "No biography available.")
                 logger.info(f"Got bio for {name}: {bio[:100]}...")
+                
+                # Also try to get birth year from short description via query API
+                birth_year = 0
+                try:
+                    query_url = f"https://en.wikipedia.org/w/api.php?action=query&titles={name.replace(' ', '_')}&prop=pageprops&format=json"
+                    query_response = await client.get(query_url, timeout=5.0, headers=headers)
+                    if query_response.status_code == 200:
+                        query_data = query_response.json()
+                        pages = query_data.get("query", {}).get("pages", {})
+                        if pages:
+                            page = list(pages.values())[0]
+                            short_desc = page.get("pageprops", {}).get("wikibase-shortdesc", "")
+                            # Extract birth year from patterns like "(born 1930)" or "(b. 1945)"
+                            birth_match = re.search(r'\((?:born|b\.)\s*(\d{4})\)', short_desc, re.IGNORECASE)
+                            if birth_match:
+                                birth_year = int(birth_match.group(1))
+                except Exception as e:
+                    logger.error(f"Failed to get birth year for {name}: {e}")
+                
                 return {
                     "name": data.get("title", name),
                     "bio": bio,
                     "image": data.get("thumbnail", {}).get("source", ""),
-                    "wiki_url": data.get("content_urls", {}).get("desktop", {}).get("page", "")
+                    "wiki_url": data.get("content_urls", {}).get("desktop", {}).get("page", ""),
+                    "birth_year": birth_year
                 }
             else:
                 logger.error(f"Wikipedia returned status {response.status_code}: {response.text[:200]}")
     except Exception as e:
         logger.error(f"Wikipedia fetch error for {name}: {type(e).__name__}: {e}")
-    return {"name": name, "bio": "Celebrity profile", "image": "", "wiki_url": ""}
+    return {"name": name, "bio": "Celebrity profile", "image": "", "wiki_url": "", "birth_year": 0}
 
 def detect_category_from_bio(bio: str, name: str) -> str:
     """Detect celebrity category from bio text"""
