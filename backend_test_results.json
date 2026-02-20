@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-20T18:13:29.873298",
+  "timestamp": "2026-02-20T18:27:46.517213",
   "summary": {
     "tests_run": 10,
     "tests_passed": 10,
@@ -66,436 +66,304 @@
       "response_data": {
         "trending": [
           {
-            "id": "8dd2251a-2038-4d73-97f7-bf8a978d6fd4",
-            "name": "Tom Holland",
-            "bio": "Thomas Stanley Holland is an English actor. He is the recipient of numerous accolades, including a BAFTA Award and three Saturn Awards. Holland's films as a lead actor have grossed over $9.9\u00a0billion worldwide, making him one of the highest-grossing film actors of all time. He was featured on the Forbes 30 Under 30 Europe list of 2019.",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Tom_Holland_during_pro-am_Wentworth_golf_club_2023-2.jpg/330px-Tom_Holland_during_pro-am_Wentworth_golf_club_2023-2.jpg",
-            "category": "movie_stars",
-            "wiki_url": "https://en.wikipedia.org/wiki/Tom_Holland",
+            "id": "f584fb4f-9c2e-4ddd-bb94-23610a3fbe5f",
+            "name": "Gemma Collins",
+            "bio": "Gemma Clair Collins is an English media personality and businesswoman. She came to prominence appearing on the ITV reality series The Only Way Is Essex (2011\u20132019) and went on to appear on various other reality television shows, including I'm a Celebrity...Get Me Out of Here! (2014), Celebrity Big Brother (2016), Celebs Go Dating (2018) and Dancing on Ice (2019). Known for her \"diva persona\" and alter-ego \"The GC\", she became the subject of several internet memes and a staple of the British hun ",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Gemma_Collins_by_Gemma_Collagen.jpg/330px-Gemma_Collins_by_Gemma_Collagen.jpg",
+            "category": "reality_tv",
+            "wiki_url": "https://en.wikipedia.org/wiki/Gemma_Collins",
             "buzz_score": 24.0,
-            "price": 7,
+            "price": 8,
+            "tier": "C",
             "news": [
               {
-                "title": "Tom Holland Returns to the MCU as Spider-Man in New Film",
-                "summary": "Amid much excitement, Tom Holland is set to reprise his role as Spider-Man in an upcoming Marvel Cinematic Universe film, sparking fan theories and speculation.",
+                "title": "Gemma Collins Stuns on 'Dancing with the Stars'",
+                "summary": "Gemma Collins wowed audiences with an unexpected high-scoring performance on 'Dancing with the Stars', earning praise from the judges for her dramatic paso doble.",
                 "source": "Entertainment Weekly",
                 "date": "Jan 15, 2026",
                 "sentiment": "positive"
               },
               {
-                "title": "Tom Holland Opens Up About Filmmaking Process in New Directorial Debut",
-                "summary": "Tom Holland steps behind the camera for the first time in his new film, sharing insights into his transition from actor to director.",
-                "source": "BBC News",
-                "date": "Jan 14, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Tom Holland and Zendaya: Are Marriage Bells Ringing Soon?",
-                "summary": "Rumors are swirling about an engagement between Tom Holland and Zendaya, as the couple was spotted ring shopping last weekend.",
-                "source": "TMZ",
-                "date": "Jan 13, 2026",
-                "sentiment": "neutral"
-              },
-              {
-                "title": "Tom Holland Criticized for Pushing Release Date of New Film",
-                "summary": "Fans express disappointment as Tom Holland's latest film faces delays, raising concerns about its production status.",
-                "source": "Daily Mail",
-                "date": "Jan 12, 2026",
-                "sentiment": "negative"
-              },
-              {
-                "title": "Broadway Beckons: Tom Holland Joins Musical Revival",
-                "summary": "Tom Holland is set to star in a major Broadway revival, marking a return to his theater roots and exciting music and theater enthusiasts alike.",
+                "title": "Gemma Collins Opens Up About Her Engagement!",
+                "summary": "Reality TV star Gemma Collins has shared intimate details about her engagement to long-time partner Rami Hawash, describing it as a dream come true.",
                 "source": "People",
                 "date": "Jan 14, 2026",
                 "sentiment": "positive"
+              },
+              {
+                "title": "Gemma Collins Launches Her Own Skincare Line",
+                "summary": "Adding to her entrepreneurial ventures, Gemma Collins has announced the launch of her new skincare range, GC Beauty, aiming to empower fans with affordable yet luxurious skincare products.",
+                "source": "Daily Mail",
+                "date": "Jan 13, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Gemma Collins Sparks Debate with Recent Diet Comments",
+                "summary": "Gemma Collins has sparked controversy again, this time with comments on her recent diet, leading to a mixed reaction from health experts and fans alike.",
+                "source": "BBC News",
+                "date": "Jan 12, 2026",
+                "sentiment": "neutral"
+              },
+              {
+                "title": "Gemma Collins' Paris Trip Hits Snag Due to Lost Luggage",
+                "summary": "Gemma Collins' vacation in Paris took an unexpected turn when her luggage was lost at the airport, but the star took to social media to assure fans she remains in high spirits.",
+                "source": "TMZ",
+                "date": "Jan 10, 2026",
+                "sentiment": "negative"
               }
             ],
-            "created_at": "2026-02-20T18:08:33.366148+00:00"
+            "page_views": 0,
+            "created_at": "2026-02-20T18:25:44.321815+00:00"
           },
           {
-            "id": "e5865817-17b3-474c-a315-fe2af380b974",
+            "id": "c2eedf31-a20e-4bfa-993f-04b980a6e686",
             "name": "David Beckham",
             "bio": "Sir David Robert Joseph Beckham is an English former professional footballer, the president and co-owner of Inter Miami CF and co-owner of Salford City. Primarily a right midfielder and known for his range of passing, crossing ability and set-piece taking, Beckham is considered one of the best players of his generation and one of the greatest set-piece specialists of all time. He won 19 major trophies in his career, and is the only English player to win league titles in four different countries:",
             "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/David_Beckham_UNICEF_%28cropped2%29.jpg/330px-David_Beckham_UNICEF_%28cropped2%29.jpg",
             "category": "athletes",
             "wiki_url": "https://en.wikipedia.org/wiki/David_Beckham",
             "buzz_score": 24.0,
-            "price": 7,
+            "price": 8,
+            "tier": "C",
             "news": [
               {
-                "title": "David Beckham Starts New Youth Soccer Initiative in London",
-                "summary": "David Beckham has launched a new soccer initiative aimed at fostering young talent in London's underserved communities, emphasizing the importance of sports in personal development.",
-                "source": "BBC News",
-                "date": "Jan 12, 2026",
+                "title": "David Beckham Launches New Skincare Line for Men",
+                "summary": "Former football star David Beckham has officially launched his new line of skincare products for men, aiming to meet the growing demand for male grooming products.",
+                "source": "Entertainment Weekly",
+                "date": "Mar 28, 2026",
                 "sentiment": "positive"
               },
               {
-                "title": "Beckham Addresses Rumors of Becoming Manchester United Manager",
-                "summary": "In a recent interview, David Beckham dismissed ongoing rumors of him taking up the managerial role at Manchester United, stating he is focusing on his role as a club owner in the U.S.",
-                "source": "Daily Mail",
-                "date": "Jan 14, 2026",
+                "title": "David Beckham Shares Insight on Marriage with Victoria",
+                "summary": "In a recent interview, David Beckham opened up about his long-standing marriage with Victoria Beckham, discussing how they maintain their relationship amid public scrutiny.",
+                "source": "People",
+                "date": "Feb 14, 2026",
                 "sentiment": "neutral"
               },
               {
-                "title": "David and Victoria Beckham Donate $1 Million to Global Hunger Relief",
-                "summary": "The Beckham duo has pledged $1 million to aid global hunger relief efforts, supporting programs that provide essential resources to underserved regions.",
-                "source": "People",
-                "date": "Jan 10, 2026",
+                "title": "Beckham's Miami CF Signs Promising Young Talent",
+                "summary": "David Beckham's MLS team, Inter Miami CF, has signed a promising young midfielder anticipating a dynamic performance in the upcoming season.",
+                "source": "BBC News",
+                "date": "Mar 15, 2026",
                 "sentiment": "positive"
               },
               {
-                "title": "David Beckham's MLS Team Faces Criticism Over Recent Performance",
-                "summary": "Inter Miami, partially owned by David Beckham, is under fire after a string of poor performances leading to fan discontent and calls for management changes.",
-                "source": "TMZ",
-                "date": "Jan 11, 2026",
+                "title": "David Beckham Criticized Over New Housing Development Plans",
+                "summary": "The former footballer's plans to develop luxury housing in a historic London area have drawn criticism from local residents concerned about potential disruptions.",
+                "source": "Daily Mail",
+                "date": "Mar 9, 2026",
                 "sentiment": "negative"
               },
               {
-                "title": "David Beckham to Launch New Sportswear Line",
-                "summary": "Capitalizing on his fashion-forward image, David Beckham is set to release a new sportswear line this spring, combining elements of performance and style for athletes.",
-                "source": "Entertainment Weekly",
-                "date": "Jan 13, 2026",
+                "title": "Victoria Beckham Praises David's Doting Dad Role",
+                "summary": "Victoria Beckham shared a heartfelt post on social media praising husband David for his hands-on approach to parenting their four children.",
+                "source": "TMZ",
+                "date": "Feb 25, 2026",
                 "sentiment": "positive"
               }
             ],
-            "created_at": "2026-02-20T18:09:16.691214+00:00"
+            "page_views": 0,
+            "created_at": "2026-02-20T18:25:20.148376+00:00"
           },
           {
-            "id": "ae4dfd62-ba88-4cbd-aaf1-b74d9cd94ede",
+            "id": "d9543fd2-10a9-4124-9b00-83c7fce0b9eb",
             "name": "Gordon Ramsay",
             "bio": "Gordon James Ramsay is a British celebrity chef, restaurateur, television presenter, and writer. His restaurant group, Gordon Ramsay Restaurants, was founded in 1997 and has been awarded 17 Michelin stars overall and currently holds eight. His signature restaurant, Restaurant Gordon Ramsay in Chelsea, London, which he founded, has held three Michelin stars since 2001 and is currently run by chef Matt Ab\u00e9. After rising to fame on the British television miniseries Boiling Point in 1999, Ramsay bec",
             "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Gordon_Ramsay_%28cropped%29.jpg/330px-Gordon_Ramsay_%28cropped%29.jpg",
             "category": "other",
             "wiki_url": "https://en.wikipedia.org/wiki/Gordon_Ramsay",
             "buzz_score": 24.0,
-            "price": 7,
+            "price": 4,
+            "tier": "D",
             "news": [
               {
-                "title": "Gordon Ramsay Expands Culinary Empire with New Paris Restaurant",
-                "summary": "The famed chef is set to open his latest restaurant in the heart of Paris, adding to his impressive global portfolio.",
-                "source": "BBC News",
-                "date": "Jan 10, 2026",
+                "title": "Gordon Ramsay Expands Restaurant Empire with New Vegas Eatery",
+                "summary": "Celebrity chef Gordon Ramsay has announced the opening of his latest restaurant, 'Hell\u2019s Kitchen: Las Vegas', marking his eighth venture on the Strip.",
+                "source": "Daily Mail",
+                "date": "Jan 14, 2026",
                 "sentiment": "positive"
               },
               {
-                "title": "Gordon Ramsay's Daughter Tilly Ramsay Named UK TV's Rising Star of 2026",
-                "summary": "Tilly Ramsay, the charismatic daughter of world-renowned chef Gordon Ramsay, has been crowned the Rising Star of the Year by UK Television Awards.",
+                "title": "Fans Thrilled as Gordon Ramsay Teases Upcoming Cookbook",
+                "summary": "Gordon Ramsay gave fans a sneak peek of his new cookbook on Instagram, featuring never-before-seen recipes from his diverse culinary adventures around the globe.",
                 "source": "Entertainment Weekly",
-                "date": "Jan 11, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Chefs Critique Gordon Ramsay's New Cookware Line",
-                "summary": "Gordon Ramsay's newly launched cookware line is receiving mixed reviews from culinary experts, sparking debates on quality versus price.",
-                "source": "Daily Mail",
-                "date": "Jan 13, 2026",
-                "sentiment": "neutral"
-              },
-              {
-                "title": "Gordon Ramsay Faces Backlash Over Controversial Comments",
-                "summary": "Chef Gordon Ramsay has drawn criticism for comments made during a recent television interview, which some viewers have called insensitive.",
-                "source": "TMZ",
-                "date": "Jan 12, 2026",
-                "sentiment": "negative"
-              },
-              {
-                "title": "Gordon Ramsay Pledges Support for Global Food Waste Initiative",
-                "summary": "Ramsay has joined forces with international organizations to combat food waste, emphasizing sustainable practices in the culinary industry.",
-                "source": "People",
-                "date": "Jan 14, 2026",
-                "sentiment": "positive"
-              }
-            ],
-            "created_at": "2026-02-20T18:08:45.096760+00:00"
-          },
-          {
-            "id": "05265f87-3176-4b08-878b-1e44bd5b887a",
-            "name": "Adele",
-            "bio": "Adele Laurie Blue Adkins is an English singer-songwriter. Regarded as a British cultural icon, she is known for her mezzo-soprano vocals and sentimental songwriting. Her accolades include 16 Grammy Awards, 12 Brit Awards, an Academy Award, a Primetime Emmy Award, and a Golden Globe Award.",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Adele_2016.jpg/330px-Adele_2016.jpg",
-            "category": "musicians",
-            "wiki_url": "https://en.wikipedia.org/wiki/Adele",
-            "buzz_score": 23.0,
-            "price": 7,
-            "news": [
-              {
-                "title": "Adele Set to Release Her First Duet with Elton John",
-                "summary": "Music legends Adele and Elton John have announced their exciting collaboration on a new single, sending fans into a frenzy. The song is set to drop next month.",
-                "source": "Rolling Stone",
-                "date": "Jan 20, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Adele and Her Partner Welcome Their New Baby Girl",
-                "summary": "Adele and her partner have announced the birth of their daughter this past weekend, sharing their joy with fans on social media.",
-                "source": "People",
-                "date": "Jan 22, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Adele Reflects on Her Career in Candid New Interview",
-                "summary": "In a recent interview, Adele opened up about her journey in the music industry, discussing both the struggles and triumphs she has experienced over the years.",
-                "source": "BBC News",
-                "date": "Jan 18, 2026",
-                "sentiment": "neutral"
-              },
-              {
-                "title": "Adele's London Concert Sells Out in Record Time",
-                "summary": "Tickets for Adele's upcoming concert in London sold out within minutes of going on sale, showcasing her enduring popularity and fan demand.",
-                "source": "Daily Mail",
-                "date": "Jan 19, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Concerns Raised Over Adele's Vocal Health After Tour Dates Postponed",
-                "summary": "Fans are worried about Adele's vocal health after she postponed several tour dates, citing unforeseen medical issues that require her to rest.",
-                "source": "TMZ",
-                "date": "Jan 21, 2026",
-                "sentiment": "negative"
-              }
-            ],
-            "created_at": "2026-02-20T18:07:21.711512+00:00"
-          },
-          {
-            "id": "1fbe2fdb-24fd-4379-a3f2-59565e64723f",
-            "name": "Gemma Collins",
-            "bio": "Gemma Clair Collins is an English media personality and businesswoman. She came to prominence appearing on the ITV reality series The Only Way Is Essex (2011\u20132019) and went on to appear on various other reality television shows, including I'm a Celebrity...Get Me Out of Here! (2014), Celebrity Big Brother (2016), Celebs Go Dating (2018) and Dancing on Ice (2019). Known for her \"diva persona\" and alter-ego \"The GC\", she became the subject of several internet memes and a staple of the British hun ",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Gemma_Collins_by_Gemma_Collagen.jpg/330px-Gemma_Collins_by_Gemma_Collagen.jpg",
-            "category": "reality_tv",
-            "wiki_url": "https://en.wikipedia.org/wiki/Gemma_Collins",
-            "buzz_score": 23.0,
-            "price": 7,
-            "news": [
-              {
-                "title": "Gemma Collins Lands First Lead Role in Upcoming Netflix Comedy Series",
-                "summary": "Reality star Gemma Collins is set to star in her first lead acting role in a new Netflix comedy that promises to showcase her wit and charm like never before.",
-                "source": "Variety",
-                "date": "Jan 14, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Gemma Collins and Fianc\u00e9 Celebrate Engagement with Lavish Party",
-                "summary": "Gemma Collins and her fianc\u00e9 marked their engagement with a lavish party attended by a host of celebrity friends, sparking speculation about the details of their wedding plans.",
-                "source": "OK! Magazine",
                 "date": "Jan 13, 2026",
                 "sentiment": "positive"
               },
               {
-                "title": "Gemma Collins Opens Up About Her New Lifestyle Transformation Journey",
-                "summary": "In a candid interview, Gemma Collins revealed insights into her new health regimen, stating, 'It's not just about losing weight \u2013 it's about feeling good in my own skin.'",
-                "source": "Daily Mail",
-                "date": "Jan 12, 2026",
-                "sentiment": "neutral"
-              },
-              {
-                "title": "Gemma Collins Criticizes Paparazzi for Privacy Invasion during Holiday Trip",
-                "summary": "The reality TV personality expressed frustration after paparazzi intruded on her recent vacation, calling for better privacy protections for celebrities.",
-                "source": "The Sun",
+                "title": "Gordon Ramsay Caught in Social Media Storm Over TikTok Criticism",
+                "summary": "Some TikTok users have taken issue with Ramsay's recent comments on viral cooking trends, sparking a heated debate online about culinary standards and creativity.",
+                "source": "TMZ",
                 "date": "Jan 11, 2026",
                 "sentiment": "negative"
               },
               {
-                "title": "Gemma Collins Talks Expanding Her Business Empire in 2026",
-                "summary": "Entrepreneur Gemma Collins announced plans to expand her fashion and beauty lines, 'aiming to empower more women with products that make them feel fabulous.'",
+                "title": "Gordon Ramsay Hosts Record-Breaking Charity Event",
+                "summary": "The celebrity chef raised over $1 million at a star-studded charity gala in London, aimed at combating child hunger globally.",
                 "source": "BBC News",
+                "date": "Jan 12, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Gordon Ramsay Sparks Collaboration Rumors with Top Pastry Chef",
+                "summary": "Speculation is rife as Ramsay was spotted dining with renowned pastry chef Dominique Ansel in New York, hinting at a possible collaboration.",
+                "source": "People",
                 "date": "Jan 10, 2026",
-                "sentiment": "positive"
+                "sentiment": "neutral"
               }
             ],
-            "created_at": "2026-02-20T18:09:03.067294+00:00"
+            "page_views": 0,
+            "created_at": "2026-02-20T18:25:36.967833+00:00"
           },
           {
-            "id": "343124ea-59d0-49e7-8e92-c05487e8fdb1",
+            "id": "bb096c66-1e5f-4ba6-8942-30387c0ff07a",
+            "name": "Tom Holland",
+            "bio": "Thomas Stanley Holland is an English actor. He is the recipient of numerous accolades, including a BAFTA Award and three Saturn Awards. Holland's films as a lead actor have grossed over $9.9\u00a0billion worldwide, making him one of the highest-grossing film actors of all time. He was featured on the Forbes 30 Under 30 Europe list of 2019.",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Tom_Holland_during_pro-am_Wentworth_golf_club_2023-2.jpg/330px-Tom_Holland_during_pro-am_Wentworth_golf_club_2023-2.jpg",
+            "category": "movie_stars",
+            "wiki_url": "https://en.wikipedia.org/wiki/Tom_Holland",
+            "buzz_score": 22.5,
+            "price": 19,
+            "tier": "A",
+            "news": [
+              {
+                "title": "Tom Holland Set to Direct His First Feature Film",
+                "summary": "Tom Holland is stepping behind the camera as he announced he's directing an upcoming indie project focusing on environmental conservation. The actor shared his excitement about this new venture with his fans on Instagram.",
+                "source": "Entertainment Weekly",
+                "date": "Nov 8, 2023",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Tom Holland and Zendaya Spotted House Hunting in New York",
+                "summary": "The Hollywood power couple was seen exploring luxury apartments in Manhattan, sparking rumors that they may be planning a move to the Big Apple.",
+                "source": "People",
+                "date": "Nov 6, 2023",
+                "sentiment": "neutral"
+              },
+              {
+                "title": "Tom Holland's Latest Film 'Unchartered Waters' Debuts to Mixed Reviews",
+                "summary": "While Tom Holland's performance was praised, critics were divided on the film's overall direction and pacing. 'Unchartered Waters' opened nationwide this weekend.",
+                "source": "Daily Mail",
+                "date": "Nov 7, 2023",
+                "sentiment": "neutral"
+              },
+              {
+                "title": "Tom Holland Honored at the British Film Awards",
+                "summary": "Tom Holland received the Rising Star Award at the British Film Awards, acknowledging his impressive contributions to cinema over the past few years.",
+                "source": "BBC News",
+                "date": "Nov 5, 2023",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Tom Holland Expresses Desire to Take a Break from Acting",
+                "summary": "Tom Holland has hinted at taking a hiatus from acting, citing a desire to focus on personal projects and spend more time with family.",
+                "source": "TMZ",
+                "date": "Nov 9, 2023",
+                "sentiment": "neutral"
+              }
+            ],
+            "page_views": 0,
+            "created_at": "2026-02-20T18:25:27.936792+00:00"
+          },
+          {
+            "id": "291d259f-225e-4737-9cbc-3a529c2d56e6",
             "name": "Katie Price",
             "bio": "Katrina Amy Alexandra Alexis Price is an English media personality and model. She gained recognition in the late 1990s for her glamour modelling work, including on Page 3 of the tabloid newspaper The Sun, under the pseudonym Jordan.",
             "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Katie_Price_2024.jpg/330px-Katie_Price_2024.jpg",
             "category": "reality_tv",
             "wiki_url": "https://en.wikipedia.org/wiki/Katie_Price",
-            "buzz_score": 21.0,
-            "price": 7,
+            "buzz_score": 21.5,
+            "price": 4,
+            "tier": "D",
             "news": [
               {
-                "title": "Katie Price Stuns Fans With New Project Announcement",
-                "summary": "Katie Price has revealed on her Instagram that she will be launching a new fashion line in partnership with a major UK retailer this spring.",
-                "source": "Hello Magazine",
-                "date": "Jan 12, 2026",
+                "title": "Katie Price Announces Launch of New Eco-Friendly Skincare Line",
+                "summary": "Katie Price has ventured into the beauty industry with a new skincare line emphasizing sustainability and eco-friendliness, launching later this spring.",
+                "source": "Glamour UK",
+                "date": "Feb 25, 2024",
                 "sentiment": "positive"
               },
               {
-                "title": "Katie Price Opens Up About Motherhood in Latest Interview",
-                "summary": "In a candid interview, Katie Price shares insights about balancing her career with raising five children and the lessons she\u2019s learned along the way.",
-                "source": "BBC News",
-                "date": "Jan 14, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Katie Price and Peter Andre's Reunion Sparks Rumors",
-                "summary": "After being spotted at a charity event together, former couple Katie Price and Peter Andre have ignited speculation about a potential professional collaboration.",
-                "source": "Daily Mirror",
-                "date": "Jan 13, 2026",
-                "sentiment": "neutral"
-              },
-              {
-                "title": "Katie Price Receives Backlash Over Latest Social Media Post",
-                "summary": "Katie Price is facing criticism after sharing a controversial post on Instagram, leading to a mixed response from fans and followers.",
-                "source": "TMZ",
-                "date": "Jan 15, 2026",
-                "sentiment": "negative"
-              },
-              {
-                "title": "Katie Price To Launch YouTube Channel Focused on Beauty",
-                "summary": "The reality TV star announced plans to start a YouTube channel dedicated to sharing beauty tips and personal stories with fans.",
-                "source": "Entertainment Weekly",
-                "date": "Jan 10, 2026",
-                "sentiment": "positive"
-              }
-            ],
-            "created_at": "2026-02-20T18:08:01.643001+00:00"
-          },
-          {
-            "id": "1bd4059c-fa82-4708-84fd-a68ff32a6e29",
-            "name": "Ed Sheeran",
-            "bio": "Edward Christopher Sheeran is an English singer-songwriter and musician. Born in Halifax, West Yorkshire, and raised in Framlingham, Suffolk, he began writing songs around the age of eleven. In early 2011, Sheeran independently released the extended play No. 5 Collaborations Project. He signed with Asylum Records the same year.",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Ed_Sheeran-6886_%28cropped%29.jpg/330px-Ed_Sheeran-6886_%28cropped%29.jpg",
-            "category": "musicians",
-            "wiki_url": "https://en.wikipedia.org/wiki/Ed_Sheeran",
-            "buzz_score": 20.5,
-            "price": 7,
-            "news": [
-              {
-                "title": "Ed Sheeran Announces Surprise Release of New Acoustic EP",
-                "summary": "Ed Sheeran delighted fans with the unexpected announcement of a brand new acoustic EP set to drop next week, featuring five intimate tracks recorded at his home studio.",
-                "source": "Billboard",
-                "date": "Jan 16, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Ed Sheeran Steps Up for Charity with Massive Donation to Local Schools",
-                "summary": "Continuing his philanthropic efforts, Ed Sheeran has donated $500,000 to fund music programs in his hometown's schools, emphasizing the importance of music education.",
-                "source": "BBC News",
-                "date": "Jan 15, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Ed Sheeran Addresses Fans After Recent Health Scare During Tour",
-                "summary": "Ed Sheeran reassured fans on social media after a brief health scare led to the cancellation of a concert, noting he's on the mend and eager to return to the stage.",
-                "source": "TMZ",
-                "date": "Jan 13, 2026",
-                "sentiment": "neutral"
-              },
-              {
-                "title": "Ed Sheeran Makes Acting Debut in Upcoming Romantic Comedy",
-                "summary": "The singer-songwriter is set to make his acting debut alongside seasoned Hollywood stars, taking on a humorous role in the film that promises a tuneful twist.",
-                "source": "Entertainment Weekly",
-                "date": "Jan 14, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Industry Analysis: Ed Sheeran's Label Secures Record-Breaking Deal",
-                "summary": "Ed Sheeran's management label has signed a monumental deal with a major record company, further solidifying his status as a music industry powerhouse.",
-                "source": "Forbes",
-                "date": "Jan 12, 2026",
-                "sentiment": "positive"
-              }
-            ],
-            "created_at": "2026-02-20T18:08:53.045194+00:00"
-          },
-          {
-            "id": "3a8e138c-2e3a-4fe2-9a32-2a9f34c5fb6a",
-            "name": "Harry Kane",
-            "bio": "Harry Edward Kane is an English professional footballer who plays as a striker for Bundesliga club Bayern Munich and captains the England national team. Regarded as one of the best strikers of his generation, he is Tottenham Hotspur's all-time top goalscorer (280), England's all-time top goalscorer (78), and the highest-scoring English player in the UEFA Champions League (45). He is also the Premier League's second-highest all-time goalscorer (213).",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Harry_Kane_on_October_10%2C_2023.jpg/330px-Harry_Kane_on_October_10%2C_2023.jpg",
-            "category": "athletes",
-            "wiki_url": "https://en.wikipedia.org/wiki/Harry_Kane",
-            "buzz_score": 20.5,
-            "price": 7,
-            "news": [
-              {
-                "title": "Harry Kane Scores Hat-trick in Stunning Match Against Rivals",
-                "summary": "England's star striker Harry Kane was in sensational form as he scored three goals leading his team to a resounding victory over their long-standing rivals in last night's match.",
-                "source": "BBC Sport",
-                "date": "Oct 14, 2023",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Harry Kane Launches New Charitable Foundation",
-                "summary": "In an inspiring move off the pitch, Harry Kane announced the creation of a new foundation aimed at supporting underprivileged youth through sports initiatives.",
-                "source": "The Guardian",
-                "date": "Oct 12, 2023",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Transfer Rumors: Is Harry Kane Eyeing a Move to Spain?",
-                "summary": "Amidst a swirl of transfer speculation, sources suggest Harry Kane might be considering a move to one of Spain's top clubs, fueling debates among fans and analysts.",
-                "source": "Sky Sports",
-                "date": "Oct 10, 2023",
-                "sentiment": "neutral"
-              },
-              {
-                "title": "Harry Kane Signs Controversial Sponsorship Deal",
-                "summary": "Harry Kane's new sponsorship deal with a major sportswear company has sparked debate, with critics questioning the ethical considerations of the partnership.",
+                "title": "Katie Price Speaks Out About Recent Health Scare and Recovery",
+                "summary": "In a candid interview, Katie Price revealed details about a recent health issue that landed her in the hospital, reassuring fans about her recovery progress.",
                 "source": "Daily Mail",
-                "date": "Oct 13, 2023",
-                "sentiment": "negative"
-              },
-              {
-                "title": "Experts Name Harry Kane Premier League\u2019s Player of the Month",
-                "summary": "For his exceptional performance throughout September, Harry Kane has been awarded the Premier League Player of the Month, highlighting his continued excellence on the field.",
-                "source": "ESPN",
-                "date": "Oct 11, 2023",
-                "sentiment": "positive"
-              }
-            ],
-            "created_at": "2026-02-20T18:08:17.117370+00:00"
-          },
-          {
-            "id": "d1d4f02b-24c8-483b-93ce-5dd2ad9ed1d4",
-            "name": "Jodie Comer",
-            "bio": "Jodie Comer is an English actress of screen and stage. Her accolades include two British Academy Television Awards, a Primetime Emmy Award, a Tony Award, a Laurence Olivier Award, and two nominations for a Golden Globe Award.",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Jodie_Comer%2C_The_Bikeriders_premiere.jpg/330px-Jodie_Comer%2C_The_Bikeriders_premiere.jpg",
-            "category": "movie_stars",
-            "wiki_url": "https://en.wikipedia.org/wiki/Jodie_Comer",
-            "buzz_score": 19.0,
-            "price": 7,
-            "news": [
-              {
-                "title": "Jodie Comer Shines in New Sci-Fi Thriller 'The Last Outpost'",
-                "summary": "Jodie Comer delivers a stunning performance in 'The Last Outpost', which wowed audiences at its Sundance Film Festival premiere.",
-                "source": "Entertainment Weekly",
-                "date": "Jan 20, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Jodie Comer in Talks for Major Role in Next Marvel Film",
-                "summary": "Rumors swirl as Jodie Comer is reportedly in negotiations to join the cast of the highly anticipated next installment in the Marvel Cinematic Universe.",
-                "source": "Hollywood Reporter",
-                "date": "Jan 18, 2026",
+                "date": "Feb 20, 2024",
                 "sentiment": "neutral"
               },
               {
-                "title": "Jodie Comer Speaks Out on the Importance of Mental Health",
-                "summary": "In a recent interview, Jodie Comer stressed the importance of mental health awareness and discussed her own journey with therapy and self-care.",
+                "title": "Katie Price's Make-Up Masterclass Tour Sells Out Across the UK",
+                "summary": "Katie Price's highly anticipated make-up masterclass tour has sold out nationwide, highlighting her enduring popularity in the beauty community.",
+                "source": "Hello! Magazine",
+                "date": "Feb 18, 2024",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Katie Price Addresses Family Drama in Latest Instagram Live",
+                "summary": "Katie Price took to Instagram Live to discuss recent tensions within her family, seeking to set the record straight amid swirling rumors.",
+                "source": "The Sun",
+                "date": "Feb 22, 2024",
+                "sentiment": "negative"
+              },
+              {
+                "title": "Upcoming Documentary to Explore Katie Price's Career Evolution",
+                "summary": "A new documentary promises an in-depth look at Katie Price's journey in the entertainment industry, from her early modeling days to her multifaceted career today.",
                 "source": "BBC News",
-                "date": "Jan 16, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Jodie Comer and Olivia Colman Reunite for Stage Production",
-                "summary": "Fans are excited as Jodie Comer and Olivia Colman are set to star in a new West End play, marking their first collaboration since 'Killing Eve'.",
-                "source": "The Guardian",
-                "date": "Jan 21, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Jodie Comer's Stunning Red Carpet Look at the BAFTA Awards",
-                "summary": "Jodie Comer turned heads with a dazzling outfit at the BAFTA Awards, maintaining her status as a fashion icon.",
-                "source": "Vogue",
-                "date": "Jan 22, 2026",
-                "sentiment": "positive"
+                "date": "Feb 21, 2024",
+                "sentiment": "neutral"
               }
             ],
-            "created_at": "2026-02-20T18:09:10.053585+00:00"
+            "page_views": 0,
+            "created_at": "2026-02-20T18:25:06.499987+00:00"
+          },
+          {
+            "id": "743c59d0-0a2e-46f0-8b44-5cacbfafed0d",
+            "name": "Adele",
+            "bio": "Adele Laurie Blue Adkins is an English singer-songwriter. Regarded as a British cultural icon, she is known for her mezzo-soprano vocals and sentimental songwriting. Her accolades include 16 Grammy Awards, 12 Brit Awards, an Academy Award, a Primetime Emmy Award, and a Golden Globe Award.",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Adele_2016.jpg/330px-Adele_2016.jpg",
+            "category": "musicians",
+            "wiki_url": "https://en.wikipedia.org/wiki/Adele",
+            "buzz_score": 20.5,
+            "price": 19,
+            "tier": "A",
+            "news": [
+              {
+                "title": "Adele's Heartfelt Speech Brings Fans to Tears at the Grammy Awards",
+                "summary": "Adele delivered an emotional acceptance speech at the Grammy Awards, expressing gratitude to her fans and dedicating her win to her late grandmother.",
+                "source": "Billboard",
+                "date": "Feb 16, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Adele Set to Headline Glastonbury Festival 2026",
+                "summary": "In a major announcement, Adele is confirmed as the headliner for this year's Glastonbury Festival, marking her return to the iconic stage after a seven-year hiatus.",
+                "source": "BBC News",
+                "date": "Feb 10, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Adele Collaborates with Harry Styles on Surprise Duet Track",
+                "summary": "Fans are buzzing as Adele unveils a surprise duet with Harry Styles, blending their unique vocals on a new track that debuted at the top of global charts.",
+                "source": "Entertainment Weekly",
+                "date": "Jan 30, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Adele Opens Up About Life After Divorce in Upcoming Documentary",
+                "summary": "In her upcoming documentary, Adele candidly discusses how she navigated life post-divorce, sharing intimate details about finding balance between career and personal life.",
+                "source": "People",
+                "date": "Feb 5, 2026",
+                "sentiment": "neutral"
+              },
+              {
+                "title": "Adele Faces Criticism Over Lyrical Content on New Album",
+                "summary": "While her latest album tops charts, some critics are calling out Adele for the repetitive themes in her lyrics, suggesting a need for more creative evolution.",
+                "source": "The Guardian",
+                "date": "Jan 20, 2026",
+                "sentiment": "negative"
+              }
+            ],
+            "page_views": 0,
+            "created_at": "2026-02-20T18:25:00.361014+00:00"
           }
         ]
       }
@@ -506,52 +374,54 @@
       "details": "Status: 200",
       "response_data": {
         "celebrity": {
-          "id": "92911fc2-1566-4787-92c1-426a71918e57",
+          "id": "36c228f3-29f4-4f78-bbcd-ca7affec31b3",
           "name": "Taylor Swift",
           "bio": "Taylor Alison Swift is an American singer-songwriter. An influential figure in popular culture, she is known for her autobiographical songwriting and artistic reinventions. Swift is the highest-grossing live music artist, the wealthiest female musician, and one of the best-selling music artists of all time.",
           "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png/330px-Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png",
           "category": "musicians",
           "wiki_url": "https://en.wikipedia.org/wiki/Taylor_Swift",
-          "buzz_score": 19.5,
-          "price": 7,
+          "buzz_score": 21.5,
+          "price": 13,
+          "tier": "B",
           "news": [
             {
-              "title": "Taylor Swift Breaks Records with '1989 (Taylor's Version)'",
-              "summary": "Taylor Swift's re-released album '1989 (Taylor's Version)' has debuted at the top of the charts, becoming the fastest-selling album of the year.",
-              "source": "Billboard",
-              "date": "Nov 2, 2023",
+              "title": "Taylor Swift Announces Surprise New Album Release",
+              "summary": "Taylor Swift has shocked fans by announcing the release of a new album titled 'Midnight Reflections', set to drop next week.",
+              "source": "Entertainment Weekly",
+              "date": "Jan 15, 2026",
               "sentiment": "positive"
             },
             {
-              "title": "Taylor Swift and Matty Healy Spark Romance Rumors",
-              "summary": "After being seen together at various outings, rumors have started circulating about a potential romantic relationship between Taylor Swift and The 1975's Matty Healy.",
+              "title": "Taylor Swift Talks About Her Passion for Directing with a New Film Project",
+              "summary": "In a recent interview, Taylor Swift expressed excitement about transitioning into film directing, with a project rumored to be in the works.",
+              "source": "Variety",
+              "date": "Jan 13, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Swift's 'Eras Tour' Sets Revenue Records with Over $1 Billion in Sales",
+              "summary": "Taylor Swift\u2019s 'Eras Tour' has surpassed $1 billion in ticket sales, marking a record-breaking milestone in her illustrious career.",
+              "source": "Billboard",
+              "date": "Jan 10, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Rumors Swirl About Taylor Swift\u2019s Romantic Getaway",
+              "summary": "Photos have emerged of Taylor Swift vacationing on a private island with a mystery man, fueling speculations about her dating life.",
               "source": "TMZ",
-              "date": "Oct 28, 2023",
+              "date": "Jan 12, 2026",
               "sentiment": "neutral"
             },
             {
-              "title": "Taylor Swift Unveils Collaboration with Luxury Fashion Brand",
-              "summary": "Swift has announced an exciting collaboration with a leading luxury fashion house, planning to launch an exclusive line inspired by her iconic style.",
-              "source": "Vogue",
-              "date": "Nov 1, 2023",
-              "sentiment": "positive"
-            },
-            {
-              "title": "Taylor Swift's Stalker Arrested Outside Her Home Again",
-              "summary": "Police have arrested a man outside Taylor Swift's home after he was caught violating a restraining order in the latest of several incidents.",
-              "source": "NBC News",
-              "date": "Nov 3, 2023",
-              "sentiment": "negative"
-            },
-            {
-              "title": "Grammy Buzz Surrounds Taylor Swift Following Latest Album Release",
-              "summary": "Industry insiders speculate Taylor Swift could sweep the upcoming Grammy Awards with her critically acclaimed new albums, cementing her status as a pop powerhouse.",
-              "source": "Rolling Stone",
-              "date": "Oct 30, 2023",
-              "sentiment": "positive"
+              "title": "Taylor Swift Addresses Fans After Social Media Feud with Fellow Artist",
+              "summary": "Taylor Swift took to Instagram to clarify her remarks following a heated online exchange with a fellow musician, urging her fandom to promote positivity.",
+              "source": "People",
+              "date": "Jan 14, 2026",
+              "sentiment": "neutral"
             }
           ],
-          "created_at": "2026-02-20T18:13:28.854825+00:00"
+          "page_views": 0,
+          "created_at": "2026-02-20T18:27:45.004201+00:00"
         }
       }
     },
@@ -562,148 +432,104 @@
       "response_data": {
         "celebrities": [
           {
-            "id": "05265f87-3176-4b08-878b-1e44bd5b887a",
+            "id": "743c59d0-0a2e-46f0-8b44-5cacbfafed0d",
             "name": "Adele",
             "bio": "Adele Laurie Blue Adkins is an English singer-songwriter. Regarded as a British cultural icon, she is known for her mezzo-soprano vocals and sentimental songwriting. Her accolades include 16 Grammy Awards, 12 Brit Awards, an Academy Award, a Primetime Emmy Award, and a Golden Globe Award.",
             "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Adele_2016.jpg/330px-Adele_2016.jpg",
             "category": "musicians",
             "wiki_url": "https://en.wikipedia.org/wiki/Adele",
-            "buzz_score": 23.0,
-            "price": 7,
+            "buzz_score": 20.5,
+            "price": 19,
+            "tier": "A",
             "news": [
               {
-                "title": "Adele Set to Release Her First Duet with Elton John",
-                "summary": "Music legends Adele and Elton John have announced their exciting collaboration on a new single, sending fans into a frenzy. The song is set to drop next month.",
-                "source": "Rolling Stone",
-                "date": "Jan 20, 2026",
+                "title": "Adele's Heartfelt Speech Brings Fans to Tears at the Grammy Awards",
+                "summary": "Adele delivered an emotional acceptance speech at the Grammy Awards, expressing gratitude to her fans and dedicating her win to her late grandmother.",
+                "source": "Billboard",
+                "date": "Feb 16, 2026",
                 "sentiment": "positive"
               },
               {
-                "title": "Adele and Her Partner Welcome Their New Baby Girl",
-                "summary": "Adele and her partner have announced the birth of their daughter this past weekend, sharing their joy with fans on social media.",
-                "source": "People",
-                "date": "Jan 22, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Adele Reflects on Her Career in Candid New Interview",
-                "summary": "In a recent interview, Adele opened up about her journey in the music industry, discussing both the struggles and triumphs she has experienced over the years.",
+                "title": "Adele Set to Headline Glastonbury Festival 2026",
+                "summary": "In a major announcement, Adele is confirmed as the headliner for this year's Glastonbury Festival, marking her return to the iconic stage after a seven-year hiatus.",
                 "source": "BBC News",
-                "date": "Jan 18, 2026",
+                "date": "Feb 10, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Adele Collaborates with Harry Styles on Surprise Duet Track",
+                "summary": "Fans are buzzing as Adele unveils a surprise duet with Harry Styles, blending their unique vocals on a new track that debuted at the top of global charts.",
+                "source": "Entertainment Weekly",
+                "date": "Jan 30, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Adele Opens Up About Life After Divorce in Upcoming Documentary",
+                "summary": "In her upcoming documentary, Adele candidly discusses how she navigated life post-divorce, sharing intimate details about finding balance between career and personal life.",
+                "source": "People",
+                "date": "Feb 5, 2026",
                 "sentiment": "neutral"
               },
               {
-                "title": "Adele's London Concert Sells Out in Record Time",
-                "summary": "Tickets for Adele's upcoming concert in London sold out within minutes of going on sale, showcasing her enduring popularity and fan demand.",
-                "source": "Daily Mail",
-                "date": "Jan 19, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Concerns Raised Over Adele's Vocal Health After Tour Dates Postponed",
-                "summary": "Fans are worried about Adele's vocal health after she postponed several tour dates, citing unforeseen medical issues that require her to rest.",
-                "source": "TMZ",
-                "date": "Jan 21, 2026",
+                "title": "Adele Faces Criticism Over Lyrical Content on New Album",
+                "summary": "While her latest album tops charts, some critics are calling out Adele for the repetitive themes in her lyrics, suggesting a need for more creative evolution.",
+                "source": "The Guardian",
+                "date": "Jan 20, 2026",
                 "sentiment": "negative"
               }
             ],
-            "created_at": "2026-02-20T18:07:21.711512+00:00"
+            "page_views": 0,
+            "created_at": "2026-02-20T18:25:00.361014+00:00"
           },
           {
-            "id": "1bd4059c-fa82-4708-84fd-a68ff32a6e29",
-            "name": "Ed Sheeran",
-            "bio": "Edward Christopher Sheeran is an English singer-songwriter and musician. Born in Halifax, West Yorkshire, and raised in Framlingham, Suffolk, he began writing songs around the age of eleven. In early 2011, Sheeran independently released the extended play No. 5 Collaborations Project. He signed with Asylum Records the same year.",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Ed_Sheeran-6886_%28cropped%29.jpg/330px-Ed_Sheeran-6886_%28cropped%29.jpg",
-            "category": "musicians",
-            "wiki_url": "https://en.wikipedia.org/wiki/Ed_Sheeran",
-            "buzz_score": 20.5,
-            "price": 7,
-            "news": [
-              {
-                "title": "Ed Sheeran Announces Surprise Release of New Acoustic EP",
-                "summary": "Ed Sheeran delighted fans with the unexpected announcement of a brand new acoustic EP set to drop next week, featuring five intimate tracks recorded at his home studio.",
-                "source": "Billboard",
-                "date": "Jan 16, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Ed Sheeran Steps Up for Charity with Massive Donation to Local Schools",
-                "summary": "Continuing his philanthropic efforts, Ed Sheeran has donated $500,000 to fund music programs in his hometown's schools, emphasizing the importance of music education.",
-                "source": "BBC News",
-                "date": "Jan 15, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Ed Sheeran Addresses Fans After Recent Health Scare During Tour",
-                "summary": "Ed Sheeran reassured fans on social media after a brief health scare led to the cancellation of a concert, noting he's on the mend and eager to return to the stage.",
-                "source": "TMZ",
-                "date": "Jan 13, 2026",
-                "sentiment": "neutral"
-              },
-              {
-                "title": "Ed Sheeran Makes Acting Debut in Upcoming Romantic Comedy",
-                "summary": "The singer-songwriter is set to make his acting debut alongside seasoned Hollywood stars, taking on a humorous role in the film that promises a tuneful twist.",
-                "source": "Entertainment Weekly",
-                "date": "Jan 14, 2026",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Industry Analysis: Ed Sheeran's Label Secures Record-Breaking Deal",
-                "summary": "Ed Sheeran's management label has signed a monumental deal with a major record company, further solidifying his status as a music industry powerhouse.",
-                "source": "Forbes",
-                "date": "Jan 12, 2026",
-                "sentiment": "positive"
-              }
-            ],
-            "created_at": "2026-02-20T18:08:53.045194+00:00"
-          },
-          {
-            "id": "92911fc2-1566-4787-92c1-426a71918e57",
+            "id": "36c228f3-29f4-4f78-bbcd-ca7affec31b3",
             "name": "Taylor Swift",
             "bio": "Taylor Alison Swift is an American singer-songwriter. An influential figure in popular culture, she is known for her autobiographical songwriting and artistic reinventions. Swift is the highest-grossing live music artist, the wealthiest female musician, and one of the best-selling music artists of all time.",
             "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png/330px-Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png",
             "category": "musicians",
             "wiki_url": "https://en.wikipedia.org/wiki/Taylor_Swift",
-            "buzz_score": 19.5,
-            "price": 7,
+            "buzz_score": 21.5,
+            "price": 13,
+            "tier": "B",
             "news": [
               {
-                "title": "Taylor Swift Breaks Records with '1989 (Taylor's Version)'",
-                "summary": "Taylor Swift's re-released album '1989 (Taylor's Version)' has debuted at the top of the charts, becoming the fastest-selling album of the year.",
-                "source": "Billboard",
-                "date": "Nov 2, 2023",
+                "title": "Taylor Swift Announces Surprise New Album Release",
+                "summary": "Taylor Swift has shocked fans by announcing the release of a new album titled 'Midnight Reflections', set to drop next week.",
+                "source": "Entertainment Weekly",
+                "date": "Jan 15, 2026",
                 "sentiment": "positive"
               },
               {
-                "title": "Taylor Swift and Matty Healy Spark Romance Rumors",
-                "summary": "After being seen together at various outings, rumors have started circulating about a potential romantic relationship between Taylor Swift and The 1975's Matty Healy.",
+                "title": "Taylor Swift Talks About Her Passion for Directing with a New Film Project",
+                "summary": "In a recent interview, Taylor Swift expressed excitement about transitioning into film directing, with a project rumored to be in the works.",
+                "source": "Variety",
+                "date": "Jan 13, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Swift's 'Eras Tour' Sets Revenue Records with Over $1 Billion in Sales",
+                "summary": "Taylor Swift\u2019s 'Eras Tour' has surpassed $1 billion in ticket sales, marking a record-breaking milestone in her illustrious career.",
+                "source": "Billboard",
+                "date": "Jan 10, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Rumors Swirl About Taylor Swift\u2019s Romantic Getaway",
+                "summary": "Photos have emerged of Taylor Swift vacationing on a private island with a mystery man, fueling speculations about her dating life.",
                 "source": "TMZ",
-                "date": "Oct 28, 2023",
+                "date": "Jan 12, 2026",
                 "sentiment": "neutral"
               },
               {
-                "title": "Taylor Swift Unveils Collaboration with Luxury Fashion Brand",
-                "summary": "Swift has announced an exciting collaboration with a leading luxury fashion house, planning to launch an exclusive line inspired by her iconic style.",
-                "source": "Vogue",
-                "date": "Nov 1, 2023",
-                "sentiment": "positive"
-              },
-              {
-                "title": "Taylor Swift's Stalker Arrested Outside Her Home Again",
-                "summary": "Police have arrested a man outside Taylor Swift's home after he was caught violating a restraining order in the latest of several incidents.",
-                "source": "NBC News",
-                "date": "Nov 3, 2023",
-                "sentiment": "negative"
-              },
-              {
-                "title": "Grammy Buzz Surrounds Taylor Swift Following Latest Album Release",
-                "summary": "Industry insiders speculate Taylor Swift could sweep the upcoming Grammy Awards with her critically acclaimed new albums, cementing her status as a pop powerhouse.",
-                "source": "Rolling Stone",
-                "date": "Oct 30, 2023",
-                "sentiment": "positive"
+                "title": "Taylor Swift Addresses Fans After Social Media Feud with Fellow Artist",
+                "summary": "Taylor Swift took to Instagram to clarify her remarks following a heated online exchange with a fellow musician, urging her fandom to promote positivity.",
+                "source": "People",
+                "date": "Jan 14, 2026",
+                "sentiment": "neutral"
               }
             ],
-            "created_at": "2026-02-20T18:13:28.854825+00:00"
+            "page_views": 0,
+            "created_at": "2026-02-20T18:27:45.004201+00:00"
           }
         ]
       }
@@ -714,12 +540,12 @@
       "details": "Status: 200",
       "response_data": {
         "team": {
-          "id": "4ebd0928-01ed-49a5-832d-e32567453de2",
+          "id": "0558ae56-1063-4ab5-98c3-d483c40f549f",
           "team_name": "Test Buzz Team",
           "budget_remaining": 50,
           "total_points": 0.0,
           "celebrities": [],
-          "created_at": "2026-02-20T18:13:29.262458+00:00"
+          "created_at": "2026-02-20T18:27:45.537388+00:00"
         }
       }
     },
@@ -729,12 +555,12 @@
       "details": "Status: 200",
       "response_data": {
         "team": {
-          "id": "4ebd0928-01ed-49a5-832d-e32567453de2",
+          "id": "0558ae56-1063-4ab5-98c3-d483c40f549f",
           "team_name": "Test Buzz Team",
           "budget_remaining": 50,
           "total_points": 0.0,
           "celebrities": [],
-          "created_at": "2026-02-20T18:13:29.262458+00:00"
+          "created_at": "2026-02-20T18:27:45.537388+00:00"
         }
       }
     },
@@ -744,21 +570,22 @@
       "details": "Status: 200",
       "response_data": {
         "team": {
-          "id": "4ebd0928-01ed-49a5-832d-e32567453de2",
+          "id": "0558ae56-1063-4ab5-98c3-d483c40f549f",
           "team_name": "Test Buzz Team",
-          "budget_remaining": 43,
-          "total_points": 19.5,
+          "budget_remaining": 37,
+          "total_points": 21.5,
           "celebrities": [
             {
-              "celebrity_id": "92911fc2-1566-4787-92c1-426a71918e57",
+              "celebrity_id": "36c228f3-29f4-4f78-bbcd-ca7affec31b3",
               "name": "Taylor Swift",
               "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png/330px-Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png",
               "category": "musicians",
-              "price": 7,
-              "buzz_score": 19.5
+              "price": 13,
+              "buzz_score": 21.5,
+              "tier": "B"
             }
           ],
-          "created_at": "2026-02-20T18:13:29.262458+00:00"
+          "created_at": "2026-02-20T18:27:45.537388+00:00"
         }
       }
     },
@@ -768,12 +595,12 @@
       "details": "Status: 200",
       "response_data": {
         "team": {
-          "id": "4ebd0928-01ed-49a5-832d-e32567453de2",
+          "id": "0558ae56-1063-4ab5-98c3-d483c40f549f",
           "team_name": "Test Buzz Team",
           "budget_remaining": 50,
           "total_points": 0,
           "celebrities": [],
-          "created_at": "2026-02-20T18:13:29.262458+00:00"
+          "created_at": "2026-02-20T18:27:45.537388+00:00"
         }
       }
     },
@@ -799,6 +626,12 @@
             "team_id": "83faa5ba-ead4-4d04-8a09-c30df2996604",
             "team_name": "My Buzz Team",
             "total_points": 21.5,
+            "celebrity_count": 1
+          },
+          {
+            "team_id": "af87d29f-2cff-43d3-8efe-b607e93dffa2",
+            "team_name": "My Buzz Team",
+            "total_points": 21.0,
             "celebrity_count": 1
           },
           {
@@ -893,12 +726,6 @@
           },
           {
             "team_id": "4716646b-38d6-4053-a163-cdd8c6480379",
-            "team_name": "My Buzz Team",
-            "total_points": 0.0,
-            "celebrity_count": 0
-          },
-          {
-            "team_id": "e32f37e5-2ec0-410a-9498-2ea2d157cc06",
             "team_name": "My Buzz Team",
             "total_points": 0.0,
             "celebrity_count": 0
