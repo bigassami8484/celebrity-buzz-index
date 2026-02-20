@@ -306,7 +306,8 @@ async def search_celebrity(search: CelebritySearch):
     await db.celebrities.insert_one(doc)
     
     # Remove _id before returning
-    del doc['_id'] if '_id' in doc else None
+    if '_id' in doc:
+        del doc['_id']
     
     return {"celebrity": doc}
 
