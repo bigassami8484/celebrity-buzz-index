@@ -601,6 +601,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showMethodology, setShowMethodology] = useState(false);
 
   // Fetch categories
   const fetchCategories = useCallback(async () => {
