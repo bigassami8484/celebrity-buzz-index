@@ -8,9 +8,10 @@ from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import httpx
 import json
+import re
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 
 ROOT_DIR = Path(__file__).parent
@@ -32,6 +33,25 @@ api_router = APIRouter(prefix="/api")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Banned words for team names (racist, offensive)
+BANNED_WORDS = [
+    "nigger", "nigga", "faggot", "fag", "retard", "spic", "chink", "gook", 
+    "kike", "wetback", "beaner", "coon", "darkie", "paki", "raghead", 
+    "cracker", "honky", "nazi", "hitler", "kkk", "n1gger", "n1gga"
+]
+
+# High-profile celebrities with boosted base prices (controversial/newsworthy)
+CONTROVERSIAL_CELEBS = {
+    "prince andrew": 12,  # Always in news
+    "meghan markle": 10,
+    "prince harry": 10,
+    "katie price": 8,
+    "kanye west": 12,
+    "elon musk": 15,
+    "donald trump": 15,
+    "boris johnson": 10,
+}
+
 # ==================== MODELS ====================
 
 class Celebrity(BaseModel):
@@ -47,6 +67,8 @@ class Celebrity(BaseModel):
     tier: str = "D"  # A, B, C, or D list
     news: List[dict] = []
     page_views: int = 0
+    is_deceased: bool = False  # For brown bread bonus
+    times_picked: int = 0  # Track popularity
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class CelebritySearch(BaseModel):
