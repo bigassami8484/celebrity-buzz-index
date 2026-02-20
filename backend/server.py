@@ -1173,9 +1173,15 @@ async def get_team(team_id: str):
 @api_router.post("/team/add")
 async def add_to_team(data: AddToTeam):
     """Add celebrity to team"""
+    MAX_TEAM_SIZE = 10
+    
     team = await db.teams.find_one({"id": data.team_id})
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
+    
+    # Check team size limit
+    if len(team.get("celebrities", [])) >= MAX_TEAM_SIZE:
+        raise HTTPException(status_code=400, detail=f"Team is full! Maximum {MAX_TEAM_SIZE} celebrities allowed")
     
     celebrity = await db.celebrities.find_one({"id": data.celebrity_id})
     if not celebrity:
@@ -1187,7 +1193,7 @@ async def add_to_team(data: AddToTeam):
             raise HTTPException(status_code=400, detail="Celebrity already in team")
     
     # Check budget
-    price = celebrity.get("price", 5)
+    price = celebrity.get("price", 2)
     if team.get("budget_remaining", 0) < price:
         raise HTTPException(status_code=400, detail="Insufficient budget")
     
