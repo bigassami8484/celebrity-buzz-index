@@ -320,7 +320,12 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                         continue
                     
                     # Skip single word titles (usually not specific celebrities)
-                    if " " not in title and len(title) < 15:
+                    words = title.split()
+                    if len(words) < 2 or len(words) > 5:
+                        continue
+                    
+                    # Name should look like a proper name (each word capitalized, reasonable length)
+                    if not all(word[0].isupper() for word in words if word):
                         continue
                     
                     # Check for duplicates - use first two words as base name
