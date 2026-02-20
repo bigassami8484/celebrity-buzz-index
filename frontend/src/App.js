@@ -1615,6 +1615,7 @@ function App() {
       
       <div className="max-w-7xl mx-auto px-4 py-8">
         <HowItWorks onShowMethodology={() => setShowMethodology(true)} />
+        <HotCelebsBanner celebs={hotCelebs} onSelect={searchCelebrity} />
         <TodaysNews news={todaysNews} />
         <SearchBar onSearch={searchCelebrity} loading={searchLoading} />
         <CategoryFilter 
