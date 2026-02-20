@@ -498,12 +498,12 @@ def estimate_tier_from_description(description: str) -> str:
 def get_price_for_tier(tier: str) -> int:
     """Get price based on celebrity tier"""
     prices = {
-        "A": 18,  # £18M for A-list
-        "B": 12,  # £12M for B-list
-        "C": 7,   # £7M for C-list
-        "D": 3    # £3M for D-list
+        "A": 9,   # £9M for A-list
+        "B": 6,   # £6M for B-list
+        "C": 4,   # £4M for C-list
+        "D": 2    # £2M for D-list
     }
-    return prices.get(tier, 5)
+    return prices.get(tier, 2)
 
 async def calculate_celebrity_tier(bio: str, name: str) -> tuple:
     """Calculate celebrity tier based on bio content and return (tier, price)"""
@@ -512,12 +512,12 @@ async def calculate_celebrity_tier(bio: str, name: str) -> tuple:
     # A-list: Major awards, billions in earnings, legendary status
     a_list_score = sum(1 for ind in A_LIST_INDICATORS if ind in bio_lower)
     if a_list_score >= 2:
-        return ("A", 18)
+        return ("A", 9)
     
     # B-list: Award-winning, millions, chart-topping
     b_list_score = sum(1 for ind in B_LIST_INDICATORS if ind in bio_lower)
     if a_list_score >= 1 or b_list_score >= 2:
-        return ("B", 12)
+        return ("B", 6)
     
     # C-list: Known for appearances, contestants
     c_list_score = sum(1 for ind in C_LIST_INDICATORS if ind in bio_lower)
