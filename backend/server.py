@@ -1186,6 +1186,50 @@ async def rename_team(team_id: str, new_name: str):
     team = await db.teams.find_one({"id": team_id}, {"_id": 0})
     return {"team": team}
 
+@api_router.get("/team/customization-options")
+async def get_customization_options():
+    """Get available team customization options"""
+    return {
+        "colors": TEAM_COLORS,
+        "icons": TEAM_ICONS
+    }
+
+@api_router.post("/team/customize")
+async def customize_team(data: TeamCustomize):
+    """Customize team appearance"""
+    team = await db.teams.find_one({"id": data.team_id})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    updates = {}
+    
+    # Update team name (with profanity check)
+    if data.team_name:
+        if contains_banned_words(data.team_name):
+            raise HTTPException(status_code=400, detail="Team name contains inappropriate language")
+        updates["team_name"] = data.team_name
+    
+    # Update team color
+    if data.team_color:
+        valid_colors = [c["id"] for c in TEAM_COLORS]
+        if data.team_color not in valid_colors:
+            raise HTTPException(status_code=400, detail="Invalid color selection")
+        updates["team_color"] = data.team_color
+    
+    # Update team icon
+    if data.team_icon:
+        valid_icons = [i["id"] for i in TEAM_ICONS]
+        if data.team_icon not in valid_icons:
+            raise HTTPException(status_code=400, detail="Invalid icon selection")
+        updates["team_icon"] = data.team_icon
+    
+    if updates:
+        await db.teams.update_one({"id": data.team_id}, {"$set": updates})
+    
+    # Return updated team
+    updated_team = await db.teams.find_one({"id": data.team_id}, {"_id": 0})
+    return {"team": updated_team, "message": "Team customized!"}
+
 @api_router.get("/team/{team_id}")
 async def get_team(team_id: str):
     """Get team by ID"""
