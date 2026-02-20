@@ -478,9 +478,6 @@ const MobileNav = ({ activeTab, onTabChange }) => (
     </div>
   </div>
 );
-    </div>
-  </div>
-);
 
 // How It Works Component
 const HowItWorks = ({ onShowMethodology }) => (
