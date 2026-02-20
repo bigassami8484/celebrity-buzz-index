@@ -153,27 +153,33 @@ def detect_category_from_bio(bio: str, name: str) -> str:
                                      "house of windsor", "buckingham palace", "monarchy"]):
         return "royals"
     
-    # Musicians/Singers
-    if any(x in bio_lower for x in ["singer", "musician", "rapper", "songwriter", "vocalist", 
+    # Musicians/Singers - expanded keywords
+    if any(x in bio_lower for x in ["singer", "songwriter", "musician", "rapper", "vocalist", 
                                      "band", "album", "record", "grammy", "brit award", "concert", 
-                                     "tour", "music artist", "pop star", "rock star", "hip hop"]):
+                                     "tour", "music artist", "pop star", "rock star", "hip hop",
+                                     "r&b", "mezzo-soprano", "soprano", "tenor", "musical artist"]):
         return "musicians"
     
-    # Athletes
+    # Athletes - expanded keywords
     if any(x in bio_lower for x in ["footballer", "athlete", "football", "basketball", "soccer", 
                                      "tennis", "olympic", "premier league", "f1", "formula one",
-                                     "racing driver", "cricketer", "rugby", "boxing", "boxer"]):
+                                     "racing driver", "cricketer", "rugby", "boxing", "boxer",
+                                     "striker", "goalkeeper", "midfielder", "defender",
+                                     "bundesliga", "la liga", "serie a", "england national team",
+                                     "world cup", "champion", "motorsport"]):
         return "athletes"
     
     # TV actors
     if any(x in bio_lower for x in ["television actor", "tv actor", "television series", "tv series", 
                                      "sitcom", "soap opera", "tv show", "bbc", "itv", "channel 4",
-                                     "eastenders", "coronation street", "emmerdale", "doctor who"]):
+                                     "eastenders", "coronation street", "emmerdale", "doctor who",
+                                     "killing eve", "the crown"]):
         return "tv_actors"
     
-    # Movie stars
+    # Movie stars - check for film/movie actors
     if any(x in bio_lower for x in ["actor", "actress", "film", "movie", "cinema", "hollywood", 
-                                     "oscar", "bafta", "academy award"]):
+                                     "oscar", "bafta", "academy award", "golden globe",
+                                     "box office", "marvel", "superhero", "spider-man"]):
         return "movie_stars"
     
     # Other (businesspeople, chefs, presenters, etc.)
@@ -181,7 +187,7 @@ def detect_category_from_bio(bio: str, name: str) -> str:
                                      "tv presenter", "author", "journalist", "comedian"]):
         return "other"
     
-    return "other"  # Default to other instead of movie_stars
+    return "other"  # Default to other
 
 async def generate_celebrity_news(name: str, category: str) -> List[dict]:
     """Generate AI-powered news summaries for celebrity"""
