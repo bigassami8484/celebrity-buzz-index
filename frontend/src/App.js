@@ -859,6 +859,20 @@ const TeamPanel = ({ team, onRemove, onShare }) => {
           <p className="text-sm text-[#A1A1AA] font-space">
             {team.celebrities?.length || 0} celebrities • {team.total_points?.toFixed(1)} points
           </p>
+          {/* Badges Display */}
+          {team.badges?.length > 0 && (
+            <div className="flex gap-1 mt-2 flex-wrap">
+              {team.badges.map((badge, idx) => (
+                <span 
+                  key={idx} 
+                  className="text-lg cursor-help" 
+                  title={`${badge.name || badge.id}: ${badge.description || ''}`}
+                >
+                  {badge.icon || '🏅'}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
         <div className="text-right">
           <div className="budget-display" data-testid="budget-display">
