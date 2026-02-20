@@ -288,7 +288,7 @@ async def get_trending():
     return {"trending": trending[:15]}
 
 @api_router.post("/celebrity/search")
-async def search_celebrity(search: CelebritySearch):
+async def search_celebrity(search: CelebritySearch, override_category: str = None):
     """Search for a celebrity and get their buzz data"""
     name = search.name.strip()
     
@@ -300,19 +300,11 @@ async def search_celebrity(search: CelebritySearch):
     # Fetch from Wikipedia
     wiki_info = await fetch_wikipedia_info(name)
     
-    # Determine category based on bio
-    category = "movie_stars"  # Default
-    bio_lower = wiki_info.get("bio", "").lower()
-    if any(x in bio_lower for x in ["singer", "musician", "rapper", "band", "album"]):
-        category = "musicians"
-    elif any(x in bio_lower for x in ["athlete", "football", "basketball", "soccer", "tennis", "olympic"]):
-        category = "athletes"
-    elif any(x in bio_lower for x in ["prince", "princess", "king", "queen", "royal", "duke", "duchess"]):
-        category = "royals"
-    elif any(x in bio_lower for x in ["reality", "kardashian", "jenner"]):
-        category = "reality_tv"
-    elif any(x in bio_lower for x in ["television", "tv series", "sitcom"]):
-        category = "tv_actors"
+    # Use override category if provided, otherwise detect from bio
+    if override_category:
+        category = override_category
+    else:
+        category = detect_category_from_bio(wiki_info.get("bio", ""), wiki_info["name"])
     
     # Generate news
     news = await generate_celebrity_news(wiki_info["name"], category)
