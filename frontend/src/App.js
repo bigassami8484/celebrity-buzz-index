@@ -1443,6 +1443,16 @@ function App() {
             <TopPickedCelebs celebs={topPicked} onSelect={searchCelebrity} />
             <BrownBreadWatch watchList={brownBreadWatch} onSelect={searchCelebrity} />
             <Leaderboard entries={leaderboard} />
+            
+            {/* Hall of Fame Button */}
+            <button
+              onClick={() => { fetchHallOfFame(); setShowHallOfFame(true); }}
+              className="w-full bg-gradient-to-r from-[#FFD700] to-[#FF8C00] text-black font-bold py-3 px-4 flex items-center justify-center gap-2 hover:from-[#FFE44D] hover:to-[#FFA033] transition-all"
+              data-testid="hall-of-fame-btn"
+            >
+              <span className="text-xl">🏆</span>
+              Hall of Fame
+            </button>
           </div>
         </div>
       </div>
