@@ -84,6 +84,12 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - ✅ Updated minimum base points to 5 (was 10, now enforces min 5)
 - ✅ Updated Brown Bread Bonus to +100 in UI (was showing +50)
 
+## New Features (Dec 2025)
+- ✅ **Brown Bread Watch** - Strategic sidebar showing elderly celebrities (60+) with risk indicators
+  - 🔴 Critical (90+), 🟠 High (80-89), 🟡 Elevated (70-79), 🟢 Moderate (60-69)
+  - Grayscale photos, age display, click-to-search integration
+  - Extracts birth year from Wikipedia's wikibase-shortdesc API
+
 ## Backlog / Future Features
 
 ### P1 (High Priority)
