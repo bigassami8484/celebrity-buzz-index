@@ -431,13 +431,13 @@ def calculate_buzz_score(news: List[dict]) -> float:
         else:
             score += 1.0
         
-        # Sentiment modifier
+        # Sentiment modifier - CONTROVERSY BONUS is 25 points!
         if sentiment == "positive":
             score += 0.5
         elif sentiment == "negative":
-            score += 1.0  # Controversy = more buzz
+            score += 25.0  # Big controversy bonus!
     
-    return round(min(score, 100.0), 1)
+    return round(min(score, 150.0), 1)  # Increased max to account for controversy
 
 def calculate_price(buzz_score: float, tier: str, name: str = "") -> int:
     """Calculate celebrity price based on buzz score, tier, and controversy"""
