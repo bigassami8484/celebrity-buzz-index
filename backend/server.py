@@ -617,8 +617,12 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     # Calculate buzz score
     buzz_score = calculate_buzz_score(news)
     
-    # Final price based on tier and buzz
-    price = calculate_price(buzz_score, tier)
+    # Final price based on tier, buzz, and controversy
+    price = calculate_price(buzz_score, tier, wiki_info["name"])
+    
+    # Check if celebrity is deceased (look for death date in bio)
+    bio_lower = wiki_info.get("bio", "").lower()
+    is_deceased = any(x in bio_lower for x in ["was a ", "died ", "passed away", "1900–", "1910–", "1920–", "1930–", "1940–", "1950–", "1960–", "1970–", "1980–", "1990–", "2000–", "2010–", "2020–"])
     
     # Create celebrity object
     celebrity = Celebrity(
@@ -630,7 +634,9 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         buzz_score=buzz_score,
         price=price,
         tier=tier,
-        news=news
+        news=news,
+        is_deceased=is_deceased,
+        times_picked=0
     )
     
     # Save to database
