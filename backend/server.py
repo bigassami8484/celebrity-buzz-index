@@ -99,6 +99,8 @@ class UserTeam(BaseModel):
     celebrities: List[TeamCelebrity] = []
     transfers_this_week: int = 0
     last_transfer_reset: str = ""
+    badges: List[dict] = []  # Earned badges
+    weekly_wins: int = 0  # Number of weekly wins
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class TeamCreate(BaseModel):
