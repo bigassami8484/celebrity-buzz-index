@@ -1131,22 +1131,6 @@ function App() {
     }
   };
 
-  // Place a bet in the mini game
-  const placeBet = async (celebrityId, betAmount) => {
-    if (!team) return;
-    try {
-      const res = await axios.post(`${API}/minigame/bet`, {
-        team_id: team.id,
-        celebrity_id: celebrityId,
-        bet_amount: betAmount
-      });
-      setBets(prev => [res.data.bet, ...prev]);
-      toast.success(res.data.message);
-    } catch (e) {
-      toast.error(e.response?.data?.detail || "Failed to place bet");
-    }
-  };
-
   // Fetch categories
   const fetchCategories = useCallback(async () => {
     try {
