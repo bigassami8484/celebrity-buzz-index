@@ -1,8 +1,8 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import "@/App.css";
 import axios from "axios";
 import { Toaster, toast } from "sonner";
-import { Search, Crown, Film, Tv, Music, Trophy, Star, Share2, X, Copy, Check, TrendingUp, Minus, Plus, Users } from "lucide-react";
+import { Search, Crown, Film, Tv, Music, Trophy, Star, Share2, X, Copy, Check, TrendingUp, Minus, Plus, Users, Info, ChevronUp } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -18,31 +18,119 @@ const categoryIcons = {
   other: Users,
 };
 
+// Tier colors
+const tierColors = {
+  A: { bg: "bg-[#FFD700]", text: "text-black", label: "A-LIST" },
+  B: { bg: "bg-[#C0C0C0]", text: "text-black", label: "B-LIST" },
+  C: { bg: "bg-[#CD7F32]", text: "text-white", label: "C-LIST" },
+  D: { bg: "bg-[#666666]", text: "text-white", label: "D-LIST" },
+};
+
+// Tier Badge Component
+const TierBadge = ({ tier }) => {
+  const tierStyle = tierColors[tier] || tierColors.D;
+  return (
+    <span className={`${tierStyle.bg} ${tierStyle.text} px-2 py-1 text-[10px] font-bold uppercase tracking-wider`}>
+      {tierStyle.label}
+    </span>
+  );
+};
+
+// Points Methodology Component
+const PointsMethodology = ({ onClose }) => (
+  <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
+    <div className="bg-[#0A0A0A] border border-[#262626] max-w-2xl w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="font-anton text-2xl uppercase text-[#FFD700]">How Points Are Calculated</h3>
+          <button onClick={onClose} className="text-[#A1A1AA] hover:text-white">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        
+        <p className="text-[#A1A1AA] mb-6">Celebrity Buzz Points are calculated based on media coverage and public interest:</p>
+        
+        <div className="space-y-4 mb-6">
+          <div className="bg-[#1A1A1A] p-4">
+            <h4 className="font-bold text-[#FF0099] mb-2">📰 News Mentions</h4>
+            <p className="text-sm text-[#A1A1AA]">+1.0 point per article mentioning the celebrity</p>
+          </div>
+          <div className="bg-[#1A1A1A] p-4">
+            <h4 className="font-bold text-[#FF0099] mb-2">🗞️ Tabloid Coverage</h4>
+            <p className="text-sm text-[#A1A1AA]">+3.0 points per tabloid article (Daily Mail, The Sun, TMZ) - higher weight due to engagement</p>
+          </div>
+          <div className="bg-[#1A1A1A] p-4">
+            <h4 className="font-bold text-[#FF0099] mb-2">📺 Broadsheet Coverage</h4>
+            <p className="text-sm text-[#A1A1AA]">+2.0 points per quality press article (BBC, Guardian, Times)</p>
+          </div>
+          <div className="bg-[#1A1A1A] p-4">
+            <h4 className="font-bold text-[#FF0099] mb-2">⚡ Controversy Bonus</h4>
+            <p className="text-sm text-[#A1A1AA]">+1.0 point per negative/scandal article - controversy generates buzz!</p>
+          </div>
+          <div className="bg-[#1A1A1A] p-4">
+            <h4 className="font-bold text-[#FF0099] mb-2">📱 Social Media Trending</h4>
+            <p className="text-sm text-[#A1A1AA]">+5.0 points per trending event on social platforms</p>
+          </div>
+        </div>
+        
+        <h4 className="font-bold text-white mb-3">Tier Multipliers</h4>
+        <div className="grid grid-cols-2 gap-2 mb-6">
+          <div className="bg-[#FFD700] text-black p-2 text-center text-sm font-bold">A-LIST: 1.0x</div>
+          <div className="bg-[#C0C0C0] text-black p-2 text-center text-sm font-bold">B-LIST: 1.2x</div>
+          <div className="bg-[#CD7F32] text-white p-2 text-center text-sm font-bold">C-LIST: 1.5x</div>
+          <div className="bg-[#666666] text-white p-2 text-center text-sm font-bold">D-LIST: 2.0x</div>
+        </div>
+        
+        <div className="bg-[#FF0099]/20 border border-[#FF0099] p-4">
+          <p className="text-sm"><strong>Example:</strong> A D-list celebrity with 10 tabloid mentions = 10 × 3.0 × 2.0 = <span className="text-[#FFD700] font-bold">60 points</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 // How It Works Component
-const HowItWorks = () => (
+const HowItWorks = ({ onShowMethodology }) => (
   <div className="bg-[#0A0A0A] border border-[#262626] p-6 mb-8" data-testid="how-it-works">
-    <h3 className="font-anton text-2xl uppercase tracking-tight mb-4 text-[#FFD700]">How It Works</h3>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="flex justify-between items-center mb-4">
+      <h3 className="font-anton text-2xl uppercase tracking-tight text-[#FFD700]">How It Works</h3>
+      <button 
+        onClick={onShowMethodology}
+        className="flex items-center gap-2 text-[#00F0FF] hover:text-white text-sm"
+        data-testid="show-methodology-btn"
+      >
+        <Info className="w-4 h-4" />
+        How Points Work
+      </button>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
       <div className="text-center">
         <div className="w-12 h-12 bg-[#FF0099] flex items-center justify-center mx-auto mb-3">
           <Search className="w-6 h-6 text-white" />
         </div>
         <h4 className="font-space font-bold text-lg mb-2">1. Search & Browse</h4>
-        <p className="text-sm text-[#A1A1AA]">Find celebrities by name or browse categories like Royals, Reality TV, Musicians & more</p>
+        <p className="text-sm text-[#A1A1AA]">Search ANY celebrity with a Wikipedia page worldwide</p>
       </div>
       <div className="text-center">
         <div className="w-12 h-12 bg-[#00F0FF] flex items-center justify-center mx-auto mb-3">
-          <Plus className="w-6 h-6 text-black" />
+          <Star className="w-6 h-6 text-black" />
         </div>
-        <h4 className="font-space font-bold text-lg mb-2">2. Build Your Team</h4>
-        <p className="text-sm text-[#A1A1AA]">Spend your £50M budget wisely. High buzz = higher price!</p>
+        <h4 className="font-space font-bold text-lg mb-2">2. Check Their Tier</h4>
+        <p className="text-sm text-[#A1A1AA]">A-list costs more (£18M), D-list is cheaper (£3M)</p>
       </div>
       <div className="text-center">
         <div className="w-12 h-12 bg-[#FFD700] flex items-center justify-center mx-auto mb-3">
-          <Trophy className="w-6 h-6 text-black" />
+          <Plus className="w-6 h-6 text-black" />
         </div>
-        <h4 className="font-space font-bold text-lg mb-2">3. Climb the Leaderboard</h4>
-        <p className="text-sm text-[#A1A1AA]">Earn points based on your celebrities' buzz scores. Share & compete!</p>
+        <h4 className="font-space font-bold text-lg mb-2">3. Build Your Team</h4>
+        <p className="text-sm text-[#A1A1AA]">Spend your £50M budget wisely on your dream squad</p>
+      </div>
+      <div className="text-center">
+        <div className="w-12 h-12 bg-[#FF5500] flex items-center justify-center mx-auto mb-3">
+          <Trophy className="w-6 h-6 text-white" />
+        </div>
+        <h4 className="font-space font-bold text-lg mb-2">4. Win!</h4>
+        <p className="text-sm text-[#A1A1AA]">Earn points based on buzz. D-listers get 2x multiplier!</p>
       </div>
     </div>
   </div>
