@@ -79,7 +79,7 @@ const Header = () => (
   </header>
 );
 
-// Trending Ticker Component
+// Trending Ticker Component with Images
 const TrendingTicker = ({ celebrities }) => {
   if (!celebrities.length) return null;
   
@@ -89,7 +89,15 @@ const TrendingTicker = ({ celebrities }) => {
     <div className="ticker-container" data-testid="trending-ticker">
       <div className="ticker-content">
         {doubled.map((celeb, idx) => (
-          <span key={idx} className="ticker-item">
+          <span key={idx} className="ticker-item flex items-center gap-2">
+            <img 
+              src={celeb.image || `https://ui-avatars.com/api/?name=${celeb.name}&size=32&background=FF0099&color=fff`}
+              alt={celeb.name}
+              className="w-8 h-8 rounded-full object-cover border-2 border-black"
+              onError={(e) => {
+                e.target.src = `https://ui-avatars.com/api/?name=${celeb.name}&size=32&background=FF0099&color=fff`;
+              }}
+            />
             {celeb.name} <TrendingUp className="inline w-4 h-4 mx-1" /> {celeb.buzz_score?.toFixed(1)}
           </span>
         ))}
