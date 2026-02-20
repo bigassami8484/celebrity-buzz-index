@@ -1090,16 +1090,6 @@ function App() {
     }
   }, []);
 
-  // Fetch team's bets
-  const fetchTeamBets = useCallback(async (teamId) => {
-    try {
-      const res = await axios.get(`${API}/minigame/bets/${teamId}`);
-      setBets(res.data.bets || []);
-    } catch (e) {
-      console.error("Error fetching bets:", e);
-    }
-  }, []);
-
   // Create a new league
   const createLeague = async (name) => {
     if (!team) return;
