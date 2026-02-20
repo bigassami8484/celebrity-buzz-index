@@ -1011,6 +1011,9 @@ function App() {
       {showMethodology && (
         <PointsMethodology onClose={() => setShowMethodology(false)} />
       )}
+      
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
