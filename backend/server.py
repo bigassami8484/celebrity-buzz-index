@@ -359,14 +359,28 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             
                             # Check description for person keywords
                             desc_lower = desc.lower()
-                            person_indicators = ["born", "is a", "was a", "singer", "actor", "actress", 
-                                                "musician", "footballer", "athlete", "politician", 
-                                                "presenter", "model", "chef", "comedian", "director",
-                                                "rapper", "personality", "celebrity", "star"]
                             
-                            # Skip fictional characters
-                            if "fictional" in desc_lower or "character" in desc_lower:
+                            # Skip fictional characters, albums, songs, TV shows
+                            skip_indicators = [
+                                "fictional", "character", "album", "studio album", 
+                                "single by", "song by", "ep by", "soundtrack",
+                                "television series", "tv series", "sitcom", "drama series",
+                                "video game", "film", "movie", "novel", "book",
+                                "band", "musical group", "rock band", "pop group"
+                            ]
+                            if any(skip in desc_lower for skip in skip_indicators):
                                 continue
+                            
+                            # Must have person indicators
+                            person_indicators = [
+                                "born", "is a", "was a", "is an", "was an",
+                                "singer", "actor", "actress", "musician", "footballer", 
+                                "athlete", "politician", "presenter", "model", "chef", 
+                                "comedian", "director", "rapper", "personality", "celebrity",
+                                "businessman", "businesswoman", "entrepreneur", "influencer",
+                                "author", "writer", "journalist", "host", "dancer",
+                                "prince", "princess", "duke", "duchess", "queen", "king"
+                            ]
                             
                             if not any(ind in desc_lower for ind in person_indicators):
                                 continue
