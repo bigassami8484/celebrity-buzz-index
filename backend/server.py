@@ -973,10 +973,10 @@ async def transfer_celebrity(data: TransferRequest):
     new_budget = budget_after_sale - buy_celeb["price"]
     new_points = team.get("total_points", 0) - sell_celeb["buzz_score"] + buy_celeb["buzz_score"]
     
-    # Check brown bread bonus for new celeb
+    # Check brown bread bonus for new celeb (100 points)
     brown_bread_bonus = 0
     if buy_celeb.get("is_deceased"):
-        brown_bread_bonus = 50.0
+        brown_bread_bonus = 100.0  # 100 points for dead celebs!
         new_points += brown_bread_bonus
     
     new_team_celeb = TeamCelebrity(
