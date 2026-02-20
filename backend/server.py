@@ -1146,28 +1146,49 @@ async def get_todays_news():
     news_items = []
     headers = {"User-Agent": "CelebrityBuzzIndex/1.0"}
     
-    # News sources with RSS feeds - UK and US publications
+    # News sources with RSS feeds - prioritize major news sources
     rss_sources = [
-        ("https://www.dailymail.co.uk/tvshowbiz/index.rss", "Daily Mail"),
-        ("https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "BBC News"),
-        ("https://www.theguardian.com/lifeandstyle/celebrities/rss", "The Guardian"),
-        ("https://www.tmz.com/rss.xml", "TMZ"),
-        ("https://people.com/feed/", "People"),
-        ("https://eonline.com/syndication/feeds/rssfeeds/topstories.xml", "E! News"),
-        ("https://www.usmagazine.com/feed/", "US Weekly"),
-        ("https://pagesix.com/feed/", "Page Six"),
+        ("https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "BBC News", True),  # Priority
+        ("https://www.theguardian.com/lifeandstyle/celebrities/rss", "The Guardian", True),  # Priority
+        ("https://www.tmz.com/rss.xml", "TMZ", False),
+        ("https://people.com/feed/", "People", False),
+        ("https://pagesix.com/feed/", "Page Six", False),
+        ("https://www.dailymail.co.uk/tvshowbiz/index.rss", "Daily Mail", False),
+    ]
+    
+    # Words that indicate MAJOR news (scandals, legal, deaths, awards)
+    major_news_keywords = [
+        "arrested", "charged", "court", "lawsuit", "sued", "divorce", "split",
+        "dies", "dead", "death", "passed away", "funeral", "tribute",
+        "scandal", "controversy", "fired", "axed", "cancelled", "banned",
+        "award", "wins", "nominated", "grammy", "oscar", "emmy", "bafta",
+        "pregnant", "baby", "engaged", "married", "wedding",
+        "million", "billion", "record", "historic", "first ever",
+        "feud", "slams", "blasts", "attacks", "responds", "breaks silence",
+        "comeback", "returns", "quits", "retires", "leaves",
+        "royal", "palace", "prince", "princess", "meghan", "harry", "andrew",
+        "trump", "musk", "kanye", "taylor swift", "beyonce"
+    ]
+    
+    # Words that indicate trivial gossip to SKIP
+    skip_gossip_keywords = [
+        "braless", "bikini", "swimsuit", "beach body", "abs", "toned",
+        "shows off", "flaunts", "displays", "reveals figure",
+        "lunch date", "coffee run", "grocery shopping", "walks dog",
+        "outfit", "dress", "gown", "what she wore", "fashion moment",
+        "lookalike", "doppelganger", "twinning"
     ]
     
     try:
         async with httpx.AsyncClient() as client:
-            for rss_url, source_name in rss_sources:
+            for rss_url, source_name, is_priority in rss_sources:
                 try:
                     response = await client.get(rss_url, timeout=10.0, headers=headers)
                     if response.status_code == 200:
                         # Parse RSS (simple parsing)
                         content = response.text
                         # Extract items using simple string parsing
-                        items = content.split("<item>")[1:6]  # Get first 5 items
+                        items = content.split("<item>")[1:10]  # Get first 10 items to filter
                         
                         for item in items:
                             try:
@@ -1175,6 +1196,18 @@ async def get_todays_news():
                                 title_start = item.find("<title>") + 7
                                 title_end = item.find("</title>")
                                 title = item[title_start:title_end].replace("<![CDATA[", "").replace("]]>", "").strip()
+                                title_lower = title.lower()
+                                
+                                # Skip trivial gossip
+                                if any(skip_word in title_lower for skip_word in skip_gossip_keywords):
+                                    continue
+                                
+                                # Check if it's major news OR from priority source
+                                is_major = any(keyword in title_lower for keyword in major_news_keywords)
+                                
+                                # Skip non-major news from non-priority sources
+                                if not is_major and not is_priority:
+                                    continue
                                 
                                 # Extract link
                                 link_start = item.find("<link>") + 6
@@ -1192,7 +1225,6 @@ async def get_todays_news():
                                 desc_end = item.find("</description>")
                                 description = item[desc_start:desc_end].replace("<![CDATA[", "").replace("]]>", "").strip()
                                 # Clean HTML tags from description
-                                import re
                                 description = re.sub(r'<[^>]+>', '', description)[:200]
                                 
                                 if title and len(title) > 10:
@@ -1206,7 +1238,8 @@ async def get_todays_news():
                                         "summary": description[:200] if description else title,
                                         "source": source_name,
                                         "url": link,
-                                        "category": "other"
+                                        "category": "other",
+                                        "is_major": is_major
                                     })
                             except Exception as e:
                                 logger.error(f"Error parsing RSS item: {e}")
@@ -1215,7 +1248,8 @@ async def get_todays_news():
                     logger.error(f"Error fetching RSS from {source_name}: {e}")
                     continue
         
-        # Limit to 8 items
+        # Sort by major news first, then limit to 8 items
+        news_items.sort(key=lambda x: (not x.get("is_major", False)))
         news_items = news_items[:8]
         
         if news_items:
