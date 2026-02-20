@@ -522,10 +522,10 @@ async def calculate_celebrity_tier(bio: str, name: str) -> tuple:
     # C-list: Known for appearances, contestants
     c_list_score = sum(1 for ind in C_LIST_INDICATORS if ind in bio_lower)
     if b_list_score >= 1 or c_list_score >= 1:
-        return ("C", 7)
+        return ("C", 4)
     
     # D-list: Everyone else
-    return ("D", 3)
+    return ("D", 2)
 
 async def fetch_wikipedia_info(name: str) -> dict:
     """Fetch celebrity info from Wikipedia API"""
