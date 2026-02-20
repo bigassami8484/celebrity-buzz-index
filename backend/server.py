@@ -44,7 +44,9 @@ class Celebrity(BaseModel):
     wiki_url: str = ""
     buzz_score: float = 0.0
     price: int = 5
+    tier: str = "D"  # A, B, C, or D list
     news: List[dict] = []
+    page_views: int = 0
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class CelebritySearch(BaseModel):
