@@ -78,7 +78,7 @@ const PointsMethodology = ({ onClose }) => (
           </div>
           <div className="bg-[#1A1A1A] p-4">
             <h4 className="font-bold text-[#FF0099] mb-2">🗞️ Tabloid Coverage</h4>
-            <p className="text-sm text-[#A1A1AA]">+3.0 points per tabloid article (Daily Mail, The Sun, TMZ) - higher weight due to engagement</p>
+            <p className="text-sm text-[#A1A1AA]">+3.0 points per tabloid article (Daily Mail, The Sun, TMZ)</p>
           </div>
           <div className="bg-[#1A1A1A] p-4">
             <h4 className="font-bold text-[#FF0099] mb-2">📺 Broadsheet Coverage</h4>
@@ -86,7 +86,7 @@ const PointsMethodology = ({ onClose }) => (
           </div>
           <div className="bg-[#1A1A1A] p-4">
             <h4 className="font-bold text-[#FF0099] mb-2">⚡ Controversy Bonus</h4>
-            <p className="text-sm text-[#A1A1AA]">+1.0 point per negative/scandal article - controversy generates buzz!</p>
+            <p className="text-sm text-[#A1A1AA]"><span className="text-[#FFD700] font-bold">+25 points</span> per scandal/negative article!</p>
           </div>
           <div className="bg-[#1A1A1A] p-4">
             <h4 className="font-bold text-[#FF0099] mb-2">📱 Social Media Trending</h4>
