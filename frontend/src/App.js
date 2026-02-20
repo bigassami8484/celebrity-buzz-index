@@ -868,8 +868,14 @@ function App() {
         celebrity_id: celebrity.id
       });
       setTeam(res.data.team);
-      toast.success(`Added ${celebrity.name} to your team!`);
+      if (res.data.brown_bread_bonus) {
+        toast.success(`Added ${celebrity.name} + 💀 Brown Bread Bonus!`, { duration: 5000 });
+      } else {
+        toast.success(`Added ${celebrity.name} to your team!`);
+      }
       fetchLeaderboard();
+      fetchTopPicked();
+      fetchStats();
     } catch (e) {
       toast.error(e.response?.data?.detail || "Failed to add celebrity");
     }
