@@ -89,10 +89,39 @@ class TeamCelebrity(BaseModel):
     tier: str = "D"
     added_at: str = ""
 
+# Team customization options
+TEAM_COLORS = [
+    {"id": "pink", "name": "Hot Pink", "hex": "#FF0099"},
+    {"id": "cyan", "name": "Electric Blue", "hex": "#00F0FF"},
+    {"id": "gold", "name": "Gold", "hex": "#FFD700"},
+    {"id": "purple", "name": "Royal Purple", "hex": "#8B5CF6"},
+    {"id": "red", "name": "Fire Red", "hex": "#EF4444"},
+    {"id": "green", "name": "Emerald", "hex": "#10B981"},
+    {"id": "orange", "name": "Sunset Orange", "hex": "#F97316"},
+    {"id": "white", "name": "Classic White", "hex": "#FFFFFF"},
+]
+
+TEAM_ICONS = [
+    {"id": "star", "name": "Star", "emoji": "⭐"},
+    {"id": "crown", "name": "Crown", "emoji": "👑"},
+    {"id": "fire", "name": "Fire", "emoji": "🔥"},
+    {"id": "lightning", "name": "Lightning", "emoji": "⚡"},
+    {"id": "rocket", "name": "Rocket", "emoji": "🚀"},
+    {"id": "diamond", "name": "Diamond", "emoji": "💎"},
+    {"id": "skull", "name": "Skull", "emoji": "💀"},
+    {"id": "ghost", "name": "Ghost", "emoji": "👻"},
+    {"id": "alien", "name": "Alien", "emoji": "👽"},
+    {"id": "robot", "name": "Robot", "emoji": "🤖"},
+    {"id": "unicorn", "name": "Unicorn", "emoji": "🦄"},
+    {"id": "dragon", "name": "Dragon", "emoji": "🐉"},
+]
+
 class UserTeam(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     team_name: str = "My Team"
+    team_color: str = "pink"  # Default color
+    team_icon: str = "star"   # Default icon
     budget_remaining: int = 50
     total_points: float = 0.0
     brown_bread_bonus: float = 0.0  # Points from deceased celebs
@@ -105,6 +134,12 @@ class UserTeam(BaseModel):
 
 class TeamCreate(BaseModel):
     team_name: str = "My Team"
+
+class TeamCustomize(BaseModel):
+    team_id: str
+    team_name: str = None
+    team_color: str = None
+    team_icon: str = None
 
 class AddToTeam(BaseModel):
     team_id: str
