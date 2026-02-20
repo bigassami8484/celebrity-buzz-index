@@ -1121,8 +1121,21 @@ const Leaderboard = ({ entries }) => (
           <span className={`leaderboard-rank ${idx === 0 ? 'gold' : idx === 1 ? 'silver' : idx === 2 ? 'bronze' : ''}`}>
             #{idx + 1}
           </span>
-          <div className="flex-1 ml-4">
-            <p className="font-bold">{entry.team_name}</p>
+          {/* Team Icon */}
+          <div 
+            className="w-8 h-8 rounded-full flex items-center justify-center text-sm ml-2"
+            style={{ backgroundColor: entry.team_color || '#FF0099' }}
+          >
+            {entry.team_icon || '⭐'}
+          </div>
+          <div className="flex-1 ml-3">
+            <p className="font-bold flex items-center gap-1">
+              {entry.team_name}
+              {/* Show first 3 badges */}
+              {entry.badges?.slice(0, 3).map((b, i) => (
+                <span key={i} className="text-sm">{b.icon || '🏅'}</span>
+              ))}
+            </p>
             <p className="text-sm text-[#A1A1AA]">
               {entry.celebrity_count} celebs
               {entry.brown_bread_bonus > 0 && (
