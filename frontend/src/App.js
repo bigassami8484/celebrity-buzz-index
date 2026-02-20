@@ -1037,9 +1037,6 @@ function App() {
   const [selectedLeague, setSelectedLeague] = useState(null);
   const [leagueLeaderboard, setLeagueLeaderboard] = useState([]);
   
-  // Mini game state
-  const [bets, setBets] = useState([]);
-  
   // Mobile tab state
   const [mobileTab, setMobileTab] = useState('home');
 
