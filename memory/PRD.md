@@ -6,36 +6,44 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - View AI-generated news coverage and Wikipedia info
 - Calculate "buzz points" based on media mentions
 - Build teams with a £50M budget
-- Compete on leaderboards
+- Compete on leaderboards with friends
 - Social sharing (Twitter/X, Facebook, WhatsApp)
 
 **Latest Requirements:**
 - Price fluctuations based on controversy (Prince Andrew costs more)
-- "Brown Bread Bonus" (+50 points if celebrity dies)
+- "Brown Bread Bonus" (+100 points if celebrity dies)
+- "Brown Bread Watch" - elderly celebrities with risk indicators
 - Weekly transfer window (1 swap per week)
 - Today's Top Celeb News section
 - Player count display
 - Ban racist/offensive team names
 - Top Picked Celebrities section
 - A/B/C/D list tiers with tiered pricing
+- Friends League system with invite codes
+- Mobile responsive design
 
 ## Architecture
 
 ### Backend (FastAPI + MongoDB)
 - `/api/categories` - Get all celebrity categories
-- `/api/autocomplete?q=` - Wikipedia autocomplete search
+- `/api/autocomplete?q=` - Wikipedia autocomplete search (filters for real people only)
 - `/api/points-methodology` - Get points calculation explanation
-- `/api/stats` - **NEW** Player count, celebrity count, transfer window
-- `/api/todays-news` - **NEW** AI-generated daily celebrity news
-- `/api/top-picked` - **NEW** Most picked celebrities
+- `/api/stats` - Player count, celebrity count, transfer window
+- `/api/todays-news` - Real celebrity news from RSS feeds
+- `/api/top-picked` - Most picked celebrities
+- `/api/brown-bread-watch` - Elderly celebrities with risk levels
 - `/api/trending` - Get trending celebrities with tiers
 - `/api/celebrity/search` - Search and create celebrity profile
 - `/api/celebrities/category/{category}` - Get celebrities by category
 - `/api/team/create` - Create new team (with profanity filter)
 - `/api/team/add` - Add celebrity to team (with Brown Bread Bonus)
-- `/api/team/transfer` - **NEW** Weekly transfer (sell one, buy one)
+- `/api/team/transfer` - Weekly transfer (sell one, buy one)
 - `/api/team/remove` - Remove celebrity from team
+- `/api/team/{team_id}/leagues` - Get leagues team belongs to
 - `/api/leaderboard` - Get team rankings
+- `/api/league/create` - Create friends league
+- `/api/league/join` - Join league with code
+- `/api/league/{id}/leaderboard` - League-specific leaderboard
 
 ### Celebrity Tier & Pricing System
 - **A-LIST** (£18-22M): Oscar/Grammy winners, legendary status
