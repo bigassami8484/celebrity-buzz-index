@@ -1022,9 +1022,6 @@ async def get_leaderboard():
             "celebrity_count": len(team.get("celebrities", [])),
             "brown_bread_bonus": team.get("brown_bread_bonus", 0)
         })
-            "total_points": team.get("total_points", 0),
-            "celebrity_count": len(team.get("celebrities", []))
-        })
     
     # Sort by points
     leaderboard.sort(key=lambda x: x["total_points"], reverse=True)
