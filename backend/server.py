@@ -133,33 +133,61 @@ def detect_category_from_bio(bio: str, name: str) -> str:
     bio_lower = bio.lower()
     name_lower = name.lower()
     
-    # Check for royals first (most specific)
-    if any(x in bio_lower for x in ["prince", "princess", "king", "queen", "royal", "duke", "duchess", "monarch", "heir"]):
+    # Check for specific known celebrities first
+    reality_tv_names = ["katie price", "gemma collins", "pete wicks", "joey essex", "sam faiers", 
+                        "kardashian", "jenner", "love island"]
+    royal_names = ["prince", "princess", "king charles", "queen", "duke", "duchess", 
+                   "prince andrew", "prince william", "prince harry", "kate middleton", "meghan markle"]
+    
+    for rn in royal_names:
+        if rn in name_lower or rn in bio_lower:
+            return "royals"
+    
+    for rtn in reality_tv_names:
+        if rtn in name_lower or rtn in bio_lower:
+            return "reality_tv"
+    
+    # Reality TV keywords (check before actors)
+    if any(x in bio_lower for x in ["reality television", "reality tv", "reality show", "glamour model", 
+                                      "media personality", "television personality", "socialite",
+                                      "keeping up with", "big brother", "love island", "towie",
+                                      "i'm a celebrity", "strictly come dancing contestant"]):
+        return "reality_tv"
+    
+    # Royals
+    if any(x in bio_lower for x in ["royal family", "british royal", "heir to the throne", 
+                                     "house of windsor", "buckingham palace", "monarchy"]):
         return "royals"
     
-    # Reality TV keywords
-    if any(x in bio_lower for x in ["reality television", "reality tv", "keeping up with", "kardashian", "jenner", "love island", "real housewives", "big brother"]):
-        return "reality_tv"
-    if any(x in name_lower for x in ["kardashian", "jenner"]):
-        return "reality_tv"
-    
     # Musicians/Singers
-    if any(x in bio_lower for x in ["singer", "musician", "rapper", "songwriter", "vocalist", "band", "album", "record", "grammy", "concert", "tour", "music artist", "pop star", "rock star"]):
+    if any(x in bio_lower for x in ["singer", "musician", "rapper", "songwriter", "vocalist", 
+                                     "band", "album", "record", "grammy", "brit award", "concert", 
+                                     "tour", "music artist", "pop star", "rock star", "hip hop"]):
         return "musicians"
     
     # Athletes
-    if any(x in bio_lower for x in ["athlete", "football", "basketball", "soccer", "tennis", "olympic", "nba", "nfl", "baseball", "hockey", "golf", "swimmer", "runner", "sport"]):
+    if any(x in bio_lower for x in ["footballer", "athlete", "football", "basketball", "soccer", 
+                                     "tennis", "olympic", "premier league", "f1", "formula one",
+                                     "racing driver", "cricketer", "rugby", "boxing", "boxer"]):
         return "athletes"
     
     # TV actors
-    if any(x in bio_lower for x in ["television actor", "tv actor", "television series", "tv series", "sitcom", "soap opera", "tv show", "television personality"]):
+    if any(x in bio_lower for x in ["television actor", "tv actor", "television series", "tv series", 
+                                     "sitcom", "soap opera", "tv show", "bbc", "itv", "channel 4",
+                                     "eastenders", "coronation street", "emmerdale", "doctor who"]):
         return "tv_actors"
     
-    # Movie stars (default for actors)
-    if any(x in bio_lower for x in ["actor", "actress", "film", "movie", "cinema", "hollywood", "oscar", "academy award"]):
+    # Movie stars
+    if any(x in bio_lower for x in ["actor", "actress", "film", "movie", "cinema", "hollywood", 
+                                     "oscar", "bafta", "academy award"]):
         return "movie_stars"
     
-    return "movie_stars"  # Default
+    # Other (businesspeople, chefs, presenters, etc.)
+    if any(x in bio_lower for x in ["chef", "presenter", "host", "businessman", "entrepreneur",
+                                     "tv presenter", "author", "journalist", "comedian"]):
+        return "other"
+    
+    return "other"  # Default to other instead of movie_stars
 
 async def generate_celebrity_news(name: str, category: str) -> List[dict]:
     """Generate AI-powered news summaries for celebrity"""
