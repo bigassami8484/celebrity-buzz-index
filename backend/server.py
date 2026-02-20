@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,10 +6,12 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
-
+import httpx
+import json
+from emergentintegrations.llm.chat import LlmChat, UserMessage
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -19,56 +21,469 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
-app = FastAPI()
+# LLM API Key
+EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY', '')
 
-# Create a router with the /api prefix
+# Create the main app
+app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
+# ==================== MODELS ====================
+
+class Celebrity(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    name: str
+    bio: str = ""
+    image: str = ""
+    category: str = ""
+    wiki_url: str = ""
+    buzz_score: float = 0.0
+    price: int = 5
+    news: List[dict] = []
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class CelebritySearch(BaseModel):
+    name: str
 
-# Add your routes to the router instead of directly to app
+class TeamCelebrity(BaseModel):
+    celebrity_id: str
+    name: str
+    image: str
+    category: str
+    price: int
+    buzz_score: float
+
+class UserTeam(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    team_name: str = "My Team"
+    budget_remaining: int = 50
+    total_points: float = 0.0
+    celebrities: List[TeamCelebrity] = []
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class TeamCreate(BaseModel):
+    team_name: str = "My Team"
+
+class AddToTeam(BaseModel):
+    team_id: str
+    celebrity_id: str
+
+class LeaderboardEntry(BaseModel):
+    team_id: str
+    team_name: str
+    total_points: float
+    celebrity_count: int
+
+# ==================== CELEBRITY CATEGORIES ====================
+CATEGORIES = [
+    {"id": "movie_stars", "name": "Movie Stars", "icon": "film"},
+    {"id": "tv_actors", "name": "TV Actors", "icon": "tv"},
+    {"id": "musicians", "name": "Musicians", "icon": "music"},
+    {"id": "athletes", "name": "Athletes", "icon": "trophy"},
+    {"id": "royals", "name": "Royals", "icon": "crown"},
+    {"id": "reality_tv", "name": "Reality TV", "icon": "star"},
+]
+
+# Pre-defined trending celebrities per category
+TRENDING_CELEBRITIES = {
+    "movie_stars": ["Timothée Chalamet", "Zendaya", "Margot Robbie", "Ryan Gosling", "Florence Pugh"],
+    "tv_actors": ["Pedro Pascal", "Jenna Ortega", "Sydney Sweeney", "Austin Butler", "Emma Corrin"],
+    "musicians": ["Taylor Swift", "Bad Bunny", "Dua Lipa", "The Weeknd", "Billie Eilish"],
+    "athletes": ["Lionel Messi", "LeBron James", "Caitlin Clark", "Patrick Mahomes", "Simone Biles"],
+    "royals": ["Prince William", "Kate Middleton", "Prince Harry", "Meghan Markle", "King Charles III"],
+    "reality_tv": ["Kim Kardashian", "Kylie Jenner", "Love Island UK", "Kourtney Kardashian", "Khloé Kardashian"],
+}
+
+# ==================== HELPER FUNCTIONS ====================
+
+async def fetch_wikipedia_info(name: str) -> dict:
+    """Fetch celebrity info from Wikipedia API"""
+    try:
+        async with httpx.AsyncClient() as client:
+            url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{name.replace(' ', '_')}"
+            response = await client.get(url, timeout=10.0)
+            if response.status_code == 200:
+                data = response.json()
+                return {
+                    "name": data.get("title", name),
+                    "bio": data.get("extract", "No biography available."),
+                    "image": data.get("thumbnail", {}).get("source", ""),
+                    "wiki_url": data.get("content_urls", {}).get("desktop", {}).get("page", "")
+                }
+    except Exception as e:
+        logger.error(f"Wikipedia fetch error: {e}")
+    return {"name": name, "bio": "Celebrity profile", "image": "", "wiki_url": ""}
+
+async def generate_celebrity_news(name: str, category: str) -> List[dict]:
+    """Generate AI-powered news summaries for celebrity"""
+    try:
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"news-{uuid.uuid4()}",
+            system_message="""You are a celebrity news aggregator. Generate realistic, current celebrity news headlines and summaries.
+            Return a JSON array with 5 news items. Each item should have:
+            - title: A catchy headline
+            - summary: 1-2 sentence summary
+            - source: A realistic news source name (e.g., "Entertainment Weekly", "TMZ", "People", "BBC News", "Daily Mail")
+            - date: Recent date in format "Jan 15, 2026"
+            - sentiment: "positive", "neutral", or "negative"
+            
+            Make the news realistic and varied - mix of professional achievements, personal life, and industry news.
+            ONLY return valid JSON array, no other text."""
+        ).with_model("openai", "gpt-4o")
+
+        message = UserMessage(text=f"Generate 5 recent news headlines about {name} ({category}). Return ONLY a JSON array.")
+        response = await chat.send_message(message)
+        
+        # Parse the JSON response
+        try:
+            # Clean the response - remove markdown code blocks if present
+            clean_response = response.strip()
+            if clean_response.startswith("```"):
+                clean_response = clean_response.split("```")[1]
+                if clean_response.startswith("json"):
+                    clean_response = clean_response[4:]
+            clean_response = clean_response.strip()
+            
+            news = json.loads(clean_response)
+            return news if isinstance(news, list) else []
+        except json.JSONDecodeError:
+            logger.error(f"JSON parse error for {name}")
+            return []
+    except Exception as e:
+        logger.error(f"News generation error: {e}")
+        return []
+
+def calculate_buzz_score(news: List[dict]) -> float:
+    """Calculate buzz score based on news coverage"""
+    if not news:
+        return 10.0  # Base score
+    
+    score = 10.0
+    for article in news:
+        sentiment = article.get("sentiment", "neutral")
+        source = article.get("source", "").lower()
+        
+        # Source weight
+        if any(x in source for x in ["tmz", "daily mail", "sun"]):
+            score += 3.0
+        elif any(x in source for x in ["people", "entertainment weekly", "variety"]):
+            score += 2.0
+        elif any(x in source for x in ["bbc", "cnn", "guardian"]):
+            score += 1.5
+        else:
+            score += 1.0
+        
+        # Sentiment modifier
+        if sentiment == "positive":
+            score += 0.5
+        elif sentiment == "negative":
+            score += 1.0  # Controversy = more buzz
+    
+    return round(min(score, 100.0), 1)
+
+def calculate_price(buzz_score: float) -> int:
+    """Calculate celebrity price based on buzz score"""
+    if buzz_score >= 50:
+        return 15
+    elif buzz_score >= 35:
+        return 12
+    elif buzz_score >= 25:
+        return 10
+    elif buzz_score >= 15:
+        return 7
+    else:
+        return 5
+
+# ==================== API ROUTES ====================
+
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Celebrity Buzz Index API", "version": "1.0"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
+@api_router.get("/categories")
+async def get_categories():
+    """Get all celebrity categories"""
+    return {"categories": CATEGORIES}
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
+@api_router.get("/trending")
+async def get_trending():
+    """Get trending celebrities across all categories"""
+    # Check cache first
+    cached = await db.trending_cache.find_one(
+        {"type": "trending"},
+        {"_id": 0}
+    )
     
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
+    # Return cached if less than 1 hour old
+    if cached and cached.get("updated_at"):
+        cache_time = datetime.fromisoformat(cached["updated_at"])
+        if (datetime.now(timezone.utc) - cache_time).seconds < 3600:
+            return {"trending": cached.get("celebrities", [])}
     
-    return status_checks
+    # Otherwise fetch fresh data
+    trending = []
+    for category, names in TRENDING_CELEBRITIES.items():
+        for name in names[:3]:  # Top 3 per category
+            celeb = await db.celebrities.find_one(
+                {"name": name},
+                {"_id": 0}
+            )
+            if celeb:
+                trending.append(celeb)
+    
+    if trending:
+        # Sort by buzz score
+        trending.sort(key=lambda x: x.get("buzz_score", 0), reverse=True)
+        
+        # Update cache
+        await db.trending_cache.update_one(
+            {"type": "trending"},
+            {"$set": {
+                "celebrities": trending[:15],
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }},
+            upsert=True
+        )
+    
+    return {"trending": trending[:15]}
 
-# Include the router in the main app
+@api_router.post("/celebrity/search")
+async def search_celebrity(search: CelebritySearch):
+    """Search for a celebrity and get their buzz data"""
+    name = search.name.strip()
+    
+    # Check if already in database
+    existing = await db.celebrities.find_one({"name": {"$regex": f"^{name}$", "$options": "i"}}, {"_id": 0})
+    if existing:
+        return {"celebrity": existing}
+    
+    # Fetch from Wikipedia
+    wiki_info = await fetch_wikipedia_info(name)
+    
+    # Determine category based on bio
+    category = "movie_stars"  # Default
+    bio_lower = wiki_info.get("bio", "").lower()
+    if any(x in bio_lower for x in ["singer", "musician", "rapper", "band", "album"]):
+        category = "musicians"
+    elif any(x in bio_lower for x in ["athlete", "football", "basketball", "soccer", "tennis", "olympic"]):
+        category = "athletes"
+    elif any(x in bio_lower for x in ["prince", "princess", "king", "queen", "royal", "duke", "duchess"]):
+        category = "royals"
+    elif any(x in bio_lower for x in ["reality", "kardashian", "jenner"]):
+        category = "reality_tv"
+    elif any(x in bio_lower for x in ["television", "tv series", "sitcom"]):
+        category = "tv_actors"
+    
+    # Generate news
+    news = await generate_celebrity_news(wiki_info["name"], category)
+    
+    # Calculate buzz score
+    buzz_score = calculate_buzz_score(news)
+    price = calculate_price(buzz_score)
+    
+    # Create celebrity object
+    celebrity = Celebrity(
+        name=wiki_info["name"],
+        bio=wiki_info["bio"][:500] if wiki_info["bio"] else "No biography available.",
+        image=wiki_info["image"] or f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&size=400&background=FF0099&color=fff",
+        category=category,
+        wiki_url=wiki_info["wiki_url"],
+        buzz_score=buzz_score,
+        price=price,
+        news=news
+    )
+    
+    # Save to database
+    doc = celebrity.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.celebrities.insert_one(doc)
+    
+    # Remove _id before returning
+    del doc['_id'] if '_id' in doc else None
+    
+    return {"celebrity": doc}
+
+@api_router.get("/celebrity/{celebrity_id}")
+async def get_celebrity(celebrity_id: str):
+    """Get celebrity by ID"""
+    celebrity = await db.celebrities.find_one({"id": celebrity_id}, {"_id": 0})
+    if not celebrity:
+        raise HTTPException(status_code=404, detail="Celebrity not found")
+    return {"celebrity": celebrity}
+
+@api_router.get("/celebrities/category/{category}")
+async def get_celebrities_by_category(category: str):
+    """Get celebrities by category"""
+    # First check if we have any in DB
+    celebrities = await db.celebrities.find(
+        {"category": category},
+        {"_id": 0}
+    ).to_list(20)
+    
+    # If empty, seed with trending
+    if not celebrities and category in TRENDING_CELEBRITIES:
+        for name in TRENDING_CELEBRITIES[category][:5]:
+            search = CelebritySearch(name=name)
+            await search_celebrity(search)
+        
+        celebrities = await db.celebrities.find(
+            {"category": category},
+            {"_id": 0}
+        ).to_list(20)
+    
+    return {"celebrities": celebrities}
+
+@api_router.post("/team/create")
+async def create_team(team_data: TeamCreate):
+    """Create a new team"""
+    team = UserTeam(team_name=team_data.team_name)
+    doc = team.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.teams.insert_one(doc)
+    del doc['_id'] if '_id' in doc else None
+    return {"team": doc}
+
+@api_router.get("/team/{team_id}")
+async def get_team(team_id: str):
+    """Get team by ID"""
+    team = await db.teams.find_one({"id": team_id}, {"_id": 0})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    return {"team": team}
+
+@api_router.post("/team/add")
+async def add_to_team(data: AddToTeam):
+    """Add celebrity to team"""
+    team = await db.teams.find_one({"id": data.team_id})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    celebrity = await db.celebrities.find_one({"id": data.celebrity_id})
+    if not celebrity:
+        raise HTTPException(status_code=404, detail="Celebrity not found")
+    
+    # Check if already in team
+    for c in team.get("celebrities", []):
+        if c["celebrity_id"] == data.celebrity_id:
+            raise HTTPException(status_code=400, detail="Celebrity already in team")
+    
+    # Check budget
+    price = celebrity.get("price", 5)
+    if team.get("budget_remaining", 0) < price:
+        raise HTTPException(status_code=400, detail="Insufficient budget")
+    
+    # Add to team
+    team_celeb = TeamCelebrity(
+        celebrity_id=celebrity["id"],
+        name=celebrity["name"],
+        image=celebrity["image"],
+        category=celebrity["category"],
+        price=price,
+        buzz_score=celebrity["buzz_score"]
+    )
+    
+    new_budget = team.get("budget_remaining", 50) - price
+    new_points = team.get("total_points", 0) + celebrity["buzz_score"]
+    
+    await db.teams.update_one(
+        {"id": data.team_id},
+        {
+            "$push": {"celebrities": team_celeb.model_dump()},
+            "$set": {
+                "budget_remaining": new_budget,
+                "total_points": new_points
+            }
+        }
+    )
+    
+    updated_team = await db.teams.find_one({"id": data.team_id}, {"_id": 0})
+    return {"team": updated_team}
+
+@api_router.post("/team/remove")
+async def remove_from_team(data: AddToTeam):
+    """Remove celebrity from team"""
+    team = await db.teams.find_one({"id": data.team_id})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    # Find celebrity in team
+    removed = None
+    for c in team.get("celebrities", []):
+        if c["celebrity_id"] == data.celebrity_id:
+            removed = c
+            break
+    
+    if not removed:
+        raise HTTPException(status_code=404, detail="Celebrity not in team")
+    
+    new_budget = team.get("budget_remaining", 0) + removed["price"]
+    new_points = team.get("total_points", 0) - removed["buzz_score"]
+    
+    await db.teams.update_one(
+        {"id": data.team_id},
+        {
+            "$pull": {"celebrities": {"celebrity_id": data.celebrity_id}},
+            "$set": {
+                "budget_remaining": new_budget,
+                "total_points": max(0, new_points)
+            }
+        }
+    )
+    
+    updated_team = await db.teams.find_one({"id": data.team_id}, {"_id": 0})
+    return {"team": updated_team}
+
+@api_router.get("/leaderboard")
+async def get_leaderboard():
+    """Get team leaderboard"""
+    teams = await db.teams.find({}, {"_id": 0}).to_list(100)
+    
+    leaderboard = []
+    for team in teams:
+        leaderboard.append({
+            "team_id": team["id"],
+            "team_name": team.get("team_name", "Unknown"),
+            "total_points": team.get("total_points", 0),
+            "celebrity_count": len(team.get("celebrities", []))
+        })
+    
+    # Sort by points
+    leaderboard.sort(key=lambda x: x["total_points"], reverse=True)
+    
+    return {"leaderboard": leaderboard[:20]}
+
+@api_router.get("/share/{team_id}")
+async def get_share_data(team_id: str):
+    """Get shareable data for a team"""
+    team = await db.teams.find_one({"id": team_id}, {"_id": 0})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    celeb_names = [c["name"] for c in team.get("celebrities", [])[:3]]
+    
+    share_text = f"Check out my Celebrity Buzz team '{team['team_name']}'! "
+    if celeb_names:
+        share_text += f"Featuring: {', '.join(celeb_names)}. "
+    share_text += f"Total Buzz: {team.get('total_points', 0):.1f} points!"
+    
+    return {
+        "share_text": share_text,
+        "team_name": team["team_name"],
+        "total_points": team.get("total_points", 0),
+        "celebrity_count": len(team.get("celebrities", []))
+    }
+
+# Include router
 app.include_router(api_router)
 
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
@@ -76,13 +491,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
