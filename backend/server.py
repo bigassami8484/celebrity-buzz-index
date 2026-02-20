@@ -411,22 +411,21 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     title = item.get("title", "")
                     snippet = item.get("snippet", "").lower()
                     title_lower = title.lower()
+                    title_normalized = normalize_text(title)  # Remove accents for matching
                     
                     # CRITICAL: The search query must appear in the person's actual NAME
                     # This prevents returning people who are just associated with the query
-                    title_words = title_lower.split()
+                    title_words = title_normalized.split()
                     query_in_name = any(
-                        qpart in title_lower or 
+                        qpart in title_normalized or 
                         any(qpart in word for word in title_words)
                         for qpart in query_parts
                     )
                     if not query_in_name:
-                        logger.info(f"Skipping {title}: query not in name")
                         continue
                     
                     # Skip if title contains non-person keywords
                     if any(kw in title_lower for kw in non_person_title_keywords):
-                        logger.info(f"Skipping {title}: non-person keyword in title")
                         continue
                     
                     # Skip if title has dashes with location patterns (Paris–Brest–Paris)
