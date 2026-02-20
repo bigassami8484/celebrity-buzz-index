@@ -348,7 +348,8 @@ async def create_team(team_data: TeamCreate):
     doc = team.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     await db.teams.insert_one(doc)
-    del doc['_id'] if '_id' in doc else None
+    if '_id' in doc:
+        del doc['_id']
     return {"team": doc}
 
 @api_router.get("/team/{team_id}")
