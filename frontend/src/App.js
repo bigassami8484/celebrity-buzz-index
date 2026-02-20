@@ -1493,6 +1493,19 @@ function App() {
         <PointsMethodology onClose={() => setShowMethodology(false)} />
       )}
       
+      {/* League Detail Modal */}
+      {selectedLeague && (
+        <LeagueDetailModal
+          league={selectedLeague}
+          leaderboard={leagueLeaderboard}
+          teamId={team?.id}
+          onClose={() => setSelectedLeague(null)}
+        />
+      )}
+      
+      {/* Mobile Navigation */}
+      <MobileNav activeTab={mobileTab} onTabChange={setMobileTab} />
+      
       {/* Footer */}
       <Footer />
     </div>
