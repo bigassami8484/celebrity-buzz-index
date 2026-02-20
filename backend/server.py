@@ -848,11 +848,13 @@ async def add_to_team(data: AddToTeam):
         category=celebrity["category"],
         price=price,
         buzz_score=celebrity["buzz_score"],
-        tier=celebrity.get("tier", "D")
+        tier=celebrity.get("tier", "D"),
+        added_at=datetime.now(timezone.utc).isoformat()
     )
     
     new_budget = team.get("budget_remaining", 50) - price
-    new_points = team.get("total_points", 0) + celebrity["buzz_score"]
+    new_points = team.get("total_points", 0) + celeb_points
+    new_brown_bread = team.get("brown_bread_bonus", 0) + brown_bread_bonus
     
     await db.teams.update_one(
         {"id": data.team_id},
@@ -860,13 +862,117 @@ async def add_to_team(data: AddToTeam):
             "$push": {"celebrities": team_celeb.model_dump()},
             "$set": {
                 "budget_remaining": new_budget,
-                "total_points": new_points
+                "total_points": new_points,
+                "brown_bread_bonus": new_brown_bread
             }
         }
     )
     
+    # Increment times_picked for the celebrity
+    await db.celebrities.update_one(
+        {"id": data.celebrity_id},
+        {"$inc": {"times_picked": 1}}
+    )
+    
     updated_team = await db.teams.find_one({"id": data.team_id}, {"_id": 0})
-    return {"team": updated_team}
+    return {"team": updated_team, "brown_bread_bonus": brown_bread_bonus > 0}
+
+@api_router.post("/team/transfer")
+async def transfer_celebrity(data: TransferRequest):
+    """Transfer window: sell one celebrity and buy another (1 per week)"""
+    team = await db.teams.find_one({"id": data.team_id})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    # Check transfer window
+    current_week = get_week_number()
+    if team.get("last_transfer_reset") != current_week:
+        # Reset transfers for new week
+        team["transfers_this_week"] = 0
+    
+    if team.get("transfers_this_week", 0) >= 1:
+        raise HTTPException(status_code=400, detail="You've already used your transfer this week! Wait until next week.")
+    
+    # Find celebrity to sell
+    sell_celeb = None
+    for c in team.get("celebrities", []):
+        if c["celebrity_id"] == data.sell_celebrity_id:
+            sell_celeb = c
+            break
+    
+    if not sell_celeb:
+        raise HTTPException(status_code=404, detail="Celebrity to sell not found in team")
+    
+    # Get celebrity to buy
+    buy_celeb = await db.celebrities.find_one({"id": data.buy_celebrity_id})
+    if not buy_celeb:
+        raise HTTPException(status_code=404, detail="Celebrity to buy not found")
+    
+    # Check if already in team
+    for c in team.get("celebrities", []):
+        if c["celebrity_id"] == data.buy_celebrity_id:
+            raise HTTPException(status_code=400, detail="Celebrity already in team")
+    
+    # Calculate budget after sale
+    budget_after_sale = team.get("budget_remaining", 0) + sell_celeb["price"]
+    
+    # Check if can afford new celebrity
+    if budget_after_sale < buy_celeb.get("price", 5):
+        raise HTTPException(status_code=400, detail="Insufficient budget even after sale")
+    
+    # Perform transfer
+    new_budget = budget_after_sale - buy_celeb["price"]
+    new_points = team.get("total_points", 0) - sell_celeb["buzz_score"] + buy_celeb["buzz_score"]
+    
+    # Check brown bread bonus for new celeb
+    brown_bread_bonus = 0
+    if buy_celeb.get("is_deceased"):
+        brown_bread_bonus = 50.0
+        new_points += brown_bread_bonus
+    
+    new_team_celeb = TeamCelebrity(
+        celebrity_id=buy_celeb["id"],
+        name=buy_celeb["name"],
+        image=buy_celeb["image"],
+        category=buy_celeb["category"],
+        price=buy_celeb["price"],
+        buzz_score=buy_celeb["buzz_score"],
+        tier=buy_celeb.get("tier", "D"),
+        added_at=datetime.now(timezone.utc).isoformat()
+    )
+    
+    await db.teams.update_one(
+        {"id": data.team_id},
+        {
+            "$pull": {"celebrities": {"celebrity_id": data.sell_celebrity_id}},
+        }
+    )
+    
+    await db.teams.update_one(
+        {"id": data.team_id},
+        {
+            "$push": {"celebrities": new_team_celeb.model_dump()},
+            "$set": {
+                "budget_remaining": new_budget,
+                "total_points": max(0, new_points),
+                "transfers_this_week": 1,
+                "last_transfer_reset": current_week,
+                "brown_bread_bonus": team.get("brown_bread_bonus", 0) + brown_bread_bonus
+            }
+        }
+    )
+    
+    # Update pick counts
+    await db.celebrities.update_one({"id": data.buy_celebrity_id}, {"$inc": {"times_picked": 1}})
+    await db.celebrities.update_one({"id": data.sell_celebrity_id}, {"$inc": {"times_picked": -1}})
+    
+    updated_team = await db.teams.find_one({"id": data.team_id}, {"_id": 0})
+    return {
+        "team": updated_team,
+        "sold": sell_celeb["name"],
+        "bought": buy_celeb["name"],
+        "brown_bread_bonus": brown_bread_bonus > 0
+    }
 
 @api_router.post("/team/remove")
 async def remove_from_team(data: AddToTeam):
