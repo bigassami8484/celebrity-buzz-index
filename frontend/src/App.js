@@ -246,7 +246,7 @@ const HowItWorks = ({ onShowMethodology }) => (
           <Skull className="w-5 h-5 text-white" />
         </div>
         <h4 className="font-space font-bold text-sm mb-1">5. Brown Bread</h4>
-        <p className="text-xs text-[#A1A1AA]">+50 if celeb dies!</p>
+        <p className="text-xs text-[#A1A1AA]">+100 if celeb dies!</p>
       </div>
     </div>
   </div>

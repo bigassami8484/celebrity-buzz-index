@@ -214,10 +214,13 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     except:
                         pass
                     
+                    # Always ensure a valid image URL - use fallback if empty or None
+                    final_image = image if image and len(image) > 0 else f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&size=64&background=FF0099&color=fff"
+                    
                     results.append({
                         "name": name,
                         "description": desc[:150] + "..." if len(desc) > 150 else desc,
-                        "image": image or f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&size=64&background=FF0099&color=fff",
+                        "image": final_image,
                         "estimated_tier": tier,
                         "estimated_price": price
                     })
@@ -437,7 +440,8 @@ def calculate_buzz_score(news: List[dict]) -> float:
         elif sentiment == "negative":
             score += 25.0  # Big controversy bonus!
     
-    return round(min(score, 150.0), 1)  # Increased max to account for controversy
+    # Ensure minimum score of 5 points
+    return round(max(5.0, min(score, 150.0)), 1)
 
 def calculate_price(buzz_score: float, tier: str, name: str = "") -> int:
     """Calculate celebrity price based on buzz score, tier, and controversy"""
