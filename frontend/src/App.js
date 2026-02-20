@@ -836,6 +836,16 @@ function App() {
     }
   }, []);
 
+  // Fetch Brown Bread Watch (elderly celebs)
+  const fetchBrownBreadWatch = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/brown-bread-watch`);
+      setBrownBreadWatch(res.data.watch_list || []);
+    } catch (e) {
+      console.error("Error fetching brown bread watch:", e);
+    }
+  }, []);
+
   // Fetch categories
   const fetchCategories = useCallback(async () => {
     try {
