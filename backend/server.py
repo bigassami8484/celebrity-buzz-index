@@ -652,7 +652,8 @@ async def add_to_team(data: AddToTeam):
         image=celebrity["image"],
         category=celebrity["category"],
         price=price,
-        buzz_score=celebrity["buzz_score"]
+        buzz_score=celebrity["buzz_score"],
+        tier=celebrity.get("tier", "D")
     )
     
     new_budget = team.get("budget_remaining", 50) - price
