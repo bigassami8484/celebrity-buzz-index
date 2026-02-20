@@ -461,85 +461,6 @@ const LeagueDetailModal = ({ league, leaderboard, onClose, onShare, teamId }) =>
   );
 };
 
-// Brown Bread Mini Game Component
-const BrownBreadMiniGame = ({ watchList, team, bets, onPlaceBet }) => {
-  const [selectedCeleb, setSelectedCeleb] = useState(null);
-  const [betAmount, setBetAmount] = useState(10);
-  
-  const handlePlaceBet = () => {
-    if (selectedCeleb) {
-      onPlaceBet(selectedCeleb.id, betAmount);
-      setSelectedCeleb(null);
-      setBetAmount(10);
-    }
-  };
-  
-  const activeBets = bets.filter(b => !b.resolved);
-  
-  return (
-    <div className="bg-[#0A0A0A] border border-[#262626] p-4 mb-4" data-testid="mini-game">
-      <h4 className="font-anton text-lg uppercase tracking-tight text-[#888] mb-2 flex items-center gap-2">
-        <Gamepad2 className="w-5 h-5" />
-        Brown Bread Mini Game
-      </h4>
-      <p className="text-xs text-[#666] mb-4">Bet on who goes next - 10x payout! 💀</p>
-      
-      {/* Place Bet Section */}
-      {!selectedCeleb ? (
-        <div className="space-y-2 mb-4">
-          <p className="text-xs text-[#A1A1AA]">Select from Watch List:</p>
-          {watchList.slice(0, 4).map((celeb) => {
-            const hasBet = bets.some(b => b.celebrity_id === celeb.id && !b.resolved);
-            return (
-              <button
-                key={celeb.id}
-                onClick={() => !hasBet && setSelectedCeleb(celeb)}
-                disabled={hasBet}
-                className={`w-full flex items-center gap-2 p-2 text-left ${hasBet ? 'opacity-50 cursor-not-allowed bg-[#1A1A1A]' : 'bg-[#1A1A1A] hover:bg-[#252525]'}`}
-              >
-                <img src={celeb.image} alt={celeb.name} className="w-8 h-8 rounded-full grayscale object-cover" />
-                <div className="flex-1">
-                  <p className="text-sm">{celeb.name}</p>
-                  <p className="text-xs text-[#666]">Age {celeb.age}</p>
-                </div>
-                {hasBet && <span className="text-xs text-[#00F0FF]">Bet Active</span>}
-              </button>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="bg-[#1A1A1A] p-4 mb-4">
-          <p className="text-sm mb-2">Betting on: <span className="text-[#FFD700] font-bold">{selectedCeleb.name}</span></p>
-          <div className="flex items-center gap-2 mb-3">
-            <button onClick={() => setBetAmount(Math.max(5, betAmount - 5))} className="bg-[#262626] px-3 py-1">-</button>
-            <span className="font-bold text-lg">{betAmount} pts</span>
-            <button onClick={() => setBetAmount(Math.min(50, betAmount + 5))} className="bg-[#262626] px-3 py-1">+</button>
-          </div>
-          <p className="text-xs text-[#A1A1AA] mb-3">Potential win: <span className="text-[#FFD700]">{betAmount * 10} pts</span></p>
-          <div className="flex gap-2">
-            <button onClick={() => setSelectedCeleb(null)} className="flex-1 bg-[#262626] py-2 text-xs font-bold uppercase">Cancel</button>
-            <button onClick={handlePlaceBet} className="flex-1 bg-[#FF0099] py-2 text-xs font-bold uppercase">Place Bet</button>
-          </div>
-        </div>
-      )}
-      
-      {/* Active Bets */}
-      {activeBets.length > 0 && (
-        <div>
-          <p className="text-xs text-[#A1A1AA] mb-2">Your Active Bets:</p>
-          {activeBets.map((bet) => (
-            <div key={bet.id} className="bet-card pending">
-              <Skull className="w-4 h-4 text-[#666]" />
-              <span className="text-sm flex-1">{bet.celebrity_name}</span>
-              <span className="text-xs text-[#00F0FF]">{bet.bet_amount} pts</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
 // Mobile Navigation Component
 const MobileNav = ({ activeTab, onTabChange }) => (
   <div className="mobile-nav" data-testid="mobile-nav">
@@ -555,9 +476,8 @@ const MobileNav = ({ activeTab, onTabChange }) => (
       <Trophy className="w-5 h-5" />
       <span>Leagues</span>
     </div>
-    <div className={`mobile-nav-item ${activeTab === 'game' ? 'active' : ''}`} onClick={() => onTabChange('game')}>
-      <Gamepad2 className="w-5 h-5" />
-      <span>Game</span>
+  </div>
+);
     </div>
   </div>
 );
