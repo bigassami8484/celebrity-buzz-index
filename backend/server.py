@@ -153,6 +153,49 @@ def get_controversial_price_boost(name: str) -> int:
             return boost
     return 0
 
+def extract_birth_year_from_bio(bio: str) -> int:
+    """Extract birth year from Wikipedia bio text"""
+    if not bio:
+        return 0
+    
+    # Common patterns: "born January 15, 1945", "born 1945", "(born 1945)", "b. 1945"
+    patterns = [
+        r'\(born\s+(?:\w+\s+\d{1,2},?\s+)?(\d{4})\)',  # (born January 15, 1945)
+        r'born\s+(?:\w+\s+\d{1,2},?\s+)?(\d{4})',       # born January 15, 1945
+        r'\(b\.\s*(\d{4})\)',                            # (b. 1945)
+        r'\((\d{4})\s*[-–]\s*\)',                        # (1945 - ) for living people
+        r'\((\d{4})\s*[-–]',                             # (1945– for living people
+    ]
+    
+    for pattern in patterns:
+        match = re.search(pattern, bio, re.IGNORECASE)
+        if match:
+            year = int(match.group(1))
+            # Sanity check - birth year should be reasonable
+            if 1900 <= year <= 2010:
+                return year
+    
+    return 0
+
+def calculate_age(birth_year: int) -> int:
+    """Calculate age from birth year"""
+    if birth_year == 0:
+        return 0
+    current_year = datetime.now(timezone.utc).year
+    return current_year - birth_year
+
+def get_brown_bread_risk(age: int) -> str:
+    """Get risk level based on age"""
+    if age >= 90:
+        return "critical"  # 🔴
+    elif age >= 80:
+        return "high"      # 🟠
+    elif age >= 70:
+        return "elevated"  # 🟡
+    elif age >= 60:
+        return "moderate"  # 🟢
+    return "low"
+
 # ==================== CELEBRITY CATEGORIES ====================
 CATEGORIES = [
     {"id": "movie_stars", "name": "Movie Stars", "icon": "film"},
