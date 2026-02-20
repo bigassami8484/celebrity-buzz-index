@@ -560,9 +560,11 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             # Limit to 5 clean results
                             if len(results) >= 5:
                                 break
-                    except:
+                    except Exception as inner_e:
+                        logger.error(f"Inner error processing {title}: {inner_e}")
                         continue
-                        
+                
+                logger.info(f"Autocomplete returning {len(results)} results for {query}")
                 return results
     except Exception as e:
         logger.error(f"Wikipedia autocomplete error: {e}")
