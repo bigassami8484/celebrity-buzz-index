@@ -479,6 +479,61 @@ const MobileNav = ({ activeTab, onTabChange }) => (
   </div>
 );
 
+// Hall of Fame Modal
+const HallOfFameModal = ({ hallOfFame, onClose }) => (
+  <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
+    <div className="bg-[#0A0A0A] border border-[#262626] max-w-2xl w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="font-anton text-3xl uppercase text-[#FFD700] flex items-center gap-3">
+            <span>🏆</span> Hall of Fame
+          </h3>
+          <button onClick={onClose} className="text-[#A1A1AA] hover:text-white">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        
+        {hallOfFame.length > 0 ? (
+          <div className="space-y-4">
+            {hallOfFame.map((entry, idx) => (
+              <div 
+                key={entry.team_id}
+                className={`p-4 ${idx === 0 ? 'bg-gradient-to-r from-[#FFD700]/20 to-transparent border border-[#FFD700]' : idx === 1 ? 'bg-[#C0C0C0]/10 border border-[#C0C0C0]/30' : idx === 2 ? 'bg-[#CD7F32]/10 border border-[#CD7F32]/30' : 'bg-[#1A1A1A]'}`}
+              >
+                <div className="flex items-center gap-4">
+                  <span className={`font-anton text-3xl w-12 ${idx === 0 ? 'text-[#FFD700]' : idx === 1 ? 'text-[#C0C0C0]' : idx === 2 ? 'text-[#CD7F32]' : 'text-[#666]'}`}>
+                    #{idx + 1}
+                  </span>
+                  <div className="flex-1">
+                    <p className="font-bold text-lg">{entry.team_name}</p>
+                    <div className="flex gap-1 mt-1">
+                      {entry.badges.map((badge, bIdx) => (
+                        <span key={bIdx} className="text-xl" title={badge.name}>
+                          {badge.icon}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-[#FF0099]">{entry.badge_count} badges</p>
+                    <p className="text-xs text-[#A1A1AA]">{entry.weekly_wins} weekly wins</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-2xl mb-2">🏆</p>
+            <p className="text-[#A1A1AA]">No champions yet!</p>
+            <p className="text-xs text-[#666] mt-2">Win weekly league competitions to earn badges and join the Hall of Fame</p>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+);
+
 // How It Works Component
 const HowItWorks = ({ onShowMethodology }) => (
   <div className="bg-[#0A0A0A] border border-[#262626] p-6 mb-8" data-testid="how-it-works">
