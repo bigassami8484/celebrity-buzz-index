@@ -680,10 +680,96 @@ async def get_celebrities_by_category(category: str):
     
     return {"celebrities": celebrities}
 
+@api_router.get("/stats")
+async def get_stats():
+    """Get site statistics including player count"""
+    team_count = await db.teams.count_documents({})
+    celeb_count = await db.celebrities.count_documents({})
+    
+    return {
+        "player_count": team_count,
+        "celebrity_count": celeb_count,
+        "transfer_window": get_week_number()
+    }
+
+@api_router.get("/top-picked")
+async def get_top_picked():
+    """Get most picked celebrities"""
+    top_celebs = await db.celebrities.find(
+        {"times_picked": {"$gt": 0}},
+        {"_id": 0}
+    ).sort("times_picked", -1).to_list(10)
+    
+    return {"top_picked": top_celebs}
+
+@api_router.get("/todays-news")
+async def get_todays_news():
+    """Get today's top celebrity news using AI"""
+    # Check cache
+    cached = await db.news_cache.find_one(
+        {"type": "todays_news"},
+        {"_id": 0}
+    )
+    
+    if cached and cached.get("updated_at"):
+        cache_time = datetime.fromisoformat(cached["updated_at"])
+        if (datetime.now(timezone.utc) - cache_time).seconds < 1800:  # 30 min cache
+            return {"news": cached.get("news", [])}
+    
+    # Generate fresh news
+    try:
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"daily-news-{uuid.uuid4()}",
+            system_message="""You are a celebrity news aggregator. Generate today's top 8 celebrity news headlines.
+            Focus on UK and international celebrities. Mix of royals, reality TV, musicians, actors.
+            Return a JSON array with items containing:
+            - celebrity: Name of the celebrity
+            - headline: Catchy news headline
+            - summary: 1-2 sentence summary
+            - source: Realistic source (Daily Mail, BBC, TMZ, The Sun, etc.)
+            - category: royals/reality_tv/musicians/athletes/movie_stars/tv_actors/other
+            ONLY return valid JSON array."""
+        ).with_model("openai", "gpt-4o")
+        
+        message = UserMessage(text="Generate today's top 8 UK and international celebrity news headlines. Return ONLY JSON array.")
+        response = await chat.send_message(message)
+        
+        clean_response = response.strip()
+        if clean_response.startswith("```"):
+            clean_response = clean_response.split("```")[1]
+            if clean_response.startswith("json"):
+                clean_response = clean_response[4:]
+        clean_response = clean_response.strip()
+        
+        news = json.loads(clean_response)
+        
+        # Cache it
+        await db.news_cache.update_one(
+            {"type": "todays_news"},
+            {"$set": {
+                "news": news,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }},
+            upsert=True
+        )
+        
+        return {"news": news if isinstance(news, list) else []}
+    except Exception as e:
+        logger.error(f"Daily news error: {e}")
+        return {"news": []}
+
 @api_router.post("/team/create")
 async def create_team(team_data: TeamCreate):
     """Create a new team"""
-    team = UserTeam(team_name=team_data.team_name)
+    # Check for banned words
+    if contains_banned_words(team_data.team_name):
+        raise HTTPException(status_code=400, detail="Team name contains inappropriate language. Please choose another name.")
+    
+    team = UserTeam(
+        team_name=team_data.team_name,
+        last_transfer_reset=get_week_number()
+    )
     doc = team.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     await db.teams.insert_one(doc)
@@ -691,12 +777,39 @@ async def create_team(team_data: TeamCreate):
         del doc['_id']
     return {"team": doc}
 
+@api_router.post("/team/rename")
+async def rename_team(team_id: str, new_name: str):
+    """Rename a team (with profanity check)"""
+    if contains_banned_words(new_name):
+        raise HTTPException(status_code=400, detail="Team name contains inappropriate language")
+    
+    result = await db.teams.update_one(
+        {"id": team_id},
+        {"$set": {"team_name": new_name}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    team = await db.teams.find_one({"id": team_id}, {"_id": 0})
+    return {"team": team}
+
 @api_router.get("/team/{team_id}")
 async def get_team(team_id: str):
     """Get team by ID"""
     team = await db.teams.find_one({"id": team_id}, {"_id": 0})
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
+    
+    # Check if transfer window reset needed
+    current_week = get_week_number()
+    if team.get("last_transfer_reset") != current_week:
+        await db.teams.update_one(
+            {"id": team_id},
+            {"$set": {"transfers_this_week": 0, "last_transfer_reset": current_week}}
+        )
+        team["transfers_this_week"] = 0
+        team["last_transfer_reset"] = current_week
+    
     return {"team": team}
 
 @api_router.post("/team/add")
@@ -719,6 +832,13 @@ async def add_to_team(data: AddToTeam):
     price = celebrity.get("price", 5)
     if team.get("budget_remaining", 0) < price:
         raise HTTPException(status_code=400, detail="Insufficient budget")
+    
+    # Calculate points including brown bread bonus
+    celeb_points = celebrity["buzz_score"]
+    brown_bread_bonus = 0
+    if celebrity.get("is_deceased"):
+        brown_bread_bonus = 50.0
+        celeb_points += brown_bread_bonus
     
     # Add to team
     team_celeb = TeamCelebrity(
