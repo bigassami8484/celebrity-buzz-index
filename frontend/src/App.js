@@ -15,7 +15,38 @@ const categoryIcons = {
   athletes: Trophy,
   royals: Crown,
   reality_tv: Star,
+  other: Star,
 };
+
+// How It Works Component
+const HowItWorks = () => (
+  <div className="bg-[#0A0A0A] border border-[#262626] p-6 mb-8" data-testid="how-it-works">
+    <h3 className="font-anton text-2xl uppercase tracking-tight mb-4 text-[#FFD700]">How It Works</h3>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="text-center">
+        <div className="w-12 h-12 bg-[#FF0099] flex items-center justify-center mx-auto mb-3">
+          <Search className="w-6 h-6 text-white" />
+        </div>
+        <h4 className="font-space font-bold text-lg mb-2">1. Search & Browse</h4>
+        <p className="text-sm text-[#A1A1AA]">Find celebrities by name or browse categories like Royals, Reality TV, Musicians & more</p>
+      </div>
+      <div className="text-center">
+        <div className="w-12 h-12 bg-[#00F0FF] flex items-center justify-center mx-auto mb-3">
+          <Plus className="w-6 h-6 text-black" />
+        </div>
+        <h4 className="font-space font-bold text-lg mb-2">2. Build Your Team</h4>
+        <p className="text-sm text-[#A1A1AA]">Spend your £50M budget wisely. High buzz = higher price!</p>
+      </div>
+      <div className="text-center">
+        <div className="w-12 h-12 bg-[#FFD700] flex items-center justify-center mx-auto mb-3">
+          <Trophy className="w-6 h-6 text-black" />
+        </div>
+        <h4 className="font-space font-bold text-lg mb-2">3. Climb the Leaderboard</h4>
+        <p className="text-sm text-[#A1A1AA]">Earn points based on your celebrities' buzz scores. Share & compete!</p>
+      </div>
+    </div>
+  </div>
+);
 
 // Header Component
 const Header = () => (
