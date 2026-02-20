@@ -355,27 +355,21 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     # Get full page summary for this person
                     try:
                         summary_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{title.replace(' ', '_')}"
-                        logger.info(f"  Fetching summary: {summary_url}")
                         summary_response = await client.get(summary_url, timeout=3.0, headers=headers)
-                        logger.info(f"  Summary status: {summary_response.status_code}")
                         if summary_response.status_code == 200:
                             summary_data = summary_response.json()
                             desc = summary_data.get("extract", "")
                             image = summary_data.get("thumbnail", {}).get("source", "")
                             page_type = summary_data.get("type", "")
                             
-                            logger.info(f"  Page type: {page_type}, Desc length: {len(desc)}")
-                            
                             # Skip if not a standard article (could be disambiguation)
                             if page_type != "standard":
-                                logger.info(f"  Skipped: not standard")
                                 continue
                             
                             # Check description for person keywords
                             desc_lower = desc.lower()
                             
                             # Skip if description STARTS with non-person phrases (albums, films, etc.)
-                            # These indicate the article is about that thing, not a person
                             skip_start_phrases = [
                                 "is a fictional character", "is a character in",
                                 "is an album", "is the album", "is a studio album",
@@ -398,7 +392,6 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             for phrase in skip_start_phrases:
                                 if desc_lower.startswith(phrase) or f" {phrase}" in desc_lower[:100]:
                                     should_skip = True
-                                    logger.info(f"  Skipped: starts with '{phrase}'")
                                     break
                             if should_skip:
                                 continue
@@ -415,10 +408,7 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             ]
                             
                             if not any(ind in desc_lower for ind in person_indicators):
-                                logger.info(f"  Skipped: no person indicator")
                                 continue
-                            
-                            logger.info(f"  SUCCESS: Adding {title}")
                             
                             # Estimate tier and price
                             tier = estimate_tier_from_description(desc)
