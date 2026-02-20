@@ -484,7 +484,11 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                 "is a hotel", "is an airport", "is located in",
                                 "was a fictional", "was a character", "was an album",
                                 "was a television", "was a film", "was a band",
-                                "studio album by", "collaborative album", "compilation album"
+                                "studio album by", "collaborative album", "compilation album",
+                                "is a long-distance", "is a cycling", "is a race", "is a marathon",
+                                "is an annual", "is a sporting", "is a professional cycling",
+                                "is a haunted", "is a location", "is a place", "is a building",
+                                "is a nightclub", "is a restaurant", "is a bar", "is a pub"
                             ]
                             
                             # Check if description starts with any skip phrase
