@@ -101,12 +101,6 @@ TRENDING_CELEBRITIES = {
     "reality_tv": ["Katie Price", "Gemma Collins", "Pete Wicks", "Joey Essex", "Sam Faiers"],
     "other": ["David Beckham", "Gordon Ramsay", "Bear Grylls", "Jeremy Clarkson", "James Corden"],
 }
-    "tv_actors": ["Pedro Pascal", "Jenna Ortega", "Sydney Sweeney", "Austin Butler", "Emma Corrin"],
-    "musicians": ["Taylor Swift", "Bad Bunny", "Dua Lipa", "The Weeknd", "Billie Eilish"],
-    "athletes": ["Lionel Messi", "LeBron James", "Caitlin Clark", "Patrick Mahomes", "Simone Biles"],
-    "royals": ["Prince William", "Kate Middleton", "Prince Harry", "Meghan Markle", "King Charles III"],
-    "reality_tv": ["Kim Kardashian", "Kylie Jenner", "Love Island UK", "Kourtney Kardashian", "Khloé Kardashian"],
-}
 
 # ==================== HELPER FUNCTIONS ====================
 
