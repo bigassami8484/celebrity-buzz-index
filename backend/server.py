@@ -107,19 +107,28 @@ TRENDING_CELEBRITIES = {
 async def fetch_wikipedia_info(name: str) -> dict:
     """Fetch celebrity info from Wikipedia API"""
     try:
+        headers = {
+            "User-Agent": "CelebrityBuzzIndex/1.0 (contact@example.com)"
+        }
         async with httpx.AsyncClient() as client:
             url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{name.replace(' ', '_')}"
-            response = await client.get(url, timeout=10.0)
+            logger.info(f"Fetching Wikipedia for: {name}, URL: {url}")
+            response = await client.get(url, timeout=10.0, headers=headers)
+            logger.info(f"Wikipedia response status: {response.status_code}")
             if response.status_code == 200:
                 data = response.json()
+                bio = data.get("extract", "No biography available.")
+                logger.info(f"Got bio for {name}: {bio[:100]}...")
                 return {
                     "name": data.get("title", name),
-                    "bio": data.get("extract", "No biography available."),
+                    "bio": bio,
                     "image": data.get("thumbnail", {}).get("source", ""),
                     "wiki_url": data.get("content_urls", {}).get("desktop", {}).get("page", "")
                 }
+            else:
+                logger.error(f"Wikipedia returned status {response.status_code}: {response.text[:200]}")
     except Exception as e:
-        logger.error(f"Wikipedia fetch error: {e}")
+        logger.error(f"Wikipedia fetch error for {name}: {type(e).__name__}: {e}")
     return {"name": name, "bio": "Celebrity profile", "image": "", "wiki_url": ""}
 
 def detect_category_from_bio(bio: str, name: str) -> str:
