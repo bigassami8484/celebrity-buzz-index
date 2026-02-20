@@ -707,35 +707,38 @@ async def get_top_picked():
 
 @api_router.get("/todays-news")
 async def get_todays_news():
-    """Get today's top celebrity news using AI"""
-    # Check cache
+    """Get today's top REAL celebrity news using web search"""
+    # Check cache (15 min cache for real news)
     cached = await db.news_cache.find_one(
-        {"type": "todays_news"},
+        {"type": "todays_news_real"},
         {"_id": 0}
     )
     
     if cached and cached.get("updated_at"):
         cache_time = datetime.fromisoformat(cached["updated_at"])
-        if (datetime.now(timezone.utc) - cache_time).seconds < 1800:  # 30 min cache
+        if (datetime.now(timezone.utc) - cache_time).seconds < 900:  # 15 min cache
             return {"news": cached.get("news", [])}
     
-    # Generate fresh news
+    # Fetch real news using web search
     try:
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
-            session_id=f"daily-news-{uuid.uuid4()}",
-            system_message="""You are a celebrity news aggregator. Generate today's top 8 celebrity news headlines.
-            Focus on UK and international celebrities. Mix of royals, reality TV, musicians, actors.
-            Return a JSON array with items containing:
-            - celebrity: Name of the celebrity
-            - headline: Catchy news headline
-            - summary: 1-2 sentence summary
-            - source: Realistic source (Daily Mail, BBC, TMZ, The Sun, etc.)
+            session_id=f"real-news-{uuid.uuid4()}",
+            system_message="""You are a news aggregator. Search the web for TODAY's real celebrity news headlines.
+            Find ACTUAL recent news articles from real sources.
+            Return a JSON array with 8 items. Each MUST have:
+            - celebrity: Name of the celebrity in the news
+            - headline: The ACTUAL headline from the article
+            - summary: Brief summary of the story
+            - source: The actual publication name (Daily Mail, BBC, TMZ, The Sun, etc.)
+            - url: The ACTUAL URL to the article (must be a real working link)
             - category: royals/reality_tv/musicians/athletes/movie_stars/tv_actors/other
-            ONLY return valid JSON array."""
-        ).with_model("openai", "gpt-4o")
+            
+            Focus on UK celebrities and international stars. Include royals, reality TV stars, musicians.
+            ONLY return valid JSON array with real URLs."""
+        ).with_model("openai", "gpt-4o").with_web_search()
         
-        message = UserMessage(text="Generate today's top 8 UK and international celebrity news headlines. Return ONLY JSON array.")
+        message = UserMessage(text="Search for today's top 8 REAL celebrity news stories from UK tabloids and news sites. Include actual article URLs. Return ONLY JSON array.")
         response = await chat.send_message(message)
         
         clean_response = response.strip()
@@ -749,7 +752,7 @@ async def get_todays_news():
         
         # Cache it
         await db.news_cache.update_one(
-            {"type": "todays_news"},
+            {"type": "todays_news_real"},
             {"$set": {
                 "news": news,
                 "updated_at": datetime.now(timezone.utc).isoformat()
@@ -759,7 +762,10 @@ async def get_todays_news():
         
         return {"news": news if isinstance(news, list) else []}
     except Exception as e:
-        logger.error(f"Daily news error: {e}")
+        logger.error(f"Real news fetch error: {e}")
+        # Fallback to cached if available
+        if cached:
+            return {"news": cached.get("news", [])}
         return {"news": []}
 
 @api_router.post("/team/create")
