@@ -760,6 +760,30 @@ async def get_top_picked():
     
     return {"top_picked": top_celebs}
 
+@api_router.get("/brown-bread-watch")
+async def get_brown_bread_watch():
+    """Get elderly celebrities for Brown Bread Watch - strategic picks for the bonus!"""
+    # Find living celebrities with known age >= 60
+    elderly_celebs = await db.celebrities.find(
+        {
+            "is_deceased": False,
+            "age": {"$gte": 60}
+        },
+        {"_id": 0}
+    ).sort("age", -1).to_list(20)
+    
+    # Add risk level to each
+    watch_list = []
+    for celeb in elderly_celebs:
+        age = celeb.get("age", 0)
+        risk = get_brown_bread_risk(age)
+        watch_list.append({
+            **celeb,
+            "risk_level": risk
+        })
+    
+    return {"watch_list": watch_list}
+
 @api_router.get("/todays-news")
 async def get_todays_news():
     """Get today's top REAL celebrity news from RSS feeds"""
