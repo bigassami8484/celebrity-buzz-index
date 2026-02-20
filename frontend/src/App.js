@@ -699,7 +699,17 @@ const ShareModal = ({ team, onClose }) => {
         </div>
         
         <button onClick={handleTwitterShare} className="share-button share-twitter" data-testid="share-twitter-btn">
+          <X className="w-5 h-5" />
           Share on X / Twitter
+        </button>
+        
+        <button onClick={handleFacebookShare} className="share-button bg-[#1877F2] text-white hover:bg-[#166FE5]" data-testid="share-facebook-btn">
+          <Facebook className="w-5 h-5" />
+          Share on Facebook
+        </button>
+        
+        <button onClick={handleWhatsAppShare} className="share-button bg-[#25D366] text-white hover:bg-[#20BD5A]" data-testid="share-whatsapp-btn">
+          Share on WhatsApp
         </button>
         
         <button onClick={handleCopy} className="share-button share-copy" data-testid="share-copy-btn">
@@ -723,6 +733,39 @@ function App() {
   const [searchLoading, setSearchLoading] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showMethodology, setShowMethodology] = useState(false);
+  const [stats, setStats] = useState(null);
+  const [todaysNews, setTodaysNews] = useState([]);
+  const [topPicked, setTopPicked] = useState([]);
+
+  // Fetch stats
+  const fetchStats = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/stats`);
+      setStats(res.data);
+    } catch (e) {
+      console.error("Error fetching stats:", e);
+    }
+  }, []);
+
+  // Fetch today's news
+  const fetchTodaysNews = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/todays-news`);
+      setTodaysNews(res.data.news || []);
+    } catch (e) {
+      console.error("Error fetching news:", e);
+    }
+  }, []);
+
+  // Fetch top picked
+  const fetchTopPicked = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/top-picked`);
+      setTopPicked(res.data.top_picked || []);
+    } catch (e) {
+      console.error("Error fetching top picked:", e);
+    }
+  }, []);
 
   // Fetch categories
   const fetchCategories = useCallback(async () => {
