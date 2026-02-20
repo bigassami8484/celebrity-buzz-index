@@ -130,17 +130,40 @@ const TodaysNews = ({ news }) => {
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {news.slice(0, 8).map((item, idx) => (
-          <div key={idx} className="bg-[#1A1A1A] p-4 hover:bg-[#222] transition-colors">
+          <a 
+            key={idx} 
+            href={item.url || "#"} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="bg-[#1A1A1A] p-4 hover:bg-[#222] transition-colors block group"
+          >
             <p className="text-xs text-[#00F0FF] uppercase mb-1">{item.source}</p>
-            <p className="font-bold text-sm text-white mb-2 line-clamp-2">{item.headline}</p>
+            <p className="font-bold text-sm text-white mb-2 line-clamp-2 group-hover:text-[#FF0099]">{item.headline}</p>
             <p className="text-xs text-[#A1A1AA] line-clamp-2">{item.summary}</p>
-            <p className="text-xs text-[#FFD700] mt-2">{item.celebrity}</p>
-          </div>
+            <div className="flex justify-between items-center mt-2">
+              <p className="text-xs text-[#FFD700]">{item.celebrity}</p>
+              <span className="text-xs text-[#FF0099] opacity-0 group-hover:opacity-100 transition-opacity">Read →</span>
+            </div>
+          </a>
         ))}
       </div>
     </div>
   );
 };
+
+// Footer Component
+const Footer = () => (
+  <footer className="bg-[#050505] border-t border-[#262626] py-8 mt-16" data-testid="footer">
+    <div className="max-w-7xl mx-auto px-4 text-center">
+      <p className="text-sm text-[#A1A1AA] mb-4">
+        Celebrity Buzz Index scores are calculated automatically based on media mentions and do not reflect personal opinions.
+      </p>
+      <p className="text-xs text-[#666]">
+        © 2026 Celebrity Buzz Index. All rights reserved.
+      </p>
+    </div>
+  </footer>
+);
 
 // Top Picked Celebrities Component
 const TopPickedCelebs = ({ celebs, onSelect }) => {
