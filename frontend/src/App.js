@@ -934,6 +934,7 @@ const TeamPanel = ({ team, onRemove, onShare }) => {
             £{team.budget_remaining}M
           </div>
           <p className="text-xs text-[#A1A1AA] uppercase tracking-wider">Budget Left</p>
+          <p className="text-xs text-[#666] mt-1">{team.celebrities?.length || 0}/10 players</p>
         </div>
       </div>
       
