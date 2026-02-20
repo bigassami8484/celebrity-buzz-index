@@ -1537,96 +1537,89 @@ async def leave_league(league_id: str, team_id: str):
     
     return {"message": "Left league successfully"}
 
-# ==================== BROWN BREAD MINI GAME ENDPOINTS ====================
+# ==================== BADGE ENDPOINTS ====================
 
-@api_router.post("/minigame/bet")
-async def place_brown_bread_bet(data: PlaceBet):
-    """Place a bet on which celebrity will 'go brown bread' next"""
-    # Verify team exists
-    team = await db.teams.find_one({"id": data.team_id})
+@api_router.get("/badges")
+async def get_all_badges():
+    """Get all available badges"""
+    return {"badges": list(BADGES.values())}
+
+@api_router.get("/team/{team_id}/badges")
+async def get_team_badges(team_id: str):
+    """Get badges earned by a team"""
+    team = await db.teams.find_one({"id": team_id}, {"_id": 0, "badges": 1, "team_name": 1})
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
     
-    # Verify celebrity exists and is on the watch list (elderly, alive)
-    celebrity = await db.celebrities.find_one({"id": data.celebrity_id})
-    if not celebrity:
-        raise HTTPException(status_code=404, detail="Celebrity not found")
-    
-    if celebrity.get("is_deceased"):
-        raise HTTPException(status_code=400, detail="Can't bet on someone already brown bread!")
-    
-    if celebrity.get("age", 0) < 60:
-        raise HTTPException(status_code=400, detail="Celebrity must be on the Brown Bread Watch (60+)")
-    
-    # Check if already has an active bet on this celeb
-    existing_bet = await db.bets.find_one({
-        "team_id": data.team_id,
-        "celebrity_id": data.celebrity_id,
-        "resolved": False
-    })
-    if existing_bet:
-        raise HTTPException(status_code=400, detail="Already have an active bet on this celebrity!")
-    
-    # Check bet amount (min 5, max 50)
-    bet_amount = max(5, min(50, data.bet_amount))
-    
-    # Create bet
-    bet = BrownBreadBet(
-        team_id=data.team_id,
-        celebrity_id=data.celebrity_id,
-        celebrity_name=celebrity["name"],
-        bet_amount=bet_amount
-    )
-    
-    doc = bet.model_dump()
-    doc['placed_at'] = doc['placed_at'].isoformat()
-    await db.bets.insert_one(doc)
-    
-    if '_id' in doc:
-        del doc['_id']
-    
-    return {"bet": doc, "message": f"Bet placed on {celebrity['name']}! 💀"}
-
-@api_router.get("/minigame/bets/{team_id}")
-async def get_team_bets(team_id: str):
-    """Get all bets for a team"""
-    bets = await db.bets.find(
-        {"team_id": team_id},
-        {"_id": 0}
-    ).sort("placed_at", -1).to_list(50)
-    
-    return {"bets": bets}
-
-@api_router.get("/minigame/leaderboard")
-async def get_minigame_leaderboard():
-    """Get leaderboard for the brown bread mini game"""
-    # Aggregate wins by team
-    pipeline = [
-        {"$match": {"resolved": True, "won": True}},
-        {"$group": {
-            "_id": "$team_id",
-            "wins": {"$sum": 1},
-            "total_winnings": {"$sum": {"$multiply": ["$bet_amount", 10]}}  # 10x payout
-        }},
-        {"$sort": {"wins": -1}},
-        {"$limit": 20}
-    ]
-    
-    results = await db.bets.aggregate(pipeline).to_list(20)
-    
-    # Get team names
-    leaderboard = []
-    for result in results:
-        team = await db.teams.find_one({"id": result["_id"]}, {"_id": 0, "team_name": 1})
-        if team:
-            leaderboard.append({
-                "team_id": result["_id"],
-                "team_name": team.get("team_name", "Unknown"),
-                "wins": result["wins"],
-                "total_winnings": result["total_winnings"]
+    # Enrich badge data with full badge info
+    earned_badges = []
+    for badge in team.get("badges", []):
+        badge_info = BADGES.get(badge.get("id", ""))
+        if badge_info:
+            earned_badges.append({
+                **badge_info,
+                "earned_at": badge.get("earned_at"),
+                "league_id": badge.get("league_id", "")
             })
     
-    return {"leaderboard": leaderboard}
+    return {"badges": earned_badges, "team_name": team.get("team_name")}
+
+@api_router.post("/league/{league_id}/award-weekly")
+async def award_weekly_badge(league_id: str):
+    """Award weekly winner badge to top team in league (call weekly)"""
+    league = await db.leagues.find_one({"id": league_id})
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    
+    # Get all teams in league
+    team_ids = league.get("team_ids", [])
+    if not team_ids:
+        raise HTTPException(status_code=400, detail="No teams in league")
+    
+    teams = await db.teams.find({"id": {"$in": team_ids}}, {"_id": 0}).to_list(100)
+    
+    if not teams:
+        raise HTTPException(status_code=400, detail="No teams found")
+    
+    # Find winner (highest points)
+    winner = max(teams, key=lambda t: t.get("total_points", 0))
+    
+    # Award badge
+    badge = {
+        "id": "weekly_winner",
+        "earned_at": datetime.now(timezone.utc).isoformat(),
+        "league_id": league_id
+    }
+    
+    await db.teams.update_one(
+        {"id": winner["id"]},
+        {
+            "$push": {"badges": badge},
+            "$inc": {"weekly_wins": 1}
+        }
+    )
+    
+    # Check if they've earned League Legend (3+ wins)
+    updated_team = await db.teams.find_one({"id": winner["id"]})
+    if updated_team.get("weekly_wins", 0) >= 3:
+        # Check if they already have the legend badge
+        has_legend = any(b.get("id") == "league_champion" for b in updated_team.get("badges", []))
+        if not has_legend:
+            legend_badge = {
+                "id": "league_champion",
+                "earned_at": datetime.now(timezone.utc).isoformat(),
+                "league_id": league_id
+            }
+            await db.teams.update_one(
+                {"id": winner["id"]},
+                {"$push": {"badges": legend_badge}}
+            )
+    
+    return {
+        "winner": winner["team_name"],
+        "points": winner.get("total_points", 0),
+        "badge_awarded": "weekly_winner"
+    }
 
 # Include router
 app.include_router(api_router)
