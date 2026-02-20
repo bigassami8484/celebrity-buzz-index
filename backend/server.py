@@ -273,50 +273,111 @@ C_LIST_INDICATORS = ["known for", "appeared in", "featured", "contestant", "part
 # ==================== HELPER FUNCTIONS ====================
 
 async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
-    """Search Wikipedia for celebrity suggestions - filters for actual people only"""
+    """Search Wikipedia for celebrity suggestions - returns ONE result per person only"""
     try:
         headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (contact@example.com)"}
         async with httpx.AsyncClient() as client:
-            # Use Wikipedia opensearch API with more results to filter
-            url = f"https://en.wikipedia.org/w/api.php?action=opensearch&search={query}&limit=15&namespace=0&format=json"
+            # Use Wikipedia opensearch API
+            url = f"https://en.wikipedia.org/w/api.php?action=opensearch&search={query}&limit=20&namespace=0&format=json"
             response = await client.get(url, timeout=5.0, headers=headers)
             if response.status_code == 200:
                 data = response.json()
                 names = data[1] if len(data) > 1 else []
                 descriptions = data[2] if len(data) > 2 else []
                 
-                # Keywords that indicate non-person results to filter out
+                # Keywords that indicate this is NOT a person - FILTER OUT
                 non_person_keywords = [
                     "filmography", "discography", "bibliography", "awards", "album", 
-                    "film", "song", "band", "tv series", "television series", "movie",
+                    "song", "band", "tv series", "television series", "movie", "film",
                     "list of", "category:", "template:", "wikipedia:", "soundtrack",
-                    "video game", "book", "novel", "tour", "concert", "episode"
+                    "video game", "book", "novel", "tour", "concert", "episode",
+                    "podcast", "show", "series", "programme", "program", "season",
+                    "(", "city", "town", "village", "municipality", "district",
+                    "company", "album", "single", "ep", "discography", "videography"
                 ]
                 
-                # Keywords that indicate this IS a person
+                # Keywords that MUST be in description to confirm it's a person
                 person_keywords = [
                     "actor", "actress", "singer", "musician", "footballer", "athlete",
                     "politician", "presenter", "model", "chef", "comedian", "director",
                     "writer", "author", "rapper", "host", "personality", "prince", 
                     "princess", "duke", "duchess", "royal", "businessman", "businesswoman",
-                    "entrepreneur", "influencer", "youtuber", "tiktoker", "celebrity",
-                    "born", "american", "british", "english", "australian", "canadian"
+                    "entrepreneur", "influencer", "youtuber", "celebrity", "star",
+                    "born", "american", "british", "english", "australian", "canadian",
+                    "irish", "scottish", "welsh", "french", "german", "italian", "spanish",
+                    "player", "manager", "coach", "producer", "composer", "dancer"
                 ]
                 
                 results = []
-                seen_names = set()  # Track seen names to avoid duplicates
+                seen_base_names = set()  # Track base names to avoid ANY duplicates
                 
                 for i, name in enumerate(names):
                     desc = descriptions[i] if i < len(descriptions) else ""
                     name_lower = name.lower()
                     desc_lower = desc.lower()
                     
-                    # Skip if name contains non-person keywords
+                    # STRICT: Skip if name contains ANY non-person keywords
                     if any(kw in name_lower for kw in non_person_keywords):
                         continue
                     
-                    # Skip if description doesn't seem like a person
-                    if desc and not any(kw in desc_lower for kw in person_keywords):
+                    # STRICT: Skip if name has parentheses (usually disambiguation pages)
+                    if "(" in name:
+                        continue
+                    
+                    # STRICT: Must have a person keyword in description
+                    if not desc or not any(kw in desc_lower for kw in person_keywords):
+                        continue
+                    
+                    # STRICT: Get clean base name and check for duplicates
+                    # This ensures "Mariah Carey" only appears once
+                    base_name = name.strip().lower()
+                    if base_name in seen_base_names:
+                        continue
+                    seen_base_names.add(base_name)
+                    
+                    # Also check if this is a substring duplicate (e.g., if we have "Gemma Collins", skip "Gemma Collins Show")
+                    is_duplicate = False
+                    for seen in seen_base_names:
+                        if seen != base_name and (base_name.startswith(seen) or seen.startswith(base_name)):
+                            is_duplicate = True
+                            break
+                    if is_duplicate:
+                        continue
+                    
+                    # Estimate tier based on description
+                    tier = estimate_tier_from_description(desc)
+                    price = get_price_for_tier(tier)
+                    
+                    # Try to get thumbnail
+                    image = ""
+                    try:
+                        thumb_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{name.replace(' ', '_')}"
+                        thumb_response = await client.get(thumb_url, timeout=3.0, headers=headers)
+                        if thumb_response.status_code == 200:
+                            thumb_data = thumb_response.json()
+                            image = thumb_data.get("thumbnail", {}).get("source", "")
+                    except:
+                        pass
+                    
+                    # Always ensure a valid image URL
+                    final_image = image if image and len(image) > 0 else f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&size=64&background=FF0099&color=fff"
+                    
+                    results.append({
+                        "name": name,
+                        "description": desc[:150] + "..." if len(desc) > 150 else desc,
+                        "image": final_image,
+                        "estimated_tier": tier,
+                        "estimated_price": price
+                    })
+                    
+                    # Limit to 6 clean results
+                    if len(results) >= 6:
+                        break
+                        
+                return results
+    except Exception as e:
+        logger.error(f"Wikipedia autocomplete error: {e}")
+    return []
                         # Allow if description is empty (might still be a person)
                         if desc:
                             continue
