@@ -37,7 +37,10 @@ logger = logging.getLogger(__name__)
 BANNED_WORDS = [
     "nigger", "nigga", "faggot", "fag", "retard", "spic", "chink", "gook", 
     "kike", "wetback", "beaner", "coon", "darkie", "paki", "raghead", 
-    "cracker", "honky", "nazi", "hitler", "kkk", "n1gger", "n1gga"
+    "cracker", "honky", "nazi", "hitler", "kkk", "n1gger", "n1gga",
+    "racist", "racism", "white power", "white supremacy", "heil", 
+    "jew", "jews", "holocaust", "aryan", "fuhrer", "reich",
+    "slave", "slavery", "lynch", "lynching", "genocide"
 ]
 
 # High-profile celebrities with boosted base prices (controversial/newsworthy)
