@@ -820,6 +820,11 @@ function App() {
       {showShareModal && team && (
         <ShareModal team={team} onClose={() => setShowShareModal(false)} />
       )}
+      
+      {/* Points Methodology Modal */}
+      {showMethodology && (
+        <PointsMethodology onClose={() => setShowMethodology(false)} />
+      )}
     </div>
   );
 }
