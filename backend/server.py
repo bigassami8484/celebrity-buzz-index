@@ -162,21 +162,22 @@ def detect_category_from_bio(bio: str, name: str) -> str:
                                      "house of windsor", "buckingham palace", "monarchy"]):
         return "royals"
     
-    # Musicians/Singers - expanded keywords
-    if any(x in bio_lower for x in ["singer", "songwriter", "musician", "rapper", "vocalist", 
-                                     "band", "album", "record", "grammy", "brit award", "concert", 
-                                     "tour", "music artist", "pop star", "rock star", "hip hop",
-                                     "r&b", "mezzo-soprano", "soprano", "tenor", "musical artist"]):
-        return "musicians"
-    
-    # Athletes - expanded keywords
-    if any(x in bio_lower for x in ["footballer", "athlete", "football", "basketball", "soccer", 
+    # Athletes - check BEFORE musicians (racing driver, footballer, etc. should take priority)
+    if any(x in bio_lower for x in ["footballer", "athlete", "football player", "basketball", "soccer", 
                                      "tennis", "olympic", "premier league", "f1", "formula one",
                                      "racing driver", "cricketer", "rugby", "boxing", "boxer",
                                      "striker", "goalkeeper", "midfielder", "defender",
                                      "bundesliga", "la liga", "serie a", "england national team",
-                                     "world cup", "champion", "motorsport"]):
+                                     "world cup", "motorsport", "grand prix"]):
         return "athletes"
+    
+    # Musicians/Singers - removed "record" as it's too generic
+    if any(x in bio_lower for x in ["singer", "songwriter", "musician", "rapper", "vocalist", 
+                                     "band", "album", "grammy", "brit award", "concert", 
+                                     "tour", "music artist", "pop star", "rock star", "hip hop",
+                                     "r&b", "mezzo-soprano", "soprano", "tenor", "musical artist",
+                                     "recording artist"]):
+        return "musicians"
     
     # TV actors
     if any(x in bio_lower for x in ["television actor", "tv actor", "television series", "tv series", 
