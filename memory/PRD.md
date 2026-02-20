@@ -97,6 +97,20 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
   - 🔴 Critical (90+), 🟠 High (80-89), 🟡 Elevated (70-79), 🟢 Moderate (60-69)
   - Grayscale photos, age display, click-to-search integration
   - Extracts birth year from Wikipedia's wikibase-shortdesc API
+- ✅ **Friends League System** - Compete with friends
+  - Create leagues with auto-generated 6-char invite codes
+  - Join leagues by entering code
+  - League-specific leaderboards
+  - WhatsApp sharing for league invites
+- ✅ **Mobile Responsive Design**
+  - Bottom navigation bar (Home, Team, Leagues)
+  - Responsive CSS for all screen sizes
+  - Touch-friendly interface
+- ✅ **Improved Celebrity Search**
+  - Filters out non-person results (films, albums, shows)
+  - Removes duplicates (only one result per celebrity)
+  - Filters out fictional characters
+  - Uses Wikipedia Search API for better results
 
 ## Backlog / Future Features
 
