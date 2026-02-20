@@ -493,4 +493,225 @@
   .budget-display {
     font-size: 24px;
   }
+  
+  /* Mobile Header */
+  header h1 {
+    font-size: 2rem !important;
+  }
+  
+  header p {
+    font-size: 10px !important;
+    letter-spacing: 2px !important;
+  }
+  
+  /* Mobile Search */
+  .search-container {
+    padding: 0 8px !important;
+  }
+  
+  .search-input {
+    padding: 12px 50px 12px 16px;
+    font-size: 14px;
+  }
+  
+  .search-button {
+    padding: 10px 14px;
+  }
+  
+  /* Mobile Category Pills */
+  .category-pill {
+    padding: 6px 12px;
+    font-size: 10px;
+  }
+  
+  /* Mobile Cards */
+  .celebrity-card-overlay {
+    padding: 60px 12px 12px;
+  }
+  
+  .celebrity-card-overlay h3 {
+    font-size: 1.2rem !important;
+  }
+  
+  /* Mobile Team Panel */
+  .team-panel {
+    padding: 16px;
+  }
+  
+  .team-header {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+  
+  .team-header > div:last-child {
+    text-align: center;
+  }
+  
+  /* Mobile Leaderboard */
+  .leaderboard {
+    padding: 16px;
+  }
+  
+  .leaderboard-row {
+    padding: 12px 8px;
+  }
+  
+  .leaderboard-rank {
+    font-size: 20px;
+    width: 35px;
+  }
+  
+  /* Mobile Share Modal */
+  .share-modal {
+    padding: 20px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  /* Mobile News Panel */
+  .news-panel {
+    padding: 12px;
+  }
+  
+  .news-title {
+    font-size: 12px;
+  }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  .ticker-container {
+    padding: 8px 0;
+  }
+  
+  .ticker-item {
+    padding: 0 12px;
+    font-size: 10px;
+  }
+  
+  .buzz-score {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+  
+  .price-tag {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+  
+  .category-badge {
+    font-size: 9px;
+    padding: 3px 8px;
+  }
+  
+  .add-button {
+    padding: 10px;
+    font-size: 11px;
+  }
+  
+  .team-celeb {
+    padding: 8px;
+    gap: 8px;
+  }
+  
+  .team-celeb-image {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* League Card Styles */
+.league-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s ease;
+}
+
+.league-card:hover {
+  border-color: var(--accent-cyan);
+}
+
+.league-code {
+  font-family: 'Space Grotesk', monospace;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 4px;
+  color: var(--accent-gold);
+  background: var(--bg-muted);
+  padding: 8px 16px;
+  text-align: center;
+}
+
+/* Mini Game Styles */
+.bet-card {
+  background: var(--bg-muted);
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bet-card.won {
+  border-color: var(--accent-gold);
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.bet-card.pending {
+  border-color: var(--accent-cyan);
+}
+
+/* Bottom Navigation for Mobile */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  padding: 8px 0;
+  z-index: 50;
+}
+
+@media (max-width: 768px) {
+  .mobile-nav {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  /* Add padding to bottom to account for mobile nav */
+  .App {
+    padding-bottom: 70px;
+  }
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  color: var(--text-muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.mobile-nav-item.active {
+  color: var(--accent-pink);
+}
+
+.mobile-nav-item:hover {
+  color: var(--accent-pink);
 }
