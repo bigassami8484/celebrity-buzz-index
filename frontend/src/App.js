@@ -1195,9 +1195,8 @@ function App() {
       try {
         const res = await axios.get(`${API}/team/${storedTeamId}`);
         setTeam(res.data.team);
-        // Fetch team's leagues and bets
+        // Fetch team's leagues
         fetchTeamLeagues(storedTeamId);
-        fetchTeamBets(storedTeamId);
         return;
       } catch (e) {
         localStorage.removeItem("teamId");
