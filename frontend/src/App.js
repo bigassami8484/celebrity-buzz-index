@@ -1105,6 +1105,16 @@ function App() {
     }
   }, []);
 
+  // Fetch Hall of Fame
+  const fetchHallOfFame = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/hall-of-fame`);
+      setHallOfFame(res.data.hall_of_fame || []);
+    } catch (e) {
+      console.error("Error fetching hall of fame:", e);
+    }
+  }, []);
+
   // Create a new league
   const createLeague = async (name) => {
     if (!team) return;
