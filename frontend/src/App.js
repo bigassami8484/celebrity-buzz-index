@@ -131,11 +131,13 @@ const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford }) => {
   return (
     <div 
       className="celebrity-card"
-      onMouseEnter={() => setShowNews(true)}
-      onMouseLeave={() => setShowNews(false)}
       data-testid={`celebrity-card-${celebrity.id}`}
     >
-      <div className="relative overflow-hidden">
+      <div 
+        className="relative overflow-hidden"
+        onMouseEnter={() => setShowNews(true)}
+        onMouseLeave={() => setShowNews(false)}
+      >
         <img
           src={celebrity.image || `https://ui-avatars.com/api/?name=${celebrity.name}&size=400&background=FF0099&color=fff`}
           alt={celebrity.name}
@@ -157,15 +159,6 @@ const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford }) => {
           </div>
           <h3 className="font-anton text-2xl uppercase tracking-tight">{celebrity.name}</h3>
           <p className="text-sm text-[#A1A1AA] line-clamp-2 mt-1">{celebrity.bio?.slice(0, 100)}...</p>
-          
-          <button
-            onClick={() => onAdd(celebrity)}
-            disabled={isInTeam || !canAfford}
-            className="add-button"
-            data-testid={`add-btn-${celebrity.id}`}
-          >
-            {isInTeam ? "In Team" : !canAfford ? "Can't Afford" : "Add to Team"}
-          </button>
         </div>
         
         {/* News Panel on Hover */}
@@ -182,6 +175,18 @@ const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford }) => {
             <p className="text-[#A1A1AA] text-sm">No recent news available</p>
           )}
         </div>
+      </div>
+      
+      {/* Button outside of hover zone */}
+      <div className="p-4 bg-[#0A0A0A]">
+        <button
+          onClick={() => onAdd(celebrity)}
+          disabled={isInTeam || !canAfford}
+          className="add-button"
+          data-testid={`add-btn-${celebrity.id}`}
+        >
+          {isInTeam ? "In Team" : !canAfford ? "Can't Afford" : "Add to Team"}
+        </button>
       </div>
     </div>
   );
