@@ -1163,6 +1163,83 @@ function App() {
     }
   }, []);
 
+  // Fetch team's leagues
+  const fetchTeamLeagues = useCallback(async (teamId) => {
+    try {
+      const res = await axios.get(`${API}/team/${teamId}/leagues`);
+      setLeagues(res.data.leagues || []);
+    } catch (e) {
+      console.error("Error fetching leagues:", e);
+    }
+  }, []);
+
+  // Fetch team's bets
+  const fetchTeamBets = useCallback(async (teamId) => {
+    try {
+      const res = await axios.get(`${API}/minigame/bets/${teamId}`);
+      setBets(res.data.bets || []);
+    } catch (e) {
+      console.error("Error fetching bets:", e);
+    }
+  }, []);
+
+  // Create a new league
+  const createLeague = async (name) => {
+    if (!team) return;
+    try {
+      const res = await axios.post(`${API}/league/create`, {
+        name,
+        team_id: team.id
+      });
+      setLeagues(prev => [...prev, res.data.league]);
+      toast.success(`League "${name}" created! Share code: ${res.data.league.code}`);
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to create league");
+    }
+  };
+
+  // Join a league
+  const joinLeague = async (code) => {
+    if (!team) return;
+    try {
+      const res = await axios.post(`${API}/league/join`, {
+        code,
+        team_id: team.id
+      });
+      setLeagues(prev => [...prev, res.data.league]);
+      toast.success(res.data.message);
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to join league");
+    }
+  };
+
+  // View league details
+  const viewLeague = async (league) => {
+    try {
+      const res = await axios.get(`${API}/league/${league.id}/leaderboard`);
+      setLeagueLeaderboard(res.data.leaderboard || []);
+      setSelectedLeague(league);
+    } catch (e) {
+      toast.error("Failed to load league");
+    }
+  };
+
+  // Place a bet in the mini game
+  const placeBet = async (celebrityId, betAmount) => {
+    if (!team) return;
+    try {
+      const res = await axios.post(`${API}/minigame/bet`, {
+        team_id: team.id,
+        celebrity_id: celebrityId,
+        bet_amount: betAmount
+      });
+      setBets(prev => [res.data.bet, ...prev]);
+      toast.success(res.data.message);
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to place bet");
+    }
+  };
+
   // Fetch categories
   const fetchCategories = useCallback(async () => {
     try {
