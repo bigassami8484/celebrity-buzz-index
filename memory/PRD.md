@@ -48,9 +48,10 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - News Mentions: +1.0 point per article
 - Tabloid Coverage: +3.0 points (Daily Mail, Sun, TMZ)
 - Broadsheet Coverage: +2.0 points (BBC, Guardian, Times)
-- Controversy Bonus: +1.0 point per scandal
+- Controversy Bonus: +25.0 points per scandal
 - Social Media Trending: +5.0 points per event
-- **Brown Bread Bonus: +50 points** if celebrity passes away
+- **Brown Bread Bonus: +100 points** if celebrity passes away
+- **Minimum Buzz Score: 5 points** (no celebrity scores below 5)
 - **Tier Multipliers**: A=1.0x, B=1.2x, C=1.5x, D=2.0x
 
 ### Features
@@ -63,18 +64,25 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 
 ## What's Been Implemented (Feb 20, 2026)
 - ✅ Full FastAPI backend with all endpoints
-- ✅ Wikipedia autocomplete search
+- ✅ Wikipedia autocomplete search with fallback images
 - ✅ A/B/C/D tier system with tiered pricing
 - ✅ Controversial celebrity price boosts
-- ✅ Brown Bread Bonus (+50 for deceased)
+- ✅ Brown Bread Bonus (+100 for deceased)
+- ✅ Controversy Bonus (+25 points per scandal)
+- ✅ Minimum buzz score of 5 points
 - ✅ Player count banner
-- ✅ Today's Top Celeb News (AI-generated)
+- ✅ Today's Top Celeb News (real RSS feeds from Daily Mail, BBC, Guardian)
 - ✅ Top Picked Celebrities section
 - ✅ Transfer window (1 per week)
 - ✅ Profanity filter for team names
 - ✅ Social sharing (WhatsApp/Facebook/X)
 - ✅ Points methodology modal
 - ✅ React frontend with Tailwind styling
+
+## Bug Fixes (Dec 2025)
+- ✅ Fixed missing pictures in autocomplete - added explicit fallback to ui-avatars.com placeholder
+- ✅ Updated minimum base points to 5 (was 10, now enforces min 5)
+- ✅ Updated Brown Bread Bonus to +100 in UI (was showing +50)
 
 ## Backlog / Future Features
 
