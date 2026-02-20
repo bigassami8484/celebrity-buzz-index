@@ -102,6 +102,7 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - ✅ Friends League system with invite codes
 - ✅ Badge/achievement system
 - ✅ Mobile responsive design with bottom navigation
+- ✅ Hall of Fame page showing top badge earners
 
 ## Bug Fixes (Dec 2025)
 - ✅ Fixed missing pictures in autocomplete - added explicit fallback to ui-avatars.com placeholder
