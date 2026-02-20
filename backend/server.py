@@ -378,13 +378,13 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             
                             # Skip fictional characters, albums, songs, TV shows, places
                             skip_indicators = [
-                                "fictional", "character", "album", "studio album", 
-                                "single by", "song by", "ep by", "soundtrack",
-                                "television series", "tv series", "sitcom", "drama series",
-                                "video game", "film", "movie", "novel", "book",
-                                "band", "musical group", "rock band", "pop group",
-                                "village", "city", "town", "municipality", "district",
-                                "beach", "island", "resort", "hotel", "airport",
+                                "fictional character", "is a character", "album by", "studio album by", 
+                                "single by", "song by", "ep by", "is a soundtrack",
+                                "television series", "tv series", "is a sitcom", "drama series",
+                                "video game", "is a film", "is a movie", "is a novel", "is a book",
+                                "is a band", "musical group", "rock band", "pop group",
+                                "is a village", "is a city", "is a town", "municipality", "is a district",
+                                "is a beach", "is an island", "is a resort", "is a hotel", "is an airport",
                                 "located in", "region of", "province of", "state of"
                             ]
                             if any(skip in desc_lower for skip in skip_indicators):
