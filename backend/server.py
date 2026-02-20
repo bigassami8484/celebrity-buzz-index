@@ -539,12 +539,17 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     else:
         category = detect_category_from_bio(wiki_info.get("bio", ""), wiki_info["name"])
     
+    # Calculate celebrity tier based on bio
+    tier, base_price = await calculate_celebrity_tier(wiki_info.get("bio", ""), wiki_info["name"])
+    
     # Generate news
     news = await generate_celebrity_news(wiki_info["name"], category)
     
     # Calculate buzz score
     buzz_score = calculate_buzz_score(news)
-    price = calculate_price(buzz_score)
+    
+    # Final price based on tier and buzz
+    price = calculate_price(buzz_score, tier)
     
     # Create celebrity object
     celebrity = Celebrity(
@@ -555,6 +560,7 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         wiki_url=wiki_info["wiki_url"],
         buzz_score=buzz_score,
         price=price,
+        tier=tier,
         news=news
     )
     
