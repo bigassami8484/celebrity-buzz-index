@@ -311,6 +311,14 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     if "(" in title:
                         continue
                     
+                    # Skip titles with colons (usually shows, specials, etc.)
+                    if ":" in title:
+                        continue
+                    
+                    # Skip titles starting with "The" (usually shows, bands, etc.)
+                    if title_lower.startswith("the "):
+                        continue
+                    
                     # Skip single word titles (usually not specific celebrities)
                     if " " not in title and len(title) < 15:
                         continue
