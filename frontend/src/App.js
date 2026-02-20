@@ -1209,7 +1209,7 @@ function App() {
     } catch (e) {
       console.error("Error creating team:", e);
     }
-  }, [fetchTeamLeagues, fetchTeamBets]);
+  }, [fetchTeamLeagues]);
 
   // Fetch leaderboard
   const fetchLeaderboard = useCallback(async () => {
