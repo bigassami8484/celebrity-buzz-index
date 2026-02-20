@@ -986,6 +986,7 @@ function App() {
               onRemove={removeFromTeam}
               onShare={() => setShowShareModal(true)}
             />
+            <TopPickedCelebs celebs={topPicked} onSelect={searchCelebrity} />
             <Leaderboard entries={leaderboard} />
           </div>
         </div>
