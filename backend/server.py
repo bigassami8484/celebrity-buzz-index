@@ -88,11 +88,19 @@ CATEGORIES = [
     {"id": "athletes", "name": "Athletes", "icon": "trophy"},
     {"id": "royals", "name": "Royals", "icon": "crown"},
     {"id": "reality_tv", "name": "Reality TV", "icon": "star"},
+    {"id": "other", "name": "Other", "icon": "users"},
 ]
 
-# Pre-defined trending celebrities per category
+# Pre-defined trending celebrities per category (UK & International mix)
 TRENDING_CELEBRITIES = {
-    "movie_stars": ["Timothée Chalamet", "Zendaya", "Margot Robbie", "Ryan Gosling", "Florence Pugh"],
+    "movie_stars": ["Tom Holland", "Florence Pugh", "Idris Elba", "Emily Blunt", "Dev Patel"],
+    "tv_actors": ["Jenna Coleman", "Jodie Comer", "Richard Madden", "Ncuti Gatwa", "Olivia Colman"],
+    "musicians": ["Dua Lipa", "Ed Sheeran", "Adele", "Harry Styles", "Stormzy"],
+    "athletes": ["Harry Kane", "Marcus Rashford", "Emma Raducanu", "Lewis Hamilton", "Raheem Sterling"],
+    "royals": ["Prince William", "Kate Middleton", "Prince Harry", "Meghan Markle", "Prince Andrew"],
+    "reality_tv": ["Katie Price", "Gemma Collins", "Pete Wicks", "Joey Essex", "Sam Faiers"],
+    "other": ["David Beckham", "Gordon Ramsay", "Bear Grylls", "Jeremy Clarkson", "James Corden"],
+}
     "tv_actors": ["Pedro Pascal", "Jenna Ortega", "Sydney Sweeney", "Austin Butler", "Emma Corrin"],
     "musicians": ["Taylor Swift", "Bad Bunny", "Dua Lipa", "The Weeknd", "Billie Eilish"],
     "athletes": ["Lionel Messi", "LeBron James", "Caitlin Clark", "Patrick Mahomes", "Simone Biles"],
