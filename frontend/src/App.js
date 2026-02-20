@@ -924,18 +924,23 @@ function App() {
     fetchTrending();
     initTeam();
     fetchLeaderboard();
-  }, [fetchCategories, fetchTrending, initTeam, fetchLeaderboard]);
+    fetchStats();
+    fetchTodaysNews();
+    fetchTopPicked();
+  }, [fetchCategories, fetchTrending, initTeam, fetchLeaderboard, fetchStats, fetchTodaysNews, fetchTopPicked]);
 
   return (
     <div className="App">
       <Toaster position="top-right" theme="dark" richColors />
       <div className="noise-overlay"></div>
       
+      <PlayerCountBanner stats={stats} />
       <Header />
       <TrendingTicker celebrities={trending} />
       
       <div className="max-w-7xl mx-auto px-4 py-8">
         <HowItWorks onShowMethodology={() => setShowMethodology(true)} />
+        <TodaysNews news={todaysNews} />
         <SearchBar onSearch={searchCelebrity} loading={searchLoading} />
         <CategoryFilter 
           categories={categories} 
