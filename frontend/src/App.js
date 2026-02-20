@@ -102,13 +102,78 @@ const PointsMethodology = ({ onClose }) => (
           <div className="bg-[#666666] text-white p-2 text-center text-sm font-bold">D-LIST: 2.0x</div>
         </div>
         
-        <div className="bg-[#FF0099]/20 border border-[#FF0099] p-4">
+        <div className="bg-[#FF0099]/20 border border-[#FF0099] p-4 mb-4">
           <p className="text-sm"><strong>Example:</strong> A D-list celebrity with 10 tabloid mentions = 10 × 3.0 × 2.0 = <span className="text-[#FFD700] font-bold">60 points</span></p>
+        </div>
+        
+        <div className="bg-[#333]/50 border border-[#444] p-4">
+          <h4 className="font-bold text-white mb-2 flex items-center gap-2">
+            <Skull className="w-5 h-5 text-[#888]" />
+            Brown Bread Bonus 💀
+          </h4>
+          <p className="text-sm text-[#A1A1AA]">If one of your celebrities passes away, you receive a <span className="text-[#FFD700] font-bold">+50 bonus points</span>! Dark? Yes. Part of the game? Absolutely.</p>
         </div>
       </div>
     </div>
   </div>
 );
+
+// Today's News Component
+const TodaysNews = ({ news }) => {
+  if (!news || news.length === 0) return null;
+  
+  return (
+    <div className="bg-[#0A0A0A] border border-[#262626] p-6 mb-8" data-testid="todays-news">
+      <h3 className="font-anton text-2xl uppercase tracking-tight text-[#FF0099] mb-4 flex items-center gap-2">
+        <Newspaper className="w-6 h-6" />
+        Today's Top Celeb News
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {news.slice(0, 8).map((item, idx) => (
+          <div key={idx} className="bg-[#1A1A1A] p-4 hover:bg-[#222] transition-colors">
+            <p className="text-xs text-[#00F0FF] uppercase mb-1">{item.source}</p>
+            <p className="font-bold text-sm text-white mb-2 line-clamp-2">{item.headline}</p>
+            <p className="text-xs text-[#A1A1AA] line-clamp-2">{item.summary}</p>
+            <p className="text-xs text-[#FFD700] mt-2">{item.celebrity}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Top Picked Celebrities Component
+const TopPickedCelebs = ({ celebs, onSelect }) => {
+  if (!celebs || celebs.length === 0) return null;
+  
+  return (
+    <div className="bg-[#0A0A0A] border border-[#262626] p-4 mb-4" data-testid="top-picked">
+      <h4 className="font-anton text-lg uppercase tracking-tight text-[#00F0FF] mb-3 flex items-center gap-2">
+        <TrendingUp className="w-5 h-5" />
+        Most Picked
+      </h4>
+      <div className="space-y-2">
+        {celebs.slice(0, 5).map((celeb, idx) => (
+          <div 
+            key={celeb.id} 
+            className="flex items-center gap-3 p-2 hover:bg-[#1A1A1A] cursor-pointer"
+            onClick={() => onSelect(celeb.name)}
+          >
+            <span className="text-[#FFD700] font-bold w-6">#{idx + 1}</span>
+            <img 
+              src={celeb.image} 
+              alt={celeb.name}
+              className="w-8 h-8 rounded-full object-cover"
+              onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${celeb.name}&size=32&background=FF0099&color=fff`; }}
+            />
+            <span className="text-sm flex-1 truncate">{celeb.name}</span>
+            <span className="text-xs text-[#A1A1AA]">{celeb.times_picked} picks</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 // How It Works Component
 const HowItWorks = ({ onShowMethodology }) => (
@@ -124,25 +189,45 @@ const HowItWorks = ({ onShowMethodology }) => (
         How Points Work
       </button>
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
       <div className="text-center">
-        <div className="w-12 h-12 bg-[#FF0099] flex items-center justify-center mx-auto mb-3">
-          <Search className="w-6 h-6 text-white" />
+        <div className="w-10 h-10 bg-[#FF0099] flex items-center justify-center mx-auto mb-2">
+          <Search className="w-5 h-5 text-white" />
         </div>
-        <h4 className="font-space font-bold text-lg mb-2">1. Search & Browse</h4>
-        <p className="text-sm text-[#A1A1AA]">Search ANY celebrity with a Wikipedia page worldwide</p>
+        <h4 className="font-space font-bold text-sm mb-1">1. Search</h4>
+        <p className="text-xs text-[#A1A1AA]">Find any celebrity worldwide</p>
       </div>
       <div className="text-center">
-        <div className="w-12 h-12 bg-[#00F0FF] flex items-center justify-center mx-auto mb-3">
-          <Star className="w-6 h-6 text-black" />
+        <div className="w-10 h-10 bg-[#00F0FF] flex items-center justify-center mx-auto mb-2">
+          <Star className="w-5 h-5 text-black" />
         </div>
-        <h4 className="font-space font-bold text-lg mb-2">2. Check Their Tier</h4>
-        <p className="text-sm text-[#A1A1AA]">A-list costs more (£18M), D-list is cheaper (£3M)</p>
+        <h4 className="font-space font-bold text-sm mb-1">2. Check Tier</h4>
+        <p className="text-xs text-[#A1A1AA]">A-list £18M, D-list £3M</p>
       </div>
       <div className="text-center">
-        <div className="w-12 h-12 bg-[#FFD700] flex items-center justify-center mx-auto mb-3">
-          <Plus className="w-6 h-6 text-black" />
+        <div className="w-10 h-10 bg-[#FFD700] flex items-center justify-center mx-auto mb-2">
+          <Plus className="w-5 h-5 text-black" />
         </div>
+        <h4 className="font-space font-bold text-sm mb-1">3. Build Team</h4>
+        <p className="text-xs text-[#A1A1AA]">£50M budget</p>
+      </div>
+      <div className="text-center">
+        <div className="w-10 h-10 bg-[#FF5500] flex items-center justify-center mx-auto mb-2">
+          <ArrowLeftRight className="w-5 h-5 text-white" />
+        </div>
+        <h4 className="font-space font-bold text-sm mb-1">4. Transfer</h4>
+        <p className="text-xs text-[#A1A1AA]">1 swap per week</p>
+      </div>
+      <div className="text-center">
+        <div className="w-10 h-10 bg-[#8B5CF6] flex items-center justify-center mx-auto mb-2">
+          <Skull className="w-5 h-5 text-white" />
+        </div>
+        <h4 className="font-space font-bold text-sm mb-1">5. Brown Bread</h4>
+        <p className="text-xs text-[#A1A1AA]">+50 if celeb dies!</p>
+      </div>
+    </div>
+  </div>
+);
         <h4 className="font-space font-bold text-lg mb-2">3. Build Your Team</h4>
         <p className="text-sm text-[#A1A1AA]">Spend your £50M budget wisely on your dream squad</p>
       </div>
