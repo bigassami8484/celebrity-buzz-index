@@ -1649,6 +1649,16 @@ function App() {
         />
       )}
       
+      {/* Team Customize Modal */}
+      {showCustomize && (
+        <TeamCustomizeModal
+          team={team}
+          options={customOptions}
+          onSave={customizeTeam}
+          onClose={() => setShowCustomize(false)}
+        />
+      )}
+      
       {/* Mobile Navigation */}
       <MobileNav activeTab={mobileTab} onTabChange={setMobileTab} />
       
