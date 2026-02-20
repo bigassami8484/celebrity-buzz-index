@@ -71,6 +71,8 @@ class Celebrity(BaseModel):
     news: List[dict] = []
     page_views: int = 0
     is_deceased: bool = False  # For brown bread bonus
+    birth_year: int = 0  # For brown bread watch
+    age: int = 0  # Calculated age
     times_picked: int = 0  # Track popularity
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
