@@ -2,8 +2,8 @@
 
 ## Original Problem Statement
 Build a Celebrity Buzz Index fantasy-league style platform where users can:
-- Search celebrities and view Wikipedia info
-- See live AI-generated news coverage  
+- Search ANY celebrity worldwide with a Wikipedia page
+- View AI-generated news coverage and Wikipedia info
 - Calculate "buzz points" based on media mentions
 - Build teams with a £50M budget
 - Compete on leaderboards
@@ -12,70 +12,72 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 **User Requirements:**
 - UK-focused celebrities (Prince Andrew, Katie Price, etc.)
 - Categories: Movie Stars, TV Actors, Musicians, Athletes, Royals, Reality TV, Other
-- "How It Works" section
-- Celebrity photos in trending ticker
-- Wikipedia and news article links
+- A/B/C/D list celebrity tiers with tiered pricing
+- Autocomplete search showing all matching names with photos and prices
+- Points calculation explainer
+- Celebrity photos in trending ticker with tier badges
 
 ## Architecture
 
 ### Backend (FastAPI + MongoDB)
 - `/api/categories` - Get all celebrity categories
-- `/api/trending` - Get trending celebrities
-- `/api/celebrity/search` - Search and create celebrity profile with AI news
+- `/api/autocomplete?q=` - **NEW** Wikipedia autocomplete search
+- `/api/points-methodology` - **NEW** Get points calculation explanation
+- `/api/trending` - Get trending celebrities with tiers
+- `/api/celebrity/search` - Search and create celebrity profile with AI news + tier
 - `/api/celebrities/category/{category}` - Get celebrities by category
 - `/api/team/create` - Create new team
 - `/api/team/add` - Add celebrity to team
-- `/api/team/remove` - Remove celebrity from team  
+- `/api/team/remove` - Remove celebrity from team
 - `/api/leaderboard` - Get team rankings
-- `/api/share/{team_id}` - Get shareable team data
+
+### Celebrity Tier System
+- **A-LIST** (£18-22M): Oscar/Grammy winners, legendary status, "one of the most"
+- **B-LIST** (£12-16M): Award-winning, chart-topping, successful
+- **C-LIST** (£7-11M): Known for appearances, featured in
+- **D-LIST** (£3-6M): Everyone else
+
+### Points Calculation
+- News Mentions: +1.0 point per article
+- Tabloid Coverage: +3.0 points (Daily Mail, Sun, TMZ)
+- Broadsheet Coverage: +2.0 points (BBC, Guardian, Times)
+- Controversy Bonus: +1.0 point per scandal article
+- Social Media Trending: +5.0 points per event
+- **Tier Multipliers**: A=1.0x, B=1.2x, C=1.5x, D=2.0x
 
 ### Frontend (React + Tailwind CSS)
 - Header with animated title
-- Trending ticker with celebrity photos and buzz scores
-- "How It Works" 3-step guide
-- Search bar
+- Trending ticker with celebrity photos, buzz scores, and tier badges
+- "How It Works" 4-step guide
+- "How Points Work" methodology modal
+- Autocomplete search with suggestions dropdown
 - Category filter pills (7 categories)
-- Celebrity cards with hover news panel
+- Celebrity cards with tier badges, Wikipedia links
 - Team panel with budget display
 - Leaderboard
 - Share modal (Twitter + copy link)
 
 ### Integrations
-- Wikipedia API for celebrity bios and images
+- Wikipedia API for celebrity bios, images, and autocomplete
 - OpenAI GPT-4o (via Emergent LLM key) for AI news generation
 - MongoDB for data persistence
 
-## User Personas
-1. **Celebrity News Enthusiast** - Follows tabloids, wants UK gossip
-2. **Fantasy Sports Fan** - Enjoys team building and competition
-3. **Social Media User** - Wants to share achievements
-
-## Core Requirements (Static)
-- 7 celebrity categories with icon differentiation
-- £50M budget for team building
-- Buzz score calculation based on news coverage
-- Real Wikipedia data integration
-- AI-generated news headlines
-- Social sharing functionality
-- Leaderboard competition
-
 ## What's Been Implemented (Feb 20, 2026)
 - ✅ Full FastAPI backend with all endpoints
-- ✅ MongoDB integration for celebrities, teams, trending cache
-- ✅ Wikipedia API integration for bios and images
-- ✅ GPT-4o AI news generation via Emergent LLM key
-- ✅ Category detection algorithm (Royals, Reality TV, Musicians, Athletes, TV Actors, Movie Stars, Other)
-- ✅ React frontend with Tailwind CSS styling
-- ✅ "Electric Tabloid" dark theme design
-- ✅ Trending ticker with celebrity photos
-- ✅ "How It Works" section
+- ✅ Wikipedia autocomplete search (any celebrity worldwide)
+- ✅ A/B/C/D tier system with tiered pricing
+- ✅ Points methodology modal with detailed explanation
+- ✅ Celebrity photos in trending ticker with tier badges
+- ✅ GPT-4o AI news generation
+- ✅ React frontend with Tailwind styling
+- ✅ "Electric Tabloid" dark theme
 - ✅ All 7 category filters
-- ✅ Celebrity cards with hover news panels
-- ✅ Team management (add/remove celebrities)
-- ✅ Budget tracking
+- ✅ Celebrity cards with tier badges
+- ✅ Team management (add/remove)
+- ✅ Budget tracking with tier pricing
 - ✅ Leaderboard
 - ✅ Share modal (Twitter + copy link)
-- ✅ UK celebrities seeded (Prince Andrew, Katie Price, Prince William, etc.)
+- ✅ UK celebrities seeded
 
 ## Backlog / Future Features
 
@@ -84,24 +86,15 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 
 ### P1 (High Priority)
 - User authentication for persistent teams
-- Real news API integration (NewsAPI or similar)
+- Real news API integration (NewsAPI)
 - Weekly buzz score updates
-- Push notifications for big news
 
-### P2 (Medium Priority)  
+### P2 (Medium Priority)
 - Celebrity comparison feature
 - Historical buzz trends chart
 - Team sharing with preview cards
-- Multiple team support
 
 ### P3 (Nice to Have)
 - Dark/light mode toggle
 - Mobile app version
-- Celebrity alerts/watchlist
 - Achievement badges
-
-## Next Tasks
-1. Consider adding user authentication for persistent teams across devices
-2. Integrate real news API for live news instead of AI-generated
-3. Add more UK celebrities to each category
-4. Consider weekly "buzz updates" feature
