@@ -352,6 +352,7 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     
     # Fetch from Wikipedia
     wiki_info = await fetch_wikipedia_info(name)
+    logger.info(f"Wiki info for {name}: bio_length={len(wiki_info.get('bio', ''))}, bio_preview={wiki_info.get('bio', '')[:100]}")
     
     # Use override category if provided, otherwise detect from bio
     if override_category:
