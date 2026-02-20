@@ -111,7 +111,7 @@ const PointsMethodology = ({ onClose }) => (
             <Skull className="w-5 h-5 text-[#888]" />
             Brown Bread Bonus 💀
           </h4>
-          <p className="text-sm text-[#A1A1AA]">If one of your celebrities passes away, you receive a <span className="text-[#FFD700] font-bold">+50 bonus points</span>! Dark? Yes. Part of the game? Absolutely.</p>
+          <p className="text-sm text-[#A1A1AA]">If one of your celebrities passes away, you receive a <span className="text-[#FFD700] font-bold">+100 bonus points</span>! Dark? Yes. Part of the game? Absolutely.</p>
         </div>
       </div>
     </div>
