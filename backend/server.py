@@ -436,9 +436,14 @@ def calculate_buzz_score(news: List[dict]) -> float:
     
     return round(min(score, 100.0), 1)
 
-def calculate_price(buzz_score: float, tier: str) -> int:
-    """Calculate celebrity price based on buzz score and tier"""
+def calculate_price(buzz_score: float, tier: str, name: str = "") -> int:
+    """Calculate celebrity price based on buzz score, tier, and controversy"""
     base_price = get_price_for_tier(tier)
+    
+    # Controversial celeb boost
+    controversy_boost = get_controversial_price_boost(name)
+    if controversy_boost > 0:
+        base_price = max(base_price, controversy_boost)
     
     # Buzz modifier: high buzz adds to price
     if buzz_score >= 40:
@@ -476,6 +481,12 @@ POINTS_METHODOLOGY = {
             "description": "Negative/scandal news generates more buzz",
             "points_per_unit": 1.0,
             "unit": "per negative article"
+        },
+        {
+            "name": "Brown Bread Bonus 💀",
+            "description": "If your celebrity passes away, you receive a massive points bonus!",
+            "points_per_unit": 50.0,
+            "unit": "per deceased celebrity"
         },
         {
             "name": "Social Media Trending",
