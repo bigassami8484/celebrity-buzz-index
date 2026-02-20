@@ -229,21 +229,60 @@ C_LIST_INDICATORS = ["known for", "appeared in", "featured", "contestant", "part
 # ==================== HELPER FUNCTIONS ====================
 
 async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
-    """Search Wikipedia for celebrity suggestions"""
+    """Search Wikipedia for celebrity suggestions - filters for actual people only"""
     try:
         headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (contact@example.com)"}
         async with httpx.AsyncClient() as client:
-            # Use Wikipedia opensearch API
-            url = f"https://en.wikipedia.org/w/api.php?action=opensearch&search={query}&limit=10&namespace=0&format=json"
+            # Use Wikipedia opensearch API with more results to filter
+            url = f"https://en.wikipedia.org/w/api.php?action=opensearch&search={query}&limit=15&namespace=0&format=json"
             response = await client.get(url, timeout=5.0, headers=headers)
             if response.status_code == 200:
                 data = response.json()
                 names = data[1] if len(data) > 1 else []
                 descriptions = data[2] if len(data) > 2 else []
                 
+                # Keywords that indicate non-person results to filter out
+                non_person_keywords = [
+                    "filmography", "discography", "bibliography", "awards", "album", 
+                    "film", "song", "band", "tv series", "television series", "movie",
+                    "list of", "category:", "template:", "wikipedia:", "soundtrack",
+                    "video game", "book", "novel", "tour", "concert", "episode"
+                ]
+                
+                # Keywords that indicate this IS a person
+                person_keywords = [
+                    "actor", "actress", "singer", "musician", "footballer", "athlete",
+                    "politician", "presenter", "model", "chef", "comedian", "director",
+                    "writer", "author", "rapper", "host", "personality", "prince", 
+                    "princess", "duke", "duchess", "royal", "businessman", "businesswoman",
+                    "entrepreneur", "influencer", "youtuber", "tiktoker", "celebrity",
+                    "born", "american", "british", "english", "australian", "canadian"
+                ]
+                
                 results = []
+                seen_names = set()  # Track seen names to avoid duplicates
+                
                 for i, name in enumerate(names):
                     desc = descriptions[i] if i < len(descriptions) else ""
+                    name_lower = name.lower()
+                    desc_lower = desc.lower()
+                    
+                    # Skip if name contains non-person keywords
+                    if any(kw in name_lower for kw in non_person_keywords):
+                        continue
+                    
+                    # Skip if description doesn't seem like a person
+                    if desc and not any(kw in desc_lower for kw in person_keywords):
+                        # Allow if description is empty (might still be a person)
+                        if desc:
+                            continue
+                    
+                    # Skip duplicates (same base name)
+                    base_name = name.split(" (")[0].strip().lower()
+                    if base_name in seen_names:
+                        continue
+                    seen_names.add(base_name)
+                    
                     # Estimate tier based on description
                     tier = estimate_tier_from_description(desc)
                     price = get_price_for_tier(tier)
@@ -269,6 +308,11 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                         "estimated_tier": tier,
                         "estimated_price": price
                     })
+                    
+                    # Limit to 8 results
+                    if len(results) >= 8:
+                        break
+                        
                 return results
     except Exception as e:
         logger.error(f"Wikipedia autocomplete error: {e}")
