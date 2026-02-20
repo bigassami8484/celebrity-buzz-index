@@ -1289,6 +1289,16 @@ function App() {
     }
   }, []);
 
+  // Fetch hot celebs this week
+  const fetchHotCelebs = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/hot-celebs`);
+      setHotCelebs(res.data.hot_celebs || []);
+    } catch (e) {
+      console.error("Error fetching hot celebs:", e);
+    }
+  }, []);
+
   // Fetch Brown Bread Watch (elderly celebs)
   const fetchBrownBreadWatch = useCallback(async () => {
     try {
