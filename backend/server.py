@@ -676,6 +676,10 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     bio_lower = wiki_info.get("bio", "").lower()
     is_deceased = any(x in bio_lower for x in ["was a ", "died ", "passed away", "1900–", "1910–", "1920–", "1930–", "1940–", "1950–", "1960–", "1970–", "1980–", "1990–", "2000–", "2010–", "2020–"])
     
+    # Extract birth year and calculate age for Brown Bread Watch
+    birth_year = extract_birth_year_from_bio(wiki_info.get("bio", ""))
+    age = calculate_age(birth_year)
+    
     # Create celebrity object
     celebrity = Celebrity(
         name=wiki_info["name"],
@@ -688,6 +692,8 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         tier=tier,
         news=news,
         is_deceased=is_deceased,
+        birth_year=birth_year,
+        age=age,
         times_picked=0
     )
     
