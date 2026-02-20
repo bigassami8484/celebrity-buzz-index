@@ -198,6 +198,17 @@ const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford }) => {
           </div>
           <h3 className="font-anton text-2xl uppercase tracking-tight">{celebrity.name}</h3>
           <p className="text-sm text-[#A1A1AA] line-clamp-2 mt-1">{celebrity.bio?.slice(0, 100)}...</p>
+          {celebrity.wiki_url && (
+            <a 
+              href={celebrity.wiki_url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-xs text-[#00F0FF] hover:underline mt-2 inline-block"
+              onClick={(e) => e.stopPropagation()}
+            >
+              View on Wikipedia →
+            </a>
+          )}
         </div>
         
         {/* News Panel on Hover */}
