@@ -198,6 +198,65 @@ const TopPickedCelebs = ({ celebs, onSelect }) => {
   );
 };
 
+// Brown Bread Watch Component - Strategic picks for the +100 bonus!
+const BrownBreadWatch = ({ watchList, onSelect }) => {
+  if (!watchList || watchList.length === 0) return null;
+  
+  const getRiskColor = (risk) => {
+    switch(risk) {
+      case 'critical': return 'bg-red-500';
+      case 'high': return 'bg-orange-500';
+      case 'elevated': return 'bg-yellow-500';
+      case 'moderate': return 'bg-green-500';
+      default: return 'bg-gray-500';
+    }
+  };
+  
+  const getRiskEmoji = (risk) => {
+    switch(risk) {
+      case 'critical': return '🔴';
+      case 'high': return '🟠';
+      case 'elevated': return '🟡';
+      case 'moderate': return '🟢';
+      default: return '⚪';
+    }
+  };
+  
+  return (
+    <div className="bg-[#0A0A0A] border border-[#262626] p-4 mb-4" data-testid="brown-bread-watch">
+      <h4 className="font-anton text-lg uppercase tracking-tight text-[#888] mb-3 flex items-center gap-2">
+        <Skull className="w-5 h-5" />
+        Brown Bread Watch
+      </h4>
+      <p className="text-xs text-[#666] mb-3">Strategic picks for the +100 bonus 💀</p>
+      <div className="space-y-2">
+        {watchList.slice(0, 6).map((celeb) => (
+          <div 
+            key={celeb.id} 
+            className="flex items-center gap-3 p-2 hover:bg-[#1A1A1A] cursor-pointer"
+            onClick={() => onSelect(celeb.name)}
+          >
+            <span className="text-lg" title={`Risk: ${celeb.risk_level}`}>
+              {getRiskEmoji(celeb.risk_level)}
+            </span>
+            <img 
+              src={celeb.image} 
+              alt={celeb.name}
+              className="w-8 h-8 rounded-full object-cover grayscale"
+              onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${celeb.name}&size=32&background=666&color=fff`; }}
+            />
+            <div className="flex-1 min-w-0">
+              <span className="text-sm truncate block">{celeb.name}</span>
+              <span className="text-xs text-[#666]">Age {celeb.age}</span>
+            </div>
+            <span className="text-xs text-[#FFD700]">£{celeb.price}M</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // How It Works Component
 const HowItWorks = ({ onShowMethodology }) => (
   <div className="bg-[#0A0A0A] border border-[#262626] p-6 mb-8" data-testid="how-it-works">
