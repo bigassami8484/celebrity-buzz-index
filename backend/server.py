@@ -245,6 +245,23 @@ async def get_categories():
     """Get all celebrity categories"""
     return {"categories": CATEGORIES}
 
+@api_router.post("/seed")
+async def seed_initial_data():
+    """Seed initial celebrity data for faster loading"""
+    seeded = []
+    # Seed 2 celebrities per category for quick initial load
+    for category, names in TRENDING_CELEBRITIES.items():
+        for name in names[:2]:
+            existing = await db.celebrities.find_one({"name": {"$regex": f"^{name}$", "$options": "i"}})
+            if not existing:
+                try:
+                    search = CelebritySearch(name=name)
+                    result = await search_celebrity(search, override_category=category)
+                    seeded.append(name)
+                except Exception as e:
+                    logger.error(f"Failed to seed {name}: {e}")
+    return {"seeded": seeded, "count": len(seeded)}
+
 @api_router.get("/trending")
 async def get_trending():
     """Get trending celebrities across all categories"""
