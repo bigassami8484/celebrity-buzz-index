@@ -153,23 +153,58 @@ class LeagueJoin(BaseModel):
     code: str
     team_id: str
 
-# ==================== BROWN BREAD MINI GAME MODELS ====================
+# ==================== BADGE SYSTEM ====================
 
-class BrownBreadBet(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    team_id: str
-    celebrity_id: str
-    celebrity_name: str
-    bet_amount: int = 10  # Virtual points bet
-    placed_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    resolved: bool = False
-    won: bool = False
+# Available badges
+BADGES = {
+    "weekly_winner": {
+        "id": "weekly_winner",
+        "name": "Weekly Champion",
+        "icon": "🏆",
+        "description": "Won a weekly league competition",
+        "color": "#FFD700"
+    },
+    "first_pick": {
+        "id": "first_pick",
+        "name": "Trendsetter",
+        "icon": "⚡",
+        "description": "First to pick a celebrity who then went viral",
+        "color": "#FF0099"
+    },
+    "brown_bread": {
+        "id": "brown_bread",
+        "name": "Grim Reaper",
+        "icon": "💀",
+        "description": "Earned the Brown Bread Bonus",
+        "color": "#8B5CF6"
+    },
+    "controversy_king": {
+        "id": "controversy_king",
+        "name": "Controversy King",
+        "icon": "🔥",
+        "description": "Picked 3+ controversial celebrities",
+        "color": "#EF4444"
+    },
+    "a_lister": {
+        "id": "a_lister",
+        "name": "A-List Club",
+        "icon": "⭐",
+        "description": "Full team of A-list celebrities",
+        "color": "#00F0FF"
+    },
+    "league_champion": {
+        "id": "league_champion",
+        "name": "League Legend",
+        "icon": "👑",
+        "description": "Won 3+ weeks in your league",
+        "color": "#FFD700"
+    }
+}
 
-class PlaceBet(BaseModel):
-    team_id: str
-    celebrity_id: str
-    bet_amount: int = 10
+class Badge(BaseModel):
+    id: str
+    earned_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    league_id: str = ""  # Optional - which league it was earned in
 
 # ==================== HELPER FUNCTIONS ====================
 
