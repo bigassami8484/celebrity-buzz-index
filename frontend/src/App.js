@@ -1108,6 +1108,10 @@ function App() {
   const [showHallOfFame, setShowHallOfFame] = useState(false);
   const [hallOfFame, setHallOfFame] = useState([]);
   
+  // Team customization state
+  const [showCustomize, setShowCustomize] = useState(false);
+  const [customOptions, setCustomOptions] = useState({ colors: [], icons: [] });
+  
   // Mobile tab state
   const [mobileTab, setMobileTab] = useState('home');
 
