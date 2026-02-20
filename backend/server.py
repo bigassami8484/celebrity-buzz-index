@@ -1019,6 +1019,10 @@ async def get_leaderboard():
             "team_id": team["id"],
             "team_name": team.get("team_name", "Unknown"),
             "total_points": team.get("total_points", 0),
+            "celebrity_count": len(team.get("celebrities", [])),
+            "brown_bread_bonus": team.get("brown_bread_bonus", 0)
+        })
+            "total_points": team.get("total_points", 0),
             "celebrity_count": len(team.get("celebrities", []))
         })
     
