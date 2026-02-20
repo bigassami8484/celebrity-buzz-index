@@ -632,7 +632,12 @@ const Leaderboard = ({ entries }) => (
           </span>
           <div className="flex-1 ml-4">
             <p className="font-bold">{entry.team_name}</p>
-            <p className="text-sm text-[#A1A1AA]">{entry.celebrity_count} celebrities</p>
+            <p className="text-sm text-[#A1A1AA]">
+              {entry.celebrity_count} celebs
+              {entry.brown_bread_bonus > 0 && (
+                <span className="text-[#888] ml-2">💀 +{entry.brown_bread_bonus}</span>
+              )}
+            </p>
           </div>
           <div className="font-space font-bold text-xl text-[#FF0099]">
             {entry.total_points?.toFixed(1)}
@@ -645,16 +650,26 @@ const Leaderboard = ({ entries }) => (
   </div>
 );
 
-// Share Modal Component
+// Share Modal Component with WhatsApp, X, Facebook
 const ShareModal = ({ team, onClose }) => {
   const [copied, setCopied] = useState(false);
   
-  const shareText = `Check out my Celebrity Buzz team "${team?.team_name}"! Total Buzz: ${team?.total_points?.toFixed(1)} points! 🌟`;
+  const shareText = `🌟 Check out my Celebrity Buzz team "${team?.team_name}"! Total Buzz: ${team?.total_points?.toFixed(1)} points! Can you beat me?`;
   const shareUrl = window.location.href;
   
   const handleTwitterShare = () => {
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
     window.open(twitterUrl, '_blank');
+  };
+  
+  const handleFacebookShare = () => {
+    const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+    window.open(fbUrl, '_blank');
+  };
+  
+  const handleWhatsAppShare = () => {
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText + " " + shareUrl)}`;
+    window.open(waUrl, '_blank');
   };
   
   const handleCopy = async () => {
