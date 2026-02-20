@@ -1007,7 +1007,8 @@ function App() {
     fetchStats();
     fetchTodaysNews();
     fetchTopPicked();
-  }, [fetchCategories, fetchTrending, initTeam, fetchLeaderboard, fetchStats, fetchTodaysNews, fetchTopPicked]);
+    fetchBrownBreadWatch();
+  }, [fetchCategories, fetchTrending, initTeam, fetchLeaderboard, fetchStats, fetchTodaysNews, fetchTopPicked, fetchBrownBreadWatch]);
 
   return (
     <div className="App">
