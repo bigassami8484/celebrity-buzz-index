@@ -151,6 +151,46 @@ const TodaysNews = ({ news }) => {
   );
 };
 
+// Hot Celebs This Week Banner Component
+const HotCelebsBanner = ({ celebs, onSelect }) => {
+  if (!celebs || celebs.length === 0) return null;
+  
+  return (
+    <div className="bg-gradient-to-r from-[#FF0099]/20 via-[#0A0A0A] to-[#00F0FF]/20 border border-[#FF0099]/50 p-6 mb-8" data-testid="hot-celebs-banner">
+      <h3 className="font-anton text-2xl uppercase tracking-tight text-white mb-4 flex items-center gap-2">
+        🔥 Hot Celebs This Week
+        <span className="text-sm font-normal text-[#A1A1AA] lowercase ml-2">- Making headlines</span>
+      </h3>
+      <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+        {celebs.map((celeb, idx) => (
+          <div 
+            key={idx}
+            onClick={() => onSelect(celeb.name)}
+            className="flex-shrink-0 w-40 bg-[#1A1A1A] border border-[#262626] p-3 cursor-pointer hover:border-[#FF0099] transition-colors group"
+          >
+            <div className="relative mb-2">
+              <img 
+                src={celeb.image} 
+                alt={celeb.name}
+                className="w-full h-24 object-cover"
+                onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${celeb.name}&size=128&background=FF0099&color=fff`; }}
+              />
+              <div className={`absolute top-1 right-1 px-1 py-0.5 text-[8px] font-bold ${
+                celeb.tier === 'A' ? 'bg-[#FFD700] text-black' : 'bg-[#C0C0C0] text-black'
+              }`}>
+                {celeb.tier}-LIST
+              </div>
+            </div>
+            <p className="font-bold text-sm text-white truncate group-hover:text-[#FF0099]">{celeb.name}</p>
+            <p className="text-[10px] text-[#FF0099] truncate">{celeb.hot_reason}</p>
+            <p className="text-xs text-[#FFD700] mt-1">£{celeb.price}M</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // Footer Component
 const Footer = () => (
   <footer className="bg-[#050505] border-t border-[#262626] py-8 mt-16" data-testid="footer">
