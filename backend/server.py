@@ -357,15 +357,20 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     # Get full page summary for this person
                     try:
                         summary_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{title.replace(' ', '_')}"
+                        logger.info(f"  Fetching summary: {summary_url}")
                         summary_response = await client.get(summary_url, timeout=3.0, headers=headers)
+                        logger.info(f"  Summary status: {summary_response.status_code}")
                         if summary_response.status_code == 200:
                             summary_data = summary_response.json()
                             desc = summary_data.get("extract", "")
                             image = summary_data.get("thumbnail", {}).get("source", "")
                             page_type = summary_data.get("type", "")
                             
+                            logger.info(f"  Page type: {page_type}, Desc length: {len(desc)}")
+                            
                             # Skip if not a standard article (could be disambiguation)
                             if page_type != "standard":
+                                logger.info(f"  Skipped: not standard")
                                 continue
                             
                             # Check description for person keywords
@@ -383,6 +388,7 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                 "located in", "region of", "province of", "state of"
                             ]
                             if any(skip in desc_lower for skip in skip_indicators):
+                                logger.info(f"  Skipped: skip indicator found")
                                 continue
                             
                             # Must have person indicators
@@ -397,7 +403,10 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             ]
                             
                             if not any(ind in desc_lower for ind in person_indicators):
+                                logger.info(f"  Skipped: no person indicator")
                                 continue
+                            
+                            logger.info(f"  SUCCESS: Adding {title}")
                             
                             # Estimate tier and price
                             tier = estimate_tier_from_description(desc)
