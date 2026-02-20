@@ -1631,6 +1631,42 @@ async def award_weekly_badge(league_id: str):
         "badge_awarded": "weekly_winner"
     }
 
+@api_router.get("/hall-of-fame")
+async def get_hall_of_fame():
+    """Get the Hall of Fame - teams with most badges"""
+    # Find all teams with badges
+    teams_with_badges = await db.teams.find(
+        {"badges": {"$exists": True, "$ne": []}},
+        {"_id": 0, "id": 1, "team_name": 1, "badges": 1, "weekly_wins": 1, "total_points": 1}
+    ).to_list(100)
+    
+    hall_of_fame = []
+    for team in teams_with_badges:
+        badges = team.get("badges", [])
+        # Enrich badges with full info
+        enriched_badges = []
+        for badge in badges:
+            badge_info = BADGES.get(badge.get("id", ""))
+            if badge_info:
+                enriched_badges.append({
+                    **badge_info,
+                    "earned_at": badge.get("earned_at")
+                })
+        
+        hall_of_fame.append({
+            "team_id": team["id"],
+            "team_name": team["team_name"],
+            "badge_count": len(badges),
+            "badges": enriched_badges,
+            "weekly_wins": team.get("weekly_wins", 0),
+            "total_points": team.get("total_points", 0)
+        })
+    
+    # Sort by badge count, then by weekly wins
+    hall_of_fame.sort(key=lambda x: (x["badge_count"], x["weekly_wins"]), reverse=True)
+    
+    return {"hall_of_fame": hall_of_fame[:20]}  # Top 20
+
 # Include router
 app.include_router(api_router)
 
