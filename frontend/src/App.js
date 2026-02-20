@@ -765,7 +765,7 @@ function App() {
       <TrendingTicker celebrities={trending} />
       
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <HowItWorks />
+        <HowItWorks onShowMethodology={() => setShowMethodology(true)} />
         <SearchBar onSearch={searchCelebrity} loading={searchLoading} />
         <CategoryFilter 
           categories={categories} 
