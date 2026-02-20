@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import "@/App.css";
 import axios from "axios";
 import { Toaster, toast } from "sonner";
-import { Search, Crown, Film, Tv, Music, Trophy, Star, Share2, X, Copy, Check, TrendingUp, Minus, Plus, Users, Info, ChevronUp } from "lucide-react";
+import { Search, Crown, Film, Tv, Music, Trophy, Star, Share2, X, Copy, Check, TrendingUp, Minus, Plus, Users, Info, ChevronUp, Newspaper, ArrowLeftRight, Skull, Facebook } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -36,6 +36,28 @@ const TierBadge = ({ tier }) => {
   );
 };
 
+// Player Count Banner
+const PlayerCountBanner = ({ stats }) => {
+  if (!stats) return null;
+  return (
+    <div className="bg-[#1A1A1A] border-b border-[#262626] py-2 px-4" data-testid="player-count-banner">
+      <div className="max-w-7xl mx-auto flex justify-center items-center gap-6 text-sm">
+        <span className="text-[#A1A1AA]">
+          <span className="text-[#FFD700] font-bold">{stats.player_count.toLocaleString()}</span> Players
+        </span>
+        <span className="text-[#262626]">|</span>
+        <span className="text-[#A1A1AA]">
+          <span className="text-[#00F0FF] font-bold">{stats.celebrity_count.toLocaleString()}</span> Celebrities
+        </span>
+        <span className="text-[#262626]">|</span>
+        <span className="text-[#A1A1AA]">
+          Transfer Window: <span className="text-[#FF0099] font-bold">{stats.transfer_window}</span>
+        </span>
+      </div>
+    </div>
+  );
+};
+
 // Points Methodology Component
 const PointsMethodology = ({ onClose }) => (
   <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -47,7 +69,6 @@ const PointsMethodology = ({ onClose }) => (
             <X className="w-6 h-6" />
           </button>
         </div>
-        
         <p className="text-[#A1A1AA] mb-6">Celebrity Buzz Points are calculated based on media coverage and public interest:</p>
         
         <div className="space-y-4 mb-6">
