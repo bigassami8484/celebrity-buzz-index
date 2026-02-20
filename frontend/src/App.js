@@ -1463,6 +1463,19 @@ function App() {
               onRemove={removeFromTeam}
               onShare={() => setShowShareModal(true)}
             />
+            <LeaguePanel
+              team={team}
+              leagues={leagues}
+              onCreateLeague={createLeague}
+              onJoinLeague={joinLeague}
+              onViewLeague={viewLeague}
+            />
+            <BrownBreadMiniGame
+              watchList={brownBreadWatch}
+              team={team}
+              bets={bets}
+              onPlaceBet={placeBet}
+            />
             <TopPickedCelebs celebs={topPicked} onSelect={searchCelebrity} />
             <BrownBreadWatch watchList={brownBreadWatch} onSelect={searchCelebrity} />
             <Leaderboard entries={leaderboard} />
