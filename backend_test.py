@@ -394,6 +394,11 @@ class CelebrityBuzzTester:
         self.test_categories()
         self.test_trending()
         
+        # NEW FEATURES - Wikipedia autocomplete and tier system
+        self.test_autocomplete()
+        self.test_points_methodology()
+        self.test_tier_system()
+        
         # Celebrity search (AI-powered)
         self.test_celebrity_search()
         self.test_category_celebrities()
