@@ -986,11 +986,16 @@ async def get_todays_news():
     news_items = []
     headers = {"User-Agent": "CelebrityBuzzIndex/1.0"}
     
-    # News sources with RSS feeds
+    # News sources with RSS feeds - UK and US publications
     rss_sources = [
         ("https://www.dailymail.co.uk/tvshowbiz/index.rss", "Daily Mail"),
         ("https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "BBC News"),
         ("https://www.theguardian.com/lifeandstyle/celebrities/rss", "The Guardian"),
+        ("https://www.tmz.com/rss.xml", "TMZ"),
+        ("https://people.com/feed/", "People"),
+        ("https://eonline.com/syndication/feeds/rssfeeds/topstories.xml", "E! News"),
+        ("https://www.usmagazine.com/feed/", "US Weekly"),
+        ("https://pagesix.com/feed/", "Page Six"),
     ]
     
     try:
