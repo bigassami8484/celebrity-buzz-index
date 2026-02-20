@@ -482,13 +482,13 @@ POINTS_METHODOLOGY = {
         {
             "name": "Controversy Bonus",
             "description": "Negative/scandal news generates more buzz",
-            "points_per_unit": 1.0,
-            "unit": "per negative article"
+            "points_per_unit": 25.0,
+            "unit": "per scandal"
         },
         {
             "name": "Brown Bread Bonus 💀",
             "description": "If your celebrity passes away, you receive a massive points bonus!",
-            "points_per_unit": 50.0,
+            "points_per_unit": 100.0,
             "unit": "per deceased celebrity"
         },
         {
