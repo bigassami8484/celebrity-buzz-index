@@ -292,7 +292,8 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     "video game", "book", "novel", "tour", "concert", "episode",
                     "podcast", "show", "series", "programme", "program", "season",
                     "city", "town", "village", "municipality", "district",
-                    "company", "single", "ep", "videography", "christmas special"
+                    "company", "single", "ep", "videography", "christmas special",
+                    "fc", "cf", "afc", "united", "club", "team", "stadium", "records"
                 ]
                 
                 results = []
