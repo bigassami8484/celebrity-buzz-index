@@ -378,18 +378,62 @@ def calculate_buzz_score(news: List[dict]) -> float:
     
     return round(min(score, 100.0), 1)
 
-def calculate_price(buzz_score: float) -> int:
-    """Calculate celebrity price based on buzz score"""
-    if buzz_score >= 50:
-        return 15
-    elif buzz_score >= 35:
-        return 12
-    elif buzz_score >= 25:
-        return 10
-    elif buzz_score >= 15:
-        return 7
-    else:
-        return 5
+def calculate_price(buzz_score: float, tier: str) -> int:
+    """Calculate celebrity price based on buzz score and tier"""
+    base_price = get_price_for_tier(tier)
+    
+    # Buzz modifier: high buzz adds to price
+    if buzz_score >= 40:
+        return base_price + 4
+    elif buzz_score >= 30:
+        return base_price + 2
+    elif buzz_score >= 20:
+        return base_price + 1
+    return base_price
+
+# Points calculation methodology
+POINTS_METHODOLOGY = {
+    "description": "Celebrity Buzz Points are calculated based on media coverage and public interest",
+    "factors": [
+        {
+            "name": "News Mentions",
+            "description": "Each news article mentioning the celebrity",
+            "points_per_unit": 1.0,
+            "unit": "article"
+        },
+        {
+            "name": "Tabloid Coverage",
+            "description": "Coverage in tabloids (Daily Mail, The Sun, TMZ) - higher weight due to engagement",
+            "points_per_unit": 3.0,
+            "unit": "article"
+        },
+        {
+            "name": "Broadsheet Coverage",
+            "description": "Coverage in quality press (BBC, Guardian, Times)",
+            "points_per_unit": 2.0,
+            "unit": "article"
+        },
+        {
+            "name": "Controversy Bonus",
+            "description": "Negative/scandal news generates more buzz",
+            "points_per_unit": 1.0,
+            "unit": "per negative article"
+        },
+        {
+            "name": "Social Media Trending",
+            "description": "When celebrity trends on social platforms",
+            "points_per_unit": 5.0,
+            "unit": "trending event"
+        }
+    ],
+    "tier_multipliers": {
+        "A": "1.0x (baseline - already high visibility)",
+        "B": "1.2x (needs more buzz to match A-list)",
+        "C": "1.5x (buzz matters more for rising stars)",
+        "D": "2.0x (buzz can rapidly elevate D-listers)"
+    },
+    "example": "A D-list celebrity with 10 tabloid mentions = 10 × 3.0 × 2.0 = 60 points"
+}
 
 # ==================== API ROUTES ====================
 
@@ -401,6 +445,20 @@ async def root():
 async def get_categories():
     """Get all celebrity categories"""
     return {"categories": CATEGORIES}
+
+@api_router.get("/points-methodology")
+async def get_points_methodology():
+    """Get explanation of how points are calculated"""
+    return POINTS_METHODOLOGY
+
+@api_router.get("/autocomplete")
+async def autocomplete_search(q: str):
+    """Get Wikipedia autocomplete suggestions for celebrity search"""
+    if len(q) < 2:
+        return {"suggestions": []}
+    
+    suggestions = await fetch_wikipedia_autocomplete(q)
+    return {"suggestions": suggestions}
 
 @api_router.post("/seed")
 async def seed_initial_data():
