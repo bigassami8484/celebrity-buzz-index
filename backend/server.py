@@ -1064,6 +1064,36 @@ async def get_stats():
         "transfer_window": get_week_number()
     }
 
+@api_router.get("/hot-celebs")
+async def get_hot_celebs():
+    """Get hot celebrities making headlines this week - big names only"""
+    hot_list = []
+    
+    for celeb_info in HOT_CELEBS_THIS_WEEK:
+        # Check if celeb exists in DB
+        celeb = await db.celebrities.find_one(
+            {"name": {"$regex": f"^{celeb_info['name']}$", "$options": "i"}},
+            {"_id": 0}
+        )
+        
+        if celeb:
+            hot_list.append({
+                **celeb,
+                "hot_reason": celeb_info["reason"]
+            })
+        else:
+            # Return basic info even if not in DB yet
+            hot_list.append({
+                "name": celeb_info["name"],
+                "tier": celeb_info["tier"],
+                "category": celeb_info["category"],
+                "hot_reason": celeb_info["reason"],
+                "price": 9 if celeb_info["tier"] == "A" else 6,
+                "image": f"https://ui-avatars.com/api/?name={celeb_info['name'].replace(' ', '+')}&size=128&background=FF0099&color=fff"
+            })
+    
+    return {"hot_celebs": hot_list}
+
 @api_router.get("/top-picked")
 async def get_top_picked():
     """Get most picked celebrities"""
