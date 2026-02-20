@@ -348,9 +348,12 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
     """Search Wikipedia for celebrity suggestions - returns ONE result per person only"""
     try:
         headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (contact@example.com)"}
+        query_lower = query.lower().strip()
+        query_parts = query_lower.split()  # Split query into words for matching
+        
         async with httpx.AsyncClient() as client:
             # Use Wikipedia search API for better results with descriptions
-            url = f"https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={query}&srlimit=20&format=json"
+            url = f"https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={query}&srlimit=25&format=json"
             response = await client.get(url, timeout=5.0, headers=headers)
             if response.status_code == 200:
                 data = response.json()
@@ -368,7 +371,13 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     "fc", "cf", "afc", "united", "club", "team", "stadium", "records",
                     "child", "montana", "potter", "etc", "good girl", "sasha fierce",
                     "cowboy carter", "future nostalgia", "radical optimism", "gimme more",
-                    "jean", "is paris", "this is", "agreement", "métro", "metro"
+                    "jean", "is paris", "this is", "agreement", "métro", "metro",
+                    "race", "marathon", "rally", "championship", "cup", "trophy",
+                    "brest", "event", "cycling", "festival", "award", "prize",
+                    "airport", "station", "hotel", "resort", "beach", "island",
+                    "mountain", "river", "park", "museum", "gallery", "cathedral",
+                    "church", "school", "university", "college", "hospital",
+                    "haunted", "haunt", "ghost", "location", "place", "site"
                 ]
                 
                 results = []
@@ -379,8 +388,23 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     snippet = item.get("snippet", "").lower()
                     title_lower = title.lower()
                     
+                    # CRITICAL: The search query must appear in the person's actual NAME
+                    # This prevents returning people who are just associated with the query
+                    title_words = title_lower.split()
+                    query_in_name = any(
+                        qpart in title_lower or 
+                        any(qpart in word for word in title_words)
+                        for qpart in query_parts
+                    )
+                    if not query_in_name:
+                        continue
+                    
                     # Skip if title contains non-person keywords
                     if any(kw in title_lower for kw in non_person_title_keywords):
+                        continue
+                    
+                    # Skip if title has dashes with location patterns (Paris–Brest–Paris)
+                    if "–" in title or "—" in title:
                         continue
                     
                     # Skip if title has parentheses UNLESS it's a role descriptor like (musician), (actor)
