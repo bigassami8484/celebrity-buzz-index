@@ -1467,6 +1467,14 @@ function App() {
         />
       )}
       
+      {/* Hall of Fame Modal */}
+      {showHallOfFame && (
+        <HallOfFameModal
+          hallOfFame={hallOfFame}
+          onClose={() => setShowHallOfFame(false)}
+        />
+      )}
+      
       {/* Mobile Navigation */}
       <MobileNav activeTab={mobileTab} onTabChange={setMobileTab} />
       
