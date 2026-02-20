@@ -376,19 +376,33 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             # Check description for person keywords
                             desc_lower = desc.lower()
                             
-                            # Skip fictional characters, albums, songs, TV shows, places
-                            skip_indicators = [
-                                "fictional character", "is a character", "album by", "studio album by", 
-                                "single by", "song by", "ep by", "is a soundtrack",
-                                "television series", "tv series", "is a sitcom", "drama series",
-                                "video game", "is a film", "is a movie", "is a novel", "is a book",
-                                "is a band", "musical group", "rock band", "pop group",
-                                "is a village", "is a city", "is a town", "municipality", "is a district",
-                                "is a beach", "is an island", "is a resort", "is a hotel", "is an airport",
-                                "located in", "region of", "province of", "state of"
+                            # Skip if description STARTS with non-person phrases (albums, films, etc.)
+                            # These indicate the article is about that thing, not a person
+                            skip_start_phrases = [
+                                "is a fictional character", "is a character in",
+                                "is an album", "is the album", "is a studio album",
+                                "is a single", "is a song", "is an ep",
+                                "is a soundtrack", "is an ost",
+                                "is a television series", "is a tv series", "is a sitcom",
+                                "is a drama series", "is a reality", "is an american television",
+                                "is a video game", "is a film", "is a movie",
+                                "is a novel", "is a book", "is a band", "is a musical group",
+                                "is a rock band", "is a pop group", "is a hip hop group",
+                                "is a village", "is a city", "is a town", "is a municipality",
+                                "is a district", "is a beach", "is an island", "is a resort",
+                                "is a hotel", "is an airport", "is located in",
+                                "was a fictional", "was a character", "was an album",
+                                "was a television", "was a film", "was a band"
                             ]
-                            if any(skip in desc_lower for skip in skip_indicators):
-                                logger.info(f"  Skipped: skip indicator found")
+                            
+                            # Check if description starts with any skip phrase
+                            should_skip = False
+                            for phrase in skip_start_phrases:
+                                if desc_lower.startswith(phrase) or f" {phrase}" in desc_lower[:100]:
+                                    should_skip = True
+                                    logger.info(f"  Skipped: starts with '{phrase}'")
+                                    break
+                            if should_skip:
                                 continue
                             
                             # Must have person indicators
