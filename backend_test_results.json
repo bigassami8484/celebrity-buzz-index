@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-20T18:28:53.489288",
+  "timestamp": "2026-02-20T18:43:28.737654",
   "summary": {
     "tests_run": 17,
     "tests_passed": 17,
@@ -487,6 +487,12 @@
             "unit": "per negative article"
           },
           {
+            "name": "Brown Bread Bonus \ud83d\udc80",
+            "description": "If your celebrity passes away, you receive a massive points bonus!",
+            "points_per_unit": 50.0,
+            "unit": "per deceased celebrity"
+          },
+          {
             "name": "Social Media Trending",
             "description": "When celebrity trends on social platforms",
             "points_per_unit": 5.0,
@@ -902,12 +908,15 @@
       "details": "Status: 200",
       "response_data": {
         "team": {
-          "id": "a0e63153-2cad-4a3e-92fa-86d51bfa5a48",
+          "id": "2ce3758e-1875-440a-9fb2-4026fd237e6c",
           "team_name": "Test Buzz Team",
           "budget_remaining": 50,
           "total_points": 0.0,
+          "brown_bread_bonus": 0.0,
           "celebrities": [],
-          "created_at": "2026-02-20T18:28:52.960895+00:00"
+          "transfers_this_week": 0,
+          "last_transfer_reset": "2026-W8",
+          "created_at": "2026-02-20T18:43:28.152561+00:00"
         }
       }
     },
@@ -917,12 +926,15 @@
       "details": "Status: 200",
       "response_data": {
         "team": {
-          "id": "a0e63153-2cad-4a3e-92fa-86d51bfa5a48",
+          "id": "2ce3758e-1875-440a-9fb2-4026fd237e6c",
           "team_name": "Test Buzz Team",
           "budget_remaining": 50,
           "total_points": 0.0,
+          "brown_bread_bonus": 0.0,
           "celebrities": [],
-          "created_at": "2026-02-20T18:28:52.960895+00:00"
+          "transfers_this_week": 0,
+          "last_transfer_reset": "2026-W8",
+          "created_at": "2026-02-20T18:43:28.152561+00:00"
         }
       }
     },
@@ -932,10 +944,11 @@
       "details": "Status: 200",
       "response_data": {
         "team": {
-          "id": "a0e63153-2cad-4a3e-92fa-86d51bfa5a48",
+          "id": "2ce3758e-1875-440a-9fb2-4026fd237e6c",
           "team_name": "Test Buzz Team",
           "budget_remaining": 37,
           "total_points": 21.5,
+          "brown_bread_bonus": 0.0,
           "celebrities": [
             {
               "celebrity_id": "36c228f3-29f4-4f78-bbcd-ca7affec31b3",
@@ -944,11 +957,15 @@
               "category": "musicians",
               "price": 13,
               "buzz_score": 21.5,
-              "tier": "B"
+              "tier": "B",
+              "added_at": "2026-02-20T18:43:28.452096+00:00"
             }
           ],
-          "created_at": "2026-02-20T18:28:52.960895+00:00"
-        }
+          "transfers_this_week": 0,
+          "last_transfer_reset": "2026-W8",
+          "created_at": "2026-02-20T18:43:28.152561+00:00"
+        },
+        "brown_bread_bonus": false
       }
     },
     {
@@ -957,12 +974,15 @@
       "details": "Status: 200",
       "response_data": {
         "team": {
-          "id": "a0e63153-2cad-4a3e-92fa-86d51bfa5a48",
+          "id": "2ce3758e-1875-440a-9fb2-4026fd237e6c",
           "team_name": "Test Buzz Team",
           "budget_remaining": 50,
           "total_points": 0,
+          "brown_bread_bonus": 0.0,
           "celebrities": [],
-          "created_at": "2026-02-20T18:28:52.960895+00:00"
+          "transfers_this_week": 0,
+          "last_transfer_reset": "2026-W8",
+          "created_at": "2026-02-20T18:43:28.152561+00:00"
         }
       }
     },
@@ -973,124 +993,144 @@
       "response_data": {
         "leaderboard": [
           {
+            "team_id": "d96c6875-7fb7-42de-bf89-979ac04dd962",
+            "team_name": "Test Share Team",
+            "total_points": 23.5,
+            "celebrity_count": 1,
+            "brown_bread_bonus": 0.0
+          },
+          {
             "team_id": "6e09aa04-dd46-46f1-b5b5-cc2fad2e0bc7",
             "team_name": "My Buzz Team",
             "total_points": 21.5,
-            "celebrity_count": 1
+            "celebrity_count": 1,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "de02254c-98a2-4814-bde7-29dbb30b4c9a",
             "team_name": "Test Team",
             "total_points": 21.5,
-            "celebrity_count": 1
+            "celebrity_count": 1,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "83faa5ba-ead4-4d04-8a09-c30df2996604",
             "team_name": "My Buzz Team",
             "total_points": 21.5,
-            "celebrity_count": 1
+            "celebrity_count": 1,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "af87d29f-2cff-43d3-8efe-b607e93dffa2",
             "team_name": "My Buzz Team",
             "total_points": 21.0,
-            "celebrity_count": 1
+            "celebrity_count": 1,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "c6a18bf4-a73b-4a02-96f1-4eeb34221d52",
             "team_name": "My Buzz Team",
             "total_points": 0.0,
-            "celebrity_count": 0
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "a641aaab-7d77-4636-9ec0-a58b9d568f3a",
             "team_name": "My Buzz Team",
             "total_points": 0.0,
-            "celebrity_count": 0
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "6a1ba8c8-895a-4374-b628-1e32ab32d302",
             "team_name": "My Buzz Team",
             "total_points": 0.0,
-            "celebrity_count": 0
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "0ad40485-bb2b-4572-90a7-8d1c685187ba",
             "team_name": "My Buzz Team",
             "total_points": 0.0,
-            "celebrity_count": 0
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "66fc04d0-7304-4f0f-8bc8-517e8debf783",
             "team_name": "My Buzz Team",
             "total_points": 0.0,
-            "celebrity_count": 0
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "7ec5045a-cb58-45e3-97e9-506dd8d0ca6b",
             "team_name": "My Buzz Team",
             "total_points": 0.0,
-            "celebrity_count": 0
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "1f19c310-247b-4b7c-9e33-25532faa1d47",
             "team_name": "Test Buzz Team",
             "total_points": 0,
-            "celebrity_count": 0
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "0faedbf3-f29b-44b1-884a-81bc2ccd0d67",
             "team_name": "My Buzz Team",
             "total_points": 0.0,
-            "celebrity_count": 0
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "b4ed6104-bc29-4133-b286-b21091a7ac89",
             "team_name": "My Buzz Team",
             "total_points": 0.0,
-            "celebrity_count": 0
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "3e3e42a5-d8a2-462f-a50b-3efd22252f22",
             "team_name": "My Buzz Team",
             "total_points": 0.0,
-            "celebrity_count": 0
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "2aa707f9-e9dc-4926-9981-ecfa67fbcb3a",
             "team_name": "My Buzz Team",
             "total_points": 0.0,
-            "celebrity_count": 0
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "81c500a3-c46b-4c02-aef0-3e8f7ee01b46",
             "team_name": "My Buzz Team",
             "total_points": 0.0,
-            "celebrity_count": 0
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "2f06ed9b-d184-4fd4-9af6-e5d9f33ef6ae",
             "team_name": "My Buzz Team",
             "total_points": 0.0,
-            "celebrity_count": 0
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "14056c7f-c56a-4531-8de7-cf54782b2e71",
             "team_name": "My Buzz Team",
             "total_points": 0.0,
-            "celebrity_count": 0
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
           },
           {
             "team_id": "91b85b3a-083b-4484-893c-e890f1e4f8c5",
             "team_name": "My Buzz Team",
             "total_points": 0.0,
-            "celebrity_count": 0
-          },
-          {
-            "team_id": "4716646b-38d6-4053-a163-cdd8c6480379",
-            "team_name": "My Buzz Team",
-            "total_points": 0.0,
-            "celebrity_count": 0
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
           }
         ]
       }
