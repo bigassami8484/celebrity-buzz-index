@@ -805,6 +805,7 @@ function App() {
   const [stats, setStats] = useState(null);
   const [todaysNews, setTodaysNews] = useState([]);
   const [topPicked, setTopPicked] = useState([]);
+  const [brownBreadWatch, setBrownBreadWatch] = useState([]);
 
   // Fetch stats
   const fetchStats = useCallback(async () => {
