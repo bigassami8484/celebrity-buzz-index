@@ -357,6 +357,10 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                                 "presenter", "model", "chef", "comedian", "director",
                                                 "rapper", "personality", "celebrity", "star"]
                             
+                            # Skip fictional characters
+                            if "fictional" in desc_lower or "character" in desc_lower:
+                                continue
+                            
                             if not any(ind in desc_lower for ind in person_indicators):
                                 continue
                             
