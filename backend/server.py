@@ -59,6 +59,7 @@ class TeamCelebrity(BaseModel):
     category: str
     price: int
     buzz_score: float
+    tier: str = "D"
 
 class UserTeam(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -81,6 +82,13 @@ class LeaderboardEntry(BaseModel):
     team_name: str
     total_points: float
     celebrity_count: int
+
+class AutocompleteResult(BaseModel):
+    name: str
+    description: str
+    image: str
+    estimated_tier: str
+    estimated_price: int
 
 # ==================== CELEBRITY CATEGORIES ====================
 CATEGORIES = [
