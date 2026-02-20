@@ -64,28 +64,33 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 
 ### Features
 - **Player Count Banner**: Shows total players, celebrities, transfer window
-- **Today's News**: 8 AI-generated celebrity headlines
+- **Today's News**: Real celebrity news from TMZ, Daily Mail, BBC, People, E! News, US Weekly, Page Six
 - **Transfer Window**: 1 swap per week (resets weekly)
 - **Profanity Filter**: Blocks racist/offensive team names
 - **Social Sharing**: WhatsApp, Facebook, X/Twitter
 - **Top Picked**: Most selected celebrities by players
+- **Friends Leagues**: Create leagues with invite codes, compete with friends
+- **Badge System**: Weekly Champion 🏆, Trendsetter ⚡, Grim Reaper 💀, Controversy King 🔥, A-List Club ⭐, League Legend 👑
 
 ## What's Been Implemented (Feb 20, 2026)
 - ✅ Full FastAPI backend with all endpoints
-- ✅ Wikipedia autocomplete search with fallback images
+- ✅ Wikipedia autocomplete search - filters out albums, films, TV shows, fictional characters
 - ✅ A/B/C/D tier system with tiered pricing
 - ✅ Controversial celebrity price boosts
 - ✅ Brown Bread Bonus (+100 for deceased)
 - ✅ Controversy Bonus (+25 points per scandal)
 - ✅ Minimum buzz score of 5 points
 - ✅ Player count banner
-- ✅ Today's Top Celeb News (real RSS feeds from Daily Mail, BBC, Guardian)
+- ✅ Today's Top Celeb News (real RSS feeds from TMZ, Daily Mail, BBC, People, E! News, US Weekly, Page Six, Guardian)
 - ✅ Top Picked Celebrities section
 - ✅ Transfer window (1 per week)
 - ✅ Profanity filter for team names
 - ✅ Social sharing (WhatsApp/Facebook/X)
 - ✅ Points methodology modal
 - ✅ React frontend with Tailwind styling
+- ✅ Friends League system with invite codes
+- ✅ Badge/achievement system
+- ✅ Mobile responsive design with bottom navigation
 
 ## Bug Fixes (Dec 2025)
 - ✅ Fixed missing pictures in autocomplete - added explicit fallback to ui-avatars.com placeholder
