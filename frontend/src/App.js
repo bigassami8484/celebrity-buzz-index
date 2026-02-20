@@ -15,7 +15,7 @@ const categoryIcons = {
   athletes: Trophy,
   royals: Crown,
   reality_tv: Star,
-  other: Star,
+  other: Users,
 };
 
 // How It Works Component
