@@ -329,12 +329,15 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                         continue
                     
                     # Skip single word or too many words
-                    if len(words) < 2 or len(words) > 4:
+                    if len(words) < 1 or len(words) > 4:
                         continue
                     
-                    # Name should look like a proper name (each word capitalized)
-                    if not all(word[0].isupper() for word in words if word):
-                        continue
+                    # Allow single-word names if they have accents (like Beyoncé, Rihanna)
+                    # For multi-word names, check capitalization
+                    if len(words) > 1:
+                        # Name should look like a proper name (each word capitalized)
+                        if not all(word[0].isupper() for word in words if word and word[0].isalpha()):
+                            continue
                     
                     # Check for duplicates - use first two words as base name
                     words = title.split()
