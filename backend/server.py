@@ -1249,50 +1249,6 @@ async def get_team(team_id: str):
     
     return {"team": team}
 
-@api_router.get("/team/customization-options")
-async def get_customization_options():
-    """Get available team customization options"""
-    return {
-        "colors": TEAM_COLORS,
-        "icons": TEAM_ICONS
-    }
-
-@api_router.post("/team/customize")
-async def customize_team(data: TeamCustomize):
-    """Customize team appearance"""
-    team = await db.teams.find_one({"id": data.team_id})
-    if not team:
-        raise HTTPException(status_code=404, detail="Team not found")
-    
-    updates = {}
-    
-    # Update team name (with profanity check)
-    if data.team_name:
-        if contains_banned_words(data.team_name):
-            raise HTTPException(status_code=400, detail="Team name contains inappropriate language")
-        updates["team_name"] = data.team_name
-    
-    # Update team color
-    if data.team_color:
-        valid_colors = [c["id"] for c in TEAM_COLORS]
-        if data.team_color not in valid_colors:
-            raise HTTPException(status_code=400, detail="Invalid color selection")
-        updates["team_color"] = data.team_color
-    
-    # Update team icon
-    if data.team_icon:
-        valid_icons = [i["id"] for i in TEAM_ICONS]
-        if data.team_icon not in valid_icons:
-            raise HTTPException(status_code=400, detail="Invalid icon selection")
-        updates["team_icon"] = data.team_icon
-    
-    if updates:
-        await db.teams.update_one({"id": data.team_id}, {"$set": updates})
-    
-    # Return updated team
-    updated_team = await db.teams.find_one({"id": data.team_id}, {"_id": 0})
-    return {"team": updated_team, "message": "Team customized!"}
-
 @api_router.post("/team/add")
 async def add_to_team(data: AddToTeam):
     """Add celebrity to team"""
@@ -1606,18 +1562,18 @@ async def join_league(data: LeagueJoin):
     updated_league = await db.leagues.find_one({"id": league["id"]}, {"_id": 0})
     return {"league": updated_league, "message": f"Welcome to {league['name']}!"}
 
-@api_router.get("/league/{league_id}")
-async def get_league(league_id: str):
-    """Get league details"""
-    league = await db.leagues.find_one({"id": league_id}, {"_id": 0})
-    if not league:
-        raise HTTPException(status_code=404, detail="League not found")
-    return {"league": league}
-
 @api_router.get("/league/code/{code}")
 async def get_league_by_code(code: str):
     """Get league by invite code"""
     league = await db.leagues.find_one({"code": code.upper()}, {"_id": 0})
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    return {"league": league}
+
+@api_router.get("/league/{league_id}")
+async def get_league(league_id: str):
+    """Get league details"""
+    league = await db.leagues.find_one({"id": league_id}, {"_id": 0})
     if not league:
         raise HTTPException(status_code=404, detail="League not found")
     return {"league": league}
