@@ -1062,20 +1062,11 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize }) => {
               className="text-lg cursor-help" 
               title={`${badge.name || badge.id}: ${badge.description || ''}`}
             >
-                  {badge.icon || '🏅'}
-                </span>
-              ))}
-            </div>
-          )}
+              {badge.icon || '🏅'}
+            </span>
+          ))}
         </div>
-        <div className="text-right">
-          <div className="budget-display" data-testid="budget-display">
-            £{team.budget_remaining}M
-          </div>
-          <p className="text-xs text-[#A1A1AA] uppercase tracking-wider">Budget Left</p>
-          <p className="text-xs text-[#666] mt-1">{team.celebrities?.length || 0}/10 players</p>
-        </div>
-      </div>
+      )}
       
       {team.celebrities?.length > 0 ? (
         <>
