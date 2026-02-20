@@ -378,50 +378,6 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
     except Exception as e:
         logger.error(f"Wikipedia autocomplete error: {e}")
     return []
-                        # Allow if description is empty (might still be a person)
-                        if desc:
-                            continue
-                    
-                    # Skip duplicates (same base name)
-                    base_name = name.split(" (")[0].strip().lower()
-                    if base_name in seen_names:
-                        continue
-                    seen_names.add(base_name)
-                    
-                    # Estimate tier based on description
-                    tier = estimate_tier_from_description(desc)
-                    price = get_price_for_tier(tier)
-                    
-                    # Try to get thumbnail
-                    image = ""
-                    try:
-                        thumb_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{name.replace(' ', '_')}"
-                        thumb_response = await client.get(thumb_url, timeout=3.0, headers=headers)
-                        if thumb_response.status_code == 200:
-                            thumb_data = thumb_response.json()
-                            image = thumb_data.get("thumbnail", {}).get("source", "")
-                    except:
-                        pass
-                    
-                    # Always ensure a valid image URL - use fallback if empty or None
-                    final_image = image if image and len(image) > 0 else f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&size=64&background=FF0099&color=fff"
-                    
-                    results.append({
-                        "name": name,
-                        "description": desc[:150] + "..." if len(desc) > 150 else desc,
-                        "image": final_image,
-                        "estimated_tier": tier,
-                        "estimated_price": price
-                    })
-                    
-                    # Limit to 8 results
-                    if len(results) >= 8:
-                        break
-                        
-                return results
-    except Exception as e:
-        logger.error(f"Wikipedia autocomplete error: {e}")
-    return []
 
 def estimate_tier_from_description(description: str) -> str:
     """Estimate celebrity tier from Wikipedia description"""
