@@ -120,6 +120,39 @@ async def fetch_wikipedia_info(name: str) -> dict:
         logger.error(f"Wikipedia fetch error: {e}")
     return {"name": name, "bio": "Celebrity profile", "image": "", "wiki_url": ""}
 
+def detect_category_from_bio(bio: str, name: str) -> str:
+    """Detect celebrity category from bio text"""
+    bio_lower = bio.lower()
+    name_lower = name.lower()
+    
+    # Check for royals first (most specific)
+    if any(x in bio_lower for x in ["prince", "princess", "king", "queen", "royal", "duke", "duchess", "monarch", "heir"]):
+        return "royals"
+    
+    # Reality TV keywords
+    if any(x in bio_lower for x in ["reality television", "reality tv", "keeping up with", "kardashian", "jenner", "love island", "real housewives", "big brother"]):
+        return "reality_tv"
+    if any(x in name_lower for x in ["kardashian", "jenner"]):
+        return "reality_tv"
+    
+    # Musicians/Singers
+    if any(x in bio_lower for x in ["singer", "musician", "rapper", "songwriter", "vocalist", "band", "album", "record", "grammy", "concert", "tour", "music artist", "pop star", "rock star"]):
+        return "musicians"
+    
+    # Athletes
+    if any(x in bio_lower for x in ["athlete", "football", "basketball", "soccer", "tennis", "olympic", "nba", "nfl", "baseball", "hockey", "golf", "swimmer", "runner", "sport"]):
+        return "athletes"
+    
+    # TV actors
+    if any(x in bio_lower for x in ["television actor", "tv actor", "television series", "tv series", "sitcom", "soap opera", "tv show", "television personality"]):
+        return "tv_actors"
+    
+    # Movie stars (default for actors)
+    if any(x in bio_lower for x in ["actor", "actress", "film", "movie", "cinema", "hollywood", "oscar", "academy award"]):
+        return "movie_stars"
+    
+    return "movie_stars"  # Default
+
 async def generate_celebrity_news(name: str, category: str) -> List[dict]:
     """Generate AI-powered news summaries for celebrity"""
     try:
