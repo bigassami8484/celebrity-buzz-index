@@ -127,6 +127,50 @@ class AutocompleteResult(BaseModel):
     estimated_tier: str
     estimated_price: int
 
+# ==================== LEAGUE MODELS ====================
+
+def generate_league_code() -> str:
+    """Generate a 6-character league invite code"""
+    import random
+    import string
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+class League(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    code: str = Field(default_factory=generate_league_code)
+    owner_team_id: str  # Team that created the league
+    team_ids: List[str] = []  # Teams in this league
+    max_teams: int = 20
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class LeagueCreate(BaseModel):
+    name: str
+    team_id: str  # The creating team
+
+class LeagueJoin(BaseModel):
+    code: str
+    team_id: str
+
+# ==================== BROWN BREAD MINI GAME MODELS ====================
+
+class BrownBreadBet(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    team_id: str
+    celebrity_id: str
+    celebrity_name: str
+    bet_amount: int = 10  # Virtual points bet
+    placed_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    resolved: bool = False
+    won: bool = False
+
+class PlaceBet(BaseModel):
+    team_id: str
+    celebrity_id: str
+    bet_amount: int = 10
+
 # ==================== HELPER FUNCTIONS ====================
 
 def contains_banned_words(text: str) -> bool:
