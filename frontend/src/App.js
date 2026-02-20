@@ -380,8 +380,12 @@ const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford }) => {
         <div className="buzz-score" data-testid={`buzz-score-${celebrity.id}`}>
           {celebrity.buzz_score?.toFixed(1)}
         </div>
+        {/* Tier badge top left */}
+        <div className="absolute top-3 left-3">
+          <TierBadge tier={celebrity.tier || "D"} />
+        </div>
         <div className="celebrity-card-overlay">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
             <span className="category-badge flex items-center gap-1">
               <Icon className="w-3 h-3" />
               {celebrity.category?.replace("_", " ")}
