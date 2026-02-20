@@ -1458,12 +1458,22 @@ async def get_leaderboard():
     
     leaderboard = []
     for team in teams:
+        # Get team color and icon info
+        team_color = team.get("team_color", "pink")
+        team_icon = team.get("team_icon", "star")
+        
+        color_info = next((c for c in TEAM_COLORS if c["id"] == team_color), TEAM_COLORS[0])
+        icon_info = next((i for i in TEAM_ICONS if i["id"] == team_icon), TEAM_ICONS[0])
+        
         leaderboard.append({
             "team_id": team["id"],
             "team_name": team.get("team_name", "Unknown"),
             "total_points": team.get("total_points", 0),
             "celebrity_count": len(team.get("celebrities", [])),
-            "brown_bread_bonus": team.get("brown_bread_bonus", 0)
+            "brown_bread_bonus": team.get("brown_bread_bonus", 0),
+            "team_color": color_info["hex"],
+            "team_icon": icon_info["emoji"],
+            "badges": team.get("badges", [])[:3]  # Show first 3 badges
         })
     
     # Sort by points
