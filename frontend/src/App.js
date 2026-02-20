@@ -1175,6 +1175,34 @@ function App() {
     }
   }, []);
 
+  // Fetch customization options
+  const fetchCustomOptions = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/team/customization-options`);
+      setCustomOptions(res.data);
+    } catch (e) {
+      console.error("Error fetching customization options:", e);
+    }
+  }, []);
+
+  // Customize team
+  const customizeTeam = async (teamName, teamColor, teamIcon) => {
+    if (!team) return;
+    try {
+      const res = await axios.post(`${API}/team/customize`, {
+        team_id: team.id,
+        team_name: teamName || undefined,
+        team_color: teamColor || undefined,
+        team_icon: teamIcon || undefined
+      });
+      setTeam(res.data.team);
+      toast.success("Team customized! 🎨");
+      setShowCustomize(false);
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to customize team");
+    }
+  };
+
   // Create a new league
   const createLeague = async (name) => {
     if (!team) return;
