@@ -1304,6 +1304,9 @@ function App() {
       try {
         const res = await axios.get(`${API}/team/${storedTeamId}`);
         setTeam(res.data.team);
+        // Fetch team's leagues and bets
+        fetchTeamLeagues(storedTeamId);
+        fetchTeamBets(storedTeamId);
         return;
       } catch (e) {
         localStorage.removeItem("teamId");
@@ -1319,7 +1322,7 @@ function App() {
     } catch (e) {
       console.error("Error creating team:", e);
     }
-  }, []);
+  }, [fetchTeamLeagues, fetchTeamBets]);
 
   // Fetch leaderboard
   const fetchLeaderboard = useCallback(async () => {
