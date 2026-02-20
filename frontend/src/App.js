@@ -228,19 +228,6 @@ const HowItWorks = ({ onShowMethodology }) => (
     </div>
   </div>
 );
-        <h4 className="font-space font-bold text-lg mb-2">3. Build Your Team</h4>
-        <p className="text-sm text-[#A1A1AA]">Spend your £50M budget wisely on your dream squad</p>
-      </div>
-      <div className="text-center">
-        <div className="w-12 h-12 bg-[#FF5500] flex items-center justify-center mx-auto mb-3">
-          <Trophy className="w-6 h-6 text-white" />
-        </div>
-        <h4 className="font-space font-bold text-lg mb-2">4. Win!</h4>
-        <p className="text-sm text-[#A1A1AA]">Earn points based on buzz. D-listers get 2x multiplier!</p>
-      </div>
-    </div>
-  </div>
-);
 
 // Header Component
 const Header = () => (
