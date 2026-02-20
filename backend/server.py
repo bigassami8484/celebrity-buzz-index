@@ -353,11 +353,11 @@ async def get_celebrities_by_category(category: str):
         {"_id": 0}
     ).to_list(20)
     
-    # If empty, seed with trending
+    # If empty, seed with trending (force correct category)
     if not celebrities and category in TRENDING_CELEBRITIES:
         for name in TRENDING_CELEBRITIES[category][:5]:
             search = CelebritySearch(name=name)
-            await search_celebrity(search)
+            await search_celebrity(search, override_category=category)
         
         celebrities = await db.celebrities.find(
             {"category": category},
