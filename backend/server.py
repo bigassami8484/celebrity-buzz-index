@@ -314,10 +314,16 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                         logger.info(f"  Skipped: non-person keyword")
                         continue
                     
-                    # Skip if title has parentheses (usually disambiguation or albums)
+                    # Skip if title has parentheses UNLESS it's a role descriptor like (musician), (actor)
                     if "(" in title:
-                        logger.info(f"  Skipped: parentheses")
-                        continue
+                        # Allow if parentheses contain role descriptors
+                        paren_content = title.split("(")[1].split(")")[0].lower() if ")" in title else ""
+                        allowed_roles = ["musician", "actor", "actress", "singer", "rapper", "footballer",
+                                        "politician", "presenter", "comedian", "director", "writer",
+                                        "athlete", "businessman", "model", "chef", "host", "dancer"]
+                        if not any(role in paren_content for role in allowed_roles):
+                            logger.info(f"  Skipped: parentheses (not a role)")
+                            continue
                     
                     # Skip titles with colons (usually shows, specials, etc.)
                     if ":" in title:
