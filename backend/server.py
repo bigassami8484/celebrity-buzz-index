@@ -269,6 +269,60 @@ def get_week_number() -> str:
     now = datetime.now(timezone.utc)
     return f"{now.year}-W{now.isocalendar()[1]}"
 
+def is_transfer_window_open() -> dict:
+    """Check if transfer window is open (Saturday 12pm GMT for 24 hours)"""
+    now = datetime.now(timezone.utc)
+    
+    # Transfer window opens Saturday 12:00 GMT
+    # Find this Saturday's window
+    days_since_saturday = (now.weekday() - 5) % 7  # Saturday is 5
+    
+    # Calculate when the current/next window starts
+    if now.weekday() == 5:  # It's Saturday
+        window_start = now.replace(hour=12, minute=0, second=0, microsecond=0)
+        if now < window_start:
+            # Before 12pm Saturday, use last Saturday
+            window_start = window_start - timedelta(days=7)
+    elif now.weekday() == 6:  # Sunday
+        # Window started yesterday at 12pm
+        window_start = (now - timedelta(days=1)).replace(hour=12, minute=0, second=0, microsecond=0)
+    else:
+        # Window was last Saturday at 12pm
+        window_start = (now - timedelta(days=days_since_saturday)).replace(hour=12, minute=0, second=0, microsecond=0)
+    
+    window_end = window_start + timedelta(hours=24)
+    
+    is_open = window_start <= now < window_end
+    
+    # Calculate next window
+    if is_open:
+        next_window = window_start + timedelta(days=7)
+        time_remaining = window_end - now
+        hours_remaining = int(time_remaining.total_seconds() // 3600)
+        mins_remaining = int((time_remaining.total_seconds() % 3600) // 60)
+        status_text = f"OPEN - {hours_remaining}h {mins_remaining}m left"
+    else:
+        # Calculate time until next Saturday 12pm
+        days_until_saturday = (5 - now.weekday()) % 7
+        if days_until_saturday == 0 and now.hour >= 12:
+            days_until_saturday = 7
+        next_window = (now + timedelta(days=days_until_saturday)).replace(hour=12, minute=0, second=0, microsecond=0)
+        time_until = next_window - now
+        days_until = time_until.days
+        hours_until = int((time_until.total_seconds() % 86400) // 3600)
+        if days_until > 0:
+            status_text = f"Opens in {days_until}d {hours_until}h"
+        else:
+            status_text = f"Opens in {hours_until}h"
+    
+    return {
+        "is_open": is_open,
+        "status": status_text,
+        "window_start": window_start.isoformat(),
+        "window_end": window_end.isoformat(),
+        "next_window": next_window.isoformat() if not is_open else None
+    }
+
 def get_controversial_price_boost(name: str) -> int:
     """Get price boost for controversial/newsworthy celebs"""
     name_lower = name.lower()
