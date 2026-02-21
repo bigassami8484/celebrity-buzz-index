@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { Film, Tv, Music, Trophy, Crown, Star, Users, LineChart } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Film, Tv, Music, Trophy, Crown, Star, Users, LineChart, Sparkles } from "lucide-react";
 import TierBadge from "../common/TierBadge";
+import { getAiImage } from "../../api";
 
 const categoryIcons = {
   movie_stars: Film,
@@ -12,9 +13,56 @@ const categoryIcons = {
   other: Users,
 };
 
+// Check if image is a placeholder (ui-avatars)
+const isPlaceholderImage = (url) => {
+  return !url || url.includes("ui-avatars.com");
+};
+
 const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford, onShowPriceHistory }) => {
   const [showNews, setShowNews] = useState(false);
+  const [imageUrl, setImageUrl] = useState(celebrity.image);
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
+  const [hasAiImage, setHasAiImage] = useState(false);
   const Icon = categoryIcons[celebrity.category] || Star;
+  
+  // Check for AI image if current image is a placeholder
+  useEffect(() => {
+    const checkForAiImage = async () => {
+      if (isPlaceholderImage(celebrity.image) && !hasAiImage) {
+        try {
+          // Check if we have a cached AI image
+          const result = await getAiImage(celebrity.name);
+          if (result.image && !result.image.includes("ui-avatars.com")) {
+            setImageUrl(result.image);
+            setHasAiImage(true);
+          }
+        } catch (e) {
+          // Silently fail - keep placeholder
+        }
+      }
+    };
+    
+    checkForAiImage();
+  }, [celebrity.name, celebrity.image, hasAiImage]);
+  
+  // Handle generating AI image on demand
+  const handleGenerateAiImage = async (e) => {
+    e.stopPropagation();
+    if (isGeneratingAi) return;
+    
+    setIsGeneratingAi(true);
+    try {
+      const result = await getAiImage(celebrity.name);
+      if (result.image && !result.image.includes("ui-avatars.com")) {
+        setImageUrl(result.image);
+        setHasAiImage(true);
+      }
+    } catch (error) {
+      console.error("Failed to generate AI image:", error);
+    } finally {
+      setIsGeneratingAi(false);
+    }
+  };
   
   return (
     <div 
@@ -27,13 +75,36 @@ const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford, onShowPriceHisto
         onMouseLeave={() => setShowNews(false)}
       >
         <img
-          src={celebrity.image || `https://ui-avatars.com/api/?name=${celebrity.name}&size=400&background=FF0099&color=fff`}
+          src={imageUrl || `https://ui-avatars.com/api/?name=${celebrity.name}&size=400&background=FF0099&color=fff`}
           alt={celebrity.name}
           className="celebrity-card-image"
           onError={(e) => {
             e.target.src = `https://ui-avatars.com/api/?name=${celebrity.name}&size=400&background=FF0099&color=fff`;
           }}
         />
+        
+        {/* AI Generate button for placeholder images */}
+        {isPlaceholderImage(imageUrl) && !hasAiImage && (
+          <button
+            onClick={handleGenerateAiImage}
+            disabled={isGeneratingAi}
+            className="absolute bottom-3 left-3 bg-gradient-to-r from-[#8B5CF6] to-[#FF0099] text-white px-2 py-1 text-[10px] font-bold flex items-center gap-1 hover:opacity-90 transition-opacity disabled:opacity-50"
+            title="Generate AI portrait"
+            data-testid={`ai-gen-btn-${celebrity.id}`}
+          >
+            <Sparkles className="w-3 h-3" />
+            {isGeneratingAi ? "Generating..." : "AI Photo"}
+          </button>
+        )}
+        
+        {/* AI badge if image was AI generated */}
+        {hasAiImage && (
+          <div className="absolute bottom-3 left-3 bg-[#8B5CF6]/80 text-white px-2 py-0.5 text-[8px] font-bold flex items-center gap-1">
+            <Sparkles className="w-2.5 h-2.5" />
+            AI Generated
+          </div>
+        )}
+        
         <div className="buzz-score hidden" data-testid={`buzz-score-${celebrity.id}`}>
           {celebrity.buzz_score?.toFixed(1)}
         </div>
