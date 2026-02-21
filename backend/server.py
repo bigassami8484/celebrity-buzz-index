@@ -768,24 +768,41 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     continue
                 seen_names.add(base_name)
                 
-                # Check if celebrity exists in DB - use their stored tier/price for consistency
-                existing = await db.celebrities.find_one(
-                    {"name": {"$regex": f"^{actual_title}$", "$options": "i"}},
-                    {"_id": 0, "tier": 1, "price": 1}
+                # FIRST: Check if this celeb is in the Hot Celebs cache - use that price
+                hot_celebs_cache = await db.news_cache.find_one(
+                    {"type": "hot_celebs_from_news_v2"},
+                    {"_id": 0, "hot_celebs": 1}
                 )
+                hot_celeb_match = None
+                if hot_celebs_cache and hot_celebs_cache.get("hot_celebs"):
+                    for hc in hot_celebs_cache["hot_celebs"]:
+                        if hc.get("name", "").lower() == actual_title.lower():
+                            hot_celeb_match = hc
+                            break
                 
-                if existing:
-                    tier = existing.get("tier", "D")
-                    price = get_dynamic_price(tier, 50, actual_title)
+                if hot_celeb_match:
+                    # Use Hot Celebs price (includes news premium)
+                    tier = hot_celeb_match.get("tier", "D")
+                    price = hot_celeb_match["price"]
                 else:
-                    # Check if in HOT_CELEBS_POOL for known tier
-                    pool_entry = next((c for c in HOT_CELEBS_POOL if c["name"].lower() == actual_title.lower()), None)
-                    if pool_entry:
-                        tier = pool_entry["tier"]
+                    # Check if celebrity exists in DB
+                    existing = await db.celebrities.find_one(
+                        {"name": {"$regex": f"^{actual_title}$", "$options": "i"}},
+                        {"_id": 0, "tier": 1, "price": 1}
+                    )
+                    
+                    if existing:
+                        tier = existing.get("tier", "D")
+                        price = get_dynamic_price(tier, 50, actual_title)
                     else:
-                        # Estimate tier from description
-                        tier = estimate_tier_from_description(extract)
-                    price = get_dynamic_price(tier, 50, actual_title)
+                        # Check if in HOT_CELEBS_POOL for known tier
+                        pool_entry = next((c for c in HOT_CELEBS_POOL if c["name"].lower() == actual_title.lower()), None)
+                        if pool_entry:
+                            tier = pool_entry["tier"]
+                        else:
+                            # Estimate tier from description
+                            tier = estimate_tier_from_description(extract)
+                        price = get_dynamic_price(tier, 50, actual_title)
                 
                 results.append({
                     "name": actual_title,
@@ -793,7 +810,8 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     "image": image or f"https://ui-avatars.com/api/?name={actual_title}&size=150&background=FF0099&color=fff",
                     "wiki_url": wiki_url,
                     "estimated_tier": tier,
-                    "estimated_price": price
+                    "estimated_price": price,
+                    "news_premium": hot_celeb_match is not None
                 })
                 
                 if len(results) >= 5:
@@ -805,9 +823,6 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
     except Exception as e:
         logger.error(f"Wikipedia autocomplete error: {e}")
         return []
-            
-    except Exception as e:
-        logger.error(f"Wikipedia autocomplete error: {e}")
         return []
 
 def estimate_tier_from_description(description: str) -> str:
