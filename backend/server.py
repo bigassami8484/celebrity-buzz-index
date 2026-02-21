@@ -1730,16 +1730,24 @@ async def get_pricing_info():
 async def get_hot_celebs():
     """Get 15+ hot celebrities WHO ARE ACTUALLY IN THE NEWS THIS WEEK - all with real photos"""
     
-    # Check cache first (1 hour cache)
+    # Calculate the start of the current week (Monday 00:00 UTC)
+    now = datetime.now(timezone.utc)
+    days_since_monday = now.weekday()  # Monday = 0
+    week_start = now - timedelta(days=days_since_monday, hours=now.hour, minutes=now.minute, seconds=now.second, microseconds=now.microsecond)
+    
+    # Check cache first (1 hour cache) but invalidate if from previous week
     cached = await db.news_cache.find_one(
-        {"type": "hot_celebs_from_news_v2"},
+        {"type": "hot_celebs_from_news_v3"},  # New version with weekly filtering
         {"_id": 0}
     )
     
-    if cached and cached.get("updated_at"):
+    if cached and cached.get("updated_at") and cached.get("week_start"):
         cache_time = datetime.fromisoformat(cached["updated_at"])
-        cache_age = datetime.now(timezone.utc) - cache_time
-        if cache_age.total_seconds() < 3600:  # 1 hour cache
+        cache_week_start = datetime.fromisoformat(cached["week_start"])
+        cache_age = now - cache_time
+        
+        # Use cache if: less than 1 hour old AND from the same week
+        if cache_age.total_seconds() < 3600 and cache_week_start >= week_start:
             return {"hot_celebs": cached.get("hot_celebs", [])}
     
     headers = {
