@@ -1363,9 +1363,9 @@ async def get_trending():
                 {"_id": 0}
             )
             if celeb:
-                # Recalculate tier from bio if needed
+                # Recalculate tier from bio if needed (pass name for guaranteed A-list check)
                 bio = celeb.get("bio", "")
-                recalc_tier = estimate_tier_from_description(bio)
+                recalc_tier = estimate_tier_from_description(bio, name)
                 
                 # Use recalculated tier
                 tier = recalc_tier
