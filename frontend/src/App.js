@@ -203,15 +203,14 @@ const HotCelebsBanner = ({ celebs, onSelect }) => {
                 className="w-full h-20 object-cover"
                 onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${celeb.name}&size=128&background=FF0099&color=fff`; }}
               />
-              <div className={`absolute top-1 right-1 px-1 py-0.5 text-[8px] font-bold ${
+              <div className={`absolute top-0 right-0 px-1 py-0.5 text-[7px] font-bold ${
                 celeb.tier === 'A' ? 'bg-[#FFD700] text-black' : 'bg-[#C0C0C0] text-black'
               }`}>
-                {celeb.tier}-LIST
+                {celeb.tier}
               </div>
             </div>
-            <p className="font-bold text-sm text-white truncate group-hover:text-[#FF0099]">{celeb.name}</p>
-            <p className="text-[10px] text-[#FF0099] truncate">{celeb.hot_reason}</p>
-            <p className="text-xs text-[#FFD700] mt-1">£{celeb.price}M</p>
+            <p className="font-bold text-xs text-white truncate group-hover:text-[#FF0099]">{celeb.name}</p>
+            <p className="text-[10px] text-[#00FF00]">£{celeb.price}M</p>
           </div>
         ))}
       </div>
