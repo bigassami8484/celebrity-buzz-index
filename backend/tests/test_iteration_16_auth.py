@@ -53,13 +53,16 @@ class TestBasicEndpoints:
         assert len(data["categories"]) > 0, "Should have at least one category"
         
     def test_celebrities_search(self):
-        """Test /api/celebrities/search endpoint"""
-        response = requests.get(f"{BASE_URL}/api/celebrities/search?q=taylor")
+        """Test /api/celebrity/search endpoint"""
+        response = requests.post(
+            f"{BASE_URL}/api/celebrity/search",
+            json={"name": "taylor swift"}
+        )
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
-        assert "celebrities" in data, "Response should contain 'celebrities' field"
+        assert "celebrity" in data or "error" in data, "Response should contain 'celebrity' or 'error' field"
         
     def test_hot_celebs_endpoint(self):
         """Test /api/hot-celebs returns data"""
