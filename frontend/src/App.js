@@ -78,16 +78,19 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess, mode = "login" }) => {
   };
   
   const handleGoogleLogin = () => {
-    // Google Sign-In will be handled by Google's SDK
-    toast.info("Google login coming soon!");
+    // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
+    // Use Emergent Google Auth - dynamically build redirect URL from current location
+    const redirectUrl = window.location.origin;
+    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
   
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" data-testid="auth-modal">
       <div className="bg-[#0A0A0A] border border-[#FF0099] p-6 max-w-md w-full relative">
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 text-[#666] hover:text-white"
+          data-testid="auth-modal-close"
         >
           <X className="w-5 h-5" />
         </button>
@@ -104,40 +107,11 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess, mode = "login" }) => {
         
         {!magicLinkSent ? (
           <>
-            {/* Magic Link Form */}
-            <form onSubmit={handleMagicLink} className="mb-6">
-              <label className="block text-sm text-[#A1A1AA] mb-2">Email Address</label>
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="flex-1 bg-[#1A1A1A] border border-[#333] text-white px-4 py-3 focus:border-[#FF0099] outline-none"
-                  required
-                />
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="bg-gradient-to-r from-[#FF0099] to-[#FF0099]/80 text-white px-6 py-3 font-bold disabled:opacity-50 flex items-center gap-2"
-                >
-                  <Mail className="w-4 h-4" />
-                  {loading ? "Sending..." : "Send Link"}
-                </button>
-              </div>
-              <p className="text-xs text-[#666] mt-2">We'll send you a magic link to sign in - no password needed!</p>
-            </form>
-            
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex-1 h-px bg-[#333]"></div>
-              <span className="text-[#666] text-sm">or</span>
-              <div className="flex-1 h-px bg-[#333]"></div>
-            </div>
-            
-            {/* Google Login Button */}
+            {/* Google Login Button - Primary */}
             <button
               onClick={handleGoogleLogin}
-              className="w-full bg-white text-black py-3 px-4 font-medium flex items-center justify-center gap-3 hover:bg-gray-100 transition-colors"
+              className="w-full bg-white text-black py-3 px-4 font-medium flex items-center justify-center gap-3 hover:bg-gray-100 transition-colors mb-6"
+              data-testid="google-login-btn"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -147,6 +121,38 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess, mode = "login" }) => {
               </svg>
               Continue with Google
             </button>
+            
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex-1 h-px bg-[#333]"></div>
+              <span className="text-[#666] text-sm">or use email</span>
+              <div className="flex-1 h-px bg-[#333]"></div>
+            </div>
+            
+            {/* Magic Link Form */}
+            <form onSubmit={handleMagicLink}>
+              <label className="block text-sm text-[#A1A1AA] mb-2">Email Address</label>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="flex-1 bg-[#1A1A1A] border border-[#333] text-white px-4 py-3 focus:border-[#FF0099] outline-none"
+                  data-testid="magic-link-email"
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="bg-gradient-to-r from-[#FF0099] to-[#FF0099]/80 text-white px-6 py-3 font-bold disabled:opacity-50 flex items-center gap-2"
+                  data-testid="send-magic-link-btn"
+                >
+                  <Mail className="w-4 h-4" />
+                  {loading ? "..." : "Send"}
+                </button>
+              </div>
+              <p className="text-xs text-[#666] mt-2">We'll send you a magic link to sign in - no password needed!</p>
+            </form>
           </>
         ) : (
           <div className="text-center py-8">
