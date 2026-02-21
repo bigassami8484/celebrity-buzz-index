@@ -783,6 +783,25 @@ CELEBRITY_ALIASES = {
     "snoop dog": "Snoop Dogg",
     "lady gaga": "Lady Gaga",
     "stefani germanotta": "Lady Gaga",
+    # Royal Children - Prince William's kids
+    "prince george": "Prince George of Wales",
+    "george cambridge": "Prince George of Wales",
+    "george of wales": "Prince George of Wales",
+    "princess charlotte": "Princess Charlotte of Wales",
+    "charlotte cambridge": "Princess Charlotte of Wales",
+    "charlotte of wales": "Princess Charlotte of Wales",
+    "prince louis": "Prince Louis of Wales",
+    "louis cambridge": "Princess Louis of Wales",
+    "louis of wales": "Prince Louis of Wales",
+    # Royal Children - Prince Harry's kids
+    "prince archie": "Prince Archie of Sussex",
+    "archie mountbatten-windsor": "Prince Archie of Sussex",
+    "archie of sussex": "Prince Archie of Sussex",
+    "archie harrison": "Prince Archie of Sussex",
+    "princess lilibet": "Princess Lilibet of Sussex",
+    "lilibet mountbatten-windsor": "Princess Lilibet of Sussex", 
+    "lilibet of sussex": "Princess Lilibet of Sussex",
+    "lilibet diana": "Princess Lilibet of Sussex",
 }
 
 # Reverse mapping - canonical name to all aliases (for duplicate checking)
