@@ -677,15 +677,67 @@ def estimate_tier_from_description(description: str) -> str:
     
     return "D"
 
-def get_price_for_tier(tier: str) -> int:
-    """Get price based on celebrity tier"""
-    prices = {
-        "A": 9,   # £9M for A-list
-        "B": 6,   # £6M for B-list
-        "C": 4,   # £4M for C-list
-        "D": 2    # £2M for D-list
+def get_base_price_for_tier(tier: str) -> float:
+    """Get BASE price range for celebrity tier (in millions)"""
+    # New pricing structure:
+    # A-List: £9m-£12m (high scoring but expensive)
+    # B-List: £5m-£8m (balanced steady picks)
+    # C-List: £2m-£4m (risk/reward)
+    # D-List: £0.5m-£1.5m (cheap wildcards)
+    base_prices = {
+        "A": 9.0,   # Base £9M, can go up to £12M
+        "B": 5.0,   # Base £5M, can go up to £8M
+        "C": 2.0,   # Base £2M, can go up to £4M
+        "D": 0.5    # Base £0.5M, can go up to £1.5M
     }
-    return prices.get(tier, 2)
+    return base_prices.get(tier, 0.5)
+
+def get_dynamic_price(tier: str, buzz_score: float, name: str = "") -> float:
+    """Calculate dynamic price based on tier, buzz score, and controversy
+    
+    Price increases when celebrity is in the news (high buzz)
+    Price decreases when celebrity is out of the news (low buzz)
+    
+    Pricing Tiers:
+    - A-List: £9m-£12m (high scoring but expensive)
+    - B-List: £5m-£8m (balanced steady picks)  
+    - C-List: £2m-£4m (risk/reward)
+    - D-List: £0.5m-£1.5m (cheap wildcards)
+    """
+    base_price = get_base_price_for_tier(tier)
+    
+    # Define price ranges for each tier
+    price_ranges = {
+        "A": (9.0, 12.0),   # £9m-£12m
+        "B": (5.0, 8.0),    # £5m-£8m
+        "C": (2.0, 4.0),    # £2m-£4m
+        "D": (0.5, 1.5)     # £0.5m-£1.5m
+    }
+    
+    min_price, max_price = price_ranges.get(tier, (0.5, 1.5))
+    price_range = max_price - min_price
+    
+    # Dynamic pricing based on buzz score
+    # Buzz score typically ranges from 5 (minimum) to 150 (very high)
+    # Map this to a 0-1 scale for price adjustment
+    buzz_factor = min(1.0, max(0.0, (buzz_score - 5) / 100))
+    
+    # Calculate dynamic price within the tier's range
+    dynamic_price = min_price + (price_range * buzz_factor)
+    
+    # Controversial celebrity boost (adds to price)
+    controversy_boost = get_controversial_price_boost(name)
+    if controversy_boost > 0:
+        # Add up to £3M for very controversial celebs
+        dynamic_price = min(max_price + 3, dynamic_price + (controversy_boost / 5))
+    
+    # Round to 1 decimal place
+    return round(dynamic_price, 1)
+
+# Keep old function for backwards compatibility but make it use dynamic pricing
+def get_price_for_tier(tier: str) -> float:
+    """Get base price for tier (for autocomplete before buzz is calculated)"""
+    return get_base_price_for_tier(tier)
 
 async def calculate_celebrity_tier(bio: str, name: str) -> tuple:
     """Calculate celebrity tier based on bio content and return (tier, price)"""
