@@ -282,7 +282,7 @@ class AutocompleteResult(BaseModel):
     description: str
     image: str
     estimated_tier: str
-    estimated_price: int
+    estimated_price: float
 
 # ==================== LEAGUE MODELS ====================
 
