@@ -1833,12 +1833,12 @@ function App() {
               </div>
             ) : (
               <div className="text-center py-16">
-                <h3 className="font-anton text-3xl text-[#A1A1AA] uppercase">
-                  {activeCategory ? "Loading celebrities..." : "Select a category or search"}
+                <div className="w-16 h-16 bg-[#1A1A1A] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-[#666]" />
+                </div>
+                <h3 className="font-anton text-2xl text-[#A1A1AA] uppercase">
+                  {activeCategory ? "Loading..." : "No Celebrities Yet"}
                 </h3>
-                <p className="text-[#666] mt-2">
-                  Choose a category above or search for any celebrity
-                </p>
               </div>
             )}
           </div>
