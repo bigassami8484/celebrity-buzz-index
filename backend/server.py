@@ -677,6 +677,19 @@ B_LIST_INDICATORS = ["award-winning", "acclaimed", "successful", "popular", "wel
                       "million", "chart-topping", "hit", "starring", "lead role"]
 C_LIST_INDICATORS = ["known for", "appeared in", "featured", "contestant", "participant"]
 
+# Mega-stars who should ALWAYS be A-list regardless of bio analysis
+GUARANTEED_A_LIST = [
+    "taylor swift", "beyoncé", "beyonce", "rihanna", "drake", "kanye west", "adele",
+    "ed sheeran", "ariana grande", "justin bieber", "lady gaga", "bruno mars",
+    "leonardo dicaprio", "tom cruise", "brad pitt", "angelina jolie", "tom hanks",
+    "julia roberts", "denzel washington", "will smith", "johnny depp", "robert downey jr",
+    "dwayne johnson", "the rock", "scarlett johansson", "jennifer lawrence", "margot robbie",
+    "oprah winfrey", "kim kardashian", "elon musk", "jeff bezos", "cristiano ronaldo",
+    "lionel messi", "lebron james", "serena williams", "roger federer", "michael jordan",
+    "david beckham", "prince william", "prince harry", "kate middleton", "queen elizabeth",
+    "king charles", "barack obama", "donald trump", "joe biden", "bill gates"
+]
+
 # ==================== HELPER FUNCTIONS ====================
 
 async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
