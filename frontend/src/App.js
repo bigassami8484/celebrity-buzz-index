@@ -218,6 +218,113 @@ const HotCelebsBanner = ({ celebs, onSelect }) => {
   );
 };
 
+// Price History Modal Component
+const PriceHistoryModal = ({ celebrityName, onClose }) => {
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPrice, setCurrentPrice] = useState(0);
+  const [currentTier, setCurrentTier] = useState("D");
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${API}/price-history/celebrity-name/${encodeURIComponent(celebrityName)}`);
+        setHistory(response.data.history || []);
+        setCurrentPrice(response.data.current_price || 0);
+        setCurrentTier(response.data.current_tier || "D");
+      } catch (error) {
+        console.error("Error fetching price history:", error);
+        toast.error("Could not load price history");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (celebrityName) {
+      fetchHistory();
+    }
+  }, [celebrityName]);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+  };
+
+  const getPriceChange = (index) => {
+    if (index >= history.length - 1) return null;
+    const current = history[index].price;
+    const previous = history[index + 1].price;
+    const change = current - previous;
+    return change;
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" data-testid="price-history-modal">
+      <div className="bg-[#0A0A0A] border border-[#262626] max-w-md w-full max-h-[80vh] overflow-hidden">
+        <div className="p-4 border-b border-[#262626] flex justify-between items-center">
+          <div>
+            <h2 className="font-anton text-xl uppercase text-white flex items-center gap-2">
+              <LineChart className="w-5 h-5 text-[#00F0FF]" />
+              Price History
+            </h2>
+            <p className="text-sm text-[#A1A1AA]">{celebrityName}</p>
+          </div>
+          <button onClick={onClose} className="text-[#666] hover:text-white">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        
+        <div className="p-4">
+          <div className="bg-[#1A1A1A] p-4 mb-4 border border-[#262626]">
+            <p className="text-sm text-[#A1A1AA]">Current Price</p>
+            <p className="font-anton text-3xl text-[#00FF00]">£{currentPrice}M</p>
+            <p className="text-xs text-[#FFD700]">{currentTier}-LIST</p>
+          </div>
+          
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin w-8 h-8 border-2 border-[#FF0099] border-t-transparent rounded-full mx-auto"></div>
+              <p className="text-sm text-[#A1A1AA] mt-2">Loading history...</p>
+            </div>
+          ) : history.length === 0 ? (
+            <p className="text-center text-[#A1A1AA] py-8">No price history available yet</p>
+          ) : (
+            <div className="max-h-[300px] overflow-y-auto space-y-2">
+              {history.map((entry, idx) => {
+                const change = getPriceChange(idx);
+                return (
+                  <div key={idx} className="bg-[#1A1A1A] p-3 border border-[#262626] flex justify-between items-center">
+                    <div>
+                      <p className="text-sm text-white">£{entry.price}M</p>
+                      <p className="text-xs text-[#A1A1AA]">{formatDate(entry.recorded_at)}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-[#FFD700]">{entry.tier}-LIST</p>
+                      {change !== null && (
+                        <p className={`text-xs flex items-center gap-1 ${change > 0 ? 'text-[#00FF00]' : change < 0 ? 'text-[#FF4444]' : 'text-[#A1A1AA]'}`}>
+                          {change > 0 ? <TrendingUp className="w-3 h-3" /> : change < 0 ? <TrendingDown className="w-3 h-3" /> : null}
+                          {change > 0 ? '+' : ''}{change.toFixed(1)}M
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        
+        <div className="p-4 border-t border-[#262626]">
+          <p className="text-xs text-[#666] text-center">
+            Prices update based on media buzz and trending status
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Footer Component
 const Footer = () => (
   <footer className="bg-[#050505] border-t border-[#262626] py-8 mt-16" data-testid="footer">
