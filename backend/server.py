@@ -1547,18 +1547,27 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     
     # FIRST: Check if this celeb is in the Hot Celebs cache - use that price for consistency
     hot_celebs_cache = await db.news_cache.find_one(
-        {"type": "hot_celebs_from_news_v2"},
+        {"type": "hot_celebs_from_news_v4"},
         {"_id": 0}
     )
     hot_celeb_match = None
     if hot_celebs_cache and hot_celebs_cache.get("hot_celebs"):
         for hc in hot_celebs_cache["hot_celebs"]:
-            if hc.get("name", "").lower() == name.lower():
+            hc_name = hc.get("name", "").lower()
+            # Check both original name and wikipedia name
+            if hc_name == name.lower() or hc_name == wikipedia_search_name.lower():
+                hot_celeb_match = hc
+                break
+            # Also check if they're aliases of each other
+            if are_same_celebrity(hc.get("name", ""), name) or are_same_celebrity(hc.get("name", ""), wikipedia_search_name):
                 hot_celeb_match = hc
                 break
     
-    # Check if already in database
+    # Check if already in database (try both original name and Wikipedia name)
     existing = await db.celebrities.find_one({"name": {"$regex": f"^{name}$", "$options": "i"}}, {"_id": 0})
+    if not existing and wikipedia_search_name != name:
+        existing = await db.celebrities.find_one({"name": {"$regex": f"^{wikipedia_search_name}$", "$options": "i"}}, {"_id": 0})
+    
     if existing:
         # Check if this is a guaranteed A-lister (mega-star override)
         celeb_name = existing.get("name", name)
