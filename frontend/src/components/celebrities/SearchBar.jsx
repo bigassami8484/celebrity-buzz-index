@@ -1,15 +1,26 @@
 import { useState, useRef, useEffect } from "react";
-import { Search, TrendingUp } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import { fetchAutocomplete } from "../../api";
 import TierBadge from "../common/TierBadge";
 
-const SearchBar = ({ onSearch, loading }) => {
+const SearchBar = ({ onSearch, onQuickAdd, loading, team }) => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const searchRef = useRef(null);
   const debounceRef = useRef(null);
+  
+  // Check if celebrity is already in team
+  const isInTeam = (name) => {
+    if (!team?.celebrities) return false;
+    return team.celebrities.some(c => c.name.toLowerCase() === name.toLowerCase());
+  };
+  
+  // Check if can afford celebrity
+  const canAfford = (price) => {
+    return (team?.budget_remaining || 0) >= price;
+  };
   
   // Fetch autocomplete suggestions
   const fetchSuggestions = async (searchQuery) => {
@@ -52,6 +63,16 @@ const SearchBar = ({ onSearch, loading }) => {
     setQuery("");
     setSuggestions([]);
     setShowSuggestions(false);
+  };
+  
+  const handleQuickAdd = (e, suggestion) => {
+    e.stopPropagation(); // Prevent triggering the parent onClick
+    if (onQuickAdd) {
+      onQuickAdd(suggestion);
+      setQuery("");
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
   };
   
   const handleSubmit = (e) => {
@@ -103,33 +124,57 @@ const SearchBar = ({ onSearch, loading }) => {
           {loadingSuggestions ? (
             <div className="p-4 text-center text-[#A1A1AA]">Searching Wikipedia...</div>
           ) : (
-            suggestions.map((suggestion, idx) => (
-              <div
-                key={idx}
-                onClick={() => handleSelectSuggestion(suggestion)}
-                className="flex items-center gap-3 p-3 hover:bg-[#1A1A1A] cursor-pointer border-b border-[#262626] last:border-b-0"
-                data-testid={`suggestion-${idx}`}
-              >
-                <img
-                  src={suggestion.image}
-                  alt={suggestion.name}
-                  className="w-12 h-12 rounded object-cover"
-                  onError={(e) => {
-                    e.target.src = `https://ui-avatars.com/api/?name=${suggestion.name}&size=48&background=FF0099&color=fff`;
-                  }}
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-white truncate">{suggestion.name}</span>
-                    <TierBadge tier={suggestion.tier || suggestion.estimated_tier} />
+            suggestions.map((suggestion, idx) => {
+              const inTeam = isInTeam(suggestion.name);
+              const price = suggestion.price || suggestion.estimated_price;
+              const affordable = canAfford(price);
+              
+              return (
+                <div
+                  key={idx}
+                  onClick={() => handleSelectSuggestion(suggestion)}
+                  className="flex items-center gap-3 p-3 hover:bg-[#1A1A1A] cursor-pointer border-b border-[#262626] last:border-b-0"
+                  data-testid={`suggestion-${idx}`}
+                >
+                  <img
+                    src={suggestion.image}
+                    alt={suggestion.name}
+                    className="w-12 h-12 rounded object-cover"
+                    onError={(e) => {
+                      e.target.src = `https://ui-avatars.com/api/?name=${suggestion.name}&size=48&background=FF0099&color=fff`;
+                    }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-white truncate">{suggestion.name}</span>
+                      <TierBadge tier={suggestion.tier || suggestion.estimated_tier} />
+                    </div>
+                    <p className="text-xs text-[#A1A1AA] truncate">{suggestion.description}</p>
                   </div>
-                  <p className="text-xs text-[#A1A1AA] truncate">{suggestion.description}</p>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <div className="text-[#FFD700] font-bold">£{price}M</div>
+                    </div>
+                    {/* Quick Add Button */}
+                    <button
+                      onClick={(e) => handleQuickAdd(e, suggestion)}
+                      disabled={inTeam || !affordable}
+                      className={`flex items-center justify-center w-10 h-10 rounded transition-colors ${
+                        inTeam 
+                          ? 'bg-[#333] text-[#666] cursor-not-allowed' 
+                          : !affordable 
+                            ? 'bg-[#333] text-[#666] cursor-not-allowed'
+                            : 'bg-[#FF0099] hover:bg-[#e6008a] text-white'
+                      }`}
+                      title={inTeam ? "Already in team" : !affordable ? "Can't afford" : "Add to team"}
+                      data-testid={`quick-add-${idx}`}
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-[#FFD700] font-bold">£{suggestion.price || suggestion.estimated_price}M</div>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       )}
