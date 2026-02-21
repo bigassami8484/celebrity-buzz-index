@@ -34,6 +34,85 @@ def decode_html_entities(text: str) -> str:
     decoded = decoded.replace('â€™', "'").replace('â€"', "—").replace('â€œ', '"').replace('â€', '"')
     return decoded
 
+async def check_wikidata_is_human(page_ids: List[int]) -> dict:
+    """
+    Check Wikidata to see if Wikipedia pages are about humans.
+    Uses P31 (instance of) = Q5 (human) to verify.
+    Returns dict mapping page_id to True/False for human status.
+    """
+    if not page_ids:
+        return {}
+    
+    results = {}
+    try:
+        async with httpx.AsyncClient() as client:
+            # First get Wikidata IDs for the Wikipedia pages
+            page_ids_str = "|".join(str(pid) for pid in page_ids)
+            url = f"https://en.wikipedia.org/w/api.php?action=query&pageids={page_ids_str}&prop=pageprops&ppprop=wikibase_item&format=json"
+            
+            response = await client.get(url, timeout=10.0, headers={"User-Agent": "CelebrityBuzzIndex/1.0"})
+            if response.status_code != 200:
+                return {pid: False for pid in page_ids}
+            
+            data = response.json()
+            pages = data.get("query", {}).get("pages", {})
+            
+            # Map page_id to wikidata_id
+            wikidata_ids = {}
+            for page_id, page_data in pages.items():
+                wikibase_item = page_data.get("pageprops", {}).get("wikibase_item")
+                if wikibase_item:
+                    wikidata_ids[int(page_id)] = wikibase_item
+            
+            if not wikidata_ids:
+                return {pid: False for pid in page_ids}
+            
+            # Now query Wikidata to check if these entities are humans (P31 = Q5)
+            qids = list(wikidata_ids.values())
+            qids_str = " ".join(f"wd:{qid}" for qid in qids)
+            
+            # SPARQL query to check instance of (P31) = human (Q5)
+            sparql_query = f"""
+            SELECT ?item WHERE {{
+                VALUES ?item {{ {qids_str} }}
+                ?item wdt:P31 wd:Q5 .
+            }}
+            """
+            
+            sparql_url = "https://query.wikidata.org/sparql"
+            sparql_response = await client.get(
+                sparql_url,
+                params={"query": sparql_query, "format": "json"},
+                timeout=10.0,
+                headers={"User-Agent": "CelebrityBuzzIndex/1.0"}
+            )
+            
+            if sparql_response.status_code == 200:
+                sparql_data = sparql_response.json()
+                human_qids = set()
+                for binding in sparql_data.get("results", {}).get("bindings", []):
+                    item_uri = binding.get("item", {}).get("value", "")
+                    # Extract QID from URI like "http://www.wikidata.org/entity/Q76"
+                    if "/entity/" in item_uri:
+                        qid = item_uri.split("/entity/")[1]
+                        human_qids.add(qid)
+                
+                # Map back to page_ids
+                for page_id, qid in wikidata_ids.items():
+                    results[page_id] = qid in human_qids
+            
+            # Mark pages without wikidata IDs as non-human
+            for pid in page_ids:
+                if pid not in results:
+                    results[pid] = False
+                    
+    except Exception as e:
+        logger.error(f"Error checking Wikidata: {e}")
+        # On error, default to False (not human)
+        return {pid: False for pid in page_ids}
+    
+    return results
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
