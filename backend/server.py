@@ -513,16 +513,36 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     # Movies and TV shows
                     "cop", "90210", "hills", "housewives", "real housewives",
                     "ninja", "turtles", "wars", "trek", "rings", "thrones",
-                    # Places
-                    "beverly hills", "hollywood", "manhattan", "brooklyn"
+                    # Places - more comprehensive
+                    "beverly hills", "hollywood", "manhattan", "brooklyn",
+                    "heights", "township", "valley", "street", "road", "avenue",
+                    "neighborhood", "neighbourhood", "suburb", "area", "territory",
+                    "border", "crossing", "harbor", "harbour", "bay", "lake",
+                    "forest", "wood", "woods", "gardens", "square", "plaza"
                 ]
                 
                 # Known location/city names to always filter out
                 known_locations = [
+                    # European cities
                     "mariehamn", "helsinki", "stockholm", "oslo", "copenhagen",
                     "london", "paris", "berlin", "rome", "madrid", "amsterdam",
+                    "dublin", "lisbon", "vienna", "prague", "warsaw", "brussels",
+                    "zurich", "geneva", "manchester", "birmingham", "glasgow",
+                    "edinburgh", "liverpool", "leeds", "cardiff", "belfast",
+                    # US cities
                     "new york", "los angeles", "chicago", "houston", "phoenix",
-                    "beverly hills", "hollywood", "malibu", "miami", "las vegas"
+                    "beverly hills", "hollywood", "malibu", "miami", "las vegas",
+                    "san francisco", "seattle", "boston", "atlanta", "dallas",
+                    "denver", "detroit", "philadelphia", "san diego", "portland",
+                    # Areas/neighborhoods that match common names
+                    "leonard", "florence", "georgia", "victoria", "regina",
+                    "charlotte", "austin", "jackson", "lincoln", "madison",
+                    "hamilton", "nelson", "clinton", "jefferson", "washington",
+                    "kennedy", "roosevelt", "harrison", "taylor", "grant",
+                    # Countries
+                    "france", "germany", "italy", "spain", "portugal", "greece",
+                    "poland", "russia", "china", "japan", "india", "brazil",
+                    "canada", "australia", "mexico", "argentina", "chile"
                 ]
                 
                 # Known team/club patterns
