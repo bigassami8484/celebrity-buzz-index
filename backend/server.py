@@ -1316,6 +1316,10 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         birth_year = extract_birth_year_from_bio(wiki_info.get("bio", ""))
     age = calculate_age(birth_year)
     
+    # Check for Brown Bread premium pricing (for elderly celebrities)
+    temp_celeb = {"name": wiki_info["name"], "age": age, "is_deceased": is_deceased}
+    price = await apply_brown_bread_premium(temp_celeb, price)
+    
     # Create celebrity object
     celebrity = Celebrity(
         name=wiki_info["name"],
