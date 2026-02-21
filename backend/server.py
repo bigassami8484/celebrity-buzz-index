@@ -1232,6 +1232,9 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         # For consistency with Hot Celebs display, use fixed buzz score of 50
         default_buzz = 50
         new_price = get_dynamic_price(tier, default_buzz, existing.get("name", ""))
+        
+        # Check if this celeb qualifies for Brown Bread premium pricing
+        new_price = await apply_brown_bread_premium(existing, new_price)
         existing["price"] = new_price
         
         # Record price history
