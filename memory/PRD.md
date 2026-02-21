@@ -40,20 +40,27 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
   - 100% accurate filtering - no brands, animals, places
   - Verified: Gucci returns only people, Lion returns only Alfred Lion
 - ✅ A/B/C/D tier system with STRICT dynamic pricing (max £12M)
-- ✅ Dynamic pricing recalculated on every search/category view
+- ✅ **CONSISTENT PRICING** - uses default buzz score (50) for Hot Celebs, search, and categories
 - ✅ Saturday 12pm GMT transfer window (24 hours)
 - ✅ Brown Bread Watch with PREMIUM pricing (top 3 up to £15M)
 - ✅ **PRICE HISTORY TRACKING**:
   - MongoDB 'price_history' collection
   - Records price changes automatically
   - API endpoints: `/api/price-history/celebrity-name/{name}`, `/api/celebrity/{id}/price-history`
+  - Frontend modal with trend indicators
 - ✅ Price alerts system
 - ✅ Hot streak notifications (3+ days in news)
 - ✅ Profanity filter for team names
+- ✅ **CATEGORY DETECTION FIX**: Known actors (Michael Caine, Ian McKellen, Morgan Freeman, etc.) correctly classified as movie_stars
 
 ### UI Features
-- ✅ Scrolling banner shows CORRECT tier-based prices
-- ✅ "How It Works" with explanatory text under each icon
+- ✅ **HOT CELEBS SCROLLING TICKER** at top of page (replaced old banner)
+  - Shows photos, names, tiers, prices, and hot reasons
+  - Clickable - clicking triggers a search
+  - 10 randomized celebs per refresh
+  - New celebs added: Timothée Chalamet, Zendaya, Travis Kelce, Sydney Sweeney
+- ✅ "How It Works" with **BIGGER** explanatory text under each icon (text-[10px])
+  - Find any celeb, Tier pricing, Your budget, Transfer window, Brown Bread
 - ✅ Proper spacing between components
 - ✅ "Select a category or search for any celebrity" helper text
 - ✅ Category filter directly under search bar
