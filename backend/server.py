@@ -493,6 +493,10 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     if title_lower in known_locations:
                         continue
                     
+                    # Skip sports teams/clubs
+                    if any(pattern in title_lower for pattern in team_patterns):
+                        continue
+                    
                     # Skip if title contains non-person keywords
                     if any(kw in title_lower for kw in non_person_title_keywords):
                         continue
