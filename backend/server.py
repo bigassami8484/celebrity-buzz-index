@@ -1325,26 +1325,44 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     """Search for a celebrity and get their buzz data"""
     name = search.name.strip()
     
+    # FIRST: Check if this celeb is in the Hot Celebs cache - use that price for consistency
+    hot_celebs_cache = await db.news_cache.find_one(
+        {"type": "hot_celebs_from_news_v2"},
+        {"_id": 0}
+    )
+    hot_celeb_match = None
+    if hot_celebs_cache and hot_celebs_cache.get("hot_celebs"):
+        for hc in hot_celebs_cache["hot_celebs"]:
+            if hc.get("name", "").lower() == name.lower():
+                hot_celeb_match = hc
+                break
+    
     # Check if already in database
     existing = await db.celebrities.find_one({"name": {"$regex": f"^{name}$", "$options": "i"}}, {"_id": 0})
     if existing:
-        # Use CONSISTENT pricing - same as Hot Celebs (buzz_score = 50)
-        tier = existing.get("tier", "D")
-        # For consistency with Hot Celebs display, use fixed buzz score of 50
-        default_buzz = 50
-        new_price = get_dynamic_price(tier, default_buzz, existing.get("name", ""))
-        
-        # Check if this celeb qualifies for Brown Bread premium pricing
-        new_price = await apply_brown_bread_premium(existing, new_price)
-        existing["price"] = new_price
+        # If this celeb is in Hot Celebs, use that price (includes news premium)
+        if hot_celeb_match:
+            existing["price"] = hot_celeb_match["price"]
+            existing["tier"] = hot_celeb_match.get("tier", existing.get("tier", "D"))
+            existing["news_premium"] = hot_celeb_match.get("news_premium", False)
+            existing["trending_tag"] = hot_celeb_match.get("trending_tag", "")
+        else:
+            # Use CONSISTENT pricing - same as Hot Celebs (buzz_score = 50)
+            tier = existing.get("tier", "D")
+            default_buzz = 50
+            new_price = get_dynamic_price(tier, default_buzz, existing.get("name", ""))
+            
+            # Check if this celeb qualifies for Brown Bread premium pricing
+            new_price = await apply_brown_bread_premium(existing, new_price)
+            existing["price"] = new_price
         
         # Record price history
         await record_price_history(
             celebrity_id=existing.get("id", ""),
             celebrity_name=existing.get("name", ""),
-            price=new_price,
-            tier=tier,
-            buzz_score=existing.get("buzz_score", default_buzz)
+            price=existing["price"],
+            tier=existing.get("tier", "D"),
+            buzz_score=existing.get("buzz_score", 50)
         )
         
         return {"celebrity": existing}
