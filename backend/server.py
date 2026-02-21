@@ -159,12 +159,30 @@ FRONTEND_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://starpower-draft.
 
 # Banned words for team names (racist, offensive)
 BANNED_WORDS = [
+    # Racial slurs
     "nigger", "nigga", "faggot", "fag", "retard", "spic", "chink", "gook", 
     "kike", "wetback", "beaner", "coon", "darkie", "paki", "raghead", 
     "cracker", "honky", "nazi", "hitler", "kkk", "n1gger", "n1gga",
     "racist", "racism", "white power", "white supremacy", "heil", 
-    "jew", "jews", "holocaust", "aryan", "fuhrer", "reich",
-    "slave", "slavery", "lynch", "lynching", "genocide"
+    "holocaust", "aryan", "fuhrer", "reich",
+    "slave", "slavery", "lynch", "lynching", "genocide",
+    # Common swear words
+    "fuck", "fucking", "fucked", "fucker", "fck", "f*ck", "fu*k",
+    "shit", "shite", "sh1t", "bullshit", "horseshit",
+    "cunt", "c*nt", "cnt",
+    "bitch", "b1tch", "btch",
+    "ass", "arse", "asshole", "arsehole", "a$$",
+    "dick", "d1ck", "dickhead",
+    "cock", "c0ck", "cockhead",
+    "wanker", "wank", "tosser",
+    "twat", "tw4t",
+    "bastard", "bstrd",
+    "piss", "pissed",
+    "damn", "dammit", "goddamn",
+    "whore", "slut", "slag", "skank",
+    "bollocks", "balls",
+    # Leet speak variations
+    "f4g", "r3tard", "b1tch", "sh1t", "a55", "d1ck"
 ]
 
 # High-profile celebrities with boosted base prices (controversial/newsworthy)
