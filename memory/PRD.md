@@ -30,9 +30,10 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 ### Backend (FastAPI + MongoDB)
 - `/api/stats` - Player count and transfer window status (NO celebrity count)
 - `/api/pricing-info` - Tier pricing information and strategy guide
-- `/api/hot-celebs` - Hot celebrities with REAL Wikipedia photos
+- `/api/hot-celebs` - Hot celebrities RANDOMIZED on each refresh with real photos
+- `/api/price-alerts/{team_id}` - Price change alerts for team's celebrities
 - `/api/autocomplete?q=` - Wikipedia search with advanced filtering
-- `/api/todays-news` - Major celebrity news (filtered for quality)
+- `/api/todays-news` - Major celebrity news (filtered for quality, HTML entities decoded)
 - `/api/leaderboard` - Team rankings
 - `/api/team/*` - Team management endpoints
 - `/api/league/*` - Friends league endpoints
@@ -42,7 +43,7 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 ### Search Filtering (Wikipedia Autocomplete)
 Filters OUT:
 - Albums, songs, films, TV shows
-- Locations (cities, capitals like Mariehamn)
+- Locations (cities, capitals like Mariehamn, Helsinki)
 - Sports teams (IFK, FC, AFC, United, City)
 - Football/soccer clubs
 - Plants, animals, objects
@@ -75,14 +76,18 @@ Filters OUT:
 - ✅ Brown Bread Bonus (+100 for deceased)
 - ✅ Minimum buzz score of 5 points
 - ✅ Profanity filter for team names
+- ✅ Price alerts system for team's celebrities
 
 ### UI Features
-- ✅ Player count banner (removed celebrity count)
+- ✅ Player count banner (NO celebrity count)
 - ✅ Transfer window countdown
-- ✅ Hot Celebs This Week banner with REAL Wikipedia photos
-- ✅ Today's Top Celeb News (major news only, no gossip)
-- ✅ Search bar positioned ABOVE news section
+- ✅ Scrolling banner shows PRICE (not points)
+- ✅ Hot Celebs This Week - RANDOMIZED on each refresh with REAL photos
+- ✅ Today's Top Celeb News (major news only, HTML entities decoded)
+- ✅ Search bar positioned BEFORE news section
+- ✅ "Search for any celebrity or select a category below" helper text
 - ✅ Pricing tier info in methodology modal
+- ✅ Price Alerts panel in sidebar
 - ✅ Mobile responsive design with bottom navigation
 
 ### Social Features
@@ -92,15 +97,27 @@ Filters OUT:
 - ✅ Badge/achievement system
 - ✅ Hall of Fame
 
+## Hot Celebs Pool (30+ celebrities)
+Randomized from pool including:
+- **Royals**: Prince Andrew, Meghan Markle, Prince Harry, Kate Middleton, King Charles III
+- **Musicians**: Kanye West, Taylor Swift, Beyoncé, Drake, Rihanna, Ed Sheeran, Adele
+- **Tech/Business**: Elon Musk, Mark Zuckerberg, Jeff Bezos
+- **Politicians**: Donald Trump, Joe Biden
+- **Reality TV/UK**: Katie Price, Holly Willoughby, Phillip Schofield, Gemma Collins, Kerry Katona
+- **Actors**: Tom Cruise, Leonardo DiCaprio, Jennifer Lawrence, Brad Pitt, Angelina Jolie
+- **Sports**: Cristiano Ronaldo, David Beckham, Lewis Hamilton
+
 ## Bug Fixes (Feb 2026)
 - ✅ Fixed search returning plants (Holly genus)
-- ✅ Fixed search returning locations (Mariehamn)
-- ✅ Fixed search returning sports teams (IFK Mariehamn)
+- ✅ Fixed search returning locations (Mariehamn, capital cities)
+- ✅ Fixed search returning sports teams (IFK Mariehamn, football clubs)
 - ✅ Fixed "is a bar" substring false positive
 - ✅ Fixed route ordering for customization-options endpoint
 - ✅ Added accent normalization for celebrity names
 - ✅ Removed celebrity count from stats banner
 - ✅ Updated pricing display throughout app
+- ✅ Fixed HTML entities in news headlines (&amp; → &, &#8217; → ')
+- ✅ Replaced points with prices in scrolling banner
 
 ## News Sources
 - BBC News (priority - major news)
@@ -112,24 +129,13 @@ Filters OUT:
 
 News is filtered for MAJOR stories (deaths, divorces, awards, legal battles, scandals) and skips gossip.
 
-## Hot Celebs This Week
-Currently featuring with REAL Wikipedia photos:
-- Prince Andrew (Royal scandal & legal battles)
-- Meghan Markle (Netflix & Royal drama)
-- Kanye West (Controversy & headlines)
-- Taylor Swift (Eras Tour & awards)
-- Elon Musk (Tech & politics headlines)
-- Donald Trump (Political & legal news)
-- Katie Price (Tabloid regular)
-- Holly Willoughby (TV drama)
-
 ## Backlog / Future Features
 
 ### P1 (High Priority)
 - User authentication for persistent teams
 - Real news API integration (NewsAPI)
 - Automated weekly badge awards
-- Refresh hot celebs based on current news
+- Refresh hot celebs based on current trending news
 
 ### P2 (Medium Priority)
 - Celebrity comparison feature
