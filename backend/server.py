@@ -771,8 +771,13 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     tier = existing.get("tier", "D")
                     price = get_dynamic_price(tier, 50, actual_title)
                 else:
-                    # Estimate tier and price for new celebrities
-                    tier = estimate_tier_from_description(extract)
+                    # Check if in HOT_CELEBS_POOL for known tier
+                    pool_entry = next((c for c in HOT_CELEBS_POOL if c["name"].lower() == actual_title.lower()), None)
+                    if pool_entry:
+                        tier = pool_entry["tier"]
+                    else:
+                        # Estimate tier from description
+                        tier = estimate_tier_from_description(extract)
                     price = get_dynamic_price(tier, 50, actual_title)
                 
                 results.append({
