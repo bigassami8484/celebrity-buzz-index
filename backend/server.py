@@ -1201,6 +1201,10 @@ def determine_tier_from_bio(bio: str, name: str = "") -> str:
     if name_lower in GUARANTEED_A_LIST:
         return "A"
     
+    # Check for royal family members using partial keyword matching
+    if any(keyword in name_lower for keyword in ROYAL_A_LIST_KEYWORDS):
+        return "A"
+    
     # Check if guaranteed B-lister
     if name_lower in GUARANTEED_B_LIST:
         return "B"
