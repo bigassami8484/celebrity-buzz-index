@@ -1467,6 +1467,17 @@ function App() {
     }
   }, []);
 
+  // Fetch price alerts for team
+  const fetchPriceAlerts = useCallback(async (teamId) => {
+    if (!teamId) return;
+    try {
+      const res = await axios.get(`${API}/price-alerts/${teamId}`);
+      setPriceAlerts(res.data.alerts || []);
+    } catch (e) {
+      console.error("Error fetching price alerts:", e);
+    }
+  }, []);
+
   // Fetch team's leagues
   const fetchTeamLeagues = useCallback(async (teamId) => {
     try {
