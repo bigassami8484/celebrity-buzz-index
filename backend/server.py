@@ -45,13 +45,19 @@ async def check_wikidata_is_human(page_ids: List[int]) -> dict:
     
     results = {}
     try:
+        # Use a proper User-Agent as required by Wikipedia API
+        headers = {
+            "User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com; contact@example.com) httpx/0.27"
+        }
+        
         async with httpx.AsyncClient() as client:
             # First get Wikidata IDs for the Wikipedia pages
             page_ids_str = "|".join(str(pid) for pid in page_ids)
             url = f"https://en.wikipedia.org/w/api.php?action=query&pageids={page_ids_str}&prop=pageprops&ppprop=wikibase_item&format=json"
             
-            response = await client.get(url, timeout=10.0, headers={"User-Agent": "CelebrityBuzzIndex/1.0"})
+            response = await client.get(url, timeout=10.0, headers=headers)
             if response.status_code != 200:
+                logger.error(f"Wikipedia API error: {response.status_code}")
                 return {pid: False for pid in page_ids}
             
             data = response.json()
@@ -80,11 +86,15 @@ async def check_wikidata_is_human(page_ids: List[int]) -> dict:
             """
             
             sparql_url = "https://query.wikidata.org/sparql"
+            sparql_headers = {
+                "User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com; contact@example.com) httpx/0.27",
+                "Accept": "application/sparql-results+json"
+            }
             sparql_response = await client.get(
                 sparql_url,
                 params={"query": sparql_query, "format": "json"},
-                timeout=10.0,
-                headers={"User-Agent": "CelebrityBuzzIndex/1.0"}
+                timeout=15.0,
+                headers=sparql_headers
             )
             
             if sparql_response.status_code == 200:
@@ -100,6 +110,8 @@ async def check_wikidata_is_human(page_ids: List[int]) -> dict:
                 # Map back to page_ids
                 for page_id, qid in wikidata_ids.items():
                     results[page_id] = qid in human_qids
+            else:
+                logger.error(f"Wikidata SPARQL error: {sparql_response.status_code}")
             
             # Mark pages without wikidata IDs as non-human
             for pid in page_ids:
