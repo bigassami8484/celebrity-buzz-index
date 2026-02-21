@@ -98,7 +98,37 @@ const PointsMethodology = ({ onClose }) => (
           </div>
         </div>
         
-        <h4 className="font-bold text-white mb-3">Tier Multipliers</h4>
+        <h4 className="font-bold text-white mb-3">Tier Pricing (Dynamic)</h4>
+        <div className="space-y-2 mb-6">
+          <div className="bg-[#FFD700] text-black p-2 flex justify-between items-center">
+            <span className="font-bold">A-LIST</span>
+            <span className="text-sm">£9m-£12m • High scoring but expensive</span>
+          </div>
+          <div className="bg-[#C0C0C0] text-black p-2 flex justify-between items-center">
+            <span className="font-bold">B-LIST</span>
+            <span className="text-sm">£5m-£8m • Balanced steady picks</span>
+          </div>
+          <div className="bg-[#CD7F32] text-white p-2 flex justify-between items-center">
+            <span className="font-bold">C-LIST</span>
+            <span className="text-sm">£2m-£4m • Risk/reward</span>
+          </div>
+          <div className="bg-[#666666] text-white p-2 flex justify-between items-center">
+            <span className="font-bold">D-LIST</span>
+            <span className="text-sm">£0.5m-£1.5m • Cheap wildcards</span>
+          </div>
+        </div>
+        
+        <div className="bg-[#00F0FF]/10 border border-[#00F0FF] p-4 mb-4">
+          <h4 className="font-bold text-[#00F0FF] mb-2">📈 Dynamic Pricing</h4>
+          <p className="text-sm text-[#A1A1AA]">Prices fluctuate weekly based on media coverage. Hot celebs cost more, quiet celebs cost less!</p>
+        </div>
+        
+        <div className="bg-[#FF0099]/20 border border-[#FF0099] p-4 mb-4">
+          <h4 className="font-bold text-[#FF0099] mb-2">🕐 Transfer Window</h4>
+          <p className="text-sm text-[#A1A1AA]">Opens every <span className="text-white font-bold">Saturday at 12pm GMT</span> for 24 hours. Make your moves!</p>
+        </div>
+        
+        <h4 className="font-bold text-white mb-3">Points Multipliers</h4>
         <div className="grid grid-cols-2 gap-2 mb-6">
           <div className="bg-[#FFD700] text-black p-2 text-center text-sm font-bold">A-LIST: 1.0x</div>
           <div className="bg-[#C0C0C0] text-black p-2 text-center text-sm font-bold">B-LIST: 1.2x</div>
