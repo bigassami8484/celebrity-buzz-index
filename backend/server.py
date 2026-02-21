@@ -13,6 +13,8 @@ import httpx
 import json
 import re
 import unicodedata
+import html
+import random
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 
 def normalize_text(text: str) -> str:
@@ -21,6 +23,16 @@ def normalize_text(text: str) -> str:
     normalized = unicodedata.normalize('NFD', text)
     # Remove combining characters (accents)
     return ''.join(c for c in normalized if not unicodedata.combining(c)).lower()
+
+def decode_html_entities(text: str) -> str:
+    """Decode HTML entities like &amp; &#8217; etc. to readable text"""
+    if not text:
+        return text
+    # Decode HTML entities
+    decoded = html.unescape(text)
+    # Clean up any remaining issues
+    decoded = decoded.replace('â€™', "'").replace('â€"', "—").replace('â€œ', '"').replace('â€', '"')
+    return decoded
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
