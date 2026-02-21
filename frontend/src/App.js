@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import "@/App.css";
 import axios from "axios";
 import { Toaster, toast } from "sonner";
-import { Search, Crown, Film, Tv, Music, Trophy, Star, Share2, X, Copy, Check, TrendingUp, Minus, Plus, Users, Info, ChevronUp, Newspaper, ArrowLeftRight, Skull, Facebook, UserPlus, Home, Clock, Bell } from "lucide-react";
+import { Search, Crown, Film, Tv, Music, Trophy, Star, Share2, X, Copy, Check, TrendingUp, TrendingDown, Minus, Plus, Users, Info, ChevronUp, Newspaper, ArrowLeftRight, Skull, Facebook, UserPlus, Home, Clock, Bell, LineChart } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
