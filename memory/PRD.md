@@ -205,14 +205,19 @@ Response format:
 - ✅ Hot Celebs dynamic pricing - COMPLETED
 - ✅ How It Works explainer text - COMPLETED
 - ✅ **Title Size Fix** - COMPLETED (Dec 2025)
-  - Desktop: 12-14rem (192-224px) 
-  - Mobile: 2.25-2.75rem (36-44px)
+  - Desktop: 6-8rem (96-128px) - well balanced
+  - Mobile: 2.75-3.25rem (44-52px) - increased for readability
 - ✅ **Authentication System** - COMPLETED (Dec 2025)
   - Emergent Google OAuth (no API keys required)
   - Magic Link email login (requires RESEND_API_KEY for production)
   - Sign In button in header
   - Auth modal with Google + Email options
   - User menu with logout
+- ✅ **Save My Team Prompt** - COMPLETED (Dec 2025)
+  - Shows for guest users after adding celebrities
+  - 3-second delay for better UX
+  - "Sign In to Save" and "Later" options
+- ✅ **Mobile Bottom Tabs Removed** - COMPLETED (Dec 2025)
 - 🔄 Hot Streak Notifications - Backend ready, needs full UI
 
 ### P1 (High Priority)
