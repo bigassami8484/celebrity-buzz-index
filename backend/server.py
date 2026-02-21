@@ -1220,6 +1220,25 @@ async def fetch_wikipedia_info(name: str) -> dict:
                     except:
                         pass
                 
+                # Try Wikidata P18 (image) property as another backup
+                if not wiki_image:
+                    try:
+                        wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={name.replace(' ', '_')}&props=claims&format=json"
+                        wd_response = await client.get(wikidata_url, timeout=5.0, headers=headers)
+                        if wd_response.status_code == 200:
+                            wd_data = wd_response.json()
+                            entities = wd_data.get("entities", {})
+                            for entity in entities.values():
+                                claims = entity.get("claims", {})
+                                if "P18" in claims:  # P18 is the image property
+                                    img_file = claims["P18"][0]["mainsnak"]["datavalue"]["value"]
+                                    # URL encode the filename for Commons
+                                    img_file_encoded = img_file.replace(" ", "_")
+                                    wiki_image = f"https://commons.wikimedia.org/wiki/Special:FilePath/{img_file_encoded}?width=400"
+                                    break
+                    except:
+                        pass
+                
                 # If still no image, use a styled placeholder with initials
                 if not wiki_image:
                     # Create a nice gradient placeholder using UI Avatars
