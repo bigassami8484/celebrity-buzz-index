@@ -50,24 +50,31 @@ async def generate_ai_celebrity_image(name: str, description: str = "") -> Optio
             logger.warning("No EMERGENT_LLM_KEY found for AI image generation")
             return None
         
-        # Create a prompt for a stylized celebrity portrait
-        # Keep it generic to avoid likeness issues
-        prompt = f"A professional stylized artistic portrait photo of a celebrity named {name}. "
-        if description:
-            # Extract key details from description
-            desc_lower = description.lower()
-            if "actor" in desc_lower or "actress" in desc_lower:
-                prompt += "Hollywood actor/actress style, dramatic lighting. "
-            elif "singer" in desc_lower or "musician" in desc_lower:
-                prompt += "Music artist style, stage presence vibe. "
-            elif "footballer" in desc_lower or "soccer" in desc_lower:
-                prompt += "Professional athlete, sports portrait style. "
-            elif "model" in desc_lower:
-                prompt += "Fashion model style, editorial lighting. "
-            else:
-                prompt += "Celebrity portrait style, professional photography. "
+        # Create a generic professional portrait prompt
+        # Avoid using celebrity names to prevent safety system issues
+        desc_lower = (description or "").lower()
         
-        prompt += "High quality, clean background, portrait orientation, photorealistic style."
+        # Determine profession/style based on description
+        if "actor" in desc_lower or "actress" in desc_lower or "film" in desc_lower:
+            style = "A professional Hollywood headshot portrait of an elegant person in dramatic studio lighting"
+        elif "singer" in desc_lower or "musician" in desc_lower or "music" in desc_lower:
+            style = "A professional portrait of a stylish music artist with creative lighting and modern aesthetic"
+        elif "footballer" in desc_lower or "soccer" in desc_lower or "athlete" in desc_lower or "sports" in desc_lower:
+            style = "A professional sports portrait of an athletic person with dynamic energy"
+        elif "model" in desc_lower or "fashion" in desc_lower:
+            style = "A high fashion editorial portrait with elegant lighting and sophisticated styling"
+        elif "royal" in desc_lower or "prince" in desc_lower or "princess" in desc_lower:
+            style = "A dignified formal portrait with classic elegant lighting"
+        elif "reality" in desc_lower or "media" in desc_lower or "personality" in desc_lower:
+            style = "A modern social media influencer style portrait with trendy aesthetic"
+        elif "chef" in desc_lower or "cook" in desc_lower:
+            style = "A professional portrait of a culinary expert in a kitchen setting"
+        elif "comedian" in desc_lower or "comic" in desc_lower:
+            style = "A warm friendly portrait with expressive lighting"
+        else:
+            style = "A professional celebrity headshot portrait with elegant studio lighting"
+        
+        prompt = f"{style}. High quality photography, clean background, portrait orientation, photorealistic, 8k resolution."
         
         image_gen = OpenAIImageGeneration(api_key=api_key)
         images = await image_gen.generate_images(
