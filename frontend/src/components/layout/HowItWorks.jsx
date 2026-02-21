@@ -25,7 +25,7 @@ const HowItWorks = ({ onShowMethodology }) => (
         <div className="w-10 h-10 bg-[#00F0FF] flex items-center justify-center mx-auto mb-2">
           <Star className="w-5 h-5 text-black" />
         </div>
-        <h4 className="font-space font-bold text-sm">£0.5-12M</h4>
+        <h4 className="font-space font-bold text-sm">£0.5-15M</h4>
         <p className="text-xs text-[#A1A1AA] mt-1">Tier pricing</p>
       </div>
       <div className="text-center">
