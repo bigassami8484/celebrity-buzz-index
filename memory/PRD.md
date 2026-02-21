@@ -32,63 +32,58 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - `/api/pricing-info` - Tier pricing information and strategy guide
 - `/api/hot-celebs` - Hot celebrities RANDOMIZED on each refresh with real photos
 - `/api/price-alerts/{team_id}` - Price change alerts for team's celebrities
+- `/api/hot-streaks/{team_id}` - Hot streak notifications (3+ days in news)
 - `/api/autocomplete?q=` - Wikipedia search with advanced filtering
 - `/api/todays-news` - Major celebrity news (filtered for quality, HTML entities decoded)
+- `/api/trending` - Trending celebrities with CORRECT dynamic pricing
 - `/api/leaderboard` - Team rankings
 - `/api/team/*` - Team management endpoints
 - `/api/league/*` - Friends league endpoints
 - `/api/hall-of-fame` - Top players with badges
 - `/api/brown-bread-watch` - Elderly celebrities with risk levels
 
-### Search Filtering (Wikipedia Autocomplete)
-Filters OUT:
-- Albums, songs, films, TV shows
-- Locations (cities, capitals like Mariehamn, Helsinki)
-- Sports teams (IFK, FC, AFC, United, City)
-- Football/soccer clubs
-- Plants, animals, objects
-- Non-celebrities
+### UI Layout (Top to Bottom)
+1. Stats Banner (Player count + Transfer window countdown)
+2. Header
+3. Trending Ticker (with PRICES not points)
+4. How It Works
+5. **Search Bar** (with helper text below)
+6. **Category Filter** (directly under search)
+7. Hot Celebs This Week (randomized)
+8. Today's Top Celeb News
+9. Celebrity Grid + Sidebar
 
-### Points Calculation
-- News Mentions: +1.0 point per article
-- Tabloid Coverage: +3.0 points (Daily Mail, Sun, TMZ)
-- Broadsheet Coverage: +2.0 points (BBC, Guardian, Times)
-- Controversy Bonus: +25.0 points per scandal
-- Social Media Trending: +5.0 points per event
-- **Brown Bread Bonus: +100 points** if celebrity passes away
-- **Minimum Buzz Score: 5 points**
-- **Tier Multipliers**: A=1.0x, B=1.2x, C=1.5x, D=2.0x
-
-### Team Rules
-- **Budget: £50M**
-- **Max team size: 10 players**
-- **1 transfer per week** (during Saturday window)
+### Sidebar Components
+1. Team Panel
+2. League Panel
+3. **Price Alerts** (upcoming price changes)
+4. **Hot Streaks** (3+ days in news notifications)
+5. Top Picked Celebs
+6. Brown Bread Watch
+7. Leaderboard
+8. Hall of Fame button
 
 ## What's Been Implemented (Feb 2026)
 
 ### Core Features
 - ✅ Full FastAPI backend with all endpoints
 - ✅ Wikipedia autocomplete search with advanced filtering
-- ✅ Accent-normalized search (Beyoncé, Rihanna work without accents)
 - ✅ A/B/C/D tier system with DYNAMIC pricing
 - ✅ Saturday 12pm GMT transfer window (24 hours)
-- ✅ Controversial celebrity price boosts
 - ✅ Brown Bread Bonus (+100 for deceased)
-- ✅ Minimum buzz score of 5 points
+- ✅ Price alerts system
+- ✅ Hot streak notifications (3+ days in news)
 - ✅ Profanity filter for team names
-- ✅ Price alerts system for team's celebrities
 
 ### UI Features
-- ✅ Player count banner (NO celebrity count)
-- ✅ Transfer window countdown
-- ✅ Scrolling banner shows PRICE (not points)
-- ✅ Hot Celebs This Week - RANDOMIZED on each refresh with REAL photos
-- ✅ Today's Top Celeb News (major news only, HTML entities decoded)
-- ✅ Search bar positioned BEFORE news section
-- ✅ "Search for any celebrity or select a category below" helper text
-- ✅ Pricing tier info in methodology modal
+- ✅ Scrolling banner shows PRICE (correct for tier ranges)
+- ✅ Category filter moved UNDER search bar
+- ✅ Search helper text: "Search for any celebrity or select a category below"
+- ✅ Hot Celebs RANDOMIZED on each refresh with real Wikipedia photos
+- ✅ News headlines cleaned (HTML entities decoded)
 - ✅ Price Alerts panel in sidebar
-- ✅ Mobile responsive design with bottom navigation
+- ✅ Hot Streaks panel in sidebar
+- ✅ Mobile responsive design
 
 ### Social Features
 - ✅ Team sharing (WhatsApp, X, Facebook)
@@ -108,26 +103,11 @@ Randomized from pool including:
 - **Sports**: Cristiano Ronaldo, David Beckham, Lewis Hamilton
 
 ## Bug Fixes (Feb 2026)
-- ✅ Fixed search returning plants (Holly genus)
-- ✅ Fixed search returning locations (Mariehamn, capital cities)
-- ✅ Fixed search returning sports teams (IFK Mariehamn, football clubs)
-- ✅ Fixed "is a bar" substring false positive
-- ✅ Fixed route ordering for customization-options endpoint
-- ✅ Added accent normalization for celebrity names
-- ✅ Removed celebrity count from stats banner
-- ✅ Updated pricing display throughout app
-- ✅ Fixed HTML entities in news headlines (&amp; → &, &#8217; → ')
-- ✅ Replaced points with prices in scrolling banner
-
-## News Sources
-- BBC News (priority - major news)
-- The Guardian (priority - major news)
-- TMZ
-- People
-- Page Six
-- Daily Mail
-
-News is filtered for MAJOR stories (deaths, divorces, awards, legal battles, scandals) and skips gossip.
+- ✅ Fixed scrolling banner prices to use correct tier ranges
+- ✅ Fixed trending endpoint to recalculate dynamic prices
+- ✅ Moved category filter under search bar
+- ✅ Fixed HTML entities in news headlines
+- ✅ Hot celebs randomized on each refresh
 
 ## Backlog / Future Features
 
@@ -135,7 +115,6 @@ News is filtered for MAJOR stories (deaths, divorces, awards, legal battles, sca
 - User authentication for persistent teams
 - Real news API integration (NewsAPI)
 - Automated weekly badge awards
-- Refresh hot celebs based on current trending news
 
 ### P2 (Medium Priority)
 - Celebrity comparison feature
