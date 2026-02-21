@@ -290,6 +290,7 @@ const HotCelebsBanner = ({ celebs, onSelect }) => {
       <div className="max-w-7xl mx-auto">
         <h3 className="font-anton text-lg uppercase tracking-tight text-white mb-3 flex items-center gap-2">
           🔥 Hot Celebs This Week
+          <span className="text-xs font-normal text-[#A1A1AA]">(prices increase with news coverage)</span>
         </h3>
         <div className="hot-celebs-scroll-container">
           <div className="hot-celebs-scroll-content">
@@ -311,9 +312,17 @@ const HotCelebsBanner = ({ celebs, onSelect }) => {
                   }`}>
                     {celeb.tier}-LIST
                   </div>
+                  {celeb.trending_tag && (
+                    <div className="absolute top-0 left-0 text-[10px]">
+                      {celeb.trending_tag}
+                    </div>
+                  )}
                 </div>
                 <p className="font-bold text-xs text-white truncate group-hover:text-[#FF0099]">{celeb.name}</p>
-                <p className="text-[10px] text-[#00FF00] font-bold">£{celeb.price}M</p>
+                <p className={`text-[10px] font-bold ${celeb.news_premium ? 'text-[#FF6B00]' : 'text-[#00FF00]'}`}>
+                  £{celeb.price}M
+                  {celeb.news_premium && <span className="text-[8px] ml-1">📈</span>}
+                </p>
               </div>
             ))}
           </div>
