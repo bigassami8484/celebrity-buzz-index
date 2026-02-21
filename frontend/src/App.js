@@ -1207,7 +1207,7 @@ const SearchBar = ({ onSearch, loading }) => {
 };
 
 // Celebrity Card Component
-const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford }) => {
+const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford, onShowPriceHistory }) => {
   const [showNews, setShowNews] = useState(false);
   const Icon = categoryIcons[celebrity.category] || Star;
   
@@ -1236,6 +1236,18 @@ const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford }) => {
         <div className="absolute top-3 left-3">
           <TierBadge tier={celebrity.tier || "D"} />
         </div>
+        {/* Price history button top right */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onShowPriceHistory(celebrity.name);
+          }}
+          className="absolute top-3 right-3 bg-[#0A0A0A]/80 p-1.5 hover:bg-[#FF0099] transition-colors"
+          title="View price history"
+          data-testid={`price-history-btn-${celebrity.id}`}
+        >
+          <LineChart className="w-4 h-4 text-[#00F0FF]" />
+        </button>
         <div className="celebrity-card-overlay">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
             <span className="category-badge flex items-center gap-1">
