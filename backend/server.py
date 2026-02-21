@@ -762,7 +762,11 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                 "metropolitan area", "urban area", "incorporated city",
                                 "unincorporated community", "census-designated",
                                 "within the city", "in the city of", "located in the",
-                                "is a neighborhood in", "is an area of", "is a suburb of"
+                                "is a neighborhood in", "is an area of", "is a suburb of",
+                                # Awards and objects
+                                "is the highest", "is the most prestigious", "is a military decoration",
+                                "is a medal", "is an award", "is a trophy", "is a prize",
+                                "is a decoration of the"
                             ]
                             
                             if any(kw in desc_lower for kw in non_person_description_keywords):
