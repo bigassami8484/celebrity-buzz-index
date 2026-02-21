@@ -553,160 +553,140 @@ C_LIST_INDICATORS = ["known for", "appeared in", "featured", "contestant", "part
 # ==================== HELPER FUNCTIONS ====================
 
 async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
-    """Search Wikipedia for celebrity suggestions - returns ONE result per person only"""
+    """
+    Search Wikipedia for celebrity suggestions - ONLY returns humans (verified via Wikidata P31=Q5).
+    This uses the Wikidata API to filter out places, bands, objects, companies and other non-person entities.
+    """
     try:
         headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (contact@example.com)"}
         query_lower = query.lower().strip()
-        query_parts = query_lower.split()  # Split query into words for matching
+        query_parts = query_lower.split()
         
-        logger.info(f"Autocomplete search for: {query}, parts: {query_parts}")
+        logger.info(f"Autocomplete search for: {query}")
         
         async with httpx.AsyncClient() as client:
-            # Use Wikipedia search API for better results with descriptions
-            url = f"https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={query}&srlimit=25&format=json"
-            response = await client.get(url, timeout=5.0, headers=headers)
-            if response.status_code == 200:
-                data = response.json()
-                search_results = data.get("query", {}).get("search", [])
+            # Step 1: Search Wikipedia and get page IDs
+            url = f"https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={query}&srlimit=30&format=json"
+            response = await client.get(url, timeout=8.0, headers=headers)
+            
+            if response.status_code != 200:
+                return []
+            
+            data = response.json()
+            search_results = data.get("query", {}).get("search", [])
+            
+            if not search_results:
+                return []
+            
+            # Quick title filters (obvious non-people)
+            quick_skip_keywords = [
+                "filmography", "discography", "bibliography", "awards", "album", 
+                "list of", "category:", "template:", "wikipedia:", "soundtrack",
+                "video game", "tour", "concert", "episode", "series", "season",
+                "fc", "cf", "afc", "united", "club", "team", "stadium"
+            ]
+            
+            # Filter candidates and collect page IDs
+            candidates = []
+            for item in search_results:
+                title = item.get("title", "")
+                page_id = item.get("pageid")
+                title_lower = title.lower()
+                title_normalized = normalize_text(title)
                 
-                # Keywords that indicate this is NOT a person - FILTER OUT from title
-                non_person_title_keywords = [
-                    "filmography", "discography", "bibliography", "awards", "album", 
-                    "song", "band", "tv series", "television series", "movie", "film",
-                    "list of", "category:", "template:", "wikipedia:", "soundtrack",
-                    "video game", "book", "novel", "tour", "concert", "episode",
-                    "podcast", "show", "series", "programme", "program", "season",
-                    "city", "town", "village", "municipality", "district", "commune",
-                    "company", "single", "ep", "videography", "christmas special",
-                    "fc", "cf", "afc", "united", "club", "team", "stadium", "records",
-                    "child", "montana", "potter", "etc", "good girl", "sasha fierce",
-                    "cowboy carter", "future nostalgia", "radical optimism", "gimme more",
-                    "jean", "is paris", "this is", "agreement", "métro", "metro",
-                    "race", "marathon", "rally", "championship", "cup", "trophy",
-                    "brest", "event", "cycling", "festival", "award", "prize",
-                    "airport", "station", "hotel", "resort", "beach", "island",
-                    "mountain", "river", "park", "museum", "gallery", "cathedral",
-                    "church", "school", "university", "college", "hospital",
-                    "haunted", "haunt", "ghost", "location", "place", "site",
-                    "capital", "county", "region", "province", "state", "country",
-                    # Movies and TV shows
-                    "cop", "90210", "hills", "housewives", "real housewives",
-                    "ninja", "turtles", "wars", "trek", "rings", "thrones",
-                    # Places - more comprehensive
-                    "beverly hills", "hollywood", "manhattan", "brooklyn",
-                    "heights", "township", "valley", "street", "road", "avenue",
-                    "neighborhood", "neighbourhood", "suburb", "area", "territory",
-                    "border", "crossing", "harbor", "harbour", "bay", "lake",
-                    "forest", "wood", "woods", "gardens", "square", "plaza"
-                ]
+                # Check if query appears in the name
+                query_in_name = any(
+                    qpart in title_normalized or 
+                    any(qpart in word for word in title_normalized.split())
+                    for qpart in query_parts
+                )
+                if not query_in_name:
+                    continue
                 
-                # Known location/city names to always filter out
-                known_locations = [
-                    # European cities
-                    "mariehamn", "helsinki", "stockholm", "oslo", "copenhagen",
-                    "london", "paris", "berlin", "rome", "madrid", "amsterdam",
-                    "dublin", "lisbon", "vienna", "prague", "warsaw", "brussels",
-                    "zurich", "geneva", "manchester", "birmingham", "glasgow",
-                    "edinburgh", "liverpool", "leeds", "cardiff", "belfast",
-                    # US cities
-                    "new york", "los angeles", "chicago", "houston", "phoenix",
-                    "beverly hills", "hollywood", "malibu", "miami", "las vegas",
-                    "san francisco", "seattle", "boston", "atlanta", "dallas",
-                    "denver", "detroit", "philadelphia", "san diego", "portland",
-                    # Areas/neighborhoods that match common names
-                    "leonard", "florence", "georgia", "victoria", "regina",
-                    "charlotte", "austin", "jackson", "lincoln", "madison",
-                    "hamilton", "nelson", "clinton", "jefferson", "washington",
-                    "kennedy", "roosevelt", "harrison", "taylor", "grant",
-                    # Countries
-                    "france", "germany", "italy", "spain", "portugal", "greece",
-                    "poland", "russia", "china", "japan", "india", "brazil",
-                    "canada", "australia", "mexico", "argentina", "chile"
-                ]
+                # Quick skip obvious non-people
+                if any(kw in title_lower for kw in quick_skip_keywords):
+                    continue
                 
-                # Known team/club patterns
-                team_patterns = ["ifk", "afc", "bfc", "cfc", "dfc", "fc ", " fc", "united", "city", "rovers", "athletic"]
+                # Skip titles with colons, commas, ampersands (usually not people)
+                if ":" in title or "," in title or "&" in title:
+                    continue
                 
-                results = []
-                seen_base_names = set()
+                # Skip titles starting with "The" or "List"
+                if title_lower.startswith("the ") or title_lower.startswith("list "):
+                    continue
                 
-                pass  # Results received
+                candidates.append({
+                    "title": title,
+                    "page_id": page_id,
+                    "snippet": item.get("snippet", "")
+                })
+            
+            if not candidates:
+                return []
+            
+            # Step 2: Use Wikidata to verify which are humans (P31 = Q5)
+            page_ids = [c["page_id"] for c in candidates if c["page_id"]]
+            human_status = await check_wikidata_is_human(page_ids)
+            
+            # Filter to only humans
+            human_candidates = [c for c in candidates if human_status.get(c["page_id"], False)]
+            
+            if not human_candidates:
+                logger.info(f"No humans found for query: {query}")
+                return []
+            
+            # Step 3: Get full page info for verified humans
+            human_page_ids = [str(c["page_id"]) for c in human_candidates[:10]]  # Limit to 10
+            info_url = f"https://en.wikipedia.org/w/api.php?action=query&pageids={'|'.join(human_page_ids)}&prop=extracts|pageimages|info&exintro=true&explaintext=true&pithumbsize=300&inprop=url&format=json"
+            
+            info_response = await client.get(info_url, timeout=8.0, headers=headers)
+            
+            if info_response.status_code != 200:
+                return []
+            
+            info_data = info_response.json()
+            pages = info_data.get("query", {}).get("pages", {})
+            
+            results = []
+            seen_names = set()
+            
+            for candidate in human_candidates[:10]:
+                page_id = str(candidate["page_id"])
+                page_info = pages.get(page_id, {})
                 
-                for item in search_results:
-                    title = item.get("title", "")
-                    snippet = item.get("snippet", "").lower()
-                    title_lower = title.lower()
-                    title_normalized = normalize_text(title)  # Remove accents for matching
-                    
-                    # CRITICAL: The search query must appear in the person's actual NAME
-                    # This prevents returning people who are just associated with the query
-                    title_words = title_normalized.split()
-                    query_in_name = any(
-                        qpart in title_normalized or 
-                        any(qpart in word for word in title_words)
-                        for qpart in query_parts
-                    )
-                    if not query_in_name:
-                        continue
-                    
-                    # Skip known location names
-                    if title_lower in known_locations:
-                        continue
-                    
-                    # Skip sports teams/clubs
-                    if any(pattern in title_lower for pattern in team_patterns):
-                        continue
-                    
-                    # Skip if title contains non-person keywords
-                    if any(kw in title_lower for kw in non_person_title_keywords):
-                        continue
-                    
-                    # Skip if title has dashes with location patterns (Paris–Brest–Paris)
-                    if "–" in title or "—" in title:
-                        continue
-                    
-                    # Skip if title has parentheses UNLESS it's a role descriptor like (musician), (actor)
-                    if "(" in title:
-                        # Allow if parentheses contain role descriptors
-                        paren_content = title.split("(")[1].split(")")[0].lower() if ")" in title else ""
-                        allowed_roles = ["musician", "actor", "actress", "singer", "rapper", "footballer",
-                                        "politician", "presenter", "comedian", "director", "writer",
-                                        "athlete", "businessman", "model", "chef", "host", "dancer",
-                                        "duke", "duchess", "prince", "princess", "royal", "queen", "king"]
-                        if not any(role in paren_content for role in allowed_roles):
-                            continue
-                    
-                    # Skip titles with colons (usually shows, specials, etc.)
-                    if ":" in title:
-                        pass  # Filtered out
-                        continue
-                    
-                    # Skip titles with commas (usually "Place, Place" patterns)
-                    if "," in title:
-                        pass  # Filtered out
-                        continue
-                    
-                    # Skip titles with ampersands (usually TV shows like "Ginny & Georgia")
-                    if "&" in title or " and " in title_lower:
-                        pass  # Filtered out
-                        continue
-                    
-                    # Skip titles starting with "The" (usually shows, bands, etc.)
-                    if title_lower.startswith("the "):
-                        pass  # Filtered out
-                        continue
-                    
-                    # Skip titles starting with "For " (usually songs, albums)
-                    if title_lower.startswith("for "):
-                        pass  # Filtered out
-                        continue
-                    
-                    # Skip plurals that are likely nationalities/groups (Georgians, Americans, etc.)
-                    if len(title.split()) == 1 and title_lower.endswith("ians"):
-                        pass  # Filtered out
-                        continue
-                    
-                    # Skip if same word repeated (like "Paris Paris", "Simon Simon")
+                title = page_info.get("title", candidate["title"])
+                extract = page_info.get("extract", "")[:300]
+                image = page_info.get("thumbnail", {}).get("source", "")
+                wiki_url = page_info.get("fullurl", f"https://en.wikipedia.org/wiki/{title.replace(' ', '_')}")
+                
+                # Skip duplicates
+                base_name = title.split("(")[0].strip().lower()
+                if base_name in seen_names:
+                    continue
+                seen_names.add(base_name)
+                
+                # Estimate tier and price
+                tier = estimate_tier_from_description(extract)
+                price = get_dynamic_price(tier, 10, title)
+                
+                results.append({
+                    "name": title,
+                    "description": extract or f"{title} is a notable person.",
+                    "image": image or f"https://ui-avatars.com/api/?name={title}&size=150&background=FF0099&color=fff",
+                    "wiki_url": wiki_url,
+                    "estimated_tier": tier,
+                    "estimated_price": price
+                })
+                
+                if len(results) >= 5:
+                    break
+            
+            logger.info(f"Wikidata-verified autocomplete returning {len(results)} humans for '{query}'")
+            return results
+            
+    except Exception as e:
+        logger.error(f"Wikipedia autocomplete error: {e}")
+        return []
                     words = title.split()
                     if len(words) >= 2 and words[0].lower() == words[1].lower():
                         pass  # Filtered out
