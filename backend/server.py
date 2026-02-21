@@ -602,8 +602,23 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                         pass  # Filtered out
                         continue
                     
+                    # Skip titles with commas (usually "Place, Place" patterns)
+                    if "," in title:
+                        pass  # Filtered out
+                        continue
+                    
                     # Skip titles starting with "The" (usually shows, bands, etc.)
                     if title_lower.startswith("the "):
+                        pass  # Filtered out
+                        continue
+                    
+                    # Skip titles starting with "For " (usually songs, albums)
+                    if title_lower.startswith("for "):
+                        pass  # Filtered out
+                        continue
+                    
+                    # Skip plurals that are likely nationalities/groups (Georgians, Americans, etc.)
+                    if len(title.split()) == 1 and title_lower.endswith("ians"):
                         pass  # Filtered out
                         continue
                     
