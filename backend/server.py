@@ -636,10 +636,9 @@ C_LIST_INDICATORS = ["known for", "appeared in", "featured", "contestant", "part
 async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
     """
     Search Wikipedia for celebrity suggestions - ONLY returns humans (verified via Wikidata P31=Q5).
-    This uses the Wikidata API to filter out places, bands, objects, companies and other non-person entities.
+    Uses OpenSearch API for better partial name matching, then Wikidata for human verification.
     """
     try:
-        # Use a proper User-Agent as required by Wikipedia API
         headers = {
             "User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com; contact@example.com) httpx/0.27"
         }
@@ -649,17 +648,17 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
         logger.info(f"Autocomplete search for: {query}")
         
         async with httpx.AsyncClient() as client:
-            # Step 1: Search Wikipedia and get page IDs
-            url = f"https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={query}&srlimit=30&format=json"
-            response = await client.get(url, timeout=8.0, headers=headers)
+            # Step 1: Use OpenSearch API for better name matching
+            opensearch_url = f"https://en.wikipedia.org/w/api.php?action=opensearch&search={query}&limit=20&format=json"
+            response = await client.get(opensearch_url, timeout=8.0, headers=headers)
             
             if response.status_code != 200:
                 return []
             
             data = response.json()
-            search_results = data.get("query", {}).get("search", [])
+            titles = data[1] if len(data) > 1 else []
             
-            if not search_results:
+            if not titles:
                 return []
             
             # Quick title filters (obvious non-people)
@@ -667,70 +666,66 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 "filmography", "discography", "bibliography", "awards", "album", 
                 "list of", "category:", "template:", "wikipedia:", "soundtrack",
                 "video game", "tour", "concert", "episode", "series", "season",
-                "fc", "cf", "afc", "united", "club", "team", "stadium"
+                "fc", "cf", "afc", "united", "club", "team", "stadium", "'s ", " of "
             ]
             
-            # Filter candidates and collect page IDs
+            # Filter candidates
             candidates = []
-            for item in search_results:
-                title = item.get("title", "")
-                page_id = item.get("pageid")
+            for title in titles:
                 title_lower = title.lower()
-                title_normalized = normalize_text(title)
-                
-                # Check if query appears in the name (more flexible matching)
-                # Allow partial word matches (e.g., "att" matches "attenborough")
-                query_in_name = False
-                for qpart in query_parts:
-                    if qpart in title_normalized:
-                        query_in_name = True
-                        break
-                    # Check if any word in title starts with qpart
-                    for word in title_normalized.split():
-                        if word.startswith(qpart):
-                            query_in_name = True
-                            break
-                    if query_in_name:
-                        break
-                
-                if not query_in_name:
-                    continue
                 
                 # Quick skip obvious non-people
                 if any(kw in title_lower for kw in quick_skip_keywords):
                     continue
                 
-                # Skip titles with colons, commas, ampersands (usually not people)
-                if ":" in title or "," in title or "&" in title:
+                # Skip titles with colons (usually not people)
+                if ":" in title:
                     continue
                 
                 # Skip titles starting with "The" or "List"
                 if title_lower.startswith("the ") or title_lower.startswith("list "):
                     continue
                 
-                candidates.append({
-                    "title": title,
-                    "page_id": page_id,
-                    "snippet": item.get("snippet", "")
-                })
+                candidates.append(title)
             
             if not candidates:
                 return []
             
-            # Step 2: Use Wikidata to verify which are humans (P31 = Q5)
-            page_ids = [c["page_id"] for c in candidates if c["page_id"]]
+            # Step 2: Get page IDs for candidates
+            titles_param = "|".join(candidates[:15])
+            pageids_url = f"https://en.wikipedia.org/w/api.php?action=query&titles={titles_param}&format=json"
+            pageids_response = await client.get(pageids_url, timeout=8.0, headers=headers)
+            
+            if pageids_response.status_code != 200:
+                return []
+            
+            pageids_data = pageids_response.json()
+            pages = pageids_data.get("query", {}).get("pages", {})
+            
+            # Map titles to page IDs
+            title_to_pageid = {}
+            for page_id, page_info in pages.items():
+                if page_id != "-1":
+                    title_to_pageid[page_info.get("title", "")] = int(page_id)
+            
+            page_ids = list(title_to_pageid.values())
+            
+            if not page_ids:
+                return []
+            
+            # Step 3: Use Wikidata to verify which are humans (P31 = Q5)
             human_status = await check_wikidata_is_human(page_ids)
             
             # Filter to only humans
-            human_candidates = [c for c in candidates if human_status.get(c["page_id"], False)]
+            human_titles = [t for t, pid in title_to_pageid.items() if human_status.get(pid, False)]
             
-            if not human_candidates:
+            if not human_titles:
                 logger.info(f"No humans found for query: {query}")
                 return []
             
-            # Step 3: Get full page info for verified humans
-            human_page_ids = [str(c["page_id"]) for c in human_candidates[:15]]  # Get more to sort
-            info_url = f"https://en.wikipedia.org/w/api.php?action=query&pageids={'|'.join(human_page_ids)}&prop=extracts|pageimages|info&exintro=true&explaintext=true&pithumbsize=300&inprop=url&format=json"
+            # Step 4: Get full page info for verified humans
+            human_titles_param = "|".join(human_titles[:10])
+            info_url = f"https://en.wikipedia.org/w/api.php?action=query&titles={human_titles_param}&prop=extracts|pageimages|info&exintro=true&explaintext=true&pithumbsize=300&inprop=url&format=json"
             
             info_response = await client.get(info_url, timeout=8.0, headers=headers)
             
@@ -743,11 +738,19 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
             results = []
             seen_names = set()
             
-            for candidate in human_candidates[:15]:
-                page_id = str(candidate["page_id"])
-                page_info = pages.get(page_id, {})
+            # Process in order of human_titles (which preserves opensearch relevance)
+            for title in human_titles[:10]:
+                # Find the page info for this title
+                page_info = None
+                for pid, pinfo in pages.items():
+                    if pinfo.get("title", "").lower() == title.lower():
+                        page_info = pinfo
+                        break
                 
-                title = page_info.get("title", candidate["title"])
+                if not page_info:
+                    continue
+                
+                title = page_info.get("title", title)
                 extract = page_info.get("extract", "")[:300]
                 image = page_info.get("thumbnail", {}).get("source", "")
                 wiki_url = page_info.get("fullurl", f"https://en.wikipedia.org/wiki/{title.replace(' ', '_')}")
@@ -762,42 +765,24 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 tier = estimate_tier_from_description(extract)
                 price = get_dynamic_price(tier, 50, title)
                 
-                # Calculate match score - prioritize names that start with or closely match query
-                title_lower = title.lower()
-                match_score = 0
-                if title_lower.startswith(query_lower):
-                    match_score = 100  # Exact start match
-                elif title_lower.replace(" ", "").startswith(query_lower.replace(" ", "")):
-                    match_score = 90
-                else:
-                    # Check how many query parts match at word starts
-                    title_words = title_lower.split()
-                    for i, qpart in enumerate(query_parts):
-                        for j, word in enumerate(title_words):
-                            if word.startswith(qpart):
-                                match_score += 20 - i - j  # Earlier matches score higher
-                
                 results.append({
                     "name": title,
                     "description": extract or f"{title} is a notable person.",
                     "image": image or f"https://ui-avatars.com/api/?name={title}&size=150&background=FF0099&color=fff",
                     "wiki_url": wiki_url,
                     "estimated_tier": tier,
-                    "estimated_price": price,
-                    "_match_score": match_score
+                    "estimated_price": price
                 })
-            
-            # Sort by match score (best matches first)
-            results.sort(key=lambda x: x.get("_match_score", 0), reverse=True)
-            
-            # Remove internal score and limit to 5
-            for r in results:
-                r.pop("_match_score", None)
-            
-            results = results[:5]
+                
+                if len(results) >= 5:
+                    break
             
             logger.info(f"Wikidata-verified autocomplete returning {len(results)} humans for '{query}'")
             return results
+            
+    except Exception as e:
+        logger.error(f"Wikipedia autocomplete error: {e}")
+        return []
             
     except Exception as e:
         logger.error(f"Wikipedia autocomplete error: {e}")
