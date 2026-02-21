@@ -453,7 +453,15 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     "airport", "station", "hotel", "resort", "beach", "island",
                     "mountain", "river", "park", "museum", "gallery", "cathedral",
                     "church", "school", "university", "college", "hospital",
-                    "haunted", "haunt", "ghost", "location", "place", "site"
+                    "haunted", "haunt", "ghost", "location", "place", "site",
+                    "capital", "county", "region", "province", "state", "country"
+                ]
+                
+                # Known location/city names to always filter out
+                known_locations = [
+                    "mariehamn", "helsinki", "stockholm", "oslo", "copenhagen",
+                    "london", "paris", "berlin", "rome", "madrid", "amsterdam",
+                    "new york", "los angeles", "chicago", "houston", "phoenix"
                 ]
                 
                 results = []
