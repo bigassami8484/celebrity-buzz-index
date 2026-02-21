@@ -1122,7 +1122,7 @@ const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford }) => {
             e.target.src = `https://ui-avatars.com/api/?name=${celebrity.name}&size=400&background=FF0099&color=fff`;
           }}
         />
-        <div className="buzz-score" data-testid={`buzz-score-${celebrity.id}`}>
+        <div className="buzz-score hidden" data-testid={`buzz-score-${celebrity.id}`}>
           {celebrity.buzz_score?.toFixed(1)}
         </div>
         {/* Tier badge top left */}
