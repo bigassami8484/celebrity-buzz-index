@@ -687,7 +687,33 @@ GUARANTEED_A_LIST = [
     "oprah winfrey", "kim kardashian", "elon musk", "jeff bezos", "cristiano ronaldo",
     "lionel messi", "lebron james", "serena williams", "roger federer", "michael jordan",
     "david beckham", "prince william", "prince harry", "kate middleton", "queen elizabeth",
-    "king charles", "barack obama", "donald trump", "joe biden", "bill gates"
+    "king charles", "barack obama", "donald trump", "joe biden", "bill gates",
+    # Additional mega-stars
+    "britney spears", "madonna", "michael jackson", "jennifer lopez", "shakira",
+    "eminem", "jay-z", "jay z", "snoop dogg", "50 cent", "nicki minaj", "cardi b",
+    "selena gomez", "miley cyrus", "katy perry", "demi lovato", "the weeknd",
+    "tom brady", "tiger woods", "usain bolt", "muhammad ali", "mike tyson",
+    "meryl streep", "nicole kidman", "cate blanchett", "natalie portman", "emma watson",
+    "george clooney", "matt damon", "ben affleck", "keanu reeves", "morgan freeman",
+    "samuel l. jackson", "samuel l jackson", "al pacino", "robert de niro", "jack nicholson"
+]
+
+# Guaranteed B-list celebrities (not quite A-list but definitely not C or D)
+GUARANTEED_B_LIST = [
+    "shia labeouf", "megan fox", "lindsay lohan", "paris hilton", "nicole richie",
+    "pete davidson", "machine gun kelly", "mgk", "post malone", "travis scott",
+    "kylie jenner", "kendall jenner", "khloe kardashian", "kourtney kardashian",
+    "gigi hadid", "bella hadid", "cara delevingne", "emily ratajkowski",
+    "zac efron", "channing tatum", "ryan reynolds", "chris pratt", "chris evans",
+    "henry cavill", "jason momoa", "idris elba", "tom hardy", "benedict cumberbatch"
+]
+
+# Guaranteed C-list celebrities (TV personalities, chefs, etc.)
+GUARANTEED_C_LIST = [
+    "gordon ramsay", "jamie oliver", "simon cowell", "piers morgan", "james corden",
+    "jimmy fallon", "jimmy kimmel", "ellen degeneres", "graham norton", "alan carr",
+    "rylan clark", "phillip schofield", "holly willoughby", "amanda holden",
+    "ant mcpartlin", "declan donnelly", "dermot o'leary", "davina mccall"
 ]
 
 # ==================== HELPER FUNCTIONS ====================
