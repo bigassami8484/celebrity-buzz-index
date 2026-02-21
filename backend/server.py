@@ -1640,7 +1640,9 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         # Regenerate news if empty or missing
         if not existing.get("news") or len(existing.get("news", [])) == 0:
             category = existing.get("category", "other")
-            news = await generate_celebrity_news(celeb_name, category)
+            # Get real news context from hot celebs if available
+            real_news_context = hot_celeb_match.get("hot_reason") if hot_celeb_match else None
+            news = await generate_celebrity_news(celeb_name, category, real_news_context)
             existing["news"] = news
             # Update in database
             await db.celebrities.update_one(
