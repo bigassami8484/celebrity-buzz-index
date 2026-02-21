@@ -193,10 +193,13 @@ function App() {
 
   const fetchHotCelebs = useCallback(async () => {
     try {
+      console.log("Fetching hot celebs from API...");
       const celebs = await fetchHotCelebsAPI();
-      setHotCelebs(celebs);
+      console.log("Hot celebs received:", celebs?.length || 0);
+      setHotCelebs(celebs || []);
     } catch (e) {
       console.error("Error fetching hot celebs:", e);
+      setHotCelebs([]);
     }
   }, []);
 
