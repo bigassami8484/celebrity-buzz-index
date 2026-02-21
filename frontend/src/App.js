@@ -2493,6 +2493,15 @@ function App() {
         
         <TodaysNews news={todaysNews} />
         
+        {/* Center Content - Brown Bread, Most Picked, Leaderboard */}
+        <div className="hidden lg:block mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <BrownBreadWatch watchList={brownBreadWatch} onSelect={searchCelebrity} />
+            <TopPickedCelebs celebs={topPicked} onSelect={searchCelebrity} />
+            <Leaderboard entries={leaderboard} />
+          </div>
+        </div>
+        
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
           {/* Main Content */}
           <div className="lg:col-span-8 space-y-6">
@@ -2505,13 +2514,17 @@ function App() {
             />
           </div>
           
-          {/* Sidebar */}
+          {/* Sidebar - Only Price Alerts, Hot Streaks, and Hall of Fame on desktop */}
           <div className="lg:col-span-4 space-y-6">
             <PriceAlerts alerts={priceAlerts} teamId={team?.id} />
             <HotStreaks streaks={hotStreaks} teamId={team?.id} />
-            <TopPickedCelebs celebs={topPicked} onSelect={searchCelebrity} />
-            <BrownBreadWatch watchList={brownBreadWatch} onSelect={searchCelebrity} />
-            <Leaderboard entries={leaderboard} />
+            
+            {/* Show these only on mobile - they're in center section on desktop */}
+            <div className="lg:hidden">
+              <TopPickedCelebs celebs={topPicked} onSelect={searchCelebrity} />
+              <BrownBreadWatch watchList={brownBreadWatch} onSelect={searchCelebrity} />
+              <Leaderboard entries={leaderboard} />
+            </div>
             
             {/* Hall of Fame Button */}
             <button
