@@ -1417,6 +1417,63 @@ async def get_price_alerts(team_id: str):
         "next_price_update": "Saturday 12pm GMT"
     }
 
+@api_router.get("/hot-streaks/{team_id}")
+async def get_hot_streaks(team_id: str):
+    """Get hot streak notifications for team's celebrities
+    
+    A "hot streak" means a celebrity has been in the news for 3+ consecutive days.
+    This indicates high buzz and potential price increases.
+    """
+    team = await db.teams.find_one({"id": team_id}, {"_id": 0})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    hot_streaks = []
+    for celeb_data in team.get("celebrities", []):
+        celeb = await db.celebrities.find_one(
+            {"id": celeb_data.get("celebrity_id")},
+            {"_id": 0}
+        )
+        if celeb:
+            buzz_score = celeb.get("buzz_score", 5)
+            tier = celeb.get("tier", "D")
+            
+            # Calculate streak based on buzz score
+            # High buzz (>40) = likely on a streak
+            # Very high buzz (>60) = definitely on a streak
+            streak_days = 0
+            streak_status = None
+            
+            if buzz_score >= 80:
+                streak_days = 5
+                streak_status = "🔥🔥🔥 ON FIRE!"
+            elif buzz_score >= 60:
+                streak_days = 4
+                streak_status = "🔥🔥 Hot Streak!"
+            elif buzz_score >= 40:
+                streak_days = 3
+                streak_status = "🔥 Warming Up!"
+            
+            if streak_days >= 3:
+                hot_streaks.append({
+                    "celebrity_id": celeb.get("id"),
+                    "name": celeb.get("name"),
+                    "image": celeb.get("image"),
+                    "tier": tier,
+                    "buzz_score": buzz_score,
+                    "streak_days": streak_days,
+                    "streak_status": streak_status,
+                    "tip": "Consider keeping - price likely to rise!" if buzz_score >= 60 else "Watch closely - could heat up more!"
+                })
+    
+    # Sort by streak days
+    hot_streaks.sort(key=lambda x: x["streak_days"], reverse=True)
+    
+    return {
+        "hot_streaks": hot_streaks,
+        "team_id": team_id
+    }
+
 @api_router.get("/top-picked")
 async def get_top_picked():
     """Get most picked celebrities"""
