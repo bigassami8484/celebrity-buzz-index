@@ -2087,7 +2087,7 @@ function App() {
         <TodaysNews news={todaysNews} />
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
-          {/* Sidebar - Team Panel */}
+          {/* Main Content */}
           <div className="lg:col-span-8 space-y-6">
             <TeamPanel 
               team={team} 
@@ -2102,6 +2102,10 @@ function App() {
               onJoinLeague={joinLeague}
               onViewLeague={viewLeague}
             />
+          </div>
+          
+          {/* Sidebar */}
+          <div className="lg:col-span-4 space-y-6">
             <PriceAlerts alerts={priceAlerts} teamId={team?.id} />
             <HotStreaks streaks={hotStreaks} teamId={team?.id} />
             <TopPickedCelebs celebs={topPicked} onSelect={searchCelebrity} />
