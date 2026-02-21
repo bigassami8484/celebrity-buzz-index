@@ -1954,6 +1954,7 @@ function App() {
                     onAdd={addToTeam}
                     isInTeam={isInTeam(celeb.id)}
                     canAfford={canAfford(celeb.price)}
+                    onShowPriceHistory={handleShowPriceHistory}
                   />
                 ))}
               </div>
