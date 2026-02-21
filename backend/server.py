@@ -509,14 +509,20 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     "mountain", "river", "park", "museum", "gallery", "cathedral",
                     "church", "school", "university", "college", "hospital",
                     "haunted", "haunt", "ghost", "location", "place", "site",
-                    "capital", "county", "region", "province", "state", "country"
+                    "capital", "county", "region", "province", "state", "country",
+                    # Movies and TV shows
+                    "cop", "90210", "hills", "housewives", "real housewives",
+                    "ninja", "turtles", "wars", "trek", "rings", "thrones",
+                    # Places
+                    "beverly hills", "hollywood", "manhattan", "brooklyn"
                 ]
                 
                 # Known location/city names to always filter out
                 known_locations = [
                     "mariehamn", "helsinki", "stockholm", "oslo", "copenhagen",
                     "london", "paris", "berlin", "rome", "madrid", "amsterdam",
-                    "new york", "los angeles", "chicago", "houston", "phoenix"
+                    "new york", "los angeles", "chicago", "houston", "phoenix",
+                    "beverly hills", "hollywood", "malibu", "miami", "las vegas"
                 ]
                 
                 # Known team/club patterns
