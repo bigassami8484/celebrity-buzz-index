@@ -408,17 +408,60 @@ TRENDING_CELEBRITIES = {
     "other": ["David Beckham", "Gordon Ramsay", "Bear Grylls", "Jeremy Clarkson", "James Corden"],
 }
 
-# HOT CELEBS - Big names consistently in major news (rotate weekly)
-HOT_CELEBS_THIS_WEEK = [
+# HOT CELEBS POOL - Large pool to randomly select from on each refresh
+HOT_CELEBS_POOL = [
+    # Royals
     {"name": "Prince Andrew", "reason": "Royal scandal & legal battles", "tier": "A", "category": "royals"},
     {"name": "Meghan Markle", "reason": "Netflix & Royal drama", "tier": "A", "category": "royals"},
+    {"name": "Prince Harry", "reason": "Spare memoir revelations", "tier": "A", "category": "royals"},
+    {"name": "Kate Middleton", "reason": "Royal duties & fashion", "tier": "A", "category": "royals"},
+    {"name": "King Charles III", "reason": "Royal family head", "tier": "A", "category": "royals"},
+    # Musicians
     {"name": "Kanye West", "reason": "Controversy & headlines", "tier": "A", "category": "musicians"},
     {"name": "Taylor Swift", "reason": "Eras Tour & awards", "tier": "A", "category": "musicians"},
+    {"name": "Beyoncé", "reason": "Renaissance & Grammys", "tier": "A", "category": "musicians"},
+    {"name": "Drake", "reason": "Music & feuds", "tier": "A", "category": "musicians"},
+    {"name": "Rihanna", "reason": "Fenty & fashion empire", "tier": "A", "category": "musicians"},
+    {"name": "Ed Sheeran", "reason": "Tours & legal battles", "tier": "A", "category": "musicians"},
+    {"name": "Adele", "reason": "Vegas residency", "tier": "A", "category": "musicians"},
+    # Tech/Business
     {"name": "Elon Musk", "reason": "Tech & politics headlines", "tier": "A", "category": "other"},
+    {"name": "Mark Zuckerberg", "reason": "Meta & AI news", "tier": "A", "category": "other"},
+    {"name": "Jeff Bezos", "reason": "Space & business", "tier": "A", "category": "other"},
+    # Politicians
     {"name": "Donald Trump", "reason": "Political & legal news", "tier": "A", "category": "other"},
+    {"name": "Joe Biden", "reason": "Political headlines", "tier": "A", "category": "other"},
+    # Reality TV/UK
     {"name": "Katie Price", "reason": "Tabloid regular", "tier": "B", "category": "reality_tv"},
     {"name": "Holly Willoughby", "reason": "TV drama", "tier": "B", "category": "tv_actors"},
+    {"name": "Phillip Schofield", "reason": "TV scandal", "tier": "B", "category": "tv_actors"},
+    {"name": "Gemma Collins", "reason": "Reality star antics", "tier": "C", "category": "reality_tv"},
+    {"name": "Kerry Katona", "reason": "Tabloid stories", "tier": "C", "category": "reality_tv"},
+    # Actors
+    {"name": "Tom Cruise", "reason": "Mission Impossible & stunts", "tier": "A", "category": "movie_stars"},
+    {"name": "Leonardo DiCaprio", "reason": "Film & dating life", "tier": "A", "category": "movie_stars"},
+    {"name": "Jennifer Lawrence", "reason": "Film & fashion", "tier": "A", "category": "movie_stars"},
+    {"name": "Brad Pitt", "reason": "Films & personal life", "tier": "A", "category": "movie_stars"},
+    {"name": "Angelina Jolie", "reason": "Humanitarian & acting", "tier": "A", "category": "movie_stars"},
+    # Sports
+    {"name": "Cristiano Ronaldo", "reason": "Football & brand deals", "tier": "A", "category": "athletes"},
+    {"name": "David Beckham", "reason": "Business & family", "tier": "A", "category": "athletes"},
+    {"name": "Lewis Hamilton", "reason": "F1 & fashion", "tier": "A", "category": "athletes"},
 ]
+
+def get_random_hot_celebs(count: int = 8) -> list:
+    """Get a random selection of hot celebs from the pool"""
+    # Ensure we have a good mix of tiers
+    a_list = [c for c in HOT_CELEBS_POOL if c["tier"] == "A"]
+    b_list = [c for c in HOT_CELEBS_POOL if c["tier"] in ["B", "C"]]
+    
+    # Pick mostly A-list with some B/C list
+    selected = random.sample(a_list, min(6, len(a_list)))
+    if b_list:
+        selected += random.sample(b_list, min(2, len(b_list)))
+    
+    random.shuffle(selected)
+    return selected[:count]
 
 # A-list indicators (keywords that suggest high fame)
 A_LIST_INDICATORS = ["oscar", "grammy", "emmy", "golden globe", "bafta", "world cup winner", 
