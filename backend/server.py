@@ -1387,10 +1387,13 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     buzz_score = calculate_buzz_score(news)
     
     # Final price using CONSISTENT buzz (50) for initial display price
-    # This ensures prices match what's shown in Hot Celebs ticker
-    # The stored buzz_score is still the actual calculated value for tracking
     default_buzz = 50
     price = get_dynamic_price(tier, default_buzz, wiki_info["name"])
+    
+    # If this celeb is in Hot Celebs, use that price (includes news premium)
+    if hot_celeb_match:
+        price = hot_celeb_match["price"]
+        tier = hot_celeb_match.get("tier", tier)
     
     # Check if celebrity is deceased (look for death date in bio)
     bio_lower = wiki_info.get("bio", "").lower()
@@ -1402,9 +1405,10 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         birth_year = extract_birth_year_from_bio(wiki_info.get("bio", ""))
     age = calculate_age(birth_year)
     
-    # Check for Brown Bread premium pricing (for elderly celebrities)
-    temp_celeb = {"name": wiki_info["name"], "age": age, "is_deceased": is_deceased}
-    price = await apply_brown_bread_premium(temp_celeb, price)
+    # Check for Brown Bread premium pricing (for elderly celebrities) - only if not already in Hot Celebs
+    if not hot_celeb_match:
+        temp_celeb = {"name": wiki_info["name"], "age": age, "is_deceased": is_deceased}
+        price = await apply_brown_bread_premium(temp_celeb, price)
     
     # Create celebrity object
     celebrity = Celebrity(
