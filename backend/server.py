@@ -614,7 +614,7 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                 pass  # Filtered out
                                 continue
                             
-                            # Additional filter for non-person entities (plants, animals, objects, etc.)
+                            # Additional filter for non-person entities (plants, animals, objects, locations)
                             non_person_description_keywords = [
                                 "is a genus", "is a species", "is a family of", "is a type of",
                                 "is a plant", "is a tree", "is a flower", "is a shrub",
@@ -622,7 +622,11 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                 "is a guitar", "is an instrument", "is a car", "is a vehicle",
                                 "is a brand", "is a company", "is a product", "is a software",
                                 "is a website", "is a game", "is an app", "flowering plants",
-                                "is a genus of", "are a genus", "is a common name"
+                                "is a genus of", "are a genus", "is a common name",
+                                "is the capital", "is a capital", "is the largest city",
+                                "is a seaport", "is a port", "is located on", "is situated",
+                                "with a population", "inhabitants", "square kilometres",
+                                "square miles", "administrative centre"
                             ]
                             
                             if any(kw in desc_lower for kw in non_person_description_keywords):
