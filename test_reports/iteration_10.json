@@ -1,0 +1,110 @@
+{
+  "summary": "All 8 requested bug fixes tested and verified. Search autocomplete correctly filters out locations/places/countries for 'leonard', 'georgia', 'florence', and 'victoria' queries. Hot Celebs shows correct dynamic prices matching tier ranges (A-list £9-12M, B-list £5-8M, C-list £2-4M, D-list £0.5-1.5M). Hot Celebs randomizes on page refresh. How It Works section has explainer text below icons. Green price text in Hot Celebs is smaller (text-[8px]).",
+  
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "Search 'leonard' returns only people (Kawhi Leonard, Leonard Cohen, Leonard Nimoy, Sugar Ray Leonard, Leonard Bernstein) - NO locations",
+    "Search 'georgia' returns only celebrities (Georgia O'Keeffe, Georgia Holt, Georgia Tennant, Georgia May Jagger, Georgia Toffolo) - NO places/universities",
+    "Search 'florence' returns only people (Florence Welch, Florence Nightingale, Florence Hunt, Florence Pugh, Florence Price) - NO prisons",
+    "Search 'victoria' returns only people (Queen Victoria, Victoria Beckham, Victoria Starmer, Victoria Justice, Victoria Mboko) - NO awards",
+    "Hot Celebs endpoint returns 8 celebrities with correct data",
+    "Hot Celebs prices match tier ranges: A-list £9-12M, B-list £5-8M, C-list £2-4M, D-list £0.5-1.5M",
+    "Hot Celebs randomizes on page refresh (verified with 3 refreshes)",
+    "Hot Celebs has required fields (name, tier, price, image)",
+    "Pricing endpoint returns correct tier ranges",
+    "Trending ticker shows correct prices matching tiers",
+    "How It Works section has explainer text: 'Search for any celebrity • Prices range from £0.5m-£12m based on tier & buzz • Draft a team of 10 with your £50M budget • Transfer window opens Sat 12pm GMT • Earn +100 bonus if a celeb passes away'",
+    "Hot Celebs banner price text uses text-[8px] class (smaller green text)"
+  ],
+
+  "test_report_links": [
+    "/app/backend/tests/test_iteration_10_bug_fixes.py",
+    "/app/test_reports/pytest/iteration_10_results.xml"
+  ],
+  
+  "action_items": [],
+  
+  "critical_code_review_comments": [],
+  
+  "updated_files": [
+    "/app/backend/tests/test_iteration_10_bug_fixes.py"
+  ],
+  
+  "success_rate": {
+    "backend": "100% (10/10 tests passed)",
+    "frontend": "100% (all UI features verified via Playwright)"
+  },
+  
+  "seed_data_creation": "None - used existing data",
+  
+  "retest_needed": false,
+  
+  "should_main_agent_self_test": false,
+  
+  "context_for_next_testing_agent": "All 8 bug fixes from iteration 10 verified: (1) Search 'leonard' returns only people, no locations. (2) Search 'georgia' returns only celebrities, no places/universities. (3) Search 'florence' returns only people, no prisons. (4) Search 'victoria' returns only people, no awards. (5) Hot Celebs shows correct dynamic prices based on tier (A £9-12M, B £5-8M, C £2-4M, D £0.5-1.5M). (6) Hot Celebs randomizes on page refresh. (7) How It Works has explainer text below icons. (8) Hot Celebs price text is smaller (text-[8px]).",
+  
+  "verification_details": {
+    "search_filtering": {
+      "status": "PASS",
+      "leonard_results": ["Kawhi Leonard", "Leonard Cohen", "Leonard Nimoy", "Sugar Ray Leonard", "Leonard Bernstein"],
+      "georgia_results": ["Georgia O'Keeffe", "Georgia Holt", "Georgia Tennant", "Georgia May Jagger", "Georgia Toffolo"],
+      "florence_results": ["Florence Welch", "Florence Nightingale", "Florence Hunt", "Florence Pugh", "Florence Price"],
+      "victoria_results": ["Queen Victoria", "Victoria Beckham", "Victoria Starmer", "Victoria Justice", "Victoria Mboko"],
+      "locations_filtered": true,
+      "prisons_filtered": true,
+      "awards_filtered": true
+    },
+    "hot_celebs_pricing": {
+      "status": "PASS",
+      "sample_prices": {
+        "Adele": {"tier": "A", "price": "£9.5M", "valid": true},
+        "Holly Willoughby": {"tier": "B", "price": "£6.3M", "valid": true},
+        "Prince Andrew": {"tier": "A", "price": "£10.3M", "valid": true},
+        "Kate Middleton": {"tier": "A", "price": "£10.3M", "valid": true},
+        "Phillip Schofield": {"tier": "B", "price": "£6.3M", "valid": true},
+        "David Beckham": {"tier": "C", "price": "£2.4M", "valid": true}
+      },
+      "all_prices_within_tier_ranges": true
+    },
+    "hot_celebs_randomization": {
+      "status": "PASS",
+      "first_load": ["Holly Willoughby", "Donald Trump", "Mark Zuckerberg", "David Beckham", "Phillip Schofield", "Rihanna", "Tom Cruise", "Kanye West"],
+      "after_refresh": ["Mark Zuckerberg", "Jennifer Lawrence", "Kate Middleton", "Holly Willoughby", "Jeff Bezos", "Cristiano Ronaldo", "Phillip Schofield", "Ed Sheeran"],
+      "randomizes": true
+    },
+    "how_it_works_explainer": {
+      "status": "PASS",
+      "explainer_text_present": true,
+      "contains_search_info": true,
+      "contains_price_range": true,
+      "contains_budget_info": true,
+      "contains_transfer_window": true,
+      "contains_brown_bread_bonus": true
+    },
+    "hot_celebs_price_text_size": {
+      "status": "PASS",
+      "css_class": "text-[8px]",
+      "smaller_than_before": true
+    },
+    "scrolling_ticker_prices": {
+      "status": "PASS",
+      "sample_prices": {
+        "Ed Sheeran": {"tier": "D-LIST", "price": "£0.9M"},
+        "Gemma Collins": {"tier": "C-LIST", "price": "£2.4M"},
+        "David Beckham": {"tier": "C-LIST", "price": "£2.4M"},
+        "Gordon Ramsay": {"tier": "D-LIST", "price": "£0.7M"},
+        "Tom Holland": {"tier": "A-LIST", "price": "£9.5M"}
+      }
+    }
+  }
+}
