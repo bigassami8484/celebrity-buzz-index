@@ -35,7 +35,7 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 
 ### Core Features
 - ✅ Full FastAPI backend with all endpoints
-- ✅ Wikipedia autocomplete search with advanced filtering
+- ✅ Wikipedia autocomplete search with **ADVANCED FILTERING** (no locations, places, films, universities, awards)
 - ✅ A/B/C/D tier system with STRICT dynamic pricing (max £12M)
 - ✅ Saturday 12pm GMT transfer window (24 hours)
 - ✅ Brown Bread Watch with PREMIUM pricing (top 3 up to £15M)
@@ -48,7 +48,9 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - ✅ "Select a category or search for any celebrity" helper text (gold, under search)
 - ✅ Category filter directly under search bar
 - ✅ Hot Celebs RANDOMIZED on each refresh with real Wikipedia photos
-- ✅ News headlines cleaned (HTML entities decoded)
+- ✅ Hot Celebs uses DYNAMIC pricing based on tier and buzz
+- ✅ "How It Works" section with explainer text
+- ✅ News headlines cleaned (HTML entities decoded) - limited to 6 articles
 - ✅ Price Alerts panel in sidebar
 - ✅ Hot Streaks panel in sidebar
 - ✅ Brown Bread Watch with PREMIUM tags for top 3
@@ -68,6 +70,20 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - ✅ Badge/achievement system
 - ✅ Hall of Fame
 
+### Search Filtering (Updated Feb 21, 2026)
+- ✅ Filters out locations, cities, countries, areas
+- ✅ Filters out films, TV shows, albums, songs
+- ✅ Filters out universities, schools, institutions
+- ✅ Filters out awards, medals, decorations
+- ✅ Filters out prisons, hospitals, buildings
+- ✅ Only returns actual people/celebrities
+
+**Tested Search Queries:**
+- "leonard" → Kawhi Leonard, Leonard Cohen, Leonard Nimoy ✅
+- "georgia" → Georgia O'Keeffe, Georgia Holt, Georgia Tennant ✅
+- "florence" → Florence Welch, Florence Pugh, Florence Nightingale ✅
+- "victoria" → Queen Victoria, Victoria Beckham, Victoria Justice ✅
+
 ## Example Prices (Verified)
 **Trending Celebs:**
 - Ed Sheeran: D-LIST £0.9M ✅
@@ -77,6 +93,12 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Tom Holland: A-LIST £9.5M ✅
 - Katie Price: D-LIST £0.7M ✅
 
+**Hot Celebs (Dynamic Pricing):**
+- Adele: A-LIST £9.5M ✅
+- Prince Harry: A-LIST £10.3M ✅
+- Kate Middleton: A-LIST £10.3M ✅
+- Kerry Katona: C-LIST £2.9M ✅
+
 **Brown Bread Watch:**
 - Michael Caine (Age 93): £15M ⭐ PREMIUM
 - Judi Dench (Age 92): £13M ⭐ PREMIUM
@@ -85,6 +107,12 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Al Pacino (Age 86): £9.5M
 
 ## Backlog / Future Features
+
+### P0 (Immediate - In Progress)
+- ✅ Search filter improvements - COMPLETED
+- ✅ Hot Celebs dynamic pricing - COMPLETED
+- ✅ How It Works explainer text - COMPLETED
+- 🔄 Hot Streak Notifications - Backend ready, needs full UI
 
 ### P1 (High Priority)
 - User authentication for persistent teams
