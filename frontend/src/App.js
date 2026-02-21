@@ -1810,6 +1810,11 @@ function App() {
     }
   };
 
+  // Handle clicking on a celeb in the hot celebs ticker
+  const handleCelebSearch = (name) => {
+    searchCelebrity(name);
+  };
+
   // Create or get team
   const initTeam = useCallback(async () => {
     // Check localStorage for existing team
