@@ -47,12 +47,14 @@ class TestBasicEndpoints:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
-        assert isinstance(data, list), "Categories should return a list"
-        assert len(data) > 0, "Should have at least one category"
+        # API returns {"categories": [...]}
+        assert "categories" in data, "Response should contain 'categories' field"
+        assert isinstance(data["categories"], list), "Categories should be a list"
+        assert len(data["categories"]) > 0, "Should have at least one category"
         
     def test_celebrities_search(self):
-        """Test /api/celebrities search endpoint"""
-        response = requests.get(f"{BASE_URL}/api/celebrities?search=taylor")
+        """Test /api/celebrities/search endpoint"""
+        response = requests.get(f"{BASE_URL}/api/celebrities/search?q=taylor")
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
@@ -66,7 +68,9 @@ class TestBasicEndpoints:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
-        assert isinstance(data, list), "Hot celebs should return a list"
+        # API returns {"hot_celebs": [...]}
+        assert "hot_celebs" in data, "Response should contain 'hot_celebs' field"
+        assert isinstance(data["hot_celebs"], list), "Hot celebs should be a list"
         
     def test_stats_endpoint(self):
         """Test /api/stats returns data"""
