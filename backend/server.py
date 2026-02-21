@@ -1744,18 +1744,46 @@ async def get_hot_celebs():
                         bio = wiki_data.get("extract", "")
                         tier = determine_tier_from_bio(bio)
                         category = get_category_from_bio(bio, name)
-                        price = get_dynamic_price(tier, 50, name)
+                        base_price = get_dynamic_price(tier, 50, name)
+                        
+                        # Apply NEWS PREMIUM based on mention count
+                        # More mentions = higher price (capped at 3x base)
+                        mention_count = data["count"]
+                        if mention_count >= 5:
+                            news_multiplier = 3.0  # 5+ mentions = 3x price
+                        elif mention_count >= 3:
+                            news_multiplier = 2.0  # 3-4 mentions = 2x price
+                        elif mention_count >= 2:
+                            news_multiplier = 1.5  # 2 mentions = 1.5x price
+                        else:
+                            news_multiplier = 1.0
+                        
+                        price = round(base_price * news_multiplier, 1)
+                        # Cap at £15M unless Brown Bread premium
+                        price = min(price, 15.0)
                         
                         hot_reason = data["headline"][:70] + "..." if data["headline"] else "Trending in news"
+                        
+                        # Add trending indicator if high mentions
+                        trending_tag = ""
+                        if mention_count >= 5:
+                            trending_tag = "🔥🔥🔥"
+                        elif mention_count >= 3:
+                            trending_tag = "🔥🔥"
+                        elif mention_count >= 2:
+                            trending_tag = "🔥"
                         
                         hot_list.append({
                             "name": wiki_data.get("title", name),
                             "tier": tier,
                             "category": category,
                             "price": price,
+                            "base_price": base_price,
+                            "news_premium": news_multiplier > 1.0,
+                            "trending_tag": trending_tag,
                             "hot_reason": hot_reason,
                             "image": image,
-                            "mention_count": data["count"]
+                            "mention_count": mention_count
                         })
                         
                         # Store in DB for consistency with autocomplete
