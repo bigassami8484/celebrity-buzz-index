@@ -136,23 +136,26 @@ const TransferWindowBanner = ({ stats }) => {
     <div className={`${isOpen 
       ? 'bg-gradient-to-r from-green-500/20 via-green-500/10 to-green-500/20 border-green-500' 
       : 'bg-gradient-to-r from-[#FF0099]/10 via-[#0A0A0A] to-[#00F0FF]/10 border-[#262626]'
-    } border p-3 text-center`} data-testid="transfer-window-banner">
-      <div className="flex items-center justify-center gap-3">
-        <Clock className={`w-5 h-5 ${isOpen ? 'text-green-400 animate-pulse' : 'text-[#00F0FF]'}`} />
-        <span className="text-[#A1A1AA] font-medium">Transfer Window:</span>
+    } border p-2 sm:p-3 text-center`} data-testid="transfer-window-banner">
+      <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
+        <Clock className={`w-4 h-4 sm:w-5 sm:h-5 ${isOpen ? 'text-green-400 animate-pulse' : 'text-[#00F0FF]'}`} />
+        <span className="text-[#A1A1AA] font-medium text-xs sm:text-sm">Transfer Window:</span>
         {isOpen ? (
-          <span className="text-green-400 font-bold animate-pulse">
+          <span className="text-green-400 font-bold animate-pulse text-xs sm:text-sm">
             🟢 OPEN - {countdown}
           </span>
         ) : (
-          <span className="text-[#00F0FF] font-bold">
+          <span className="text-[#00F0FF] font-bold text-xs sm:text-sm">
             Opens in {countdown}
           </span>
         )}
       </div>
-      {isOpen && (
-        <p className="text-xs text-green-300/70 mt-1">Make your transfers now! Window closes Sunday 12pm GMT</p>
-      )}
+      <p className="text-[10px] sm:text-xs text-[#A1A1AA]/70 mt-1">
+        {isOpen 
+          ? "Make up to 2 transfers now! Window closes Sunday 12pm GMT" 
+          : "2 transfers allowed per window • Every Saturday 12pm - Sunday 12pm GMT"
+        }
+      </p>
     </div>
   );
 };
