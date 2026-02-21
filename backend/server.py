@@ -1178,10 +1178,32 @@ async def fetch_wikipedia_info(name: str) -> dict:
                 except Exception as e:
                     logger.error(f"Failed to get birth year for {name}: {e}")
                 
+                # Get image - use fallback if not available
+                wiki_image = data.get("thumbnail", {}).get("source", "")
+                if not wiki_image:
+                    # Try pageimages API as backup
+                    try:
+                        pageimages_url = f"https://en.wikipedia.org/w/api.php?action=query&titles={name.replace(' ', '_')}&prop=pageimages&format=json&pithumbsize=400"
+                        img_response = await client.get(pageimages_url, timeout=5.0, headers=headers)
+                        if img_response.status_code == 200:
+                            img_data = img_response.json()
+                            pages = img_data.get("query", {}).get("pages", {})
+                            if pages:
+                                page = list(pages.values())[0]
+                                wiki_image = page.get("thumbnail", {}).get("source", "")
+                    except:
+                        pass
+                
+                # If still no image, use a styled placeholder with initials
+                if not wiki_image:
+                    # Create a nice gradient placeholder using UI Avatars
+                    clean_name = data.get("title", name).replace(" ", "+")
+                    wiki_image = f"https://ui-avatars.com/api/?name={clean_name}&size=400&background=1a1a1a&color=FF0099&bold=true&format=png"
+                
                 return {
                     "name": data.get("title", name),
                     "bio": bio,
-                    "image": data.get("thumbnail", {}).get("source", ""),
+                    "image": wiki_image,
                     "wiki_url": data.get("content_urls", {}).get("desktop", {}).get("page", ""),
                     "birth_year": birth_year
                 }
