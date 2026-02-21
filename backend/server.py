@@ -1128,7 +1128,7 @@ async def seed_initial_data():
 
 @api_router.get("/trending")
 async def get_trending():
-    """Get trending celebrities across all categories"""
+    """Get trending celebrities across all categories with correct dynamic pricing"""
     # Check cache first
     cached = await db.trending_cache.find_one(
         {"type": "trending"},
@@ -1150,6 +1150,10 @@ async def get_trending():
                 {"_id": 0}
             )
             if celeb:
+                # Recalculate price with dynamic pricing
+                tier = celeb.get("tier", "D")
+                buzz_score = celeb.get("buzz_score", 5)
+                celeb["price"] = get_dynamic_price(tier, buzz_score, name)
                 trending.append(celeb)
     
     if trending:
