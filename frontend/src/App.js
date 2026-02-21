@@ -1679,6 +1679,7 @@ function App() {
   const [searchLoading, setSearchLoading] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showMethodology, setShowMethodology] = useState(false);
+  const [showMobileTeam, setShowMobileTeam] = useState(false);
   const [stats, setStats] = useState(null);
   const [todaysNews, setTodaysNews] = useState([]);
   const [topPicked, setTopPicked] = useState([]);
