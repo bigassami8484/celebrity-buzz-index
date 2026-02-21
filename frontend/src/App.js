@@ -1236,8 +1236,32 @@ const TeamCustomizeModal = ({ team, options, onSave, onClose }) => {
   const [teamName, setTeamName] = useState(team?.team_name || "");
   const [selectedColor, setSelectedColor] = useState(team?.team_color || "pink");
   const [selectedIcon, setSelectedIcon] = useState(team?.team_icon || "star");
+  const [nameError, setNameError] = useState("");
+  
+  // Simple client-side profanity check (basic words only - server has full list)
+  const checkName = (name) => {
+    const badWords = ["fuck", "shit", "cunt", "bitch", "ass", "dick", "cock", "wanker", "twat", "nigger", "nigga", "faggot", "retard"];
+    const nameLower = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    for (const word of badWords) {
+      if (nameLower.includes(word)) {
+        return "Team name contains inappropriate language";
+      }
+    }
+    return "";
+  };
+  
+  const handleNameChange = (e) => {
+    const newName = e.target.value;
+    setTeamName(newName);
+    setNameError(checkName(newName));
+  };
   
   const handleSave = () => {
+    const error = checkName(teamName);
+    if (error) {
+      setNameError(error);
+      return;
+    }
     onSave(teamName, selectedColor, selectedIcon);
   };
   
