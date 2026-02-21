@@ -1037,6 +1037,11 @@ async def calculate_celebrity_tier(bio: str, name: str) -> tuple:
     # First check guaranteed lists (mega-star overrides)
     if name_lower in GUARANTEED_A_LIST:
         return ("A", get_base_price_for_tier("A"))
+    
+    # Check for royal family members using partial keyword matching
+    if any(keyword in name_lower for keyword in ROYAL_A_LIST_KEYWORDS):
+        return ("A", get_base_price_for_tier("A"))
+    
     if name_lower in GUARANTEED_B_LIST:
         return ("B", get_base_price_for_tier("B"))
     if name_lower in GUARANTEED_C_LIST:
