@@ -802,6 +802,18 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             if re.search(r'(airline|air\s*line|aviation|carrier)', desc_lower[:150]):
                                 should_skip = True
                             
+                            # Check for supermarkets/retail chains
+                            if re.search(r'(supermarket chain|retail chain|grocery chain|department store chain|store chain)', desc_lower[:150]):
+                                should_skip = True
+                            
+                            # Check for TV channels/networks
+                            if re.search(r'(cable channel|television channel|tv channel|basic cable|network)', desc_lower[:150]):
+                                should_skip = True
+                            
+                            # Check for general "substance" or non-person
+                            if re.search(r'(substance|consumed by|organism|nutritional)', desc_lower[:100]):
+                                should_skip = True
+                            
                             if should_skip:
                                 pass  # Filtered out
                                 continue
