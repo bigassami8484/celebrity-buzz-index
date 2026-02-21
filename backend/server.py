@@ -794,6 +794,14 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             if re.search(r'(tokusatsu|japanese television|franchise|tv series|television series)', desc_lower[:150]):
                                 should_skip = True
                             
+                            # Check for bands/musical groups
+                            if re.search(r'is (a|an) .*(band|group) (formed|from)', desc_lower[:150]):
+                                should_skip = True
+                            
+                            # Check for airlines
+                            if re.search(r'(airline|air\s*line|aviation|carrier)', desc_lower[:150]):
+                                should_skip = True
+                            
                             if should_skip:
                                 pass  # Filtered out
                                 continue
