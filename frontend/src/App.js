@@ -2350,6 +2350,24 @@ function App() {
       <Toaster position="top-right" theme="dark" richColors />
       <div className="noise-overlay"></div>
       
+      {/* Auth Bar */}
+      <div className="bg-[#0A0A0A] border-b border-[#262626] py-2 px-4">
+        <div className="max-w-7xl mx-auto flex justify-end items-center">
+          {user ? (
+            <UserMenu user={user} onLogout={handleLogout} />
+          ) : (
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="flex items-center gap-2 bg-[#FF0099] hover:bg-[#e6008a] text-white px-4 py-2 text-sm font-bold transition-colors"
+              data-testid="sign-in-btn"
+            >
+              <UserPlus className="w-4 h-4" />
+              Sign In
+            </button>
+          )}
+        </div>
+      </div>
+      
       <TransferWindowBanner stats={stats} />
       <Header />
       
