@@ -1747,13 +1747,13 @@ function App() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <HowItWorks onShowMethodology={() => setShowMethodology(true)} />
         <SearchBar onSearch={searchCelebrity} loading={searchLoading} />
-        <HotCelebsBanner celebs={hotCelebs} onSelect={searchCelebrity} />
-        <TodaysNews news={todaysNews} />
         <CategoryFilter 
           categories={categories} 
           activeCategory={activeCategory} 
           onSelect={handleCategoryChange} 
         />
+        <HotCelebsBanner celebs={hotCelebs} onSelect={searchCelebrity} />
+        <TodaysNews news={todaysNews} />
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
           {/* Celebrity Grid */}
