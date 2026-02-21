@@ -1745,6 +1745,23 @@ async def get_hot_celebs():
                             "image": image,
                             "mention_count": data["count"]
                         })
+                        
+                        # Store in DB for consistency with autocomplete
+                        actual_name = wiki_data.get("title", name)
+                        existing = await db.celebrities.find_one({"name": {"$regex": f"^{actual_name}$", "$options": "i"}})
+                        if not existing:
+                            await db.celebrities.update_one(
+                                {"name": actual_name},
+                                {"$set": {
+                                    "name": actual_name,
+                                    "tier": tier,
+                                    "category": category,
+                                    "image": image,
+                                    "bio": bio[:500],
+                                    "updated_at": datetime.now(timezone.utc).isoformat()
+                                }},
+                                upsert=True
+                            )
             except Exception as e:
                 logger.error(f"Error fetching {name}: {e}")
                 continue
