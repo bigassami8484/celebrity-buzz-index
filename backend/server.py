@@ -607,6 +607,11 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                         pass  # Filtered out
                         continue
                     
+                    # Skip titles with ampersands (usually TV shows like "Ginny & Georgia")
+                    if "&" in title or " and " in title_lower:
+                        pass  # Filtered out
+                        continue
+                    
                     # Skip titles starting with "The" (usually shows, bands, etc.)
                     if title_lower.startswith("the "):
                         pass  # Filtered out
