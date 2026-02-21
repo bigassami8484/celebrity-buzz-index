@@ -1633,6 +1633,8 @@ function App() {
         setTeam(res.data.team);
         // Fetch team's leagues
         fetchTeamLeagues(storedTeamId);
+        // Fetch price alerts
+        fetchPriceAlerts(storedTeamId);
         return;
       } catch (e) {
         localStorage.removeItem("teamId");
@@ -1648,7 +1650,7 @@ function App() {
     } catch (e) {
       console.error("Error creating team:", e);
     }
-  }, [fetchTeamLeagues]);
+  }, [fetchTeamLeagues, fetchPriceAlerts]);
 
   // Fetch leaderboard
   const fetchLeaderboard = useCallback(async () => {
