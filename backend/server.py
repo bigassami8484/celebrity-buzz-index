@@ -1362,6 +1362,57 @@ async def get_hot_celebs():
     
     return {"hot_celebs": hot_list}
 
+@api_router.get("/price-alerts/{team_id}")
+async def get_price_alerts(team_id: str):
+    """Get price change alerts for a team's celebrities
+    
+    Shows which celebrities have significant price changes coming:
+    - Hot celebs (rising in news) = price likely to increase
+    - Quiet celebs (out of news) = price likely to decrease
+    """
+    team = await db.teams.find_one({"id": team_id}, {"_id": 0})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    alerts = []
+    for celeb_data in team.get("celebrities", []):
+        celeb = await db.celebrities.find_one(
+            {"id": celeb_data.get("celebrity_id")},
+            {"_id": 0}
+        )
+        if celeb:
+            current_price = celeb.get("price", 0)
+            buzz_score = celeb.get("buzz_score", 5)
+            tier = celeb.get("tier", "D")
+            
+            # Calculate what the new dynamic price would be
+            new_price = get_dynamic_price(tier, buzz_score, celeb.get("name", ""))
+            price_change = new_price - current_price
+            
+            # Only alert if significant change (>= £0.5M)
+            if abs(price_change) >= 0.5:
+                alert_type = "rising" if price_change > 0 else "falling"
+                alerts.append({
+                    "celebrity_id": celeb.get("id"),
+                    "name": celeb.get("name"),
+                    "image": celeb.get("image"),
+                    "tier": tier,
+                    "current_price": current_price,
+                    "projected_price": new_price,
+                    "change": round(price_change, 1),
+                    "alert_type": alert_type,
+                    "reason": f"High media buzz" if alert_type == "rising" else "Low media coverage"
+                })
+    
+    # Sort by biggest changes first
+    alerts.sort(key=lambda x: abs(x["change"]), reverse=True)
+    
+    return {
+        "alerts": alerts,
+        "team_id": team_id,
+        "next_price_update": "Saturday 12pm GMT"
+    }
+
 @api_router.get("/top-picked")
 async def get_top_picked():
     """Get most picked celebrities"""
