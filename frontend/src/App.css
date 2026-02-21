@@ -213,6 +213,22 @@
   50% { box-shadow: 0 0 30px rgba(255, 0, 153, 0.8); }
 }
 
+/* Slide up animation for prompts */
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+@keyframes slide-up {
+  0% { 
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 /* Price Tag */
 .price-tag {
   background: var(--accent-gold);
