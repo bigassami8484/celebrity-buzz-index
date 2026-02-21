@@ -272,6 +272,60 @@ const TopPickedCelebs = ({ celebs, onSelect }) => {
   );
 };
 
+// Price Alerts Component - Shows upcoming price changes for team
+const PriceAlerts = ({ alerts, teamId }) => {
+  if (!alerts || alerts.length === 0) {
+    return (
+      <div className="bg-[#0A0A0A] border border-[#262626] p-4 mb-4" data-testid="price-alerts">
+        <h4 className="font-anton text-lg uppercase tracking-tight text-[#FFD700] mb-3 flex items-center gap-2">
+          <Bell className="w-5 h-5" />
+          Price Alerts
+        </h4>
+        <p className="text-xs text-[#666] text-center py-4">No significant price changes expected for your team</p>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="bg-[#0A0A0A] border border-[#262626] p-4 mb-4" data-testid="price-alerts">
+      <h4 className="font-anton text-lg uppercase tracking-tight text-[#FFD700] mb-3 flex items-center gap-2">
+        <Bell className="w-5 h-5" />
+        Price Alerts
+      </h4>
+      <p className="text-xs text-[#666] mb-3">Price changes at next transfer window</p>
+      <div className="space-y-2">
+        {alerts.slice(0, 5).map((alert, idx) => (
+          <div 
+            key={idx}
+            className={`flex items-center gap-3 p-2 border-l-2 ${
+              alert.alert_type === 'rising' ? 'border-green-500 bg-green-500/10' : 'border-red-500 bg-red-500/10'
+            }`}
+          >
+            <img 
+              src={alert.image} 
+              alt={alert.name}
+              className="w-8 h-8 rounded-full object-cover"
+              onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${alert.name}&size=32&background=FF0099&color=fff`; }}
+            />
+            <div className="flex-1 min-w-0">
+              <span className="text-sm truncate block font-bold">{alert.name}</span>
+              <span className="text-xs text-[#A1A1AA]">{alert.reason}</span>
+            </div>
+            <div className="text-right">
+              <div className={`text-sm font-bold ${alert.alert_type === 'rising' ? 'text-green-400' : 'text-red-400'}`}>
+                {alert.alert_type === 'rising' ? '↑' : '↓'} £{Math.abs(alert.change)}M
+              </div>
+              <div className="text-xs text-[#666]">
+                £{alert.current_price}M → £{alert.projected_price}M
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // Brown Bread Watch Component - Strategic picks for the +100 bonus!
 const BrownBreadWatch = ({ watchList, onSelect }) => {
   if (!watchList || watchList.length === 0) return null;
