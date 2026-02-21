@@ -1198,10 +1198,11 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     # Check if already in database
     existing = await db.celebrities.find_one({"name": {"$regex": f"^{name}$", "$options": "i"}}, {"_id": 0})
     if existing:
-        # Recalculate dynamic price based on current tier and buzz
+        # Use CONSISTENT pricing - same as Hot Celebs (buzz_score = 50)
         tier = existing.get("tier", "D")
-        buzz_score = existing.get("buzz_score", 5)
-        new_price = get_dynamic_price(tier, buzz_score, existing.get("name", ""))
+        # For consistency with Hot Celebs display, use fixed buzz score of 50
+        default_buzz = 50
+        new_price = get_dynamic_price(tier, default_buzz, existing.get("name", ""))
         existing["price"] = new_price
         
         # Record price history
@@ -1210,7 +1211,7 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
             celebrity_name=existing.get("name", ""),
             price=new_price,
             tier=tier,
-            buzz_score=buzz_score
+            buzz_score=existing.get("buzz_score", default_buzz)
         )
         
         return {"celebrity": existing}
