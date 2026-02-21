@@ -1092,7 +1092,7 @@ const HowItWorks = ({ onShowMethodology }) => (
 // Header Component
 const Header = () => (
   <header className="py-6 md:py-8 px-4 text-center">
-    <h1 className="font-anton text-3xl sm:text-5xl md:text-7xl tracking-tighter uppercase header-title" data-testid="main-title">
+    <h1 className="font-anton text-4xl sm:text-5xl md:text-7xl tracking-tighter uppercase header-title" data-testid="main-title">
       <span className="text-[#FFD700]">C</span>
       <span className="text-[#FF0099]">e</span>
       <span>l</span>
