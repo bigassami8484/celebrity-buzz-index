@@ -2004,6 +2004,17 @@ function App() {
         </div>
       </div>
       
+      {/* Price History Modal */}
+      {showPriceHistory && priceHistoryCeleb && (
+        <PriceHistoryModal 
+          celebrityName={priceHistoryCeleb} 
+          onClose={() => {
+            setShowPriceHistory(false);
+            setPriceHistoryCeleb(null);
+          }} 
+        />
+      )}
+      
       {/* Share Modal */}
       {showShareModal && team && (
         <ShareModal team={team} onClose={() => setShowShareModal(false)} />
