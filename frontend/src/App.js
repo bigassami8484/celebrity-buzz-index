@@ -2483,6 +2483,17 @@ function App() {
         <PointsMethodology onClose={() => setShowMethodology(false)} />
       )}
       
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onAuthSuccess={(userData) => {
+          setUser(userData);
+          setShowAuthModal(false);
+          toast.success(`Welcome, ${userData.name}!`);
+        }}
+      />
+      
       {/* League Detail Modal */}
       {selectedLeague && (
         <LeagueDetailModal
