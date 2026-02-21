@@ -210,7 +210,7 @@ const HotCelebsBanner = ({ celebs, onSelect }) => {
               </div>
             </div>
             <p className="font-bold text-xs text-white truncate group-hover:text-[#FF0099]">{celeb.name}</p>
-            <p className="text-[10px] text-[#00FF00]">£{celeb.price}M</p>
+            <p className="text-[8px] text-[#00FF00]">£{celeb.price}M</p>
           </div>
         ))}
       </div>
