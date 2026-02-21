@@ -54,17 +54,21 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - ✅ **CATEGORY DETECTION FIX**: Known actors (Michael Caine, Ian McKellen, Morgan Freeman, etc.) correctly classified as movie_stars
 
 ### UI Features
-- ✅ **HOT CELEBS SCROLLING TICKER** at top of page (replaced old banner)
-  - Shows photos, names, tiers, prices, and hot reasons
+- ✅ **HOT CELEBS BANNER** at top of page (card format with photos)
+  - Shows photos, names, tiers (A/B/C/D-LIST), and prices
   - Clickable - clicking triggers a search
   - 10 randomized celebs per refresh
-  - New celebs added: Timothée Chalamet, Zendaya, Travis Kelce, Sydney Sweeney
+  - New celebs: Timothée Chalamet, Zendaya, Travis Kelce, Sydney Sweeney
+- ✅ **CONSISTENT PRICING EVERYWHERE**:
+  - Hot Celebs card price = Search result price = Team panel price
+  - Fixed bug where Leonardo DiCaprio showed £19M in team (now £10.3M everywhere)
 - ✅ "How It Works" with **BIGGER** explanatory text under each icon (text-[10px])
   - Find any celeb, Tier pricing, Your budget, Transfer window, Brown Bread
+- ✅ **PRICE HISTORY BUTTON** on each celebrity card (chart icon)
+- ✅ **PRICE HISTORY MODAL** showing current price, tier, and historical entries
 - ✅ Proper spacing between components
 - ✅ "Select a category or search for any celebrity" helper text
 - ✅ Category filter directly under search bar
-- ✅ Hot Celebs RANDOMIZED on each refresh with real Wikipedia photos
 - ✅ **PRICE HISTORY BUTTON** on each celebrity card (chart icon top-right)
 - ✅ **PRICE HISTORY MODAL** showing current price, tier, and historical entries with trend indicators
 
