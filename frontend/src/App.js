@@ -39,19 +39,23 @@ const TierBadge = ({ tier }) => {
 // Player Count Banner
 const PlayerCountBanner = ({ stats }) => {
   if (!stats) return null;
+  
+  const transferWindow = stats.transfer_window || {};
+  const isOpen = transferWindow.is_open;
+  const statusText = transferWindow.status || "Loading...";
+  
   return (
-    <div className="bg-[#1A1A1A] border-b border-[#262626] py-2 px-4" data-testid="player-count-banner">
-      <div className="max-w-7xl mx-auto flex justify-center items-center gap-6 text-sm">
-        <span className="text-[#A1A1AA]">
-          <span className="text-[#FFD700] font-bold">{stats.player_count.toLocaleString()}</span> Players
+    <div className="bg-gradient-to-r from-[#FF0099]/10 via-[#0A0A0A] to-[#00F0FF]/10 border border-[#262626] p-4 mb-6">
+      <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-center">
+        <span className="flex items-center gap-2">
+          <Users className="w-4 h-4 text-[#FF0099]" />
+          <span className="text-[#A1A1AA]">Players:</span>
+          <span className="text-[#FFD700] font-bold">{stats.player_count?.toLocaleString() || 0}</span>
         </span>
-        <span className="text-[#262626]">|</span>
-        <span className="text-[#A1A1AA]">
-          <span className="text-[#00F0FF] font-bold">{stats.celebrity_count.toLocaleString()}</span> Celebrities
-        </span>
-        <span className="text-[#262626]">|</span>
-        <span className="text-[#A1A1AA]">
-          Transfer Window: <span className="text-[#FF0099] font-bold">{stats.transfer_window}</span>
+        <span className={`flex items-center gap-2 px-3 py-1 ${isOpen ? 'bg-green-500/20 border border-green-500' : 'bg-[#262626]'}`}>
+          <Clock className="w-4 h-4 text-[#00F0FF]" />
+          <span className="text-[#A1A1AA]">Transfer Window:</span>
+          <span className={`font-bold ${isOpen ? 'text-green-400' : 'text-[#00F0FF]'}`}>{statusText}</span>
         </span>
       </div>
     </div>
