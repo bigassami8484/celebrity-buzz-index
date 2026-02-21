@@ -464,6 +464,9 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     "new york", "los angeles", "chicago", "houston", "phoenix"
                 ]
                 
+                # Known team/club patterns
+                team_patterns = ["ifk", "afc", "bfc", "cfc", "dfc", "fc ", " fc", "united", "city", "rovers", "athletic"]
+                
                 results = []
                 seen_base_names = set()
                 
