@@ -30,8 +30,7 @@ next-env.d.ts
 dist/
 dist
 
-# Environment files (comprehensive coverage)
-
+# Credentials (but NOT .env files - those are needed for deployment)
 *token.json*
 *credentials.json*
 
@@ -78,29 +77,7 @@ agenthub/agents/youtube/db
 
 # Mobile development
 android-sdk/
-# Note: .env files are tracked for deployment - they will be auto-updated with production values
-# *.env
-# *.env.*
-frontend/node_modules/.cache/default-development/2.pack
--e 
-# Environment files
-*.env
-*.env.*
-frontend/node_modules/.cache/default-development/4.pack
-frontend/node_modules/.cache/default-development/5.pack
--e 
-# Environment files
-*.env
-*.env.*
-frontend/node_modules/.cache/default-development/6.pack
--e 
-# Environment files
-*.env
-*.env.*
-frontend/node_modules/.cache/default-development/7.pack
-frontend/node_modules/.cache/default-development/8.pack
--e 
-# Environment files
-*.env
-*.env.*
+
+# Note: .env files are NOT ignored - they are needed for deployment
+# The deployment system will auto-update them with production values
 frontend/node_modules/.cache/default-development/9.pack
