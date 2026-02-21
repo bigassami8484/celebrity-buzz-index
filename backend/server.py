@@ -1375,6 +1375,10 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     # Check if already in database
     existing = await db.celebrities.find_one({"name": {"$regex": f"^{name}$", "$options": "i"}}, {"_id": 0})
     if existing:
+        # Recalculate dynamic price based on current tier and buzz
+        tier = existing.get("tier", "D")
+        buzz_score = existing.get("buzz_score", 5)
+        existing["price"] = get_dynamic_price(tier, buzz_score, existing.get("name", ""))
         return {"celebrity": existing}
     
     # Fetch from Wikipedia
