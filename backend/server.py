@@ -724,6 +724,15 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                     if end_idx >= len(desc_lower[:150]) or desc_lower[end_idx] in ' .,;:!?)':
                                         should_skip = True
                                         break
+                            
+                            # Also check for patterns like "is a [year] ... film"
+                            if re.search(r'is a \d{4}.*?(film|movie|series|show|album|song|book|novel)', desc_lower[:200]):
+                                should_skip = True
+                            
+                            # Check for university/school/institute patterns
+                            if re.search(r'is a (public|private|research)?.*(university|college|institute|school)', desc_lower[:150]):
+                                should_skip = True
+                            
                             if should_skip:
                                 pass  # Filtered out
                                 continue
