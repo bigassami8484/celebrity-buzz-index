@@ -1674,8 +1674,9 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     # Calculate celebrity tier based on bio
     tier, base_price = await calculate_celebrity_tier(wiki_info.get("bio", ""), wiki_info["name"])
     
-    # Generate news
-    news = await generate_celebrity_news(wiki_info["name"], category)
+    # Generate news - pass real news context if available from hot celebs
+    real_news_context = hot_celeb_match.get("hot_reason") if hot_celeb_match else None
+    news = await generate_celebrity_news(wiki_info["name"], category, real_news_context)
     
     # Calculate buzz score
     buzz_score = calculate_buzz_score(news)
