@@ -1235,8 +1235,11 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     # Calculate buzz score
     buzz_score = calculate_buzz_score(news)
     
-    # Final price based on tier, buzz, and controversy
-    price = calculate_price(buzz_score, tier, wiki_info["name"])
+    # Final price using CONSISTENT buzz (50) for initial display price
+    # This ensures prices match what's shown in Hot Celebs ticker
+    # The stored buzz_score is still the actual calculated value for tracking
+    default_buzz = 50
+    price = get_dynamic_price(tier, default_buzz, wiki_info["name"])
     
     # Check if celebrity is deceased (look for death date in bio)
     bio_lower = wiki_info.get("bio", "").lower()
