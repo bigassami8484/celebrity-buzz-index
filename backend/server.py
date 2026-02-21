@@ -718,7 +718,16 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                 "is a football club", "is a professional football", "is a finnish",
                                 "is a spanish", "is a german", "is a french", "is a english",
                                 "football club", "soccer club", "basketball team", "hockey team",
-                                "baseball team", "plays in the"
+                                "baseball team", "plays in the",
+                                # More location keywords
+                                "is an area", "is a suburb", "is a neighborhood", "is a neighbourhood",
+                                "is a region", "is a territory", "is a census", "is a county",
+                                "is a borough", "is a parish", "is a locality", "is a postal",
+                                "is a residential", "is a commercial", "is a mixed-use",
+                                "metropolitan area", "urban area", "incorporated city",
+                                "unincorporated community", "census-designated",
+                                "within the city", "in the city of", "located in the",
+                                "is a neighborhood in", "is an area of", "is a suburb of"
                             ]
                             
                             if any(kw in desc_lower for kw in non_person_description_keywords):
