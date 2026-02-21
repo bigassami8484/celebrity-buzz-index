@@ -1690,6 +1690,8 @@ function App() {
         fetchTeamLeagues(storedTeamId);
         // Fetch price alerts
         fetchPriceAlerts(storedTeamId);
+        // Fetch hot streaks
+        fetchHotStreaks(storedTeamId);
         return;
       } catch (e) {
         localStorage.removeItem("teamId");
