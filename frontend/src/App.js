@@ -267,6 +267,52 @@ const UserMenu = ({ user, onLogout }) => {
   );
 };
 
+// Save My Team Prompt - Shows when guest user has celebrities in their team
+const SaveTeamPrompt = ({ isVisible, onSave, onDismiss, teamSize }) => {
+  if (!isVisible || teamSize === 0) return null;
+  
+  return (
+    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50 animate-slide-up" data-testid="save-team-prompt">
+      <div className="bg-gradient-to-r from-[#FF0099]/20 to-[#00F0FF]/20 border border-[#FF0099] p-4 backdrop-blur-sm">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 bg-[#FF0099] rounded-full flex items-center justify-center flex-shrink-0">
+            <Users className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1">
+            <h4 className="font-bold text-white text-sm mb-1">Save Your Team!</h4>
+            <p className="text-[#A1A1AA] text-xs mb-3">
+              You have {teamSize} {teamSize === 1 ? 'celebrity' : 'celebrities'} in your team. 
+              Sign in to save your progress and access it from any device!
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={onSave}
+                className="bg-[#FF0099] hover:bg-[#e6008a] text-white px-4 py-2 text-xs font-bold transition-colors"
+                data-testid="save-team-btn"
+              >
+                Sign In to Save
+              </button>
+              <button
+                onClick={onDismiss}
+                className="text-[#666] hover:text-white px-3 py-2 text-xs transition-colors"
+                data-testid="dismiss-save-prompt"
+              >
+                Later
+              </button>
+            </div>
+          </div>
+          <button 
+            onClick={onDismiss}
+            className="text-[#666] hover:text-white"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Player Count Banner
 const PlayerCountBanner = ({ stats }) => {
   if (!stats) return null;
