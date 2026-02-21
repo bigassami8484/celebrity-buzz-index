@@ -1537,6 +1537,14 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     """Search for a celebrity and get their buzz data"""
     name = search.name.strip()
     
+    # Check if this is a common name that should redirect to Wikipedia name
+    # e.g., "King Charles" -> "Charles III", "Prince William" -> search Wikipedia
+    wikipedia_search_name = name
+    if name.lower() in CELEBRITY_ALIASES:
+        # Use the canonical Wikipedia name for searching
+        wikipedia_search_name = CELEBRITY_ALIASES[name.lower()]
+        logger.info(f"Redirecting search from '{name}' to '{wikipedia_search_name}'")
+    
     # FIRST: Check if this celeb is in the Hot Celebs cache - use that price for consistency
     hot_celebs_cache = await db.news_cache.find_one(
         {"type": "hot_celebs_from_news_v2"},
