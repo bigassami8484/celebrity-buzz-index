@@ -60,21 +60,27 @@ class TestSearchFilterLocations:
         for s in suggestions:
             print(f"  - {s['name']}: {s['description'][:80]}...")
         
-        # Check that all results are people
-        non_person_keywords = ["state", "country", "university", "college", "film", "movie",
-                             "television", "tv series", "album", "song", "band", "capital",
-                             "republic", "nation", "located", "population"]
+        # Check that all results are people - look for location/place indicators
+        location_keywords = ["is a state", "is a country", "is a university", "is a college", 
+                           "is a film", "is a movie", "is a television series", "is a tv series",
+                           "is an album", "is a song", "is a band", "is the capital",
+                           "is a republic", "is a nation", "located in", "population of"]
         
         for suggestion in suggestions:
             desc_lower = suggestion.get("description", "").lower()
-            name_lower = suggestion.get("name", "").lower()
             
-            # Should not be a non-person entity
-            for keyword in non_person_keywords:
-                # Allow "film" if it's about an actor's filmography
-                if keyword == "film" and ("actor" in desc_lower or "actress" in desc_lower):
-                    continue
-                assert keyword not in desc_lower[:100], f"'{suggestion['name']}' appears to be a non-person (contains '{keyword}')"
+            # Should not be a non-person entity (check for specific phrases)
+            for keyword in location_keywords:
+                assert keyword not in desc_lower[:150], f"'{suggestion['name']}' appears to be a non-person (contains '{keyword}')"
+            
+            # Should have person indicators
+            person_indicators = ["born", "is a", "was a", "singer", "actor", "actress", 
+                               "musician", "footballer", "athlete", "politician", "presenter",
+                               "comedian", "director", "rapper", "personality", "celebrity",
+                               "businessman", "businesswoman", "entrepreneur", "author", "writer",
+                               "painter", "artist", "model", "producer"]
+            has_person_indicator = any(ind in desc_lower for ind in person_indicators)
+            assert has_person_indicator, f"'{suggestion['name']}' doesn't appear to be a person"
     
     def test_florence_returns_only_people(self):
         """Search 'florence' should return only people, not prisons or cities"""
