@@ -63,6 +63,45 @@
   padding: 12px 0;
 }
 
+/* Hot Celebs Scrolling Ticker */
+.hot-celebs-ticker-container {
+  background: linear-gradient(90deg, #FF0099 0%, #00F0FF 50%, #FF0099 100%);
+  overflow: hidden;
+  padding: 10px 0;
+  position: relative;
+}
+
+.hot-celebs-ticker-container::before,
+.hot-celebs-ticker-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 100px;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.hot-celebs-ticker-container::before {
+  left: 0;
+  background: linear-gradient(to right, #FF0099, transparent);
+}
+
+.hot-celebs-ticker-container::after {
+  right: 0;
+  background: linear-gradient(to left, #00F0FF, transparent);
+}
+
+.hot-celebs-ticker-content {
+  display: flex;
+  animation: ticker 40s linear infinite;
+  white-space: nowrap;
+}
+
+.hot-celebs-ticker-content:hover {
+  animation-play-state: paused;
+}
+
 .ticker-content {
   display: flex;
   animation: ticker 30s linear infinite;
