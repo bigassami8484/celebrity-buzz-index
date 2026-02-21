@@ -1167,7 +1167,18 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         # Recalculate dynamic price based on current tier and buzz
         tier = existing.get("tier", "D")
         buzz_score = existing.get("buzz_score", 5)
-        existing["price"] = get_dynamic_price(tier, buzz_score, existing.get("name", ""))
+        new_price = get_dynamic_price(tier, buzz_score, existing.get("name", ""))
+        existing["price"] = new_price
+        
+        # Record price history
+        await record_price_history(
+            celebrity_id=existing.get("id", ""),
+            celebrity_name=existing.get("name", ""),
+            price=new_price,
+            tier=tier,
+            buzz_score=buzz_score
+        )
+        
         return {"celebrity": existing}
     
     # Fetch from Wikipedia
