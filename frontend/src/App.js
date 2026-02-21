@@ -1297,11 +1297,15 @@ const TeamCustomizeModal = ({ team, options, onSave, onClose }) => {
             <input
               type="text"
               value={teamName}
-              onChange={(e) => setTeamName(e.target.value)}
-              className="w-full bg-[#1A1A1A] border border-[#262626] p-3 text-white"
+              onChange={handleNameChange}
+              className={`w-full bg-[#1A1A1A] border p-3 text-white ${nameError ? 'border-red-500' : 'border-[#262626]'}`}
               placeholder="Enter team name..."
               maxLength={30}
+              data-testid="team-name-input"
             />
+            {nameError && (
+              <p className="text-red-500 text-xs mt-1">{nameError}</p>
+            )}
           </div>
           
           {/* Colors */}
