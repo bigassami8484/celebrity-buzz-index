@@ -740,26 +740,26 @@ def get_price_for_tier(tier: str) -> float:
     return get_base_price_for_tier(tier)
 
 async def calculate_celebrity_tier(bio: str, name: str) -> tuple:
-    """Calculate celebrity tier based on bio content and return (tier, price)"""
+    """Calculate celebrity tier based on bio content and return (tier, base_price)"""
     bio_lower = bio.lower()
     
     # A-list: Major awards, billions in earnings, legendary status
     a_list_score = sum(1 for ind in A_LIST_INDICATORS if ind in bio_lower)
     if a_list_score >= 2:
-        return ("A", 9)
+        return ("A", get_base_price_for_tier("A"))
     
     # B-list: Award-winning, millions, chart-topping
     b_list_score = sum(1 for ind in B_LIST_INDICATORS if ind in bio_lower)
     if a_list_score >= 1 or b_list_score >= 2:
-        return ("B", 6)
+        return ("B", get_base_price_for_tier("B"))
     
     # C-list: Known for appearances, contestants
     c_list_score = sum(1 for ind in C_LIST_INDICATORS if ind in bio_lower)
     if b_list_score >= 1 or c_list_score >= 1:
-        return ("C", 4)
+        return ("C", get_base_price_for_tier("C"))
     
     # D-list: Everyone else
-    return ("D", 2)
+    return ("D", get_base_price_for_tier("D"))
 
 async def fetch_wikipedia_info(name: str) -> dict:
     """Fetch celebrity info from Wikipedia API"""
