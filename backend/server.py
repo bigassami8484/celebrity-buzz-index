@@ -792,6 +792,9 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                 "is a dog", "is a cat", "is a horse", "is a breed",
                                 "is a reptile", "is an insect", "is a butterfly", "is a moth",
                                 "flowering plants", "is a genus of", "are a genus", "is a common name",
+                                # Specific animals
+                                "is a large cat", "is a carnivore", "is a predator", "is a wild",
+                                "of the genus", "of the family", "subspecies of",
                                 # Objects and products
                                 "is a guitar", "is an instrument", "is a car", "is a vehicle",
                                 "is a brand", "is a company", "is a product", "is a software",
