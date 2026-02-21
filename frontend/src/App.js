@@ -2559,9 +2559,6 @@ function App() {
         </div>
       )}
       
-      {/* Mobile Navigation */}
-      <MobileNav activeTab={mobileTab} onTabChange={setMobileTab} />
-      
       {/* Footer */}
       <Footer />
     </div>
