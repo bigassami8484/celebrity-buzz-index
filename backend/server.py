@@ -1679,7 +1679,7 @@ async def get_brown_bread_watch():
 @api_router.get("/todays-news")
 async def get_todays_news():
     """Get today's top REAL celebrity news from RSS feeds"""
-    # Check cache (15 min cache for real news)
+    # Check cache (24 hour cache for real news)
     cached = await db.news_cache.find_one(
         {"type": "todays_news_real"},
         {"_id": 0}
@@ -1687,7 +1687,8 @@ async def get_todays_news():
     
     if cached and cached.get("updated_at"):
         cache_time = datetime.fromisoformat(cached["updated_at"])
-        if (datetime.now(timezone.utc) - cache_time).seconds < 900:  # 15 min cache
+        cache_age = datetime.now(timezone.utc) - cache_time
+        if cache_age.total_seconds() < 86400:  # 24 hour cache (86400 seconds)
             return {"news": cached.get("news", [])}
     
     # Fetch real news from RSS feeds

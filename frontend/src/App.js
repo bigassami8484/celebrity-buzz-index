@@ -172,7 +172,7 @@ const TodaysNews = ({ news }) => {
             className="bg-[#1A1A1A] p-2 hover:bg-[#222] transition-colors block group"
           >
             <p className="text-[10px] text-[#00F0FF] uppercase mb-1">{item.source}</p>
-            <p className="font-bold text-xs text-white line-clamp-2 group-hover:text-[#FF0099]">{item.headline}</p>
+            <p className="font-bold text-xs text-white line-clamp-3 group-hover:text-[#FF0099]">{item.headline}</p>
           </a>
         ))}
       </div>
@@ -953,39 +953,39 @@ const HowItWorks = ({ onShowMethodology }) => (
     </div>
     <div className="grid grid-cols-5 gap-2">
       <div className="text-center">
-        <div className="w-8 h-8 bg-[#FF0099] flex items-center justify-center mx-auto mb-1">
-          <Search className="w-4 h-4 text-white" />
+        <div className="w-10 h-10 bg-[#FF0099] flex items-center justify-center mx-auto mb-2">
+          <Search className="w-5 h-5 text-white" />
         </div>
-        <h4 className="font-space font-bold text-xs">Search</h4>
-        <p className="text-[10px] text-[#A1A1AA] mt-1">Find any celeb</p>
+        <h4 className="font-space font-bold text-sm">Search</h4>
+        <p className="text-xs text-[#A1A1AA] mt-1">Find any celeb</p>
       </div>
       <div className="text-center">
-        <div className="w-8 h-8 bg-[#00F0FF] flex items-center justify-center mx-auto mb-1">
-          <Star className="w-4 h-4 text-black" />
+        <div className="w-10 h-10 bg-[#00F0FF] flex items-center justify-center mx-auto mb-2">
+          <Star className="w-5 h-5 text-black" />
         </div>
-        <h4 className="font-space font-bold text-xs">£0.5-12M</h4>
-        <p className="text-[10px] text-[#A1A1AA] mt-1">Tier pricing</p>
+        <h4 className="font-space font-bold text-sm">£0.5-12M</h4>
+        <p className="text-xs text-[#A1A1AA] mt-1">Tier pricing</p>
       </div>
       <div className="text-center">
-        <div className="w-8 h-8 bg-[#FFD700] flex items-center justify-center mx-auto mb-1">
-          <Plus className="w-4 h-4 text-black" />
+        <div className="w-10 h-10 bg-[#FFD700] flex items-center justify-center mx-auto mb-2">
+          <Plus className="w-5 h-5 text-black" />
         </div>
-        <h4 className="font-space font-bold text-xs">£50M</h4>
-        <p className="text-[10px] text-[#A1A1AA] mt-1">Your budget</p>
+        <h4 className="font-space font-bold text-sm">£50M</h4>
+        <p className="text-xs text-[#A1A1AA] mt-1">Your budget</p>
       </div>
       <div className="text-center">
-        <div className="w-8 h-8 bg-[#FF5500] flex items-center justify-center mx-auto mb-1">
-          <ArrowLeftRight className="w-4 h-4 text-white" />
+        <div className="w-10 h-10 bg-[#FF5500] flex items-center justify-center mx-auto mb-2">
+          <ArrowLeftRight className="w-5 h-5 text-white" />
         </div>
-        <h4 className="font-space font-bold text-xs">Sat 12pm</h4>
-        <p className="text-[10px] text-[#A1A1AA] mt-1">Transfer window</p>
+        <h4 className="font-space font-bold text-sm">Sat 12pm</h4>
+        <p className="text-xs text-[#A1A1AA] mt-1">Transfer window</p>
       </div>
       <div className="text-center">
-        <div className="w-8 h-8 bg-[#8B5CF6] flex items-center justify-center mx-auto mb-1">
-          <Skull className="w-4 h-4 text-white" />
+        <div className="w-10 h-10 bg-[#8B5CF6] flex items-center justify-center mx-auto mb-2">
+          <Skull className="w-5 h-5 text-white" />
         </div>
-        <h4 className="font-space font-bold text-xs">+100</h4>
-        <p className="text-[10px] text-[#A1A1AA] mt-1">Brown Bread</p>
+        <h4 className="font-space font-bold text-sm">+100</h4>
+        <p className="text-xs text-[#A1A1AA] mt-1">Brown Bread</p>
       </div>
     </div>
   </div>
@@ -1941,9 +1941,8 @@ function App() {
       <Toaster position="top-right" theme="dark" richColors />
       <div className="noise-overlay"></div>
       
-      <PlayerCountBanner stats={stats} />
-      <Header />
       <HotCelebsBanner celebs={hotCelebs} onSelect={handleCelebSearch} />
+      <Header />
       
       <div className="max-w-7xl mx-auto px-4 py-8">
         <HowItWorks onShowMethodology={() => setShowMethodology(true)} />

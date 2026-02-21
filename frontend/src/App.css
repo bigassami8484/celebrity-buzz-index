@@ -63,43 +63,48 @@
   padding: 12px 0;
 }
 
-/* Hot Celebs Scrolling Ticker */
-.hot-celebs-ticker-container {
-  background: linear-gradient(90deg, #FF0099 0%, #00F0FF 50%, #FF0099 100%);
+/* Hot Celebs Scrolling Ticker - Horizontal Auto-scroll */
+.hot-celebs-scroll-container {
   overflow: hidden;
-  padding: 10px 0;
   position: relative;
+  width: 100%;
 }
 
-.hot-celebs-ticker-container::before,
-.hot-celebs-ticker-container::after {
+.hot-celebs-scroll-container::before,
+.hot-celebs-scroll-container::after {
   content: '';
   position: absolute;
   top: 0;
-  width: 100px;
+  width: 60px;
   height: 100%;
   z-index: 2;
   pointer-events: none;
 }
 
-.hot-celebs-ticker-container::before {
+.hot-celebs-scroll-container::before {
   left: 0;
-  background: linear-gradient(to right, #FF0099, transparent);
+  background: linear-gradient(to right, rgba(10,10,10,0.9), transparent);
 }
 
-.hot-celebs-ticker-container::after {
+.hot-celebs-scroll-container::after {
   right: 0;
-  background: linear-gradient(to left, #00F0FF, transparent);
+  background: linear-gradient(to left, rgba(10,10,10,0.9), transparent);
 }
 
-.hot-celebs-ticker-content {
+.hot-celebs-scroll-content {
   display: flex;
-  animation: ticker 40s linear infinite;
-  white-space: nowrap;
+  gap: 12px;
+  animation: hot-celebs-scroll 25s linear infinite;
+  width: fit-content;
 }
 
-.hot-celebs-ticker-content:hover {
+.hot-celebs-scroll-content:hover {
   animation-play-state: paused;
+}
+
+@keyframes hot-celebs-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 .ticker-content {
