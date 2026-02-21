@@ -1,0 +1,92 @@
+{
+  "summary": "All 10 iteration 11 features tested and verified. How It Works has explanatory text under each icon (Find any celeb, Tier pricing, Your budget, Transfer window, Brown Bread). Spacing classes mb-8 and mb-6 are correctly applied. Search filtering works correctly for 'gucci' (returns Gucci Mane, Aldo Gucci - not brand), 'nike' (returns Nike Ardilla - not brand), 'tesla' (filters out cars), and 'lion' (returns Alfred Lion - not animal). Category pricing shows correct dynamic prices. Buzz score is hidden on celebrity cards and removed from team panel.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "How It Works has explanatory text under each icon: 'Find any celeb', 'Tier pricing', 'Your budget', 'Transfer window', 'Brown Bread'",
+    "How It Works has mb-8 class for spacing to search bar",
+    "Category filter has mb-6 class for spacing to Hot Celebs",
+    "Search 'gucci' returns only people (Gucci Mane, Aldo Gucci, Patricia Gucci, Rodolfo Gucci, Gucci Westman) - brand filtered out",
+    "Search 'nike' returns only people (Nike Ardilla, Nike Davies-Okundaye) - brand filtered out",
+    "Search 'tesla' filters out cars - returns empty or only Nikola Tesla",
+    "Search 'lion' returns only people (Alfred Lion) - animal filtered out",
+    "Musicians category shows correct dynamic prices (A-list £9-12M, B-list £5-8M, C-list £2-4M, D-list £0.5-1.5M)",
+    "Buzz score is hidden on celebrity cards (has 'hidden' class)",
+    "Buzz score is removed from team panel display"
+  ],
+
+  "test_report_links": [
+    "/app/backend/tests/test_iteration_11_features.py",
+    "/app/test_reports/pytest/iteration_11_results.xml"
+  ],
+  
+  "action_items": [],
+  
+  "critical_code_review_comments": [],
+  
+  "updated_files": [
+    "/app/backend/tests/test_iteration_11_features.py"
+  ],
+  
+  "success_rate": {
+    "backend": "100% (10/10 tests passed)",
+    "frontend": "100% (all UI features verified via Playwright)"
+  },
+  
+  "seed_data_creation": "None - used existing data",
+  
+  "retest_needed": false,
+  
+  "should_main_agent_self_test": false,
+  
+  "context_for_next_testing_agent": "All 10 iteration 11 features verified: (1) How It Works has explanatory text under each icon. (2) mb-8 spacing between How It Works and search bar. (3) mb-6 spacing between category filter and Hot Celebs. (4) Search 'gucci' returns only people. (5) Search 'nike' returns only people. (6) Search 'tesla' filters out cars. (7) Search 'lion' returns only people. (8) Category pricing shows correct dynamic prices. (9) Buzz score hidden on celebrity cards. (10) Buzz score removed from team panel.",
+
+  "verification_details": {
+    "how_it_works_text": {
+      "status": "PASS",
+      "texts_found": ["Find any celeb", "Tier pricing", "Your budget", "Transfer window", "Brown Bread"],
+      "all_under_icons": true
+    },
+    "spacing_classes": {
+      "status": "PASS",
+      "how_it_works_mb8": true,
+      "category_filter_mb6": true
+    },
+    "search_filtering": {
+      "status": "PASS",
+      "gucci_results": ["Gucci Mane", "Aldo Gucci", "Patricia Gucci", "Rodolfo Gucci", "Gucci Westman"],
+      "gucci_brand_filtered": true,
+      "nike_results": ["Nike Ardilla", "Nike Davies-Okundaye"],
+      "nike_brand_filtered": true,
+      "tesla_cars_filtered": true,
+      "lion_results": ["Alfred Lion"],
+      "lion_animal_filtered": true
+    },
+    "category_pricing": {
+      "status": "PASS",
+      "musicians_sample": {
+        "Adele": {"tier": "A", "price": "£9.5M", "valid": true},
+        "Taylor Swift": {"tier": "B", "price": "£5.5M", "valid": true},
+        "Ed Sheeran": {"tier": "D", "price": "£0.9M", "valid": true},
+        "Mick Jagger": {"tier": "B", "price": "£5.5M", "valid": true}
+      },
+      "all_prices_within_tier_ranges": true
+    },
+    "buzz_score_visibility": {
+      "status": "PASS",
+      "hidden_on_cards": true,
+      "removed_from_team_panel": true,
+      "css_class": "buzz-score hidden"
+    }
+  }
+}
