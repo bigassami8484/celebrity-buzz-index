@@ -17,7 +17,13 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 | C-List | £2m-£4m | Risk/reward |
 | D-List | £0.5m-£1.5m | Cheap wildcards |
 
-**Dynamic Pricing**: Prices fluctuate weekly based on media coverage. Hot celebs in the news cost more, quiet celebs cost less.
+**STRICT PRICE CAP: £12M maximum for all celebrities**
+
+**Exception - Brown Bread Watch Premium:**
+- #1 oldest celebrity: £15M
+- #2 oldest celebrity: £13M
+- #3 oldest celebrity: £11M
+- Rest: normal tier pricing
 
 ## Transfer Window
 - **Opens**: Every Saturday at 12:00 GMT
@@ -25,65 +31,35 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - **Closes**: Sunday at 12:00 GMT
 - 1 transfer per week allowed during window
 
-## Architecture
-
-### Backend (FastAPI + MongoDB)
-- `/api/stats` - Player count and transfer window status (NO celebrity count)
-- `/api/pricing-info` - Tier pricing information and strategy guide
-- `/api/hot-celebs` - Hot celebrities RANDOMIZED on each refresh with real photos
-- `/api/price-alerts/{team_id}` - Price change alerts for team's celebrities
-- `/api/hot-streaks/{team_id}` - Hot streak notifications (3+ days in news)
-- `/api/autocomplete?q=` - Wikipedia search with advanced filtering
-- `/api/todays-news` - Major celebrity news (filtered for quality, HTML entities decoded)
-- `/api/trending` - Trending celebrities with CORRECT dynamic pricing
-- `/api/leaderboard` - Team rankings
-- `/api/team/*` - Team management endpoints
-- `/api/league/*` - Friends league endpoints
-- `/api/hall-of-fame` - Top players with badges
-- `/api/brown-bread-watch` - Elderly celebrities with risk levels
-
-### UI Layout (Top to Bottom)
-1. Stats Banner (Player count + Transfer window countdown)
-2. Header
-3. Trending Ticker (with PRICES not points)
-4. How It Works
-5. **Search Bar** (with helper text below)
-6. **Category Filter** (directly under search)
-7. Hot Celebs This Week (randomized)
-8. Today's Top Celeb News
-9. Celebrity Grid + Sidebar
-
-### Sidebar Components
-1. Team Panel
-2. League Panel
-3. **Price Alerts** (upcoming price changes)
-4. **Hot Streaks** (3+ days in news notifications)
-5. Top Picked Celebs
-6. Brown Bread Watch
-7. Leaderboard
-8. Hall of Fame button
-
 ## What's Been Implemented (Feb 2026)
 
 ### Core Features
 - ✅ Full FastAPI backend with all endpoints
 - ✅ Wikipedia autocomplete search with advanced filtering
-- ✅ A/B/C/D tier system with DYNAMIC pricing
+- ✅ A/B/C/D tier system with STRICT dynamic pricing (max £12M)
 - ✅ Saturday 12pm GMT transfer window (24 hours)
-- ✅ Brown Bread Bonus (+100 for deceased)
+- ✅ Brown Bread Watch with PREMIUM pricing (top 3 up to £15M)
 - ✅ Price alerts system
 - ✅ Hot streak notifications (3+ days in news)
 - ✅ Profanity filter for team names
 
 ### UI Features
-- ✅ Scrolling banner shows PRICE (correct for tier ranges)
-- ✅ Category filter moved UNDER search bar
-- ✅ Search helper text: "Search for any celebrity or select a category below"
+- ✅ Scrolling banner shows CORRECT tier-based prices
+- ✅ "Select a category or search for any celebrity" helper text (gold, under search)
+- ✅ Category filter directly under search bar
 - ✅ Hot Celebs RANDOMIZED on each refresh with real Wikipedia photos
 - ✅ News headlines cleaned (HTML entities decoded)
 - ✅ Price Alerts panel in sidebar
 - ✅ Hot Streaks panel in sidebar
-- ✅ Mobile responsive design
+- ✅ Brown Bread Watch with PREMIUM tags for top 3
+- ✅ **MOBILE RESPONSIVE** - fully functional on phones
+
+### Mobile Features
+- ✅ Responsive layout with stacked elements
+- ✅ Bottom navigation bar (Home, Team tabs)
+- ✅ Touch-friendly category buttons
+- ✅ Scrollable Hot Celebs with photos
+- ✅ Mobile-optimized search bar
 
 ### Social Features
 - ✅ Team sharing (WhatsApp, X, Facebook)
@@ -92,22 +68,21 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - ✅ Badge/achievement system
 - ✅ Hall of Fame
 
-## Hot Celebs Pool (30+ celebrities)
-Randomized from pool including:
-- **Royals**: Prince Andrew, Meghan Markle, Prince Harry, Kate Middleton, King Charles III
-- **Musicians**: Kanye West, Taylor Swift, Beyoncé, Drake, Rihanna, Ed Sheeran, Adele
-- **Tech/Business**: Elon Musk, Mark Zuckerberg, Jeff Bezos
-- **Politicians**: Donald Trump, Joe Biden
-- **Reality TV/UK**: Katie Price, Holly Willoughby, Phillip Schofield, Gemma Collins, Kerry Katona
-- **Actors**: Tom Cruise, Leonardo DiCaprio, Jennifer Lawrence, Brad Pitt, Angelina Jolie
-- **Sports**: Cristiano Ronaldo, David Beckham, Lewis Hamilton
+## Example Prices (Verified)
+**Trending Celebs:**
+- Ed Sheeran: D-LIST £0.9M ✅
+- Gemma Collins: C-LIST £2.4M ✅
+- David Beckham: C-LIST £2.4M ✅
+- Gordon Ramsay: D-LIST £0.7M ✅
+- Tom Holland: A-LIST £9.5M ✅
+- Katie Price: D-LIST £0.7M ✅
 
-## Bug Fixes (Feb 2026)
-- ✅ Fixed scrolling banner prices to use correct tier ranges
-- ✅ Fixed trending endpoint to recalculate dynamic prices
-- ✅ Moved category filter under search bar
-- ✅ Fixed HTML entities in news headlines
-- ✅ Hot celebs randomized on each refresh
+**Brown Bread Watch:**
+- Michael Caine (Age 93): £15M ⭐ PREMIUM
+- Judi Dench (Age 92): £13M ⭐ PREMIUM
+- Morgan Freeman (Age 89): £11M ⭐ PREMIUM
+- Ian McKellen (Age 87): £10.3M
+- Al Pacino (Age 86): £9.5M
 
 ## Backlog / Future Features
 
