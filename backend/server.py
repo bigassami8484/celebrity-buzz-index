@@ -715,6 +715,33 @@ def estimate_tier_from_description(description: str) -> str:
     
     return "D"
 
+async def record_price_history(celebrity_id: str, celebrity_name: str, price: float, tier: str, buzz_score: float):
+    """Record a price point in the celebrity's price history"""
+    try:
+        # Check if we already have a recent entry (within 1 hour) to avoid duplicates
+        one_hour_ago = datetime.now(timezone.utc) - timedelta(hours=1)
+        recent_entry = await db.price_history.find_one({
+            "celebrity_id": celebrity_id,
+            "recorded_at": {"$gte": one_hour_ago}
+        })
+        
+        if recent_entry:
+            return  # Don't record if we have a recent entry
+        
+        # Record the new price point
+        entry = {
+            "celebrity_id": celebrity_id,
+            "celebrity_name": celebrity_name,
+            "price": price,
+            "tier": tier,
+            "buzz_score": buzz_score,
+            "recorded_at": datetime.now(timezone.utc)
+        }
+        await db.price_history.insert_one(entry)
+        logger.info(f"Recorded price history for {celebrity_name}: £{price}M ({tier})")
+    except Exception as e:
+        logger.error(f"Error recording price history: {e}")
+
 def get_base_price_for_tier(tier: str) -> float:
     """Get BASE price range for celebrity tier (in millions)"""
     # New pricing structure:
