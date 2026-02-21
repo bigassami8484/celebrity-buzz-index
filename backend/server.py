@@ -313,6 +313,32 @@ class LeagueJoin(BaseModel):
     code: str
     team_id: str
 
+# ==================== AUTH MODELS ====================
+
+class User(BaseModel):
+    user_id: str
+    email: str
+    name: str
+    picture: Optional[str] = None
+    is_guest: bool = False
+    guest_team_id: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class UserSession(BaseModel):
+    user_id: str
+    session_token: str
+    expires_at: datetime
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class MagicLinkRequest(BaseModel):
+    email: EmailStr
+
+class MagicLinkVerify(BaseModel):
+    token: str
+
+class GuestConvert(BaseModel):
+    guest_team_id: str
+
 # ==================== BADGE SYSTEM ====================
 
 # Available badges
