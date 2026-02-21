@@ -2554,7 +2554,22 @@ function App() {
         onAuthSuccess={(userData) => {
           setUser(userData);
           setShowAuthModal(false);
+          setShowSavePrompt(false);
           toast.success(`Welcome, ${userData.name}!`);
+        }}
+      />
+      
+      {/* Save Team Prompt for Guest Users */}
+      <SaveTeamPrompt 
+        isVisible={showSavePrompt}
+        teamSize={team?.celebrities?.length || 0}
+        onSave={() => {
+          setShowSavePrompt(false);
+          setShowAuthModal(true);
+        }}
+        onDismiss={() => {
+          setShowSavePrompt(false);
+          setSavePromptDismissed(true);
         }}
       />
       
