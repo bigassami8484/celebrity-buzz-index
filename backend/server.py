@@ -1395,7 +1395,7 @@ async def get_hot_celebs():
                     "tier": celeb_info["tier"],
                     "category": celeb_info["category"],
                     "hot_reason": celeb_info["reason"],
-                    "price": get_base_price_for_tier(celeb_info["tier"]),
+                    "price": get_dynamic_price(celeb_info["tier"], 50, celeb_info["name"]),  # Use dynamic price with moderate buzz
                     "image": image
                 })
     
