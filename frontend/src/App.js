@@ -1522,6 +1522,17 @@ function App() {
     }
   }, []);
 
+  // Fetch hot streaks for team
+  const fetchHotStreaks = useCallback(async (teamId) => {
+    if (!teamId) return;
+    try {
+      const res = await axios.get(`${API}/hot-streaks/${teamId}`);
+      setHotStreaks(res.data.hot_streaks || []);
+    } catch (e) {
+      console.error("Error fetching hot streaks:", e);
+    }
+  }, []);
+
   // Fetch team's leagues
   const fetchTeamLeagues = useCallback(async (teamId) => {
     try {
