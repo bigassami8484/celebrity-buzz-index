@@ -2036,6 +2036,7 @@ function App() {
       <Toaster position="top-right" theme="dark" richColors />
       <div className="noise-overlay"></div>
       
+      <TransferWindowBanner stats={stats} />
       <HotCelebsBanner celebs={hotCelebs} onSelect={handleCelebSearch} />
       <Header />
       
