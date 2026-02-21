@@ -1990,9 +1990,27 @@ function App() {
   // Mobile tab state
   const [mobileTab, setMobileTab] = useState('home');
   
+  // Save team prompt state
+  const [showSavePrompt, setShowSavePrompt] = useState(false);
+  const [savePromptDismissed, setSavePromptDismissed] = useState(false);
+  
   // Check for OAuth callback session_id in URL fragment on mount
   // CRITICAL: Check synchronously during render to prevent race conditions
   const hasSessionId = window.location.hash?.includes('session_id=');
+  
+  // Show save prompt when guest has celebrities in team
+  useEffect(() => {
+    // Show prompt if: not logged in, has team with celebrities, not dismissed
+    if (!user && team?.celebrities?.length > 0 && !savePromptDismissed) {
+      // Delay showing prompt slightly for better UX
+      const timer = setTimeout(() => {
+        setShowSavePrompt(true);
+      }, 3000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowSavePrompt(false);
+    }
+  }, [user, team, savePromptDismissed]);
   
   // Auth handlers
   const handleAuthSuccess = useCallback((userData) => {
