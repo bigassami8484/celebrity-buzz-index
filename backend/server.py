@@ -1315,12 +1315,15 @@ async def get_pricing_info():
 
 @api_router.get("/hot-celebs")
 async def get_hot_celebs():
-    """Get hot celebrities making headlines this week - big names only with real photos"""
+    """Get hot celebrities making headlines - RANDOMIZED on each refresh with real photos"""
     hot_list = []
     headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (contact@example.com)"}
     
+    # Get random selection of celebs from pool
+    random_celebs = get_random_hot_celebs(8)
+    
     async with httpx.AsyncClient() as client:
-        for celeb_info in HOT_CELEBS_THIS_WEEK:
+        for celeb_info in random_celebs:
             # Check if celeb exists in DB
             celeb = await db.celebrities.find_one(
                 {"name": {"$regex": f"^{celeb_info['name']}$", "$options": "i"}},
