@@ -1601,17 +1601,20 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         celeb_name = existing.get("name", name)
         is_mega_star = celeb_name.lower() in GUARANTEED_A_LIST
         
+        # Check for royal keywords in name
+        is_royal = any(keyword in celeb_name.lower() for keyword in ROYAL_A_LIST_KEYWORDS)
+        
         # If this celeb is in Hot Celebs, use that price (includes news premium)
         if hot_celeb_match:
             existing["price"] = hot_celeb_match["price"]
             # Use A-tier for mega-stars regardless of what's in cache
-            existing["tier"] = "A" if is_mega_star else hot_celeb_match.get("tier", existing.get("tier", "D"))
+            existing["tier"] = "A" if (is_mega_star or is_royal) else hot_celeb_match.get("tier", existing.get("tier", "D"))
             existing["news_premium"] = hot_celeb_match.get("news_premium", False)
             existing["trending_tag"] = hot_celeb_match.get("trending_tag", "")
         else:
             # Use CONSISTENT pricing - same as Hot Celebs (buzz_score = 50)
             # Use A-tier for mega-stars
-            tier = "A" if is_mega_star else existing.get("tier", "D")
+            tier = "A" if (is_mega_star or is_royal) else existing.get("tier", "D")
             existing["tier"] = tier
             default_buzz = 50
             new_price = get_dynamic_price(tier, default_buzz, celeb_name)
@@ -1619,6 +1622,17 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
             # Check if this celeb qualifies for Brown Bread premium pricing
             new_price = await apply_brown_bread_premium(existing, new_price)
             existing["price"] = new_price
+        
+        # Regenerate news if empty or missing
+        if not existing.get("news") or len(existing.get("news", [])) == 0:
+            category = existing.get("category", "other")
+            news = await generate_celebrity_news(celeb_name, category)
+            existing["news"] = news
+            # Update in database
+            await db.celebrities.update_one(
+                {"id": existing.get("id")},
+                {"$set": {"news": news}}
+            )
         
         # Record price history
         await record_price_history(
