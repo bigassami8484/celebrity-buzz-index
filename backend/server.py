@@ -633,7 +633,11 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                 "is the capital", "is a capital", "is the largest city",
                                 "is a seaport", "is a port", "is located on", "is situated",
                                 "with a population", "inhabitants", "square kilometres",
-                                "square miles", "administrative centre"
+                                "square miles", "administrative centre",
+                                "is a football club", "is a professional football", "is a finnish",
+                                "is a spanish", "is a german", "is a french", "is a english",
+                                "football club", "soccer club", "basketball team", "hockey team",
+                                "baseball team", "plays in the"
                             ]
                             
                             if any(kw in desc_lower for kw in non_person_description_keywords):
