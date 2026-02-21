@@ -898,6 +898,7 @@ def detect_category_from_bio(bio: str, name: str) -> str:
     
     for actor in known_actors:
         if actor in name_lower:
+            logger.info(f"Category detection: {name} matched known actor '{actor}' - returning movie_stars")
             return "movie_stars"
     
     reality_tv_names = ["katie price", "gemma collins", "pete wicks", "joey essex", "sam faiers", 
