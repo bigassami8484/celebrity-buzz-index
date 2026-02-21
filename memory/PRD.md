@@ -204,10 +204,19 @@ Response format:
 - ✅ Search filter improvements - COMPLETED
 - ✅ Hot Celebs dynamic pricing - COMPLETED
 - ✅ How It Works explainer text - COMPLETED
+- ✅ **Title Size Fix** - COMPLETED (Dec 2025)
+  - Desktop: 12-14rem (192-224px) 
+  - Mobile: 2.25-2.75rem (36-44px)
+- ✅ **Authentication System** - COMPLETED (Dec 2025)
+  - Emergent Google OAuth (no API keys required)
+  - Magic Link email login (requires RESEND_API_KEY for production)
+  - Sign In button in header
+  - Auth modal with Google + Email options
+  - User menu with logout
 - 🔄 Hot Streak Notifications - Backend ready, needs full UI
 
 ### P1 (High Priority)
-- User authentication for persistent teams
+- Link user accounts to teams for persistent data
 - Real news API integration (NewsAPI)
 - Automated weekly badge awards
 
@@ -221,3 +230,19 @@ Response format:
 - Dark/light mode toggle
 - Mobile app version
 - Celebrity draft mode (turn-based picking)
+
+## Authentication Details (Dec 2025)
+- **Google OAuth**: Uses Emergent Auth (https://auth.emergentagent.com)
+  - No API keys needed - managed by Emergent
+  - Redirect flow with session_id in URL fragment
+  - Backend exchanges session_id for user data
+- **Magic Link**: Uses Resend for email (requires RESEND_API_KEY in production)
+- **Session Storage**: MongoDB with 7-day expiry
+- **Cookie**: httpOnly, secure, sameSite=none
+
+### Auth Endpoints:
+- `POST /api/auth/session` - Exchange Emergent session_id for user session
+- `GET /api/auth/me` - Get current user
+- `POST /api/auth/logout` - Log out user
+- `POST /api/auth/magic-link/send` - Send magic link email
+- `POST /api/auth/magic-link/verify` - Verify magic link token
