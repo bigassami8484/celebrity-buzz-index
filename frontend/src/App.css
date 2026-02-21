@@ -716,48 +716,5 @@
   border-color: var(--accent-cyan);
 }
 
-/* Bottom Navigation for Mobile */
-.mobile-nav {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--bg-card);
-  border-top: 1px solid var(--border-color);
-  padding: 8px 0;
-  z-index: 50;
-}
-
-@media (max-width: 768px) {
-  .mobile-nav {
-    display: flex;
-    justify-content: space-around;
-  }
-  
-  /* Add padding to bottom to account for mobile nav */
-  .App {
-    padding-bottom: 70px;
-  }
-}
-
-.mobile-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 16px;
-  color: var(--text-muted);
-  font-size: 10px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.mobile-nav-item.active {
-  color: var(--accent-pink);
-}
-
-.mobile-nav-item:hover {
-  color: var(--accent-pink);
-}
+/* Bottom Navigation for Mobile - DISABLED */
+/* Mobile nav has been removed per user request */
