@@ -2321,6 +2321,7 @@ function App() {
 
   // Initial load
   useEffect(() => {
+    checkAuth();
     fetchCategories();
     fetchTrending();
     initTeam();
@@ -2330,7 +2331,19 @@ function App() {
     fetchTopPicked();
     fetchBrownBreadWatch();
     fetchHotCelebs();
-  }, [fetchCategories, fetchTrending, initTeam, fetchLeaderboard, fetchStats, fetchTodaysNews, fetchTopPicked, fetchBrownBreadWatch, fetchHotCelebs]);
+  }, [checkAuth, fetchCategories, fetchTrending, initTeam, fetchLeaderboard, fetchStats, fetchTodaysNews, fetchTopPicked, fetchBrownBreadWatch, fetchHotCelebs]);
+
+  // Show AuthCallback when processing OAuth redirect
+  if (hasSessionId || isProcessingAuth) {
+    return (
+      <div className="App">
+        <AuthCallback 
+          onAuthSuccess={handleAuthSuccess}
+          onAuthError={handleAuthError}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="App">
