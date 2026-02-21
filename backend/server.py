@@ -1302,21 +1302,30 @@ def get_category_from_bio(bio: str, name: str) -> str:
     return detect_category_from_bio(bio, name)
 
 
-async def generate_celebrity_news(name: str, category: str) -> List[dict]:
-    """Generate AI-powered news summaries for celebrity"""
+async def generate_celebrity_news(name: str, category: str, real_news_context: str = None) -> List[dict]:
+    """Generate AI-powered news summaries for celebrity, incorporating real news if available"""
     # Get current date for context
     now = datetime.now(timezone.utc)
     current_date_str = now.strftime("%b %d, %Y")  # e.g., "Feb 21, 2026"
     one_week_ago = (now - timedelta(days=7)).strftime("%b %d, %Y")
     
+    # Build context about real news events
+    real_news_instruction = ""
+    if real_news_context:
+        real_news_instruction = f"""
+            CRITICAL: This celebrity is currently in the news for: "{real_news_context}"
+            The FIRST news item MUST be about this real event. Make sure to accurately reflect this news.
+            If the news mentions death, illness, or a major event, this MUST be the primary focus."""
+    
     try:
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"news-{uuid.uuid4()}",
-            system_message=f"""You are a celebrity news aggregator. Generate realistic celebrity news headlines and summaries.
+            system_message=f"""You are a celebrity news aggregator. Generate realistic celebrity news headlines and summaries based on CURRENT events.
             
             IMPORTANT: Today's date is {current_date_str}. All news dates MUST be from the PAST 7 days (between {one_week_ago} and {current_date_str}). 
             DO NOT use any future dates!
+            {real_news_instruction}
             
             Return a JSON array with 5 news items. Each item should have:
             - title: A catchy headline
@@ -1325,11 +1334,16 @@ async def generate_celebrity_news(name: str, category: str) -> List[dict]:
             - date: A date from the past week in format "Feb 15, 2026" - MUST be before or on {current_date_str}
             - sentiment: "positive", "neutral", or "negative"
             
-            Make the news realistic and varied - mix of professional achievements, personal life, and industry news.
+            Make the news realistic and relevant to current events.
             ONLY return valid JSON array, no other text."""
         ).with_model("openai", "gpt-4o")
 
-        message = UserMessage(text=f"Generate 5 recent news headlines about {name} ({category}). Today is {current_date_str}. All dates must be from the past week. Return ONLY a JSON array.")
+        prompt = f"Generate 5 recent news headlines about {name} ({category}). Today is {current_date_str}. All dates must be from the past week."
+        if real_news_context:
+            prompt += f" The most important current news is: {real_news_context}"
+        prompt += " Return ONLY a JSON array."
+        
+        message = UserMessage(text=prompt)
         response = await chat.send_message(message)
         
         # Parse the JSON response
