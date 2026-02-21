@@ -1870,8 +1870,8 @@ async def get_hot_celebs():
                                 except:
                                     pass
                             
-                            # Only include if: no date (assume recent) OR date is this week
-                            if pub_date is None or pub_date >= week_start:
+                            # Only include if: no date (assume recent) OR within past 7 days
+                            if pub_date is None or pub_date >= news_cutoff:
                                 all_headlines.append({"title": title, "source": source_name, "date": pub_date})
                             
                         except:
@@ -1880,7 +1880,7 @@ async def get_hot_celebs():
                 logger.error(f"Error fetching RSS from {source_name}: {e}")
                 continue
         
-        # Check which known celebrities appear in headlines THIS WEEK
+        # Check which known celebrities appear in headlines from PAST 7 DAYS
         celeb_mentions = {}
         all_text = " ".join([h["title"].lower() for h in all_headlines])
         
