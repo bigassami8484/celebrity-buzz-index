@@ -1942,8 +1942,11 @@ async def add_to_team(data: AddToTeam):
         if c["celebrity_id"] == data.celebrity_id:
             raise HTTPException(status_code=400, detail="Celebrity already in team")
     
-    # Check budget
-    price = celebrity.get("price", 2)
+    # RECALCULATE PRICE using consistent pricing (same as Hot Celebs and search)
+    tier = celebrity.get("tier", "D")
+    default_buzz = 50
+    price = get_dynamic_price(tier, default_buzz, celebrity.get("name", ""))
+    
     if team.get("budget_remaining", 0) < price:
         raise HTTPException(status_code=400, detail="Insufficient budget")
     
