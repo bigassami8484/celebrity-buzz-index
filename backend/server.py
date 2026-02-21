@@ -1467,10 +1467,11 @@ async def get_hot_celebs():
                 {"_id": 0}
             )
             
-            # Use consistent tier from pool and calculate price with DEFAULT buzz (for consistency)
-            tier = celeb_info["tier"]
-            # Use a fixed moderate buzz score (50) for Hot Celebs to ensure consistency
-            # This way, when users search for the celeb, if the celeb is new, they'll get same price
+            # Use DB tier if exists, otherwise use pool tier
+            # This ensures Hot Celebs price matches what you get when you search
+            tier = celeb.get("tier", celeb_info["tier"]) if celeb else celeb_info["tier"]
+            
+            # Use consistent buzz score of 50 for pricing
             default_buzz = 50
             price = get_dynamic_price(tier, default_buzz, celeb_info["name"])
             
@@ -1478,7 +1479,7 @@ async def get_hot_celebs():
                 hot_list.append({
                     "name": celeb.get("name", celeb_info["name"]),
                     "tier": tier,
-                    "category": celeb_info["category"],
+                    "category": celeb.get("category", celeb_info["category"]),
                     "price": price,
                     "hot_reason": celeb_info["reason"],
                     "image": celeb.get("image")
