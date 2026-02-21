@@ -852,8 +852,8 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                         if pool_entry:
                             tier = pool_entry["tier"]
                         else:
-                            # Estimate tier from description
-                            tier = estimate_tier_from_description(extract)
+                            # Estimate tier from description (pass name for guaranteed A-list check)
+                            tier = estimate_tier_from_description(extract, actual_title)
                         price = get_dynamic_price(tier, 50, actual_title)
                 
                 results.append({
