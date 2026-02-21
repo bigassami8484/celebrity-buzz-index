@@ -1748,16 +1748,20 @@ async def get_pricing_info():
 
 @api_router.get("/hot-celebs")
 async def get_hot_celebs():
-    """Get 15+ hot celebrities WHO ARE ACTUALLY IN THE NEWS THIS WEEK - all with real photos"""
+    """Get 15+ hot celebrities WHO ARE ACTUALLY IN THE NEWS from the PAST 7 DAYS - Monday to Monday refresh"""
+    
+    now = datetime.now(timezone.utc)
     
     # Calculate the start of the current week (Monday 00:00 UTC)
-    now = datetime.now(timezone.utc)
     days_since_monday = now.weekday()  # Monday = 0
-    week_start = now - timedelta(days=days_since_monday, hours=now.hour, minutes=now.minute, seconds=now.second, microseconds=now.microsecond)
+    current_week_start = now - timedelta(days=days_since_monday, hours=now.hour, minutes=now.minute, seconds=now.second, microseconds=now.microsecond)
     
-    # Check cache first (1 hour cache) but invalidate if from previous week
+    # News window: past 7 days (rolling week)
+    news_cutoff = now - timedelta(days=7)
+    
+    # Check cache first (1 hour cache) but invalidate on Monday (new week)
     cached = await db.news_cache.find_one(
-        {"type": "hot_celebs_from_news_v3"},  # New version with weekly filtering
+        {"type": "hot_celebs_from_news_v4"},  # New version with 7-day rolling window
         {"_id": 0}
     )
     
@@ -1766,8 +1770,10 @@ async def get_hot_celebs():
         cache_week_start = datetime.fromisoformat(cached["week_start"])
         cache_age = now - cache_time
         
-        # Use cache if: less than 1 hour old AND from the same week
-        if cache_age.total_seconds() < 3600 and cache_week_start >= week_start:
+        # Use cache if: 
+        # 1. Less than 1 hour old AND
+        # 2. From the same week (cache invalidates every Monday)
+        if cache_age.total_seconds() < 3600 and cache_week_start >= current_week_start:
             return {"hot_celebs": cached.get("hot_celebs", [])}
     
     headers = {
