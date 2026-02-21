@@ -9,56 +9,44 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Compete on leaderboards with friends
 - Social sharing (Twitter/X, Facebook, WhatsApp)
 
-**Latest Requirements:**
-- Price fluctuations based on controversy (Prince Andrew costs more)
-- "Brown Bread Bonus" (+100 points if celebrity dies)
-- "Brown Bread Watch" - elderly celebrities with risk indicators
-- Weekly transfer window (1 swap per week)
-- Today's Top Celeb News section (MAJOR news only, not gossip)
-- Hot Celebs This Week banner (big names in headlines)
-- Player count display
-- Ban racist/offensive team names
-- Top Picked Celebrities section
-- A/B/C/D list tiers with tiered pricing
-- Friends League system with invite codes + social sharing
-- Team customization (colors and icons)
-- Mobile responsive design
+## Current Pricing Structure (DYNAMIC)
+| Tier | Price Range | Strategy Impact |
+|------|-------------|-----------------|
+| A-List | £9m-£12m | High scoring but expensive |
+| B-List | £5m-£8m | Balanced steady picks |
+| C-List | £2m-£4m | Risk/reward |
+| D-List | £0.5m-£1.5m | Cheap wildcards |
+
+**Dynamic Pricing**: Prices fluctuate weekly based on media coverage. Hot celebs in the news cost more, quiet celebs cost less.
+
+## Transfer Window
+- **Opens**: Every Saturday at 12:00 GMT
+- **Duration**: 24 hours
+- **Closes**: Sunday at 12:00 GMT
+- 1 transfer per week allowed during window
 
 ## Architecture
 
 ### Backend (FastAPI + MongoDB)
-- `/api/categories` - Get all celebrity categories
-- `/api/autocomplete?q=` - Wikipedia autocomplete search (filters for real people only)
-- `/api/points-methodology` - Get points calculation explanation
-- `/api/stats` - Player count, celebrity count, transfer window
-- `/api/hot-celebs` - Hot celebrities making headlines this week
-- `/api/todays-news` - Real celebrity news from RSS feeds (major news only)
-- `/api/top-picked` - Most picked celebrities
+- `/api/stats` - Player count and transfer window status (NO celebrity count)
+- `/api/pricing-info` - Tier pricing information and strategy guide
+- `/api/hot-celebs` - Hot celebrities with REAL Wikipedia photos
+- `/api/autocomplete?q=` - Wikipedia search with advanced filtering
+- `/api/todays-news` - Major celebrity news (filtered for quality)
+- `/api/leaderboard` - Team rankings
+- `/api/team/*` - Team management endpoints
+- `/api/league/*` - Friends league endpoints
+- `/api/hall-of-fame` - Top players with badges
 - `/api/brown-bread-watch` - Elderly celebrities with risk levels
-- `/api/trending` - Get trending celebrities with tiers
-- `/api/celebrity/search` - Search and create celebrity profile
-- `/api/celebrities/category/{category}` - Get celebrities by category
-- `/api/team/create` - Create new team (with profanity filter)
-- `/api/team/add` - Add celebrity to team (with Brown Bread Bonus)
-- `/api/team/transfer` - Weekly transfer (sell one, buy one)
-- `/api/team/remove` - Remove celebrity from team
-- `/api/team/customization-options` - Get available colors and icons
-- `/api/team/customize` - Update team appearance
-- `/api/team/{team_id}/leagues` - Get leagues team belongs to
-- `/api/leaderboard` - Get team rankings
-- `/api/league/create` - Create friends league
-- `/api/league/join` - Join league with code
-- `/api/league/code/{code}` - Get league by invite code
-- `/api/league/{id}/leaderboard` - League-specific leaderboard
-- `/api/hall-of-fame` - Top players with most badges
-- `/api/badges` - Available badges
 
-### Celebrity Tier & Pricing System
-- **A-LIST** (£9M): Oscar/Grammy winners, legendary status
-- **B-LIST** (£6M): Award-winning, chart-topping
-- **C-LIST** (£4M): Known for appearances
-- **D-LIST** (£2M): Everyone else
-- **Controversial Boost**: Prince Andrew £12M, Trump/Elon £15M, etc.
+### Search Filtering (Wikipedia Autocomplete)
+Filters OUT:
+- Albums, songs, films, TV shows
+- Locations (cities, capitals like Mariehamn)
+- Sports teams (IFK, FC, AFC, United, City)
+- Football/soccer clubs
+- Plants, animals, objects
+- Non-celebrities
 
 ### Points Calculation
 - News Mentions: +1.0 point per article
@@ -67,88 +55,89 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Controversy Bonus: +25.0 points per scandal
 - Social Media Trending: +5.0 points per event
 - **Brown Bread Bonus: +100 points** if celebrity passes away
-- **Minimum Buzz Score: 5 points** (no celebrity scores below 5)
+- **Minimum Buzz Score: 5 points**
 - **Tier Multipliers**: A=1.0x, B=1.2x, C=1.5x, D=2.0x
 
 ### Team Rules
 - **Budget: £50M**
 - **Max team size: 10 players**
-- **1 transfer per week**
+- **1 transfer per week** (during Saturday window)
 
-### Team Customization
-- 8 colors: Hot Pink, Electric Blue, Gold, Royal Purple, Fire Red, Emerald, Sunset Orange, Classic White
-- 12 icons: ⭐ Star, 👑 Crown, 🔥 Fire, ⚡ Lightning, 🚀 Rocket, 💎 Diamond, 💀 Skull, 👻 Ghost, 👽 Alien, 🤖 Robot, 🦄 Unicorn, 🐉 Dragon
+## What's Been Implemented (Feb 2026)
 
-### Features
-- **Player Count Banner**: Shows total players, celebrities, transfer window
-- **Hot Celebs This Week**: Major names making headlines (Prince Andrew, Meghan Markle, Kanye West, Taylor Swift, Elon Musk, Donald Trump, Katie Price, Holly Willoughby)
-- **Today's News**: Real celebrity news filtered for MAJOR stories only (deaths, divorces, awards, legal battles) - no gossip
-- **Transfer Window**: 1 swap per week (resets weekly)
-- **Profanity Filter**: Blocks racist/offensive team names
-- **Social Sharing**: WhatsApp, Facebook, X/Twitter (for teams AND leagues)
-- **Top Picked**: Most selected celebrities by players
-- **Friends Leagues**: Create leagues with invite codes, compete with friends
-- **Badge System**: Weekly Champion 🏆, Trendsetter ⚡, Grim Reaper 💀, Controversy King 🔥, A-List Club ⭐, League Legend 👑
-- **Hall of Fame**: Top players with most badges
-
-## What's Been Implemented (Feb 20, 2026)
+### Core Features
 - ✅ Full FastAPI backend with all endpoints
-- ✅ Wikipedia autocomplete search - filters out albums, films, TV shows, fictional characters, plants, locations
-- ✅ Accent-normalized search (Beyoncé, Rihanna work with or without accents)
-- ✅ A/B/C/D tier system with tiered pricing
+- ✅ Wikipedia autocomplete search with advanced filtering
+- ✅ Accent-normalized search (Beyoncé, Rihanna work without accents)
+- ✅ A/B/C/D tier system with DYNAMIC pricing
+- ✅ Saturday 12pm GMT transfer window (24 hours)
 - ✅ Controversial celebrity price boosts
 - ✅ Brown Bread Bonus (+100 for deceased)
-- ✅ Controversy Bonus (+25 points per scandal)
 - ✅ Minimum buzz score of 5 points
-- ✅ Player count banner
-- ✅ Hot Celebs This Week banner
-- ✅ Today's Top Celeb News (filtered for MAJOR news, no gossip)
-- ✅ Top Picked Celebrities section
-- ✅ Transfer window (1 per week)
 - ✅ Profanity filter for team names
-- ✅ Social sharing (WhatsApp/Facebook/X) for both teams AND leagues
-- ✅ Points methodology modal
-- ✅ React frontend with Tailwind styling
-- ✅ Friends League system with invite codes
-- ✅ League sharing via WhatsApp, X (Twitter), Facebook
-- ✅ Badge/achievement system
+
+### UI Features
+- ✅ Player count banner (removed celebrity count)
+- ✅ Transfer window countdown
+- ✅ Hot Celebs This Week banner with REAL Wikipedia photos
+- ✅ Today's Top Celeb News (major news only, no gossip)
+- ✅ Search bar positioned ABOVE news section
+- ✅ Pricing tier info in methodology modal
 - ✅ Mobile responsive design with bottom navigation
-- ✅ Hall of Fame page showing top badge earners
-- ✅ Team customization (colors and icons)
-- ✅ Brown Bread Watch (elderly celebrities with risk indicators)
+
+### Social Features
+- ✅ Team sharing (WhatsApp, X, Facebook)
+- ✅ League sharing (WhatsApp, X, Facebook)
+- ✅ Friends League system with invite codes
+- ✅ Badge/achievement system
+- ✅ Hall of Fame
 
 ## Bug Fixes (Feb 2026)
-- ✅ Fixed search returning plants (Holly genus) - now requires query to be in celebrity's name
-- ✅ Fixed search returning albums/songs with celebrity names
-- ✅ Fixed search returning unrelated people (e.g., Kanye search returning Bianca Censori)
-- ✅ Fixed "is a bar" substring false positive (Rihanna "is a Barbadian singer" was being filtered)
-- ✅ Fixed route ordering issue with /api/team/customization-options
-- ✅ Added accent normalization for celebrity names (Beyoncé, etc.)
-- ✅ Added league sharing buttons (WhatsApp, X, Facebook)
+- ✅ Fixed search returning plants (Holly genus)
+- ✅ Fixed search returning locations (Mariehamn)
+- ✅ Fixed search returning sports teams (IFK Mariehamn)
+- ✅ Fixed "is a bar" substring false positive
+- ✅ Fixed route ordering for customization-options endpoint
+- ✅ Added accent normalization for celebrity names
+- ✅ Removed celebrity count from stats banner
+- ✅ Updated pricing display throughout app
 
 ## News Sources
-- BBC News (priority)
-- The Guardian (priority)
+- BBC News (priority - major news)
+- The Guardian (priority - major news)
 - TMZ
 - People
 - Page Six
 - Daily Mail
 
-News is filtered to show only MAJOR stories (deaths, divorces, awards, legal battles, scandals) and skip gossip (braless, bikini, outfit stories).
+News is filtered for MAJOR stories (deaths, divorces, awards, legal battles, scandals) and skips gossip.
+
+## Hot Celebs This Week
+Currently featuring with REAL Wikipedia photos:
+- Prince Andrew (Royal scandal & legal battles)
+- Meghan Markle (Netflix & Royal drama)
+- Kanye West (Controversy & headlines)
+- Taylor Swift (Eras Tour & awards)
+- Elon Musk (Tech & politics headlines)
+- Donald Trump (Political & legal news)
+- Katie Price (Tabloid regular)
+- Holly Willoughby (TV drama)
 
 ## Backlog / Future Features
 
 ### P1 (High Priority)
 - User authentication for persistent teams
 - Real news API integration (NewsAPI)
-- Weekly buzz score updates
+- Automated weekly badge awards
+- Refresh hot celebs based on current news
 
 ### P2 (Medium Priority)
 - Celebrity comparison feature
 - Historical buzz trends chart
 - Push notifications
+- Price history tracking
 
 ### P3 (Nice to Have)
 - Dark/light mode toggle
 - Mobile app version
-- Automated weekly badge awards
+- Celebrity draft mode (turn-based picking)
