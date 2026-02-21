@@ -720,6 +720,65 @@ ROYAL_A_LIST_KEYWORDS = ["prince william", "prince harry", "king charles", "kate
                           "princess anne", "prince edward", "duke of sussex", "duke of york",
                           "prince of wales", "princess of wales", "duke of edinburgh"]
 
+# Celebrity name aliases - maps alternate names to canonical Wikipedia names
+# This prevents users from adding the same person twice under different names
+CELEBRITY_ALIASES = {
+    # British Royals
+    "prince william": "William, Prince of Wales",
+    "william": "William, Prince of Wales",
+    "prince harry": "Prince Harry, Duke of Sussex",
+    "harry": "Prince Harry, Duke of Sussex",
+    "kate middleton": "Catherine, Princess of Wales",
+    "princess kate": "Catherine, Princess of Wales",
+    "catherine middleton": "Catherine, Princess of Wales",
+    "king charles": "Charles III",
+    "prince charles": "Charles III",
+    "king charles iii": "Charles III",
+    "prince andrew": "Prince Andrew, Duke of York",
+    "andrew mountbatten-windsor": "Prince Andrew, Duke of York",
+    "meghan markle": "Meghan, Duchess of Sussex",
+    "duchess of sussex": "Meghan, Duchess of Sussex",
+    "queen elizabeth": "Elizabeth II",
+    "queen elizabeth ii": "Elizabeth II",
+    "princess diana": "Diana, Princess of Wales",
+    "lady diana": "Diana, Princess of Wales",
+    "camilla": "Camilla",
+    "queen camilla": "Camilla",
+    # Other celebs with common alternate names
+    "the rock": "Dwayne Johnson",
+    "dwayne 'the rock' johnson": "Dwayne Johnson",
+    "jay z": "Jay-Z",
+    "jay-z": "Jay-Z",
+    "50 cent": "50 Cent",
+    "fiddy": "50 Cent",
+    "p diddy": "Sean Combs",
+    "puff daddy": "Sean Combs",
+    "diddy": "Sean Combs",
+    "snoop dogg": "Snoop Dogg",
+    "snoop dog": "Snoop Dogg",
+    "lady gaga": "Lady Gaga",
+    "stefani germanotta": "Lady Gaga",
+}
+
+# Reverse mapping - canonical name to all aliases (for duplicate checking)
+def get_all_name_variants(canonical_name: str) -> set:
+    """Get all name variants for a canonical celebrity name"""
+    variants = {canonical_name.lower()}
+    for alias, canonical in CELEBRITY_ALIASES.items():
+        if canonical.lower() == canonical_name.lower():
+            variants.add(alias.lower())
+    return variants
+
+def get_canonical_name(name: str) -> str:
+    """Get the canonical name for a celebrity (or return original if no alias)"""
+    return CELEBRITY_ALIASES.get(name.lower(), name)
+
+def are_same_celebrity(name1: str, name2: str) -> bool:
+    """Check if two names refer to the same celebrity"""
+    canonical1 = get_canonical_name(name1).lower()
+    canonical2 = get_canonical_name(name2).lower()
+    return canonical1 == canonical2
+
 # Guaranteed B-list celebrities (not quite A-list but definitely not C or D)
 GUARANTEED_B_LIST = [
     "shia labeouf", "megan fox", "lindsay lohan", "paris hilton", "nicole richie",
