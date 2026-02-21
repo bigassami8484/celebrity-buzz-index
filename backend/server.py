@@ -7,6 +7,7 @@ import os
 import logging
 import asyncio
 import resend
+import base64
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from typing import List, Optional
@@ -19,6 +20,7 @@ import unicodedata
 import html
 import random
 from emergentintegrations.llm.chat import LlmChat, UserMessage
+from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
 
 def normalize_text(text: str) -> str:
     """Remove accents and normalize text for matching"""
