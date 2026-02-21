@@ -156,6 +156,15 @@ CONTROVERSIAL_CELEBS = {
 
 # ==================== MODELS ====================
 
+class PriceHistoryEntry(BaseModel):
+    """Model for tracking celebrity price changes over time"""
+    celebrity_id: str
+    celebrity_name: str
+    price: float
+    tier: str
+    buzz_score: float
+    recorded_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 class Celebrity(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
