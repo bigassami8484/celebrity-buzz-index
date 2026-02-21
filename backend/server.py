@@ -2628,15 +2628,23 @@ async def add_to_team(data: AddToTeam):
     if not celebrity:
         raise HTTPException(status_code=404, detail="Celebrity not found")
     
-    # Check if already in team
+    celeb_name = celebrity.get("name", "")
+    
+    # Check if already in team (including alternate name variants)
+    # This prevents adding "Prince William" if "William, Prince of Wales" is already in team
     for c in team.get("celebrities", []):
+        existing_name = c.get("name", "")
+        # Check exact match
         if c["celebrity_id"] == data.celebrity_id:
             raise HTTPException(status_code=400, detail="Celebrity already in team")
+        # Check if same person under different name
+        if are_same_celebrity(existing_name, celeb_name):
+            raise HTTPException(status_code=400, detail=f"This celebrity is already in your team as '{existing_name}'")
     
     # RECALCULATE PRICE using consistent pricing (same as Hot Celebs and search)
     tier = celebrity.get("tier", "D")
     default_buzz = 50
-    price = get_dynamic_price(tier, default_buzz, celebrity.get("name", ""))
+    price = get_dynamic_price(tier, default_buzz, celeb_name)
     
     if team.get("budget_remaining", 0) < price:
         raise HTTPException(status_code=400, detail="Insufficient budget")
