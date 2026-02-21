@@ -969,6 +969,34 @@ def detect_category_from_bio(bio: str, name: str) -> str:
     
     return "other"  # Default to other
 
+
+def determine_tier_from_bio(bio: str) -> str:
+    """Synchronous helper to determine celebrity tier from bio text"""
+    bio_lower = bio.lower()
+    
+    # A-list: Major awards, legendary status
+    a_list_score = sum(1 for ind in A_LIST_INDICATORS if ind in bio_lower)
+    if a_list_score >= 2:
+        return "A"
+    
+    # B-list: Award-winning, successful
+    b_list_score = sum(1 for ind in B_LIST_INDICATORS if ind in bio_lower)
+    if a_list_score >= 1 or b_list_score >= 2:
+        return "B"
+    
+    # C-list: Known for appearances
+    c_list_score = sum(1 for ind in C_LIST_INDICATORS if ind in bio_lower)
+    if b_list_score >= 1 or c_list_score >= 1:
+        return "C"
+    
+    return "D"
+
+
+def get_category_from_bio(bio: str, name: str) -> str:
+    """Synchronous wrapper for detect_category_from_bio"""
+    return detect_category_from_bio(bio, name)
+
+
 async def generate_celebrity_news(name: str, category: str) -> List[dict]:
     """Generate AI-powered news summaries for celebrity"""
     try:
