@@ -1163,10 +1163,19 @@ def detect_category_from_bio(bio: str, name: str) -> str:
 
 def determine_tier_from_bio(bio: str, name: str = "") -> str:
     """Synchronous helper to determine celebrity tier from bio text"""
+    name_lower = name.lower() if name else ""
     
     # First check if this is a guaranteed A-lister (mega-star override)
-    if name and name.lower() in GUARANTEED_A_LIST:
+    if name_lower in GUARANTEED_A_LIST:
         return "A"
+    
+    # Check if guaranteed B-lister
+    if name_lower in GUARANTEED_B_LIST:
+        return "B"
+    
+    # Check if guaranteed C-lister  
+    if name_lower in GUARANTEED_C_LIST:
+        return "C"
     
     bio_lower = bio.lower()
     
