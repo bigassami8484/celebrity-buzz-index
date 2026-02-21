@@ -678,7 +678,13 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                 "is a long-distance", "is a cycling", "is a race", "is a marathon",
                                 "is an annual", "is a sporting", "is a professional cycling",
                                 "is a haunted", "is a location", "is a place", "is a building",
-                                "is a nightclub", "is a restaurant", "is a bar", "is a pub"
+                                "is a nightclub", "is a restaurant", "is a bar", "is a pub",
+                                # More facility/building types
+                                "is a prison", "is a penitentiary", "is a correctional",
+                                "is a supermax", "is a maximum-security", "is a high-security",
+                                "is a federal", "is a state prison", "is a jail",
+                                "united states penitentiary", "administrative maximum",
+                                "is a hospital", "is a medical center", "is a clinic"
                             ]
                             
                             # Check if description starts with any skip phrase
