@@ -1015,17 +1015,22 @@ const Header = () => (
   </header>
 );
 
-// Trending Ticker Component with Images
-const TrendingTicker = ({ celebrities }) => {
-  if (!celebrities.length) return null;
+// Hot Celebs Scrolling Ticker Component (replaces old TrendingTicker)
+const HotCelebsTicker = ({ celebs, onSelect }) => {
+  if (!celebs || celebs.length === 0) return null;
   
-  const doubled = [...celebrities, ...celebrities];
+  // Double the list for infinite scroll effect
+  const doubled = [...celebs, ...celebs];
   
   return (
-    <div className="ticker-container" data-testid="trending-ticker">
-      <div className="ticker-content">
+    <div className="hot-celebs-ticker-container" data-testid="hot-celebs-ticker">
+      <div className="hot-celebs-ticker-content">
         {doubled.map((celeb, idx) => (
-          <span key={idx} className="ticker-item flex items-center gap-3">
+          <span 
+            key={idx} 
+            className="ticker-item flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => onSelect && onSelect(celeb.name)}
+          >
             <img 
               src={celeb.image || `https://ui-avatars.com/api/?name=${celeb.name}&size=40&background=FF0099&color=fff`}
               alt={celeb.name}
@@ -1037,6 +1042,7 @@ const TrendingTicker = ({ celebrities }) => {
             <span className="font-bold text-white">{celeb.name}</span>
             {celeb.tier && <TierBadge tier={celeb.tier} />}
             <span className="bg-black/80 px-2 py-0.5 text-[#00FF00] font-bold text-sm">£{celeb.price}M</span>
+            <span className="text-[10px] text-[#FF0099]">🔥 {celeb.hot_reason}</span>
           </span>
         ))}
       </div>
