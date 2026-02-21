@@ -1224,6 +1224,14 @@ async def autocomplete_search(q: str):
         return {"suggestions": []}
     
     suggestions = await fetch_wikipedia_autocomplete(q)
+    
+    # Check for Brown Bread premium pricing on each suggestion
+    for suggestion in suggestions:
+        premium_price = await get_brown_bread_premium_by_name(suggestion.get("name", ""))
+        if premium_price > 0:
+            suggestion["estimated_price"] = premium_price
+            suggestion["is_brown_bread_premium"] = True
+    
     return {"suggestions": suggestions}
 
 @api_router.post("/seed")
