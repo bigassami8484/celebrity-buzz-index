@@ -1705,7 +1705,7 @@ function App() {
     } catch (e) {
       console.error("Error creating team:", e);
     }
-  }, [fetchTeamLeagues, fetchPriceAlerts]);
+  }, [fetchTeamLeagues, fetchPriceAlerts, fetchHotStreaks]);
 
   // Fetch leaderboard
   const fetchLeaderboard = useCallback(async () => {
