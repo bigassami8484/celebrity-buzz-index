@@ -1088,8 +1088,8 @@ const HowItWorks = ({ onShowMethodology }) => (
 
 // Header Component
 const Header = () => (
-  <header className="py-8 px-4 text-center">
-    <h1 className="font-anton text-5xl md:text-7xl tracking-tighter uppercase header-title" data-testid="main-title">
+  <header className="py-6 md:py-8 px-4 text-center">
+    <h1 className="font-anton text-3xl sm:text-5xl md:text-7xl tracking-tighter uppercase header-title" data-testid="main-title">
       <span className="text-[#FFD700]">C</span>
       <span className="text-[#FF0099]">e</span>
       <span>l</span>
@@ -1099,19 +1099,19 @@ const Header = () => (
       <span>i</span>
       <span className="text-[#FF0099]">t</span>
       <span>y</span>
-      <span className="mx-4"></span>
+      <span className="mx-1 sm:mx-2 md:mx-4"></span>
       <span className="text-[#FFD700]">B</span>
       <span className="text-[#FF0099]">u</span>
       <span>z</span>
       <span className="text-[#00F0FF]">z</span>
-      <span className="mx-4"></span>
+      <span className="mx-1 sm:mx-2 md:mx-4"></span>
       <span className="text-[#FFD700]">I</span>
       <span className="text-[#FF0099]">n</span>
       <span>d</span>
       <span className="text-[#00F0FF]">e</span>
       <span>x</span>
     </h1>
-    <p className="font-space text-[#A1A1AA] mt-4 text-sm uppercase tracking-[4px]">
+    <p className="font-space text-[#A1A1AA] mt-2 md:mt-4 text-xs sm:text-sm uppercase tracking-[2px] sm:tracking-[4px]">
       Build Your Dream Celebrity Team
     </p>
   </header>
