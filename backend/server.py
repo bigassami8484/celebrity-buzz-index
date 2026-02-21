@@ -486,6 +486,39 @@ def get_brown_bread_risk(age: int) -> str:
         return "moderate"  # 🟢
     return "low"
 
+
+async def apply_brown_bread_premium(celeb: dict, base_price: float) -> float:
+    """
+    Check if celebrity qualifies for Brown Bread premium pricing.
+    Top 3 oldest living celebrities get premium prices:
+    - #1 oldest: £15M
+    - #2 oldest: £13M
+    - #3 oldest: £11M
+    """
+    age = celeb.get("age", 0)
+    is_deceased = celeb.get("is_deceased", False)
+    
+    # Only living celebrities with known age qualify
+    if is_deceased or age < 60:
+        return base_price
+    
+    # Get top 3 oldest living celebrities from DB
+    top_elderly = await db.celebrities.find(
+        {"is_deceased": False, "age": {"$gte": 60}},
+        {"_id": 0, "name": 1, "age": 1}
+    ).sort("age", -1).limit(3).to_list(3)
+    
+    # Check if this celeb is in top 3
+    celeb_name = celeb.get("name", "").lower()
+    brown_bread_premium_prices = [15.0, 13.0, 11.0]
+    
+    for idx, elderly in enumerate(top_elderly):
+        if elderly.get("name", "").lower() == celeb_name:
+            return brown_bread_premium_prices[idx]
+    
+    return base_price
+
+
 # ==================== CELEBRITY CATEGORIES ====================
 CATEGORIES = [
     {"id": "movie_stars", "name": "Movie Stars", "icon": "film"},
