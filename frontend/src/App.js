@@ -1561,6 +1561,10 @@ function App() {
   const [priceAlerts, setPriceAlerts] = useState([]);
   const [hotStreaks, setHotStreaks] = useState([]);
   
+  // Price History Modal state
+  const [showPriceHistory, setShowPriceHistory] = useState(false);
+  const [priceHistoryCeleb, setPriceHistoryCeleb] = useState(null);
+  
   // League state
   const [leagues, setLeagues] = useState([]);
   const [selectedLeague, setSelectedLeague] = useState(null);
@@ -1576,6 +1580,12 @@ function App() {
   
   // Mobile tab state
   const [mobileTab, setMobileTab] = useState('home');
+  
+  // Handler to show price history
+  const handleShowPriceHistory = (celebrityName) => {
+    setPriceHistoryCeleb(celebrityName);
+    setShowPriceHistory(true);
+  };
 
   // Fetch stats
   const fetchStats = useCallback(async () => {
