@@ -1451,46 +1451,148 @@ async def get_pricing_info():
 
 @api_router.get("/hot-celebs")
 async def get_hot_celebs():
-    """Get hot celebrities making headlines - RANDOMIZED on each refresh with real photos"""
+    """Get hot celebrities WHO ARE ACTUALLY IN THE NEWS THIS WEEK - with real photos"""
+    
+    # Check cache first (1 hour cache for hot celebs based on news)
+    cached = await db.news_cache.find_one(
+        {"type": "hot_celebs_from_news"},
+        {"_id": 0}
+    )
+    
+    if cached and cached.get("updated_at"):
+        cache_time = datetime.fromisoformat(cached["updated_at"])
+        cache_age = datetime.now(timezone.utc) - cache_time
+        if cache_age.total_seconds() < 3600:  # 1 hour cache
+            return {"hot_celebs": cached.get("hot_celebs", [])}
+    
     hot_list = []
     headers = {
         "User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com; contact@example.com) httpx/0.27"
     }
     
-    # Get random selection of celebs from pool - now 10 for the scrolling ticker
-    random_celebs = get_random_hot_celebs(10)
+    # RSS feeds to scan for celebrity news
+    rss_sources = [
+        ("https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "BBC News"),
+        ("https://www.theguardian.com/lifeandstyle/celebrities/rss", "The Guardian"),
+        ("https://www.tmz.com/rss.xml", "TMZ"),
+        ("https://people.com/feed/", "People"),
+        ("https://pagesix.com/feed/", "Page Six"),
+        ("https://www.dailymail.co.uk/tvshowbiz/index.rss", "Daily Mail"),
+    ]
+    
+    # Collect all celebrity names mentioned in news this week
+    celeb_mentions = {}  # {name: {"count": int, "headlines": [], "source": str}}
     
     async with httpx.AsyncClient() as client:
-        for celeb_info in random_celebs:
-            # Check if celeb exists in DB
-            celeb = await db.celebrities.find_one(
-                {"name": {"$regex": f"^{celeb_info['name']}$", "$options": "i"}},
-                {"_id": 0}
-            )
-            
-            # Use DB tier if exists, otherwise use pool tier
-            # This ensures Hot Celebs price matches what you get when you search
-            tier = celeb.get("tier", celeb_info["tier"]) if celeb else celeb_info["tier"]
-            
-            # Use consistent buzz score of 50 for pricing
-            default_buzz = 50
-            price = get_dynamic_price(tier, default_buzz, celeb_info["name"])
-            
-            if celeb and celeb.get("image") and not celeb.get("image", "").startswith("https://ui-avatars"):
-                hot_list.append({
-                    "name": celeb.get("name", celeb_info["name"]),
-                    "tier": tier,
-                    "category": celeb.get("category", celeb_info["category"]),
-                    "price": price,
-                    "hot_reason": celeb_info["reason"],
-                    "image": celeb.get("image")
-                })
-            else:
-                # Fetch real image from Wikipedia
+        for rss_url, source_name in rss_sources:
+            try:
+                response = await client.get(rss_url, timeout=10.0, headers=headers)
+                if response.status_code == 200:
+                    content = response.text
+                    items = content.split("<item>")[1:15]  # Get first 15 items per source
+                    
+                    for item in items:
+                        try:
+                            # Extract title
+                            title_start = item.find("<title>") + 7
+                            title_end = item.find("</title>")
+                            title = item[title_start:title_end].replace("<![CDATA[", "").replace("]]>", "").strip()
+                            title = decode_html_entities(title)
+                            
+                            # Try to extract celebrity names from headlines
+                            # Look for patterns like "Name Name" at start, or "Name Name:" or "'s"
+                            potential_names = extract_celebrity_names_from_headline(title)
+                            
+                            for name in potential_names:
+                                if name not in celeb_mentions:
+                                    celeb_mentions[name] = {"count": 0, "headlines": [], "source": source_name}
+                                celeb_mentions[name]["count"] += 1
+                                if len(celeb_mentions[name]["headlines"]) < 3:
+                                    celeb_mentions[name]["headlines"].append(title[:100])
+                        except:
+                            continue
+            except Exception as e:
+                logger.error(f"Error fetching RSS from {source_name}: {e}")
+                continue
+        
+        # Sort by mention count and verify top celebrities via Wikidata
+        sorted_celebs = sorted(celeb_mentions.items(), key=lambda x: x[1]["count"], reverse=True)
+        
+        verified_celebs = []
+        for name, data in sorted_celebs[:25]:  # Check top 25 candidates
+            if len(verified_celebs) >= 10:
+                break
+                
+            # Verify this is a real human via Wikipedia/Wikidata
+            try:
+                wiki_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{name.replace(' ', '_')}"
+                response = await client.get(wiki_url, timeout=5.0, headers=headers)
+                
+                if response.status_code == 200:
+                    wiki_data = response.json()
+                    page_id = wiki_data.get("pageid")
+                    description = wiki_data.get("description", "").lower()
+                    extract = wiki_data.get("extract", "").lower()
+                    
+                    # Check if this is a person (not a band, place, movie, etc.)
+                    non_person_indicators = ["band", "group", "film", "movie", "album", "song", "company", 
+                                             "city", "country", "organization", "team", "club"]
+                    person_indicators = ["actor", "actress", "singer", "musician", "footballer", "athlete",
+                                        "politician", "model", "presenter", "host", "comedian", "rapper",
+                                        "born", "businessman", "businesswoman", "prince", "princess", 
+                                        "duke", "duchess", "king", "queen", "celebrity", "star"]
+                    
+                    is_person = any(ind in description or ind in extract[:200] for ind in person_indicators)
+                    is_not_person = any(ind in description for ind in non_person_indicators)
+                    
+                    if is_person and not is_not_person:
+                        # Get image
+                        image = wiki_data.get("thumbnail", {}).get("source", "")
+                        if not image:
+                            image = f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&size=200&background=FF0099&color=fff"
+                        
+                        # Determine tier based on description/fame
+                        bio = wiki_data.get("extract", "")
+                        tier = determine_tier_from_bio(bio)
+                        category = get_category_from_bio(bio, name)
+                        
+                        # Calculate price
+                        default_buzz = 50
+                        price = get_dynamic_price(tier, default_buzz, name)
+                        
+                        # Create hot reason from headline
+                        hot_reason = data["headlines"][0][:60] + "..." if data["headlines"] else "Trending in news"
+                        
+                        verified_celebs.append({
+                            "name": name,
+                            "tier": tier,
+                            "category": category,
+                            "price": price,
+                            "hot_reason": hot_reason,
+                            "image": image,
+                            "mention_count": data["count"]
+                        })
+            except Exception as e:
+                logger.error(f"Error verifying {name}: {e}")
+                continue
+        
+        hot_list = verified_celebs
+        
+        # If we didn't get enough from news, supplement with fallback pool
+        if len(hot_list) < 6:
+            fallback_celebs = get_random_hot_celebs(10 - len(hot_list))
+            for celeb_info in fallback_celebs:
+                # Check if already in list
+                if any(h["name"].lower() == celeb_info["name"].lower() for h in hot_list):
+                    continue
+                    
+                tier = celeb_info["tier"]
+                price = get_dynamic_price(tier, 50, celeb_info["name"])
+                
+                # Fetch image
                 try:
                     wiki_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{celeb_info['name'].replace(' ', '_')}"
                     response = await client.get(wiki_url, timeout=5.0, headers=headers)
-                    
                     if response.status_code == 200:
                         wiki_data = response.json()
                         image = wiki_data.get("thumbnail", {}).get("source", "")
@@ -1505,12 +1607,91 @@ async def get_hot_celebs():
                     "name": celeb_info["name"],
                     "tier": tier,
                     "category": celeb_info["category"],
-                    "hot_reason": celeb_info["reason"],
                     "price": price,
-                    "image": image
+                    "hot_reason": celeb_info["reason"],
+                    "image": image,
+                    "mention_count": 0
                 })
+                
+                if len(hot_list) >= 10:
+                    break
+    
+    # Cache the results
+    if hot_list:
+        await db.news_cache.update_one(
+            {"type": "hot_celebs_from_news"},
+            {"$set": {
+                "hot_celebs": hot_list,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }},
+            upsert=True
+        )
     
     return {"hot_celebs": hot_list}
+
+
+def extract_celebrity_names_from_headline(headline: str) -> List[str]:
+    """Extract potential celebrity names from news headlines"""
+    names = []
+    
+    # Common patterns:
+    # "Taylor Swift announces..." -> "Taylor Swift"
+    # "Brad Pitt and Angelina Jolie..." -> "Brad Pitt", "Angelina Jolie"
+    # "Eric Dane's death..." -> "Eric Dane"
+    # "Meghan King Accuses Jim Edmonds" -> "Meghan King", "Jim Edmonds"
+    
+    # Skip headlines that are clearly not about specific people
+    skip_starts = ["the ", "how ", "why ", "what ", "when ", "where ", "best ", "top ", "new "]
+    if any(headline.lower().startswith(skip) for skip in skip_starts):
+        return names
+    
+    # Pattern 1: Name at start followed by verb or possessive
+    # Match: "First Last" or "First Middle Last"
+    name_pattern = r"^([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})(?:'s|:|\s+(?:says|announces|reveals|dies|dead|wins|loses|accused|claims|faces|fires|quits|returns|slams|blasts|responds|breaks|speaks|shares|posts|confirms|denies|splits|divorces|marries|pregnant|engaged|announces|launches|releases|signs|joins|leaves))"
+    match = re.search(name_pattern, headline)
+    if match:
+        names.append(match.group(1))
+    
+    # Pattern 2: "Name and Name" pattern
+    and_pattern = r"([A-Z][a-z]+\s+[A-Z][a-z]+)\s+and\s+([A-Z][a-z]+\s+[A-Z][a-z]+)"
+    and_match = re.search(and_pattern, headline)
+    if and_match:
+        names.append(and_match.group(1))
+        names.append(and_match.group(2))
+    
+    # Pattern 3: "Name Name's" possessive
+    poss_pattern = r"([A-Z][a-z]+\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)'s"
+    poss_match = re.search(poss_pattern, headline)
+    if poss_match:
+        names.append(poss_match.group(1))
+    
+    # Pattern 4: Names followed by colon (common in headlines)
+    colon_pattern = r"^([A-Z][a-z]+\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?):"
+    colon_match = re.search(colon_pattern, headline)
+    if colon_match:
+        names.append(colon_match.group(1))
+    
+    # Pattern 5: "Accuses Name Name" or "with Name Name"
+    accuses_pattern = r"(?:accuses|with|and|vs|against|featuring)\s+([A-Z][a-z]+\s+[A-Z][a-z]+)"
+    accuses_matches = re.findall(accuses_pattern, headline, re.IGNORECASE)
+    names.extend(accuses_matches)
+    
+    # Clean and dedupe
+    cleaned = []
+    for name in names:
+        name = name.strip()
+        # Skip if too short or too long
+        if len(name) < 5 or len(name) > 40:
+            continue
+        # Skip common non-name phrases
+        skip_phrases = ["the ", "real housewives", "love island", "strictly come", "good morning", 
+                       "this morning", "breaking news", "just in", "watch video"]
+        if any(skip in name.lower() for skip in skip_phrases):
+            continue
+        if name not in cleaned:
+            cleaned.append(name)
+    
+    return cleaned
 
 @api_router.get("/price-alerts/{team_id}")
 async def get_price_alerts(team_id: str):
