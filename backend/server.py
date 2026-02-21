@@ -779,6 +779,18 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             if re.search(r'(structure|architectural|building designed|constructed|built in|pavilion|temporary|shape-shifting|foundation)', desc_lower[:150]):
                                 should_skip = True
                             
+                            # Check for ships/vessels
+                            if re.search(r'(ships of the|hms |uss |royal navy|warship|vessel|submarine|destroyer|cruiser|battleship|frigate)', desc_lower[:150]):
+                                should_skip = True
+                            
+                            # Check for prehistoric/historical artifacts
+                            if re.search(r'(prehistoric|figurine|sculpture|artifact|archaeological|ancient|excavat)', desc_lower[:150]):
+                                should_skip = True
+                            
+                            # Check for Japanese TV shows/tokusatsu
+                            if re.search(r'(tokusatsu|japanese television|franchise|tv series|television series)', desc_lower[:150]):
+                                should_skip = True
+                            
                             if should_skip:
                                 pass  # Filtered out
                                 continue
