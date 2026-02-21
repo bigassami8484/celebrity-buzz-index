@@ -1806,13 +1806,14 @@ async def get_hot_celebs():
                 logger.error(f"Error fetching {name}: {e}")
                 continue
         
-        # If we still don't have 15, add from fallback pool (only those with photos)
-        if len(hot_list) < 15:
+        # Only use fallback if we have very few celebs from news (less than 8)
+        # This ensures we prioritize actual news mentions
+        if len(hot_list) < 8:
             fallback_names = [c["name"] for c in HOT_CELEBS_POOL if c["name"] not in [h["name"] for h in hot_list]]
             random.shuffle(fallback_names)
             
             for name in fallback_names:
-                if len(hot_list) >= 15:
+                if len(hot_list) >= 12:  # Only fill up to 12 with fallback
                     break
                 
                 try:
@@ -1838,6 +1839,9 @@ async def get_hot_celebs():
                                 "tier": tier,
                                 "category": category,
                                 "price": price,
+                                "base_price": price,
+                                "news_premium": False,
+                                "trending_tag": "",
                                 "hot_reason": hot_reason,
                                 "image": image,
                                 "mention_count": 0
