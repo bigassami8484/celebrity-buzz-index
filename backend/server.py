@@ -579,7 +579,10 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
     This uses the Wikidata API to filter out places, bands, objects, companies and other non-person entities.
     """
     try:
-        headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (contact@example.com)"}
+        # Use a proper User-Agent as required by Wikipedia API
+        headers = {
+            "User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com; contact@example.com) httpx/0.27"
+        }
         query_lower = query.lower().strip()
         query_parts = query_lower.split()
         
