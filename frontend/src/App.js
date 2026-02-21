@@ -837,7 +837,7 @@ const HowItWorks = ({ onShowMethodology }) => (
         Points Info
       </button>
     </div>
-    <div className="grid grid-cols-5 gap-2">
+    <div className="grid grid-cols-5 gap-2 mb-3">
       <div className="text-center">
         <div className="w-8 h-8 bg-[#FF0099] flex items-center justify-center mx-auto mb-1">
           <Search className="w-4 h-4 text-white" />
@@ -869,6 +869,9 @@ const HowItWorks = ({ onShowMethodology }) => (
         <h4 className="font-space font-bold text-xs">+100 💀</h4>
       </div>
     </div>
+    <p className="text-[10px] text-[#A1A1AA] text-center">
+      Search for any celebrity • Prices range from £0.5m-£12m based on tier & buzz • Draft a team of 10 with your £50M budget • Transfer window opens Sat 12pm GMT • Earn +100 bonus if a celeb passes away
+    </p>
   </div>
 );
 
