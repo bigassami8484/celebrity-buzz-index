@@ -1258,6 +1258,85 @@ async def get_celebrity(celebrity_id: str):
         raise HTTPException(status_code=404, detail="Celebrity not found")
     return {"celebrity": celebrity}
 
+@api_router.get("/celebrity/{celebrity_id}/price-history")
+async def get_celebrity_price_history(celebrity_id: str, limit: int = 30):
+    """Get price history for a celebrity"""
+    # Get the celebrity first
+    celebrity = await db.celebrities.find_one({"id": celebrity_id}, {"_id": 0})
+    if not celebrity:
+        raise HTTPException(status_code=404, detail="Celebrity not found")
+    
+    # Get price history entries, sorted by date descending
+    history = await db.price_history.find(
+        {"celebrity_id": celebrity_id},
+        {"_id": 0}
+    ).sort("recorded_at", -1).limit(limit).to_list(limit)
+    
+    # Convert datetime objects to ISO strings
+    for entry in history:
+        if isinstance(entry.get("recorded_at"), datetime):
+            entry["recorded_at"] = entry["recorded_at"].isoformat()
+    
+    # If no history, return current price as the only entry
+    if not history:
+        history = [{
+            "celebrity_id": celebrity_id,
+            "celebrity_name": celebrity.get("name", ""),
+            "price": celebrity.get("price", 5),
+            "tier": celebrity.get("tier", "D"),
+            "buzz_score": celebrity.get("buzz_score", 0),
+            "recorded_at": datetime.now(timezone.utc).isoformat()
+        }]
+    
+    return {
+        "celebrity_name": celebrity.get("name", ""),
+        "current_price": celebrity.get("price", 5),
+        "current_tier": celebrity.get("tier", "D"),
+        "history": history
+    }
+
+@api_router.get("/price-history/celebrity-name/{name}")
+async def get_price_history_by_name(name: str, limit: int = 30):
+    """Get price history for a celebrity by name"""
+    # Get the celebrity first
+    celebrity = await db.celebrities.find_one(
+        {"name": {"$regex": f"^{name}$", "$options": "i"}}, 
+        {"_id": 0}
+    )
+    if not celebrity:
+        raise HTTPException(status_code=404, detail="Celebrity not found")
+    
+    celebrity_id = celebrity.get("id", "")
+    
+    # Get price history entries
+    history = await db.price_history.find(
+        {"celebrity_id": celebrity_id},
+        {"_id": 0}
+    ).sort("recorded_at", -1).limit(limit).to_list(limit)
+    
+    # Convert datetime objects to ISO strings
+    for entry in history:
+        if isinstance(entry.get("recorded_at"), datetime):
+            entry["recorded_at"] = entry["recorded_at"].isoformat()
+    
+    # If no history, return current price
+    if not history:
+        history = [{
+            "celebrity_id": celebrity_id,
+            "celebrity_name": celebrity.get("name", ""),
+            "price": celebrity.get("price", 5),
+            "tier": celebrity.get("tier", "D"),
+            "buzz_score": celebrity.get("buzz_score", 0),
+            "recorded_at": datetime.now(timezone.utc).isoformat()
+        }]
+    
+    return {
+        "celebrity_name": celebrity.get("name", ""),
+        "current_price": celebrity.get("price", 5),
+        "current_tier": celebrity.get("tier", "D"),
+        "history": history
+    }
+
 @api_router.get("/celebrities/category/{category}")
 async def get_celebrities_by_category(category: str):
     """Get celebrities by category with correct dynamic pricing"""
