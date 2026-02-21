@@ -1278,8 +1278,7 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize }) => {
               <div className="flex-1">
                 <p className="font-bold">{celeb.name}</p>
                 <p className="text-sm text-[#A1A1AA]">
-                  <span className="text-[#FFD700]">£{celeb.price}M</span> • 
-                  <span className="text-[#FF0099] ml-1">{celeb.buzz_score?.toFixed(1)} buzz</span>
+                  <span className="text-[#FFD700]">£{celeb.price}M</span>
                 </p>
               </div>
               <button 
