@@ -776,7 +776,7 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                 should_skip = True
                             
                             # Check for building/structure patterns
-                            if re.search(r'(structure|architectural|building designed|constructed|built in)', desc_lower[:150]):
+                            if re.search(r'(structure|architectural|building designed|constructed|built in|pavilion|temporary|shape-shifting|foundation)', desc_lower[:150]):
                                 should_skip = True
                             
                             if should_skip:
