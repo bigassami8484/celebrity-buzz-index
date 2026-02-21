@@ -2051,42 +2051,44 @@ function App() {
           activeCategory={activeCategory} 
           onSelect={handleCategoryChange} 
         />
+        
+        {/* Celebrity Grid - Now above news so searched celebs show immediately */}
+        <div className="mb-6">
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map(i => <LoadingCard key={i} />)}
+            </div>
+          ) : celebrities.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" data-testid="celebrity-grid">
+              {celebrities.map(celeb => (
+                <CelebrityCard
+                  key={celeb.id}
+                  celebrity={celeb}
+                  onAdd={addToTeam}
+                  isInTeam={isInTeam(celeb.id)}
+                  canAfford={canAfford(celeb.price)}
+                  onShowPriceHistory={handleShowPriceHistory}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-[#0A0A0A] border border-[#262626]">
+              <div className="w-12 h-12 bg-[#1A1A1A] rounded-full flex items-center justify-center mx-auto mb-3">
+                <Search className="w-6 h-6 text-[#666]" />
+              </div>
+              <h3 className="font-anton text-lg text-[#A1A1AA] uppercase">
+                {activeCategory ? "Loading..." : "No Celebrities Yet"}
+              </h3>
+              <p className="text-xs text-[#666] mt-1">Search or select a category above</p>
+            </div>
+          )}
+        </div>
+        
         <TodaysNews news={todaysNews} />
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
-          {/* Celebrity Grid */}
-          <div className="lg:col-span-8">
-            {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {[1, 2, 3, 4, 5, 6].map(i => <LoadingCard key={i} />)}
-              </div>
-            ) : celebrities.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" data-testid="celebrity-grid">
-                {celebrities.map(celeb => (
-                  <CelebrityCard
-                    key={celeb.id}
-                    celebrity={celeb}
-                    onAdd={addToTeam}
-                    isInTeam={isInTeam(celeb.id)}
-                    canAfford={canAfford(celeb.price)}
-                    onShowPriceHistory={handleShowPriceHistory}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16">
-                <div className="w-16 h-16 bg-[#1A1A1A] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Search className="w-8 h-8 text-[#666]" />
-                </div>
-                <h3 className="font-anton text-2xl text-[#A1A1AA] uppercase">
-                  {activeCategory ? "Loading..." : "No Celebrities Yet"}
-                </h3>
-              </div>
-            )}
-          </div>
-          
-          {/* Sidebar */}
-          <div className="lg:col-span-4 space-y-6">
+          {/* Sidebar - Team Panel */}
+          <div className="lg:col-span-8 space-y-6">
             <TeamPanel 
               team={team} 
               onRemove={removeFromTeam}
