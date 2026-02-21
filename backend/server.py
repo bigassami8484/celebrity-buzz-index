@@ -779,15 +779,13 @@ def get_dynamic_price(tier: str, buzz_score: float, name: str = "") -> float:
     Price increases when celebrity is in the news (high buzz)
     Price decreases when celebrity is out of the news (low buzz)
     
-    Pricing Tiers:
+    Pricing Tiers (STRICT - prices MUST stay within range):
     - A-List: £9m-£12m (high scoring but expensive)
     - B-List: £5m-£8m (balanced steady picks)  
     - C-List: £2m-£4m (risk/reward)
     - D-List: £0.5m-£1.5m (cheap wildcards)
     """
-    base_price = get_base_price_for_tier(tier)
-    
-    # Define price ranges for each tier
+    # Define STRICT price ranges for each tier
     price_ranges = {
         "A": (9.0, 12.0),   # £9m-£12m
         "B": (5.0, 8.0),    # £5m-£8m
@@ -806,11 +804,8 @@ def get_dynamic_price(tier: str, buzz_score: float, name: str = "") -> float:
     # Calculate dynamic price within the tier's range
     dynamic_price = min_price + (price_range * buzz_factor)
     
-    # Controversial celebrity boost (adds to price)
-    controversy_boost = get_controversial_price_boost(name)
-    if controversy_boost > 0:
-        # Add up to £3M for very controversial celebs
-        dynamic_price = min(max_price + 3, dynamic_price + (controversy_boost / 5))
+    # STRICT: Ensure price stays within tier range
+    dynamic_price = max(min_price, min(max_price, dynamic_price))
     
     # Round to 1 decimal place
     return round(dynamic_price, 1)
