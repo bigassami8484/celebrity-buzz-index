@@ -1919,6 +1919,11 @@ function App() {
   const [priceAlerts, setPriceAlerts] = useState([]);
   const [hotStreaks, setHotStreaks] = useState([]);
   
+  // Auth state
+  const [user, setUser] = useState(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isProcessingAuth, setIsProcessingAuth] = useState(false);
+  
   // Price History Modal state
   const [showPriceHistory, setShowPriceHistory] = useState(false);
   const [priceHistoryCeleb, setPriceHistoryCeleb] = useState(null);
@@ -1938,6 +1943,52 @@ function App() {
   
   // Mobile tab state
   const [mobileTab, setMobileTab] = useState('home');
+  
+  // Check for OAuth callback session_id in URL fragment on mount
+  // CRITICAL: Check synchronously during render to prevent race conditions
+  const hasSessionId = window.location.hash?.includes('session_id=');
+  
+  // Auth handlers
+  const handleAuthSuccess = useCallback((userData) => {
+    setUser(userData);
+    setIsProcessingAuth(false);
+    toast.success(`Welcome, ${userData.name}!`);
+  }, []);
+  
+  const handleAuthError = useCallback((error) => {
+    setIsProcessingAuth(false);
+    toast.error(error || "Authentication failed");
+  }, []);
+  
+  const handleLogout = useCallback(async () => {
+    try {
+      await axios.post(`${AUTH_API}/logout`);
+      setUser(null);
+      toast.success("Signed out successfully");
+    } catch (error) {
+      console.error("Logout error:", error);
+      setUser(null);
+    }
+  }, []);
+  
+  // Check existing session on mount
+  const checkAuth = useCallback(async () => {
+    // Skip if we're processing OAuth callback
+    if (window.location.hash?.includes('session_id=')) {
+      setIsProcessingAuth(true);
+      return;
+    }
+    
+    try {
+      const res = await axios.get(`${AUTH_API}/me`);
+      if (res.data.is_authenticated && res.data.user) {
+        setUser(res.data.user);
+      }
+    } catch (error) {
+      // Not logged in - that's fine
+      console.log("Not authenticated");
+    }
+  }, []);
   
   // Handler to show price history
   const handleShowPriceHistory = (celebrityName) => {
