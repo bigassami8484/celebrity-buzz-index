@@ -1946,7 +1946,6 @@ function App() {
           activeCategory={activeCategory} 
           onSelect={handleCategoryChange} 
         />
-        <HotCelebsBanner celebs={hotCelebs} onSelect={searchCelebrity} />
         <TodaysNews news={todaysNews} />
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
