@@ -1235,6 +1235,15 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     doc['created_at'] = doc['created_at'].isoformat()
     await db.celebrities.insert_one(doc)
     
+    # Record initial price history
+    await record_price_history(
+        celebrity_id=celebrity.id,
+        celebrity_name=celebrity.name,
+        price=price,
+        tier=tier,
+        buzz_score=buzz_score
+    )
+    
     # Remove _id before returning
     if '_id' in doc:
         del doc['_id']
