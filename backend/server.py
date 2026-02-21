@@ -1704,8 +1704,6 @@ async def get_hot_celebs():
         )
     
     return {"hot_celebs": hot_list}
-    
-    return {"hot_celebs": hot_list}
 
 
 def extract_celebrity_names_from_headline(headline: str) -> List[str]:
