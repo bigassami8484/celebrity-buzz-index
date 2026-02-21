@@ -1936,7 +1936,7 @@ function App() {
       
       <PlayerCountBanner stats={stats} />
       <Header />
-      <HotCelebsTicker celebs={hotCelebs} onSelect={handleCelebSearch} />
+      <HotCelebsBanner celebs={hotCelebs} onSelect={handleCelebSearch} />
       
       <div className="max-w-7xl mx-auto px-4 py-8">
         <HowItWorks onShowMethodology={() => setShowMethodology(true)} />
