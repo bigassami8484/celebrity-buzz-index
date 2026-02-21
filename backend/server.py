@@ -511,9 +511,9 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                         paren_content = title.split("(")[1].split(")")[0].lower() if ")" in title else ""
                         allowed_roles = ["musician", "actor", "actress", "singer", "rapper", "footballer",
                                         "politician", "presenter", "comedian", "director", "writer",
-                                        "athlete", "businessman", "model", "chef", "host", "dancer"]
+                                        "athlete", "businessman", "model", "chef", "host", "dancer",
+                                        "duke", "duchess", "prince", "princess", "royal", "queen", "king"]
                         if not any(role in paren_content for role in allowed_roles):
-                            pass  # Filtered out
                             continue
                     
                     # Skip titles with colons (usually shows, specials, etc.)
