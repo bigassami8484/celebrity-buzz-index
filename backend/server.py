@@ -965,6 +965,23 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 image = page_info.get("thumbnail", {}).get("source", "")
                 wiki_url = page_info.get("fullurl", f"https://en.wikipedia.org/wiki/{actual_title.replace(' ', '_')}")
                 
+                # If no image from Wikipedia, try Wikidata P18
+                if not image:
+                    try:
+                        wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={actual_title.replace(' ', '_')}&props=claims&format=json"
+                        wd_response = await client.get(wikidata_url, timeout=3.0, headers=headers)
+                        if wd_response.status_code == 200:
+                            wd_data = wd_response.json()
+                            for entity in wd_data.get("entities", {}).values():
+                                claims = entity.get("claims", {})
+                                if "P18" in claims:
+                                    img_file = claims["P18"][0]["mainsnak"]["datavalue"]["value"]
+                                    img_file_encoded = img_file.replace(" ", "_")
+                                    image = f"https://commons.wikimedia.org/wiki/Special:FilePath/{img_file_encoded}?width=150"
+                                    break
+                    except:
+                        pass
+                
                 # Skip duplicates
                 base_name = actual_title.split("(")[0].strip().lower()
                 if base_name in seen_names:
