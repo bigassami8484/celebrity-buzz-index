@@ -767,6 +767,18 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             if re.search(r'(limited-edition)?\s*(shoe|sneaker|footwear|apparel|clothing)', desc_lower[:150]):
                                 should_skip = True
                             
+                            # Check for car engine/part patterns
+                            if re.search(r'(turbocharged|naturally aspirated|straight-six|inline|v6|v8|v10|v12|engine|motor|transmission)', desc_lower[:150]):
+                                should_skip = True
+                            
+                            # Check for phone/technology patterns
+                            if re.search(r'(smartphone|mobile phone|android|ios|touchscreen|wireless|cellular)', desc_lower[:150]):
+                                should_skip = True
+                            
+                            # Check for building/structure patterns
+                            if re.search(r'(structure|architectural|building designed|constructed|built in)', desc_lower[:150]):
+                                should_skip = True
+                            
                             if should_skip:
                                 pass  # Filtered out
                                 continue
