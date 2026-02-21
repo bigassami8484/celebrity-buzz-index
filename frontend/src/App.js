@@ -825,7 +825,7 @@ const TeamCustomizeModal = ({ team, options, onSave, onClose }) => {
 
 // How It Works Component
 const HowItWorks = ({ onShowMethodology }) => (
-  <div className="bg-[#0A0A0A] border border-[#262626] p-4 mb-4" data-testid="how-it-works">
+  <div className="bg-[#0A0A0A] border border-[#262626] p-4 mb-8" data-testid="how-it-works">
     <div className="flex justify-between items-center mb-3">
       <h3 className="font-anton text-lg uppercase tracking-tight text-[#FFD700]">How It Works</h3>
       <button 
@@ -837,41 +837,43 @@ const HowItWorks = ({ onShowMethodology }) => (
         Points Info
       </button>
     </div>
-    <div className="grid grid-cols-5 gap-2 mb-3">
+    <div className="grid grid-cols-5 gap-2">
       <div className="text-center">
         <div className="w-8 h-8 bg-[#FF0099] flex items-center justify-center mx-auto mb-1">
           <Search className="w-4 h-4 text-white" />
         </div>
         <h4 className="font-space font-bold text-xs">Search</h4>
+        <p className="text-[8px] text-[#A1A1AA] mt-1">Find any celeb</p>
       </div>
       <div className="text-center">
         <div className="w-8 h-8 bg-[#00F0FF] flex items-center justify-center mx-auto mb-1">
           <Star className="w-4 h-4 text-black" />
         </div>
         <h4 className="font-space font-bold text-xs">£0.5-12M</h4>
+        <p className="text-[8px] text-[#A1A1AA] mt-1">Tier pricing</p>
       </div>
       <div className="text-center">
         <div className="w-8 h-8 bg-[#FFD700] flex items-center justify-center mx-auto mb-1">
           <Plus className="w-4 h-4 text-black" />
         </div>
         <h4 className="font-space font-bold text-xs">£50M</h4>
+        <p className="text-[8px] text-[#A1A1AA] mt-1">Your budget</p>
       </div>
       <div className="text-center">
         <div className="w-8 h-8 bg-[#FF5500] flex items-center justify-center mx-auto mb-1">
           <ArrowLeftRight className="w-4 h-4 text-white" />
         </div>
         <h4 className="font-space font-bold text-xs">Sat 12pm</h4>
+        <p className="text-[8px] text-[#A1A1AA] mt-1">Transfer window</p>
       </div>
       <div className="text-center">
         <div className="w-8 h-8 bg-[#8B5CF6] flex items-center justify-center mx-auto mb-1">
           <Skull className="w-4 h-4 text-white" />
         </div>
-        <h4 className="font-space font-bold text-xs">+100 💀</h4>
+        <h4 className="font-space font-bold text-xs">+100</h4>
+        <p className="text-[8px] text-[#A1A1AA] mt-1">Brown Bread</p>
       </div>
     </div>
-    <p className="text-[10px] text-[#A1A1AA] text-center">
-      Search for any celebrity • Prices range from £0.5m-£12m based on tier & buzz • Draft a team of 10 with your £50M budget • Transfer window opens Sat 12pm GMT • Earn +100 bonus if a celeb passes away
-    </p>
   </div>
 );
 
