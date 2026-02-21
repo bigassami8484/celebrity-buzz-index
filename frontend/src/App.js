@@ -2041,10 +2041,14 @@ function App() {
       
       <TransferWindowBanner stats={stats} />
       <Header />
+      
+      <div className="max-w-7xl mx-auto px-4">
+        <HowItWorks onShowMethodology={() => setShowMethodology(true)} />
+      </div>
+      
       <HotCelebsBanner celebs={hotCelebs} onSelect={handleCelebSearch} />
       
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <HowItWorks onShowMethodology={() => setShowMethodology(true)} />
         <SearchBar onSearch={searchCelebrity} loading={searchLoading} />
         <CategoryFilter 
           categories={categories} 
