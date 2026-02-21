@@ -877,8 +877,13 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
         return []
         return []
 
-def estimate_tier_from_description(description: str) -> str:
+def estimate_tier_from_description(description: str, name: str = "") -> str:
     """Estimate celebrity tier from Wikipedia description"""
+    
+    # First check if this is a guaranteed A-lister
+    if name and name.lower() in GUARANTEED_A_LIST:
+        return "A"
+    
     desc_lower = description.lower()
     
     # Check for A-list indicators
