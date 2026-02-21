@@ -547,6 +547,11 @@ HOT_CELEBS_POOL = [
     {"name": "Cristiano Ronaldo", "reason": "Football & brand deals", "tier": "A", "category": "athletes"},
     {"name": "David Beckham", "reason": "Business & family", "tier": "A", "category": "athletes"},
     {"name": "Lewis Hamilton", "reason": "F1 & fashion", "tier": "A", "category": "athletes"},
+    # NEW - Hot due to recent news coverage
+    {"name": "Timothée Chalamet", "reason": "Dune sequel & awards buzz", "tier": "A", "category": "movie_stars"},
+    {"name": "Zendaya", "reason": "Challengers film & fashion icon", "tier": "A", "category": "movie_stars"},
+    {"name": "Travis Kelce", "reason": "NFL star & Taylor Swift relationship", "tier": "B", "category": "athletes"},
+    {"name": "Sydney Sweeney", "reason": "Euphoria star & film roles", "tier": "B", "category": "tv_actors"},
 ]
 
 def get_random_hot_celebs(count: int = 8) -> list:
