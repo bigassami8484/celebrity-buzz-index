@@ -678,12 +678,21 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 title_lower = title.lower()
                 title_normalized = normalize_text(title)
                 
-                # Check if query appears in the name
-                query_in_name = any(
-                    qpart in title_normalized or 
-                    any(qpart in word for word in title_normalized.split())
-                    for qpart in query_parts
-                )
+                # Check if query appears in the name (more flexible matching)
+                # Allow partial word matches (e.g., "att" matches "attenborough")
+                query_in_name = False
+                for qpart in query_parts:
+                    if qpart in title_normalized:
+                        query_in_name = True
+                        break
+                    # Check if any word in title starts with qpart
+                    for word in title_normalized.split():
+                        if word.startswith(qpart):
+                            query_in_name = True
+                            break
+                    if query_in_name:
+                        break
+                
                 if not query_in_name:
                     continue
                 
