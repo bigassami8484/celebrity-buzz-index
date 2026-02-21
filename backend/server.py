@@ -1588,6 +1588,18 @@ async def autocomplete_search(q: str):
         "king charles": "Charles III",
         "meghan markle": "Meghan, Duchess of Sussex",
         "the rock": "Dwayne Johnson",
+        # Royal Children - William's kids
+        "prince george": "Prince George of Wales",
+        "george": "Prince George of Wales",
+        "princess charlotte": "Princess Charlotte of Wales",
+        "charlotte": "Princess Charlotte of Wales",
+        "prince louis": "Prince Louis of Wales",
+        "louis": "Prince Louis of Wales",
+        # Royal Children - Harry's kids
+        "prince archie": "Prince Archie of Sussex",
+        "archie": "Prince Archie of Sussex",
+        "princess lilibet": "Princess Lilibet of Sussex",
+        "lilibet": "Princess Lilibet of Sussex",
     }
     
     for alias, canonical in alias_partial_matches.items():
