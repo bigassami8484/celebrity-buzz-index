@@ -2088,17 +2088,21 @@ function App() {
           )}
         </div>
         
+        {/* Team Panel - Right after search results */}
+        <div className="mb-6">
+          <TeamPanel 
+            team={team} 
+            onRemove={removeFromTeam}
+            onShare={() => setShowShareModal(true)}
+            onCustomize={() => { fetchCustomOptions(); setShowCustomize(true); }}
+          />
+        </div>
+        
         <TodaysNews news={todaysNews} />
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
           {/* Main Content */}
           <div className="lg:col-span-8 space-y-6">
-            <TeamPanel 
-              team={team} 
-              onRemove={removeFromTeam}
-              onShare={() => setShowShareModal(true)}
-              onCustomize={() => { fetchCustomOptions(); setShowCustomize(true); }}
-            />
             <LeaguePanel
               team={team}
               leagues={leagues}
