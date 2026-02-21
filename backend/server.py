@@ -686,8 +686,15 @@ GUARANTEED_A_LIST = [
     "dwayne johnson", "the rock", "scarlett johansson", "jennifer lawrence", "margot robbie",
     "oprah winfrey", "kim kardashian", "elon musk", "jeff bezos", "cristiano ronaldo",
     "lionel messi", "lebron james", "serena williams", "roger federer", "michael jordan",
-    "david beckham", "prince william", "prince harry", "kate middleton", "queen elizabeth",
-    "king charles", "barack obama", "donald trump", "joe biden", "bill gates",
+    "david beckham", "barack obama", "donald trump", "joe biden", "bill gates",
+    # British Royal Family (including Wikipedia formal names)
+    "prince william", "william, prince of wales", "prince harry", "harry, duke of sussex",
+    "kate middleton", "catherine, princess of wales", "queen elizabeth", "elizabeth ii",
+    "king charles", "charles iii", "king charles iii", "prince andrew", "andrew, duke of york",
+    "andrew mountbatten-windsor", "meghan markle", "meghan, duchess of sussex",
+    "princess diana", "diana, princess of wales", "camilla", "queen camilla",
+    "princess anne", "anne, princess royal", "prince edward", "edward, duke of edinburgh",
+    "princess beatrice", "princess eugenie", "zara tindall", "peter phillips",
     # Additional mega-stars
     "britney spears", "madonna", "michael jackson", "jennifer lopez", "shakira",
     "eminem", "jay-z", "jay z", "snoop dogg", "50 cent", "nicki minaj", "cardi b",
@@ -695,7 +702,10 @@ GUARANTEED_A_LIST = [
     "tom brady", "tiger woods", "usain bolt", "muhammad ali", "mike tyson",
     "meryl streep", "nicole kidman", "cate blanchett", "natalie portman", "emma watson",
     "george clooney", "matt damon", "ben affleck", "keanu reeves", "morgan freeman",
-    "samuel l. jackson", "samuel l jackson", "al pacino", "robert de niro", "jack nicholson"
+    "samuel l. jackson", "samuel l jackson", "al pacino", "robert de niro", "jack nicholson",
+    # Sports legends
+    "simone biles", "venus williams", "novak djokovic", "wayne rooney", "diego maradona",
+    "pele", "david beckham", "zinedine zidane", "kobe bryant", "shaquille o'neal"
 ]
 
 # Guaranteed B-list celebrities (not quite A-list but definitely not C or D)
