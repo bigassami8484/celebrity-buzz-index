@@ -39,6 +39,83 @@ def decode_html_entities(text: str) -> str:
     decoded = decoded.replace('â€™', "'").replace('â€"', "—").replace('â€œ', '"').replace('â€', '"')
     return decoded
 
+async def generate_ai_celebrity_image(name: str, description: str = "") -> Optional[str]:
+    """
+    Generate an AI portrait for a celebrity and return base64 encoded image.
+    Returns None if generation fails.
+    """
+    try:
+        api_key = os.environ.get("EMERGENT_LLM_KEY")
+        if not api_key:
+            logger.warning("No EMERGENT_LLM_KEY found for AI image generation")
+            return None
+        
+        # Create a prompt for a stylized celebrity portrait
+        # Keep it generic to avoid likeness issues
+        prompt = f"A professional stylized artistic portrait photo of a celebrity named {name}. "
+        if description:
+            # Extract key details from description
+            desc_lower = description.lower()
+            if "actor" in desc_lower or "actress" in desc_lower:
+                prompt += "Hollywood actor/actress style, dramatic lighting. "
+            elif "singer" in desc_lower or "musician" in desc_lower:
+                prompt += "Music artist style, stage presence vibe. "
+            elif "footballer" in desc_lower or "soccer" in desc_lower:
+                prompt += "Professional athlete, sports portrait style. "
+            elif "model" in desc_lower:
+                prompt += "Fashion model style, editorial lighting. "
+            else:
+                prompt += "Celebrity portrait style, professional photography. "
+        
+        prompt += "High quality, clean background, portrait orientation, photorealistic style."
+        
+        image_gen = OpenAIImageGeneration(api_key=api_key)
+        images = await image_gen.generate_images(
+            prompt=prompt,
+            model="gpt-image-1",
+            number_of_images=1
+        )
+        
+        if images and len(images) > 0:
+            image_base64 = base64.b64encode(images[0]).decode('utf-8')
+            return f"data:image/png;base64,{image_base64}"
+        
+        return None
+    except Exception as e:
+        logger.error(f"AI image generation failed for {name}: {e}")
+        return None
+
+async def get_or_generate_celebrity_image(name: str, description: str = "") -> str:
+    """
+    Get cached AI-generated image or generate a new one.
+    Falls back to UI Avatars if AI generation fails.
+    """
+    # Check cache first
+    cached = await db.ai_images.find_one({"name": name.lower()}, {"_id": 0})
+    if cached and cached.get("image"):
+        return cached["image"]
+    
+    # Generate new AI image
+    ai_image = await generate_ai_celebrity_image(name, description)
+    
+    if ai_image:
+        # Cache the generated image
+        await db.ai_images.update_one(
+            {"name": name.lower()},
+            {"$set": {
+                "name": name.lower(),
+                "display_name": name,
+                "image": ai_image,
+                "generated_at": datetime.now(timezone.utc).isoformat()
+            }},
+            upsert=True
+        )
+        return ai_image
+    
+    # Fallback to UI Avatars
+    clean_name = name.replace(" ", "+")
+    return f"https://ui-avatars.com/api/?name={clean_name}&size=400&background=1a1a1a&color=FF0099&bold=true&format=png"
+
 async def check_wikidata_is_human(page_ids: List[int]) -> dict:
     """
     Check Wikidata to see if Wikipedia pages are about humans.
