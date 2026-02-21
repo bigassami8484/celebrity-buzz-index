@@ -3246,6 +3246,95 @@ async def logout(request: Request, response: Response):
     return {"success": True, "message": "Logged out"}
 
 
+@auth_router.post("/session")
+async def exchange_session(request: Request, response: Response):
+    """
+    Exchange Emergent Auth session_id for user session.
+    This endpoint receives session_id from frontend after Google OAuth redirect.
+    REMINDER: The redirect URL on frontend MUST NOT be hardcoded - use window.location.origin
+    """
+    body = await request.json()
+    session_id = body.get("session_id")
+    
+    if not session_id:
+        raise HTTPException(status_code=400, detail="No session_id provided")
+    
+    # Call Emergent Auth to get user data
+    try:
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(
+                "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
+                headers={"X-Session-ID": session_id},
+                timeout=15.0
+            )
+            
+            if resp.status_code != 200:
+                logger.error(f"Emergent Auth session-data error: {resp.status_code} - {resp.text}")
+                raise HTTPException(status_code=400, detail="Invalid session_id")
+            
+            auth_data = resp.json()
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail="Auth service timeout")
+    except Exception as e:
+        logger.error(f"Emergent Auth session exchange failed: {e}")
+        raise HTTPException(status_code=400, detail="Failed to exchange session")
+    
+    email = auth_data.get("email", "").lower()
+    name = auth_data.get("name", email.split("@")[0])
+    picture = auth_data.get("picture", "")
+    
+    if not email:
+        raise HTTPException(status_code=400, detail="No email in auth data")
+    
+    # Find or create user
+    user = await db.users.find_one({"email": email}, {"_id": 0})
+    
+    if not user:
+        user_id = f"user_{uuid.uuid4().hex[:12]}"
+        user = {
+            "user_id": user_id,
+            "email": email,
+            "name": name,
+            "picture": picture or f"https://ui-avatars.com/api/?name={name}&background=FF0099&color=fff",
+            "is_guest": False,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.users.insert_one(user)
+        if '_id' in user:
+            del user['_id']
+    else:
+        # Update user info if needed
+        update_fields = {}
+        if name and name != user.get("name"):
+            update_fields["name"] = name
+        if picture and picture != user.get("picture"):
+            update_fields["picture"] = picture
+        
+        if update_fields:
+            await db.users.update_one({"email": email}, {"$set": update_fields})
+            user.update(update_fields)
+    
+    # Create session
+    session_token = await create_user_session(user["user_id"])
+    
+    # Set httpOnly cookie with path="/", secure=True, samesite="none"
+    response.set_cookie(
+        key="session_token",
+        value=session_token,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        path="/",
+        max_age=7 * 24 * 60 * 60  # 7 days
+    )
+    
+    return {
+        "success": True,
+        "user": user,
+        "session_token": session_token
+    }
+
+
 # Include routers
 app.include_router(api_router)
 app.include_router(auth_router)
