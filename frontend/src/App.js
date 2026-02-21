@@ -1621,12 +1621,12 @@ const SearchBar = ({ onSearch, loading }) => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-white truncate">{suggestion.name}</span>
-                    <TierBadge tier={suggestion.estimated_tier} />
+                    <TierBadge tier={suggestion.tier || suggestion.estimated_tier} />
                   </div>
                   <p className="text-xs text-[#A1A1AA] truncate">{suggestion.description}</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-[#FFD700] font-bold">£{suggestion.estimated_price}M</div>
+                  <div className="text-[#FFD700] font-bold">£{suggestion.price || suggestion.estimated_price}M</div>
                 </div>
               </div>
             ))
