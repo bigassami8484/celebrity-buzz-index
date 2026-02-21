@@ -186,7 +186,7 @@ class Celebrity(BaseModel):
     category: str = ""
     wiki_url: str = ""
     buzz_score: float = 0.0
-    price: int = 5
+    price: float = 5.0
     tier: str = "D"  # A, B, C, or D list
     news: List[dict] = []
     page_views: int = 0
@@ -204,7 +204,7 @@ class TeamCelebrity(BaseModel):
     name: str
     image: str
     category: str
-    price: int
+    price: float
     buzz_score: float
     tier: str = "D"
     added_at: str = ""
