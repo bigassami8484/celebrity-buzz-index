@@ -1,181 +1,168 @@
 <analysis>**original_problem_statement:**
-The user wants to build a Celebrity Buzz Index game. The core concept is a fantasy league where users draft a team of celebrities and earn points based on their real-world media presence.
+The user wants to build a Celebrity Buzz Index game. This is a full-stack web application where users act as fantasy league managers, drafting a team of celebrities with a starting budget. Points are awarded based on the celebrities' real-world media presence, sourced from Wikipedia and various news outlets.
 
 **PRODUCT REQUIREMENTS:**
-- **Application**: Full-stack web app (React frontend, FastAPI backend).
-- **Data**: Real-time celebrity data from Wikipedia and news from sources like BBC, Daily Mail, and TMZ.
-- **Gameplay**:
-    - Tiered pricing for celebrities (A, B, C, D-list). Current pricing: A-list £9M, D-list £2M.
-    - Points system based on news coverage, controversy, and a Brown Bread Bonus (+100 for death).
-    - Teams are limited to 10 celebrities with a starting budget of £50M.
-- **Features**:
-    - Autocomplete search bar showing unique celebrity results.
-    - Private Friends Leagues where users can create/join leagues and compete on a separate leaderboard.
-    - A Brown Bread Watch to display elderly celebrities.
-    - A badge system to award teams for achievements (e.g., 'Weekly Champion').
-    - A Hall of Fame page to showcase top players with the most badges.
-    - Social sharing for teams and leagues (WhatsApp, X, Facebook).
-    - A profanity filter for user-created team names.
-    - How it Works guide and a Points Methodology modal.
-    - Team customization with selectable colors and icons.
-- **UI/UX**: The application must be mobile-friendly.
+-   **Application**: Full-stack web app with a React frontend and a FastAPI backend.
+-   **Data**: Real-time celebrity data from the Wikipedia API and news from RSS feeds.
+-   **Gameplay**:
+    -   Users draft a team of 10 celebrities with a starting budget of £50M.
+    -   A tiered, dynamic pricing system for celebrities where prices fluctuate based on media buzz.
+    -   A weekly transfer window opens every Saturday at 12 p.m. GMT for 24 hours.
+    -   A points system based on news coverage, controversy, and a Brown Bread Bonus (+100 for a celebrity's death).
+-   **Features**:
+    -   **Critical**: Autocomplete search bar that filters out all non-human entities (places, movies, brands, companies, animals, objects, etc.).
+    -   A Hot Celebs This Week banner with real photos.
+    -   Private Friends Leagues for users to create/join.
+    -   A Brown Bread Watch for elderly celebrities.
+    -   Price history tracking for each celebrity.
+    -   A compact How it Works guide and a Points Methodology modal.
+-   **UI/UX**: The application must be mobile-friendly, with a clean and uncluttered interface.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack application with a React frontend and FastAPI backend. Most of the user's core requirements have been implemented, including the main game loop, data integration from Wikipedia and RSS feeds, dynamic celebrity pricing, a points system, team and league management, mobile responsiveness, social sharing, a badge system, and a Hall of Fame. The search functionality has been significantly improved to filter out irrelevant results. The last feature being added was team customization.
+A functional full-stack application that implements most user requirements. The backend is a monolithic FastAPI server () and the frontend is a monolithic React app (). The core features like team drafting, dynamic pricing, and news feeds are in place.
+
+The most significant recent change was a complete overhaul of the celebrity search functionality. The previous, brittle keyword-based filtering was replaced with a much more robust system that uses the Wikidata API to verify that search results are actual humans (instance of ). The agent also implemented a price history tracking feature and resolved numerous price consistency bugs across the application.
 
 **Last working item**:
--   **Last item agent was working**: Fixing the team customization feature. The agent identified that the  endpoint was not working because its route definition in FastAPI was being superseded by the dynamic  route. The agent was in the process of reordering the routes in  to fix this conflict.
--   **Status**: IN PROGRESS
+-   **Last item agent was working**: The user requested a new batch of UI/UX and feature changes. The agent was about to start implementation.
+-   **Status**: NOT STARTED
 -   **Agent Testing Done**: N
--   **Which testing method agent to use?**: both. First, use  to verify the backend endpoint  returns data. Then, use the screenshot tool to confirm the team customization modal on the frontend populates with colors and icons.
+-   **Which testing method agent to use?**: both (Frontend for UI changes, Backend for news logic)
 -   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
--   **Issue 1 (P0)**: The  endpoint fails, preventing the team customization UI from working.
--   **Issue 2 (P1)**: The implementation of sharing a *league invite code* via social media needs verification. The agent confirmed the team share modal exists, but it's unclear if a specific share flow for leagues was completed.
+-   **Issue 1 (P0)**: Implement the latest user requests.
+    -   Make the Hot Celebs This Week banner at the top scroll automatically.
+    -   Increase the font size of the text under the How it Works icons.
+    -   Update the news display to show 3 lines of text per article.
+    -   Implement logic to refresh the news feed every 24 hours.
+    -   Remove the Player Count display from the top of the page.
 
 **Issues Detail:**
--   **Issue 1: Team customization endpoint is not working.**
-    -   **Attempted fixes**: The agent created the endpoint but it incorrectly matched the  route, causing a Team not found error.
+-   **Issue 1: Implement latest user requests**
+    -   **Attempted fixes**: None. The agent has only viewed the relevant files.
     -   **Next debug checklist**:
-        1.  In , ensure the  route is defined *before* the  route.
-        2.  Restart the backend service using backend: stopped
-backend: started.
-        3.  Test the endpoint directly: .
-        4.  Verify the frontend modal for team customization loads and displays the options correctly.
-    -   **Why fix this issue and what will be achieved with the fix?**: This will complete the team customization feature, allowing users to personalize their teams with colors and icons as requested.
-    -   **Status**: IN PROGRESS
-    -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: Both
-    -   **Blocked on other issue**: None
-
--   **Issue 2: Verify league sharing functionality.**
-    -   **Attempted fixes**: None.
-    -   **Next debug checklist**:
-        1.  In , examine the  component.
-        2.  Confirm that there are UI buttons (e.g., WhatsApp, X, Facebook icons) specifically for sharing the league's invite code.
-        3.  If not present, implement the share buttons and the logic to copy/share the league code and a join link.
-    -   **Why fix this issue and what will be achieved with the fix?**: This will fulfill the user's request to allow players to easily invite friends to their private leagues.
+        1.  **Frontend (, ):**
+            -   Modify the  component to include an automatic scrolling animation (e.g., using CSS keyframes or a library like ).
+            -   Increase the font size for the text within the  component.
+            -   Modify the  component to truncate text to 3 lines (e.g., using ).
+            -   Remove the JSX for the player count display.
+        2.  **Backend ():**
+            -   Modify the  endpoint to implement a 24-hour caching mechanism for the news feed.
+    -   **Why fix this issue and what will be achieved with the fix?**: This will address the user's latest feedback, improving the UI's dynamism and readability, and ensuring the news content remains fresh.
     -   **Status**: NOT STARTED
     -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: Frontend
+    -   **Should Test frontend/backend/both after fix?**: Both
     -   **Blocked on other issue**: None
 
 **In progress Task List**:
--   **Task 1: Complete and Test Team Customization (P0)**
-    -   **Where to resume**: The agent needs to apply the final edit to reorder the endpoints in , which was interrupted. After the edit, the backend must be restarted and the full feature tested end-to-end.
-    -   **What will be achieved with this?**: A fully functional team customization feature where users can select a color and icon for their team, which is then reflected in the UI.
-    -   **Status**: IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?**: Both
-    -   **Blocked on something**: Blocked by **Issue 1**.
+-   None.
 
 **Upcoming and Future Tasks**
--   None. The agent should focus on completing the in-progress work and verifying all recently added features.
+-   **Upcoming Tasks**:
+    -   **P0: Flesh out Hot Streak Notifications**: The user approved adding hot streak notifications. The backend endpoint () and a basic UI placeholder were created, but the feature needs to be fully developed.
+-   **Future Tasks**:
+    -   **P1: Celebrity Comparison Feature**: Allow users to compare two or more celebrities side-by-side.
+    -   **P2: Push Notifications**: For major events like the transfer window opening or significant price changes.
+    -   **P2: Badge system and Hall of Fame page**.
 
 **Completed work in this session**
--   **Search Functionality Overhaul**: Iteratively improved the celebrity search filter in  to exclude duplicates, albums, films, TV shows, fictional characters, and other non-celebrity entities.
--   **Friends Leagues Feature**: Implemented a complete system for users to create, join, and compete in private leagues with dedicated leaderboards.
--   **Mobile Responsiveness**: Refactored CSS and layout in  and  to ensure the app is usable on mobile devices, including adding a mobile navigation bar.
--   **Badge & Hall of Fame System**: Added backend logic and frontend UI to award players with badges for achievements and display top players in a Hall of Fame.
--   **Feature Removal**: Removed the Brown Bread Mini Game from both the backend and frontend per user request.
--   **Game Balancing**:
-    -   Adjusted celebrity prices in  (A-list: £9M, D-list: £2M).
-    -   Set team size limit to 10 players.
-    -   Updated the How It Works text in  to reflect the new pricing.
--   **News Source Expansion**: Added TMZ and other US news feeds to the  endpoint.
--   **Initial Bug Fixes**: Resolved issues with missing autocomplete images, minimum point scores, and incorrect Brown Bread Bonus UI text.
+-   **Search Overhaul (Wikidata Integration)**: Replaced the complex and unreliable keyword-based search filter with a new implementation in  that uses the Wikidata API to validate that search results are human (), drastically improving search accuracy.
+-   **Price History Feature**:
+    -   Added a  collection and  Pydantic model.
+    -   Created a new endpoint .
+    -   Implemented a  in the frontend, accessible via a chart icon on each .
+-   **Critical Price Consistency Bug Fix**: Resolved a major issue where celebrity prices were inconsistent between search results, the Hot Celebs banner, and the user's team panel. This involved refactoring the  endpoint and other data-fetching logic to recalculate dynamic prices on the fly instead of relying on stale data from the database.
+-   **Category Detection Fix**: Corrected the  logic that was misclassifying actors like Michael Caine and Ian McKellen as royals. This required deleting the incorrect entries from the database to allow for correct re-categorization.
+-   **UI/UX Refinements**:
+    -   Replaced a scrolling text ticker with a card-based Hot Celebs banner at the top of the page.
+    -   Adjusted component spacing and text sizes based on user feedback.
+    -   Removed the buzz score display from the UI.
+    -   Re-organized the How It Works component to have descriptive text under each icon.
 
 **Earlier issues found/mentioned but not fixed**
 None.
 
 **Known issue recurrence from previous fork**
-None.
+-   **Search Filtering:** This was a major recurring issue that required multiple failed attempts with keyword filtering. The recent switch to Wikidata-based verification is a robust solution that should prevent future recurrence, but it's a historically sensitive area of the codebase.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend**: React.js, TailwindCSS, axios.
--   **Backend**: Python, FastAPI, Motor (async MongoDB), Pydantic.
--   **Data Sources**: Wikipedia API, Public RSS Feeds (httpx, feedparser).
+-   **Frontend**: React.js, TailwindCSS,  for API calls,  for icons.
+-   **Backend**: Python, FastAPI, Motor (async MongoDB driver), Pydantic, , .
+-   **Data Sources**: Wikipedia API, Wikidata API (for entity verification), Public RSS Feeds.
+-   **Key Logic**: Wikidata human verification (P31=Q5), dynamic pricing based on a buzz score, transfer window timing.
 
 **key DB schema**
+-   **celebrities**: 
 -   **teams**: 
 -   **leagues**: 
--   **hall_of_fame**: 
--   **celebrities**: 
+-   **price_history**:  **(New)**
+-   **news_cache / trending_cache**: 
 
 **changes in tech stack**
-None.
+-   No new libraries were added, but the backend workflow was significantly changed to incorporate calls to the Wikidata SPARQL endpoint for search result verification.
 
 **All files of reference**
--   : The single source for all backend logic. Contains all API endpoints, database models, and business logic for search, leagues, badges, and customization.
--   : The single source for all frontend logic. Contains all components, state management (useState, useEffect), and API call logic. It has grown significantly and is over 1700 lines.
--   : Contains custom styles and media queries for mobile responsiveness.
--   : The product requirements document, updated throughout the session.
+-   : Major changes.  was rewritten to use Wikidata. Endpoints like , , and  were refactored for price consistency. A new endpoint for price history was added.
+-   : Major changes. A  component was added. The main layout was updated to move the  to the top. State management for the new modal was added.
+-   : Minor style adjustments for component spacing and text size.
+-   : Kept up-to-date with completed tasks and future backlog.
 
 **Areas that need refactoring**:
--   The  file is critically oversized and complex. It urgently needs to be broken down into smaller, reusable components (e.g., , , , ) and moved into a  directory. This will improve maintainability and reduce the risk of introducing bugs.
--   The  file is also monolithic. It could be split into multiple files by concern (e.g., , , ) to improve organization.
+-   **Critical**: The  file is over 2,000 lines long and contains all components, state logic, and effects. It must be broken down into smaller, reusable components (e.g., , , , , ) and organized into a  directory.
+-   **High Priority**: The  file contains all API routes, database models, and business logic. It should be refactored into a standard FastAPI project structure with separate modules for routes, models, and services.
 
 **key api endpoints**
--   **Team & Player**:
-    -   
-    -    (Updated with 10-player limit)
-    -    (New)
-    -    (New, needs fix)
--   **Leagues**:
-    -    (New)
-    -    (New)
-    -    (New)
--   **Game Data**:
-    -    (Heavily updated with advanced filtering)
-    -    (New)
-    -    (New)
-    -    (Updated with more sources)
+-   : Now powered by the new Wikidata-based search logic.
+-   : Fetches full details for a celebrity selected from autocomplete.
+-   : **(New)** Fetches the price history for a celebrity.
+-   : **(Fixed)** Now correctly calculates dynamic price when adding a celebrity to a team.
+-   : Updated for price consistency.
 
 **Critical Info for New Agent**
--   The immediate priority is to fix the team customization endpoint by reordering the routes in .
--   The monolithic nature of  is a significant liability. Proposing a refactoring task to the user after the current work is complete would be beneficial for the project's long-term health.
--   The celebrity search filter logic () in  is complex and fragile. Any further changes require extensive testing with a diverse list of names to prevent regressions.
+-   The user's current request is to implement automatic scrolling for the Hot Celebs banner. This is a frontend task that will likely require CSS animations.
+-   The Wikidata-based search filter ( and  in ) is the new, definitive way to get celebrity results. Do not revert to the old keyword-based filtering logic, which has been removed.
+-   Price consistency across the app was a major pain point that has now been resolved. When making any changes that involve celebrity prices, ensure the dynamic price is recalculated on-demand rather than trusting a stored value.
+-   The codebase is highly monolithic. Proposing a refactoring task after completing the current user request is highly recommended for future maintainability.
 
 **documents and test reports created in this job**
--    (updated multiple times)
+-   
+-   
+-   
+-   
 -   
 -   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User (LATEST):** yes to team customization
-2.  **Agent:** Proposed team customization feature.
-3.  **User:** a list is too expensive, i would like a team to have 10 people and 50m won't be enough... maybe a list should be 9 mil and D list 2 mil and i still need a share to facebook, X and whatsapp button. yes please also add hall of fame
-4.  **Agent:** Proposed Hall of Fame feature.
-5.  **User:** it's probably not just those two though, I haven't checked everyone! but I don't want fictional characters or tv shows coming up. please check them all. also include some more news on the front screen from tmz and american publications and also yes please to a badge of some kind, make it cool
-6.  **Agent:** Proposed weekly prizes/badges.
-7.  **User:** when searching for celebs, more than one of the same person is coming up... also integrate it so players can compete against their friends... I also want it to be mobile friendly and be able to be shared via social media and whatsapp
-8.  **Agent:** Proposed a Brown Bread Mini Game.
-9.  **User:** and also yes to the death pool mini game but call it something like brown bread mini game so i don't get in trouble
-10. **Agent:** Finished previous task and proposed a death pool predictor.
+1.  **LATEST (Pending):** I want the hot celebs this week to scroll along automatically and i want the how it works find any celeb etc a bit bigger again. i also want the celeb news to show 3 lines of text and also to update every 24hours. also remove the player count at the top - **Status: Not Started.**
+2.  put the older version of hot celebs back but move it to the top where the scrolling celebs are, i do not want that there anymore.prices next to the names still come up wrong when putting them into my team for example leonardo says he costs 10.3m but when added to my team he costs 19m - **Status: Completed.**
+3.  add another 2 celebs to the hot celebs list but they must be hot because of news coverage that week. also the prices are still wrong, the price on the hot celeb is different from the price when you search them. please fix this. also remove the scroll banner from the top and put hot celebs there but make it scroll. also some celebs are coming up as royals when theyre not - michael caine and ian mckellen, also morgan freeman is not a singer. the price when searched for brown bread watch celebs also doesnt match. make the words under the how it works, like the find any celeb, tier pricing etc bigger" - **Status: Completed.**
+4.  “Update the Wikipedia search API call so it only returns results where the page is about a human (instance of human). Filter out places, bands, objects, companies and other non-person entities.” “add price history tracking too” - **Status: Completed.**
+5.  "i also want a bit of space in between the how it works bit before the search bar and then another bit of space before the hot celebs. also i want the how it works text underneath each box to show what it is, not a line of text. i dont want any shop names or clothing names or book or magazine names or animals or anything other than celebrities coming up in the search. no school names or university names or brand names or car names or companies to come into the search, just celebrities. pricing is still wrong when clicking on the categories and also remove the buzz points on each picture - **Status: Completed.**
 
 **Project Health Check:**
--   **Broken**: The Team Customization feature is non-functional due to a backend API routing error.
+-   **Broken**: None.
 -   **Mocked**: None.
 
 **3rd Party Integrations**
--   **OpenAI GPT-4o**: Used for news analysis via the  library. (Uses Emergent LLM Key)
--   **Wikipedia API**: Used for celebrity data.
--   **Public RSS Feeds**: Used for news aggregation.
+-   **OpenAI GPT-4o**: Used for news analysis via . (Uses Emergent LLM Key)
+-   **Wikipedia API**: Used for initial celebrity search and data sourcing.
+-   **Wikidata API**: Used via SPARQL query to verify search results are human entities.
+-   **Public RSS Feeds**: Used for news aggregation ().
 
 **Testing status**
--   **Testing agent used after significant changes**: YES, but not for the most recent large batch of features (leagues, badges, search fixes).
+-   **Testing agent used after significant changes**: YES, multiple test reports ( through ) were generated and passed.
 -   **Troubleshoot agent used after agent stuck in loop**: NO
 -   **Test files created**: None
--   **Known regressions**: None, but the search filter is sensitive to changes.
+-   **Known regressions**: None.
 
 **Credentials to test flow:**
-None required.
+None required. The application does not have a user authentication flow.
 
 **What agent forgot to execute**
--   The agent was in the middle of reordering endpoints in  to fix the team customization feature. This action was interrupted and must be completed.
--   The agent did not explicitly implement or verify a UI flow for sharing a *league invite code*. It only confirmed the existing team sharing modal. This needs to be checked and potentially implemented.</analysis>
+None. The agent has been diligent in addressing all user requests from the provided history. The upcoming and future tasks from the PRD are pending as expected.</analysis>
