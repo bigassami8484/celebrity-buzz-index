@@ -326,6 +326,49 @@ const PriceAlerts = ({ alerts, teamId }) => {
   );
 };
 
+// Hot Streaks Component - Shows celebrities on fire in the news
+const HotStreaks = ({ streaks, teamId }) => {
+  if (!streaks || streaks.length === 0) {
+    return null; // Don't show anything if no hot streaks
+  }
+  
+  return (
+    <div className="bg-gradient-to-r from-orange-500/10 via-[#0A0A0A] to-red-500/10 border border-orange-500/50 p-4 mb-4" data-testid="hot-streaks">
+      <h4 className="font-anton text-lg uppercase tracking-tight text-orange-400 mb-3 flex items-center gap-2">
+        🔥 Hot Streaks
+      </h4>
+      <p className="text-xs text-[#666] mb-3">Celebrities making headlines 3+ days in a row!</p>
+      <div className="space-y-2">
+        {streaks.slice(0, 5).map((streak, idx) => (
+          <div 
+            key={idx}
+            className="flex items-center gap-3 p-2 bg-orange-500/5 border-l-2 border-orange-500"
+          >
+            <img 
+              src={streak.image} 
+              alt={streak.name}
+              className="w-8 h-8 rounded-full object-cover"
+              onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${streak.name}&size=32&background=FF6600&color=fff`; }}
+            />
+            <div className="flex-1 min-w-0">
+              <span className="text-sm truncate block font-bold">{streak.name}</span>
+              <span className="text-xs text-orange-400">{streak.streak_status}</span>
+            </div>
+            <div className="text-right">
+              <div className="text-sm font-bold text-orange-400">
+                {streak.streak_days} days
+              </div>
+              <div className="text-xs text-[#666]">
+                {streak.tip}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // Brown Bread Watch Component - Strategic picks for the +100 bonus!
 const BrownBreadWatch = ({ watchList, onSelect }) => {
   if (!watchList || watchList.length === 0) return null;
