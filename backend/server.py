@@ -891,14 +891,25 @@ def detect_category_from_bio(bio: str, name: str) -> str:
     bio_lower = bio.lower()
     name_lower = name.lower()
     
-    # Check for specific known celebrities first
+    # Check for specific known celebrities first - ACTORS should be checked before royals
+    known_actors = ["michael caine", "ian mckellen", "morgan freeman", "judi dench", 
+                    "al pacino", "helen mirren", "anthony hopkins", "maggie smith",
+                    "clint eastwood", "robert de niro", "meryl streep", "jack nicholson"]
+    
+    for actor in known_actors:
+        if actor in name_lower:
+            return "movie_stars"
+    
     reality_tv_names = ["katie price", "gemma collins", "pete wicks", "joey essex", "sam faiers", 
                         "kardashian", "jenner", "love island"]
-    royal_names = ["prince", "princess", "king charles", "queen", "duke", "duchess", 
-                   "prince andrew", "prince william", "prince harry", "kate middleton", "meghan markle"]
+    
+    # Royal names - must specifically be about royal family, not just knighted actors
+    royal_names = ["prince andrew", "prince william", "prince harry", "kate middleton", "meghan markle",
+                   "king charles", "queen elizabeth", "princess diana", "princess charlotte",
+                   "prince george", "prince louis", "camilla"]
     
     for rn in royal_names:
-        if rn in name_lower or rn in bio_lower:
+        if rn in name_lower:
             return "royals"
     
     for rtn in reality_tv_names:
