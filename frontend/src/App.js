@@ -175,6 +175,98 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess, mode = "login" }) => {
   );
 };
 
+// AuthCallback Component - Handles the OAuth redirect with session_id
+const AuthCallback = ({ onAuthSuccess, onAuthError }) => {
+  const hasProcessed = useRef(false);
+  
+  useEffect(() => {
+    // Use ref to prevent double processing in StrictMode
+    if (hasProcessed.current) return;
+    hasProcessed.current = true;
+    
+    const processAuth = async () => {
+      // Extract session_id from URL fragment
+      const hash = window.location.hash;
+      const params = new URLSearchParams(hash.replace('#', ''));
+      const sessionId = params.get('session_id');
+      
+      if (!sessionId) {
+        onAuthError?.("No session_id found");
+        return;
+      }
+      
+      try {
+        // Exchange session_id for user session via backend
+        const response = await axios.post(`${AUTH_API}/session`, { session_id: sessionId });
+        
+        if (response.data.success && response.data.user) {
+          // Clear the URL fragment
+          window.history.replaceState(null, '', window.location.pathname);
+          onAuthSuccess(response.data.user);
+        } else {
+          throw new Error("Authentication failed");
+        }
+      } catch (error) {
+        console.error("Auth callback error:", error);
+        window.history.replaceState(null, '', window.location.pathname);
+        onAuthError?.(error.response?.data?.detail || "Authentication failed");
+      }
+    };
+    
+    processAuth();
+  }, [onAuthSuccess, onAuthError]);
+  
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-[#FF0099] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-white font-bold">Signing you in...</p>
+      </div>
+    </div>
+  );
+};
+
+// User Menu Component - Shows user profile and logout option
+const UserMenu = ({ user, onLogout }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  if (!user) return null;
+  
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 p-2 rounded hover:bg-[#1A1A1A] transition-colors"
+        data-testid="user-menu-btn"
+      >
+        <img 
+          src={user.picture || `https://ui-avatars.com/api/?name=${user.name}&background=FF0099&color=fff`}
+          alt={user.name}
+          className="w-8 h-8 rounded-full object-cover border border-[#FF0099]"
+        />
+        <span className="text-sm text-white hidden sm:block">{user.name}</span>
+      </button>
+      
+      {isOpen && (
+        <div className="absolute right-0 top-full mt-2 bg-[#0A0A0A] border border-[#262626] min-w-[200px] z-50">
+          <div className="p-3 border-b border-[#262626]">
+            <p className="text-white font-bold text-sm">{user.name}</p>
+            <p className="text-[#A1A1AA] text-xs">{user.email}</p>
+          </div>
+          <button
+            onClick={() => { setIsOpen(false); onLogout(); }}
+            className="w-full flex items-center gap-2 p-3 text-left text-[#ff4444] hover:bg-[#1A1A1A] transition-colors"
+            data-testid="logout-btn"
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="text-sm">Sign Out</span>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Player Count Banner
 const PlayerCountBanner = ({ stats }) => {
   if (!stats) return null;
