@@ -1326,7 +1326,7 @@ async def get_celebrity(celebrity_id: str):
 
 @api_router.get("/celebrities/category/{category}")
 async def get_celebrities_by_category(category: str):
-    """Get celebrities by category"""
+    """Get celebrities by category with correct dynamic pricing"""
     # First check if we have any in DB
     celebrities = await db.celebrities.find(
         {"category": category},
@@ -1343,6 +1343,12 @@ async def get_celebrities_by_category(category: str):
             {"category": category},
             {"_id": 0}
         ).to_list(20)
+    
+    # Recalculate dynamic prices for all celebrities
+    for celeb in celebrities:
+        tier = celeb.get("tier", "D")
+        buzz_score = celeb.get("buzz_score", 5)
+        celeb["price"] = get_dynamic_price(tier, buzz_score, celeb.get("name", ""))
     
     return {"celebrities": celebrities}
 
