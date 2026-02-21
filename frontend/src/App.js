@@ -1859,47 +1859,70 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize }) => {
 };
 
 // Leaderboard Component
-const Leaderboard = ({ entries }) => (
-  <div className="leaderboard" data-testid="leaderboard">
-    <h3 className="font-anton text-2xl uppercase tracking-tight mb-4">Leaderboard</h3>
-    {entries.length > 0 ? (
-      entries.slice(0, 10).map((entry, idx) => (
-        <div key={entry.team_id} className="leaderboard-row">
-          <span className={`leaderboard-rank ${idx === 0 ? 'gold' : idx === 1 ? 'silver' : idx === 2 ? 'bronze' : ''}`}>
-            #{idx + 1}
-          </span>
-          {/* Team Icon */}
-          <div 
-            className="w-8 h-8 rounded-full flex items-center justify-center text-sm ml-2"
-            style={{ backgroundColor: entry.team_color || '#FF0099' }}
-          >
-            {entry.team_icon || '⭐'}
+const Leaderboard = ({ entries }) => {
+  // Create placeholder rows 1-10
+  const placeholderRows = Array.from({ length: 10 }, (_, i) => i + 1);
+  
+  return (
+    <div className="leaderboard" data-testid="leaderboard">
+      <h3 className="font-anton text-2xl uppercase tracking-tight mb-4">Leaderboard</h3>
+      {placeholderRows.map((rank) => {
+        // Check if there's a real entry for this rank
+        const entry = entries[rank - 1];
+        const hasRealEntry = entry && entry.total_points > 0;
+        
+        return (
+          <div key={rank} className="leaderboard-row">
+            <span className={`leaderboard-rank ${rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : ''}`}>
+              #{rank}
+            </span>
+            {hasRealEntry ? (
+              <>
+                {/* Real team entry */}
+                <div 
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-sm ml-2"
+                  style={{ backgroundColor: entry.team_color || '#FF0099' }}
+                >
+                  {entry.team_icon || '⭐'}
+                </div>
+                <div className="flex-1 ml-3">
+                  <p className="font-bold flex items-center gap-1">
+                    {entry.team_name}
+                    {entry.badges?.slice(0, 3).map((b, i) => (
+                      <span key={i} className="text-sm">{b.icon || '🏅'}</span>
+                    ))}
+                  </p>
+                  <p className="text-sm text-[#A1A1AA]">
+                    {entry.celebrity_count} celebs
+                    {entry.brown_bread_bonus > 0 && (
+                      <span className="text-[#888] ml-2">💀 +{entry.brown_bread_bonus}</span>
+                    )}
+                  </p>
+                </div>
+                <div className="font-space font-bold text-xl text-[#FF0099]">
+                  {entry.total_points?.toFixed(1)}
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Empty placeholder */}
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm ml-2 bg-[#1a1a1a] border border-[#333]">
+                  <span className="text-[#444]">-</span>
+                </div>
+                <div className="flex-1 ml-3">
+                  <p className="text-[#444]">—</p>
+                </div>
+                <div className="font-space text-xl text-[#333]">
+                  —
+                </div>
+              </>
+            )}
           </div>
-          <div className="flex-1 ml-3">
-            <p className="font-bold flex items-center gap-1">
-              {entry.team_name}
-              {/* Show first 3 badges */}
-              {entry.badges?.slice(0, 3).map((b, i) => (
-                <span key={i} className="text-sm">{b.icon || '🏅'}</span>
-              ))}
-            </p>
-            <p className="text-sm text-[#A1A1AA]">
-              {entry.celebrity_count} celebs
-              {entry.brown_bread_bonus > 0 && (
-                <span className="text-[#888] ml-2">💀 +{entry.brown_bread_bonus}</span>
-              )}
-            </p>
-          </div>
-          <div className="font-space font-bold text-xl text-[#FF0099]">
-            {entry.total_points?.toFixed(1)}
-          </div>
-        </div>
-      ))
-    ) : (
-      <p className="text-center text-[#A1A1AA] py-4">No teams yet. Be the first!</p>
-    )}
-  </div>
-);
+        );
+      })}
+    </div>
+  );
+};
 
 // Share Modal Component with WhatsApp, X, Facebook
 const ShareModal = ({ team, onClose }) => {
