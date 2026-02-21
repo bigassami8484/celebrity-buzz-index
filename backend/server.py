@@ -1603,9 +1603,9 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         
         return {"celebrity": existing}
     
-    # Fetch from Wikipedia
-    wiki_info = await fetch_wikipedia_info(name)
-    logger.info(f"Wiki info for {name}: bio_length={len(wiki_info.get('bio', ''))}, bio_preview={wiki_info.get('bio', '')[:100]}")
+    # Fetch from Wikipedia using the Wikipedia search name (handles aliases like "King Charles" -> "Charles III")
+    wiki_info = await fetch_wikipedia_info(wikipedia_search_name)
+    logger.info(f"Wiki info for {wikipedia_search_name}: bio_length={len(wiki_info.get('bio', ''))}, bio_preview={wiki_info.get('bio', '')[:100]}")
     
     # Use override category if provided, otherwise detect from bio
     if override_category:
