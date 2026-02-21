@@ -1448,10 +1448,12 @@ async def get_pricing_info():
 async def get_hot_celebs():
     """Get hot celebrities making headlines - RANDOMIZED on each refresh with real photos"""
     hot_list = []
-    headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (contact@example.com)"}
+    headers = {
+        "User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com; contact@example.com) httpx/0.27"
+    }
     
-    # Get random selection of celebs from pool
-    random_celebs = get_random_hot_celebs(8)
+    # Get random selection of celebs from pool - now 10 for the scrolling ticker
+    random_celebs = get_random_hot_celebs(10)
     
     async with httpx.AsyncClient() as client:
         for celeb_info in random_celebs:
@@ -1461,16 +1463,21 @@ async def get_hot_celebs():
                 {"_id": 0}
             )
             
+            # Use consistent tier from pool and calculate price with DEFAULT buzz (for consistency)
+            tier = celeb_info["tier"]
+            # Use a fixed moderate buzz score (50) for Hot Celebs to ensure consistency
+            # This way, when users search for the celeb, if the celeb is new, they'll get same price
+            default_buzz = 50
+            price = get_dynamic_price(tier, default_buzz, celeb_info["name"])
+            
             if celeb and celeb.get("image") and not celeb.get("image", "").startswith("https://ui-avatars"):
-                # Recalculate price with dynamic pricing based on tier and buzz
-                tier = celeb.get("tier", celeb_info["tier"])
-                buzz_score = celeb.get("buzz_score", 50)
-                price = get_dynamic_price(tier, buzz_score, celeb.get("name", celeb_info["name"]))
                 hot_list.append({
-                    **celeb,
+                    "name": celeb.get("name", celeb_info["name"]),
                     "tier": tier,
+                    "category": celeb_info["category"],
                     "price": price,
-                    "hot_reason": celeb_info["reason"]
+                    "hot_reason": celeb_info["reason"],
+                    "image": celeb.get("image")
                 })
             else:
                 # Fetch real image from Wikipedia
@@ -1490,10 +1497,10 @@ async def get_hot_celebs():
                 
                 hot_list.append({
                     "name": celeb_info["name"],
-                    "tier": celeb_info["tier"],
+                    "tier": tier,
                     "category": celeb_info["category"],
                     "hot_reason": celeb_info["reason"],
-                    "price": get_dynamic_price(celeb_info["tier"], 50, celeb_info["name"]),  # Use dynamic price with moderate buzz
+                    "price": price,
                     "image": image
                 })
     
