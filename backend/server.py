@@ -1486,7 +1486,14 @@ async def get_top_picked():
 
 @api_router.get("/brown-bread-watch")
 async def get_brown_bread_watch():
-    """Get elderly celebrities for Brown Bread Watch - strategic picks for the bonus!"""
+    """Get elderly celebrities for Brown Bread Watch - strategic picks for the bonus!
+    
+    SPECIAL PRICING: Top 3 oldest celebs can cost up to £15M (decreasing)
+    - #1 oldest: £15M
+    - #2 oldest: £13M  
+    - #3 oldest: £11M
+    - Rest: normal tier pricing (max £12M)
+    """
     # Find living celebrities with known age >= 60
     elderly_celebs = await db.celebrities.find(
         {
@@ -1496,14 +1503,29 @@ async def get_brown_bread_watch():
         {"_id": 0}
     ).sort("age", -1).to_list(20)
     
-    # Add risk level to each
+    # Special pricing for top 3 oldest (Brown Bread premium)
+    brown_bread_premium_prices = [15.0, 13.0, 11.0]  # Top 3 get premium pricing
+    
+    # Add risk level and special pricing to each
     watch_list = []
-    for celeb in elderly_celebs:
+    for idx, celeb in enumerate(elderly_celebs):
         age = celeb.get("age", 0)
         risk = get_brown_bread_risk(age)
+        
+        # Apply Brown Bread premium pricing for top 3
+        if idx < 3:
+            special_price = brown_bread_premium_prices[idx]
+        else:
+            # Normal pricing for others (capped at £12M)
+            tier = celeb.get("tier", "D")
+            buzz_score = celeb.get("buzz_score", 5)
+            special_price = get_dynamic_price(tier, buzz_score, celeb.get("name", ""))
+        
         watch_list.append({
             **celeb,
-            "risk_level": risk
+            "risk_level": risk,
+            "price": special_price,
+            "is_premium": idx < 3  # Mark top 3 as premium
         })
     
     return {"watch_list": watch_list}
