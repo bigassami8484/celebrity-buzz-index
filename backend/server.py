@@ -718,6 +718,13 @@ GUARANTEED_A_LIST = [
     "princess anne", "anne, princess royal", "anne princess royal",
     "prince edward", "edward, duke of edinburgh", "edward duke of edinburgh",
     "princess beatrice", "princess eugenie", "zara tindall", "peter phillips",
+    # Royal Children - Prince William's children
+    "prince george", "prince george of wales", "george of wales",
+    "princess charlotte", "princess charlotte of wales", "charlotte of wales",
+    "prince louis", "prince louis of wales", "louis of wales",
+    # Royal Children - Prince Harry's children
+    "prince archie", "prince archie of sussex", "archie of sussex", "archie harrison",
+    "princess lilibet", "princess lilibet of sussex", "lilibet of sussex", "lilibet diana",
     "prince george", "princess charlotte", "prince louis",
     # Additional mega-stars
     "britney spears", "madonna", "michael jackson", "jennifer lopez", "shakira",
