@@ -761,9 +761,19 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     continue
                 seen_names.add(base_name)
                 
-                # Estimate tier and price
-                tier = estimate_tier_from_description(extract)
-                price = get_dynamic_price(tier, 50, actual_title)
+                # Check if celebrity exists in DB - use their stored tier/price for consistency
+                existing = await db.celebrities.find_one(
+                    {"name": {"$regex": f"^{actual_title}$", "$options": "i"}},
+                    {"_id": 0, "tier": 1, "price": 1}
+                )
+                
+                if existing:
+                    tier = existing.get("tier", "D")
+                    price = get_dynamic_price(tier, 50, actual_title)
+                else:
+                    # Estimate tier and price for new celebrities
+                    tier = estimate_tier_from_description(extract)
+                    price = get_dynamic_price(tier, 50, actual_title)
                 
                 results.append({
                     "name": actual_title,
