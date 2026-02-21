@@ -35,8 +35,17 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 
 ### Core Features
 - ✅ Full FastAPI backend with all endpoints
-- ✅ Wikipedia autocomplete search with **ADVANCED FILTERING** (no locations, places, films, universities, awards)
+- ✅ Wikipedia autocomplete search with **COMPREHENSIVE FILTERING**:
+  - No brands/shops (Gucci, Nike, Prada filtered)
+  - No cars/vehicles (Tesla, BMW filtered)
+  - No animals (Lion filtered)
+  - No locations/places/cities
+  - No films/TV shows/books/magazines
+  - No universities/schools
+  - No airlines/bands/TV channels
+  - **ONLY CELEBRITIES/PEOPLE**
 - ✅ A/B/C/D tier system with STRICT dynamic pricing (max £12M)
+- ✅ Dynamic pricing recalculated on every search/category view
 - ✅ Saturday 12pm GMT transfer window (24 hours)
 - ✅ Brown Bread Watch with PREMIUM pricing (top 3 up to £15M)
 - ✅ Price alerts system
@@ -45,6 +54,8 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 
 ### UI Features
 - ✅ Scrolling banner shows CORRECT tier-based prices
+- ✅ "How It Works" with explanatory text under each icon
+- ✅ Proper spacing between components (mb-8 after How It Works, mb-6 after categories)
 - ✅ "Select a category or search for any celebrity" helper text (gold, under search)
 - ✅ Category filter directly under search bar
 - ✅ Hot Celebs RANDOMIZED on each refresh with real Wikipedia photos
