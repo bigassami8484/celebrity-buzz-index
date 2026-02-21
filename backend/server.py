@@ -2043,14 +2043,15 @@ async def get_hot_celebs():
                 except:
                     continue
     
-    # Cache the results with week tracking
+    # Cache the results with week tracking (refreshes every Monday)
     if hot_list:
         await db.news_cache.update_one(
-            {"type": "hot_celebs_from_news_v3"},
+            {"type": "hot_celebs_from_news_v4"},
             {"$set": {
                 "hot_celebs": hot_list,
                 "updated_at": datetime.now(timezone.utc).isoformat(),
-                "week_start": week_start.isoformat()
+                "week_start": current_week_start.isoformat(),
+                "news_cutoff": news_cutoff.isoformat()
             }},
             upsert=True
         )
