@@ -698,7 +698,7 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 return []
             
             # Step 3: Get full page info for verified humans
-            human_page_ids = [str(c["page_id"]) for c in human_candidates[:10]]  # Limit to 10
+            human_page_ids = [str(c["page_id"]) for c in human_candidates[:15]]  # Get more to sort
             info_url = f"https://en.wikipedia.org/w/api.php?action=query&pageids={'|'.join(human_page_ids)}&prop=extracts|pageimages|info&exintro=true&explaintext=true&pithumbsize=300&inprop=url&format=json"
             
             info_response = await client.get(info_url, timeout=8.0, headers=headers)
@@ -712,7 +712,7 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
             results = []
             seen_names = set()
             
-            for candidate in human_candidates[:10]:
+            for candidate in human_candidates[:15]:
                 page_id = str(candidate["page_id"])
                 page_info = pages.get(page_id, {})
                 
@@ -729,7 +729,22 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 
                 # Estimate tier and price
                 tier = estimate_tier_from_description(extract)
-                price = get_dynamic_price(tier, 10, title)
+                price = get_dynamic_price(tier, 50, title)
+                
+                # Calculate match score - prioritize names that start with or closely match query
+                title_lower = title.lower()
+                match_score = 0
+                if title_lower.startswith(query_lower):
+                    match_score = 100  # Exact start match
+                elif title_lower.replace(" ", "").startswith(query_lower.replace(" ", "")):
+                    match_score = 90
+                else:
+                    # Check how many query parts match at word starts
+                    title_words = title_lower.split()
+                    for i, qpart in enumerate(query_parts):
+                        for j, word in enumerate(title_words):
+                            if word.startswith(qpart):
+                                match_score += 20 - i - j  # Earlier matches score higher
                 
                 results.append({
                     "name": title,
@@ -737,11 +752,18 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     "image": image or f"https://ui-avatars.com/api/?name={title}&size=150&background=FF0099&color=fff",
                     "wiki_url": wiki_url,
                     "estimated_tier": tier,
-                    "estimated_price": price
+                    "estimated_price": price,
+                    "_match_score": match_score
                 })
-                
-                if len(results) >= 5:
-                    break
+            
+            # Sort by match score (best matches first)
+            results.sort(key=lambda x: x.get("_match_score", 0), reverse=True)
+            
+            # Remove internal score and limit to 5
+            for r in results:
+                r.pop("_match_score", None)
+            
+            results = results[:5]
             
             logger.info(f"Wikidata-verified autocomplete returning {len(results)} humans for '{query}'")
             return results
