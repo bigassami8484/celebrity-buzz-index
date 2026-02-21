@@ -1449,10 +1449,15 @@ async def get_todays_news():
                                 # Clean HTML tags from description
                                 description = re.sub(r'<[^>]+>', '', description)[:200]
                                 
+                                # Decode HTML entities in title and description
+                                title = decode_html_entities(title)
+                                description = decode_html_entities(description)
+                                celebrity = decode_html_entities(celebrity) if 'celebrity' in dir() else "Celebrity"
+                                
                                 if title and len(title) > 10:
                                     # Try to extract celebrity name from title
                                     celebrity = title.split(":")[0] if ":" in title else title.split(" - ")[0] if " - " in title else "Celebrity"
-                                    celebrity = celebrity[:50]
+                                    celebrity = decode_html_entities(celebrity[:50])
                                     
                                     news_items.append({
                                         "celebrity": celebrity,
