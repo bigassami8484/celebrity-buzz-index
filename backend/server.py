@@ -945,23 +945,13 @@ def calculate_buzz_score(news: List[dict]) -> float:
     # Ensure minimum score of 5 points
     return round(max(5.0, min(score, 150.0)), 1)
 
-def calculate_price(buzz_score: float, tier: str, name: str = "") -> int:
-    """Calculate celebrity price based on buzz score, tier, and controversy"""
-    base_price = get_price_for_tier(tier)
+def calculate_price(buzz_score: float, tier: str, name: str = "") -> float:
+    """Calculate celebrity price with DYNAMIC PRICING based on buzz
     
-    # Controversial celeb boost
-    controversy_boost = get_controversial_price_boost(name)
-    if controversy_boost > 0:
-        base_price = max(base_price, controversy_boost)
-    
-    # Buzz modifier: high buzz adds to price
-    if buzz_score >= 40:
-        return base_price + 4
-    elif buzz_score >= 30:
-        return base_price + 2
-    elif buzz_score >= 20:
-        return base_price + 1
-    return base_price
+    Prices go UP when celebrity is in the news (high buzz)
+    Prices go DOWN when celebrity drifts out of the news (low buzz)
+    """
+    return get_dynamic_price(tier, buzz_score, name)
 
 # Points calculation methodology
 POINTS_METHODOLOGY = {
