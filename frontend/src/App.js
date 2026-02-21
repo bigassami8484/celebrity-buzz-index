@@ -929,9 +929,9 @@ const TrendingTicker = ({ celebrities }) => {
                 e.target.src = `https://ui-avatars.com/api/?name=${celeb.name}&size=40&background=FF0099&color=fff`;
               }}
             />
-            <span className="font-bold">{celeb.name}</span>
+            <span className="font-bold text-white">{celeb.name}</span>
             {celeb.tier && <TierBadge tier={celeb.tier} />}
-            <span className="text-[#FFD700] font-bold">£{celeb.price}M</span>
+            <span className="bg-black/80 px-2 py-0.5 text-[#00FF00] font-bold text-sm">£{celeb.price}M</span>
           </span>
         ))}
       </div>
