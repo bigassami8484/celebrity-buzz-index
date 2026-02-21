@@ -923,9 +923,12 @@ def detect_category_from_bio(bio: str, name: str) -> str:
                                       "i'm a celebrity", "strictly come dancing contestant"]):
         return "reality_tv"
     
-    # Royals
-    if any(x in bio_lower for x in ["royal family", "british royal", "heir to the throne", 
-                                     "house of windsor", "buckingham palace", "monarchy"]):
+    # Royals - must specifically be about royal family, NOT just people with royal honors like "Sir"
+    # Only match actual members of royal families
+    if any(x in bio_lower for x in ["member of the british royal family", "member of the royal family",
+                                     "heir to the throne", "house of windsor", "buckingham palace", 
+                                     "line of succession", "son of king", "daughter of queen",
+                                     "grandson of queen", "granddaughter of queen"]):
         return "royals"
     
     # Athletes - check BEFORE musicians (racing driver, footballer, etc. should take priority)
