@@ -1101,7 +1101,7 @@ const HowItWorks = ({ onShowMethodology }) => (
 // Header Component
 const Header = () => (
   <header className="py-6 md:py-8 px-4 text-center">
-    <h1 className="font-anton text-4xl sm:text-5xl md:text-7xl tracking-tighter uppercase header-title" data-testid="main-title">
+    <h1 className="font-anton text-5xl sm:text-6xl md:text-7xl tracking-tighter uppercase header-title" data-testid="main-title">
       <span className="text-[#FFD700]">C</span>
       <span className="text-[#FF0099]">e</span>
       <span>l</span>
@@ -1111,12 +1111,12 @@ const Header = () => (
       <span>i</span>
       <span className="text-[#FF0099]">t</span>
       <span>y</span>
-      <span className="mx-1 sm:mx-2 md:mx-4"></span>
+      <span className="mx-2 sm:mx-3 md:mx-4"></span>
       <span className="text-[#FFD700]">B</span>
       <span className="text-[#FF0099]">u</span>
       <span>z</span>
       <span className="text-[#00F0FF]">z</span>
-      <span className="mx-1 sm:mx-2 md:mx-4"></span>
+      <span className="mx-2 sm:mx-3 md:mx-4"></span>
       <span className="text-[#FFD700]">I</span>
       <span className="text-[#FF0099]">n</span>
       <span>d</span>
