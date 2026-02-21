@@ -30,6 +30,8 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - **Duration**: 24 hours
 - **Closes**: Sunday at 12:00 GMT
 - 1 transfer per week allowed during window
+- ✅ **LIVE COUNTDOWN BANNER** at top of page showing time remaining
+- ✅ Green pulsing banner when OPEN, cyan when closed
 
 ## What's Been Implemented (Feb 2026)
 
@@ -42,7 +44,11 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - ✅ A/B/C/D tier system with STRICT dynamic pricing (max £12M)
 - ✅ **CONSISTENT PRICING** - uses default buzz score (50) for Hot Celebs, search, and categories
 - ✅ Saturday 12pm GMT transfer window (24 hours)
-- ✅ Brown Bread Watch with PREMIUM pricing (top 3 up to £15M)
+- ✅ **BROWN BREAD PREMIUM PRICING IN SEARCH**:
+  - Top 3 oldest celebrities show premium prices when searched
+  - David Attenborough (Age 100): £15M
+  - Michael Caine (Age 93): £13M
+  - Judi Dench (Age 92): £11M
 - ✅ **PRICE HISTORY TRACKING**:
   - MongoDB 'price_history' collection
   - Records price changes automatically
