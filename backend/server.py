@@ -687,14 +687,20 @@ GUARANTEED_A_LIST = [
     "oprah winfrey", "kim kardashian", "elon musk", "jeff bezos", "cristiano ronaldo",
     "lionel messi", "lebron james", "serena williams", "roger federer", "michael jordan",
     "david beckham", "barack obama", "donald trump", "joe biden", "bill gates",
-    # British Royal Family (including Wikipedia formal names)
-    "prince william", "william, prince of wales", "prince harry", "harry, duke of sussex",
-    "kate middleton", "catherine, princess of wales", "queen elizabeth", "elizabeth ii",
-    "king charles", "charles iii", "king charles iii", "prince andrew", "andrew, duke of york",
-    "andrew mountbatten-windsor", "meghan markle", "meghan, duchess of sussex",
-    "princess diana", "diana, princess of wales", "camilla", "queen camilla",
-    "princess anne", "anne, princess royal", "prince edward", "edward, duke of edinburgh",
+    # British Royal Family (all variations including Wikipedia formal names)
+    "prince william", "william, prince of wales", "william prince of wales",
+    "prince harry", "harry, duke of sussex", "harry duke of sussex", "prince harry, duke of sussex", "prince harry duke of sussex",
+    "kate middleton", "catherine, princess of wales", "catherine princess of wales",
+    "queen elizabeth", "elizabeth ii", "queen elizabeth ii",
+    "king charles", "charles iii", "king charles iii",
+    "prince andrew", "andrew, duke of york", "andrew duke of york", "andrew mountbatten-windsor",
+    "meghan markle", "meghan, duchess of sussex", "meghan duchess of sussex",
+    "princess diana", "diana, princess of wales", "diana princess of wales",
+    "camilla", "queen camilla", "camilla, queen consort",
+    "princess anne", "anne, princess royal", "anne princess royal",
+    "prince edward", "edward, duke of edinburgh", "edward duke of edinburgh",
     "princess beatrice", "princess eugenie", "zara tindall", "peter phillips",
+    "prince george", "princess charlotte", "prince louis",
     # Additional mega-stars
     "britney spears", "madonna", "michael jackson", "jennifer lopez", "shakira",
     "eminem", "jay-z", "jay z", "snoop dogg", "50 cent", "nicki minaj", "cardi b",
@@ -705,8 +711,14 @@ GUARANTEED_A_LIST = [
     "samuel l. jackson", "samuel l jackson", "al pacino", "robert de niro", "jack nicholson",
     # Sports legends
     "simone biles", "venus williams", "novak djokovic", "wayne rooney", "diego maradona",
-    "pele", "david beckham", "zinedine zidane", "kobe bryant", "shaquille o'neal"
+    "pele", "pelé", "zinedine zidane", "kobe bryant", "shaquille o'neal"
 ]
+
+# Keywords that indicate A-list royalty (for partial matching)
+ROYAL_A_LIST_KEYWORDS = ["prince william", "prince harry", "king charles", "kate middleton", 
+                          "meghan markle", "princess diana", "queen elizabeth", "prince andrew",
+                          "princess anne", "prince edward", "duke of sussex", "duke of york",
+                          "prince of wales", "princess of wales", "duke of edinburgh"]
 
 # Guaranteed B-list celebrities (not quite A-list but definitely not C or D)
 GUARANTEED_B_LIST = [
