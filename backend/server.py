@@ -1822,7 +1822,7 @@ async def get_hot_celebs():
                 response = await client.get(rss_url, timeout=10.0, headers=headers)
                 if response.status_code == 200:
                     content = response.text
-                    items = content.split("<item>")[1:25]  # Get 25 items per source
+                    items = content.split("<item>")[1:30]  # Get 30 items per source
                     
                     for item in items:
                         try:
@@ -1830,14 +1830,31 @@ async def get_hot_celebs():
                             title_end = item.find("</title>")
                             title = item[title_start:title_end].replace("<![CDATA[", "").replace("]]>", "").strip()
                             title = decode_html_entities(title)
-                            all_headlines.append({"title": title, "source": source_name})
+                            
+                            # Try to extract publication date
+                            pub_date = None
+                            if "<pubDate>" in item:
+                                date_start = item.find("<pubDate>") + 9
+                                date_end = item.find("</pubDate>")
+                                date_str = item[date_start:date_end].strip()
+                                try:
+                                    # Parse RSS date format (e.g., "Mon, 09 Dec 2024 12:00:00 GMT")
+                                    from email.utils import parsedate_to_datetime
+                                    pub_date = parsedate_to_datetime(date_str)
+                                except:
+                                    pass
+                            
+                            # Only include if: no date (assume recent) OR date is this week
+                            if pub_date is None or pub_date >= week_start:
+                                all_headlines.append({"title": title, "source": source_name, "date": pub_date})
+                            
                         except:
                             continue
             except Exception as e:
                 logger.error(f"Error fetching RSS from {source_name}: {e}")
                 continue
         
-        # Check which known celebrities appear in headlines
+        # Check which known celebrities appear in headlines THIS WEEK
         celeb_mentions = {}
         all_text = " ".join([h["title"].lower() for h in all_headlines])
         
