@@ -774,12 +774,9 @@ def get_base_price_for_tier(tier: str) -> float:
     return base_prices.get(tier, 0.5)
 
 def get_dynamic_price(tier: str, buzz_score: float, name: str = "") -> float:
-    """Calculate dynamic price based on tier, buzz score, and controversy
+    """Calculate dynamic price based on tier, buzz score
     
-    Price increases when celebrity is in the news (high buzz)
-    Price decreases when celebrity is out of the news (low buzz)
-    
-    Pricing Tiers (STRICT - prices MUST stay within range):
+    Pricing Tiers (STRICT - MAX £12M for any celeb):
     - A-List: £9m-£12m (high scoring but expensive)
     - B-List: £5m-£8m (balanced steady picks)  
     - C-List: £2m-£4m (risk/reward)
@@ -804,8 +801,9 @@ def get_dynamic_price(tier: str, buzz_score: float, name: str = "") -> float:
     # Calculate dynamic price within the tier's range
     dynamic_price = min_price + (price_range * buzz_factor)
     
-    # STRICT: Ensure price stays within tier range
+    # STRICT: Ensure price stays within tier range and NEVER exceeds £12M
     dynamic_price = max(min_price, min(max_price, dynamic_price))
+    dynamic_price = min(12.0, dynamic_price)  # Hard cap at £12M
     
     # Round to 1 decimal place
     return round(dynamic_price, 1)
