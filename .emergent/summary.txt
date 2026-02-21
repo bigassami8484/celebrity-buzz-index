@@ -6,163 +6,171 @@ The user wants to build a Celebrity Buzz Index game. This is a full-stack web ap
 -   **Data**: Real-time celebrity data from the Wikipedia API and news from RSS feeds.
 -   **Gameplay**:
     -   Users draft a team of 10 celebrities with a starting budget of £50M.
-    -   A tiered, dynamic pricing system for celebrities where prices fluctuate based on media buzz.
-    -   A weekly transfer window opens every Saturday at 12 p.m. GMT for 24 hours.
+    -   A tiered, dynamic pricing system for celebrities where prices fluctuate based on media buzz. This includes a news premium for celebrities trending heavily.
+    -   A weekly transfer window opens every Saturday at 12 p.m. GMT for 24 hours, with a limit of 2 transfers.
     -   A points system based on news coverage, controversy, and a Brown Bread Bonus (+100 for a celebrity's death).
+-   **Authentication (New Requirement)**:
+    -   Allow users to play as guests initially.
+    -   Prompt for sign-up/login for persistent actions (saving teams, joining leagues).
+    -   Support Google social login and passwordless magic link email login.
 -   **Features**:
-    -   **Critical**: Autocomplete search bar that filters out all non-human entities (places, movies, brands, companies, animals, objects, etc.).
-    -   A Hot Celebs This Week banner with real photos.
+    -   **Critical**: Autocomplete search bar that filters out all non-human entities and provides relevant results for partial names.
+    -   A Hot Celebs This Week banner with real photos, dynamically populated by celebrities currently in the news.
     -   Private Friends Leagues for users to create/join.
-    -   A Brown Bread Watch for elderly celebrities.
+    -   A Brown Bread Watch for elderly celebrities with special premium pricing.
     -   Price history tracking for each celebrity.
-    -   A compact How it Works guide and a Points Methodology modal.
--   **UI/UX**: The application must be mobile-friendly, with a clean and uncluttered interface.
+-   **UI/UX**: The application must be mobile-friendly, with a clean and uncluttered interface. The main title's size is a key priority for the user.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A functional full-stack application that implements most user requirements. The backend is a monolithic FastAPI server () and the frontend is a monolithic React app (). The core features like team drafting, dynamic pricing, and news feeds are in place.
-
-The most significant recent change was a complete overhaul of the celebrity search functionality. The previous, brittle keyword-based filtering was replaced with a much more robust system that uses the Wikidata API to verify that search results are actual humans (instance of ). The agent also implemented a price history tracking feature and resolved numerous price consistency bugs across the application.
+A full-stack application with a FastAPI backend and a React frontend. Core gameplay features are implemented, including dynamic celebrity pricing based on real-time news mentions, a Brown Bread Watch for elderly celebrities, and team management. The UI has been significantly updated based on user feedback, featuring a scrolling Hot Celebs banner, a transfer window countdown, and numerous layout adjustments. An authentication system using Google OAuth and Resend for magic links has been partially implemented on the backend, with frontend work just beginning. The codebase remains monolithic in two large files (, ) and is in critical need of refactoring.
 
 **Last working item**:
--   **Last item agent was working**: The user requested a new batch of UI/UX and feature changes. The agent was about to start implementation.
--   **Status**: NOT STARTED
+-   **Last item agent was working**: The user reported that the website title on the desktop version is still too small, interrupting the agent's work on implementing a new authentication system. The agent's immediate task is to address this recurring UI feedback before continuing with the auth feature.
+-   **Status**: IN PROGRESS
 -   **Agent Testing Done**: N
--   **Which testing method agent to use?**: both (Frontend for UI changes, Backend for news logic)
+-   **Which testing method agent to use?**: frontend testing agent (for the title change), and then  for the authentication feature once resumed.
 -   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
--   **Issue 1 (P0)**: Implement the latest user requests.
-    -   Make the Hot Celebs This Week banner at the top scroll automatically.
-    -   Increase the font size of the text under the How it Works icons.
-    -   Update the news display to show 3 lines of text per article.
-    -   Implement logic to refresh the news feed every 24 hours.
-    -   Remove the Player Count display from the top of the page.
+-   **Issue 1 (P0)**: The website title font size is still too small on the desktop view. This is a recurring issue and the user's top priority.
 
 **Issues Detail:**
--   **Issue 1: Implement latest user requests**
-    -   **Attempted fixes**: None. The agent has only viewed the relevant files.
+-   **Issue 1: Title too small on desktop**
+    -   **Attempted fixes**: The agent has made multiple attempts to increase the font size using progressively larger TailwindCSS classes (e.g., , , , ). The latest user message confirms these changes are still not sufficient.
     -   **Next debug checklist**:
-        1.  **Frontend (, ):**
-            -   Modify the  component to include an automatic scrolling animation (e.g., using CSS keyframes or a library like ).
-            -   Increase the font size for the text within the  component.
-            -   Modify the  component to truncate text to 3 lines (e.g., using ).
-            -   Remove the JSX for the player count display.
-        2.  **Backend ():**
-            -   Modify the  endpoint to implement a 24-hour caching mechanism for the news feed.
-    -   **Why fix this issue and what will be achieved with the fix?**: This will address the user's latest feedback, improving the UI's dynamism and readability, and ensuring the news content remains fresh.
-    -   **Status**: NOT STARTED
-    -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: Both
+        1.  Inspect the header element in .
+        2.  The current class is . The issue might be a conflicting CSS rule or a size constraint on a parent container.
+        3.  Increase the base and responsive font sizes again (e.g., to ).
+        4.  If that fails, investigate parent elements for  or other constraining styles. Consider using a more direct CSS approach in  if Tailwind is being overridden.
+    -   **Why fix this issue and what will be achieved with the fix?**: To satisfy a direct and repeatedly emphasized user request, improving their satisfaction with the application's appearance.
+    -   **Status**: IN PROGRESS
+    -   **Is recurring issue?**: Y
+    -   **Should Test frontend/backend/both after fix?**: Frontend
     -   **Blocked on other issue**: None
 
 **In progress Task List**:
--   None.
+-   **Task 1 (P1)**: Implement Authentication (Google & Magic Link).
+    -   **Where to resume**: The backend foundation is laid in  with new auth routes, Pydantic models, and the  dependency installed. The frontend work in  has started with the creation of an  and a placeholder . The next steps are to build the  UI, connect it to the backend endpoints, wrap the app in the , and trigger the modal for protected actions.
+    -   **What will be achieved with this?**: This will allow users to create accounts, save their teams, and have a persistent experience across devices, which is a core requirement.
+    -   **Status**: IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?**: Both
+    -   **Blocked on something**: The P0 title-size issue must be resolved first to address the user's immediate feedback.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks**:
-    -   **P0: Flesh out Hot Streak Notifications**: The user approved adding hot streak notifications. The backend endpoint () and a basic UI placeholder were created, but the feature needs to be fully developed.
+    -   **P1: Flesh out Hot Streak Notifications**: Backend endpoint () and a basic UI placeholder were created, but the feature needs to be fully developed.
 -   **Future Tasks**:
-    -   **P1: Celebrity Comparison Feature**: Allow users to compare two or more celebrities side-by-side.
+    -   **P1: Refactor monolithic files**: Critically,  and  must be broken down into smaller, manageable modules for future development.
+    -   **P2: Celebrity Comparison Feature**: Allow users to compare two or more celebrities side-by-side.
     -   **P2: Push Notifications**: For major events like the transfer window opening or significant price changes.
     -   **P2: Badge system and Hall of Fame page**.
 
 **Completed work in this session**
--   **Search Overhaul (Wikidata Integration)**: Replaced the complex and unreliable keyword-based search filter with a new implementation in  that uses the Wikidata API to validate that search results are human (), drastically improving search accuracy.
--   **Price History Feature**:
-    -   Added a  collection and  Pydantic model.
-    -   Created a new endpoint .
-    -   Implemented a  in the frontend, accessible via a chart icon on each .
--   **Critical Price Consistency Bug Fix**: Resolved a major issue where celebrity prices were inconsistent between search results, the Hot Celebs banner, and the user's team panel. This involved refactoring the  endpoint and other data-fetching logic to recalculate dynamic prices on the fly instead of relying on stale data from the database.
--   **Category Detection Fix**: Corrected the  logic that was misclassifying actors like Michael Caine and Ian McKellen as royals. This required deleting the incorrect entries from the database to allow for correct re-categorization.
--   **UI/UX Refinements**:
-    -   Replaced a scrolling text ticker with a card-based Hot Celebs banner at the top of the page.
-    -   Adjusted component spacing and text sizes based on user feedback.
-    -   Removed the buzz score display from the UI.
-    -   Re-organized the How It Works component to have descriptive text under each icon.
+-   **Price Consistency Overhaul**: Fixed critical bugs causing price mismatches between the Hot Celebs banner, search results, autocomplete, and celebrity cards. All pricing is now unified, including Brown Bread and News Premium adjustments across all endpoints.
+-   **Dynamic Hot Celebs Logic**: Replaced a static list of hot celebs with a dynamic system that pulls celebrities directly from real-time news feeds, ensuring the banner reflects actual trending personalities.
+-   **News Premium Pricing**: Implemented a price multiplier based on the number of news mentions for a celebrity, with UI indicators (🔥🔥, 📈, ▲) to show trending status.
+-   **Search Functionality Upgrade**: Switched from a basic Wikipedia search to the  API, significantly improving autocomplete relevance for partial names. Ensured results are correctly ordered and filtered.
+-   **UI & Layout Enhancements**:
+    -   Implemented a live countdown timer in the transfer window banner.
+    -   Reordered the main page layout to place the team panel and celebrity search results above the news feed for better accessibility.
+    -   Added a floating Team button and modal for improved mobile UX.
+    -   Iteratively adjusted the main title's size and layout based on user feedback.
 
 **Earlier issues found/mentioned but not fixed**
-None.
+-   None.
 
 **Known issue recurrence from previous fork**
--   **Search Filtering:** This was a major recurring issue that required multiple failed attempts with keyword filtering. The recent switch to Wikidata-based verification is a robust solution that should prevent future recurrence, but it's a historically sensitive area of the codebase.
+-   **Title Font Size**: Has become a recurring issue in this session. The user has repeatedly asked for the title to be made larger, indicating the agent's previous fixes were insufficient.
+-   **Price Consistency**: This was a major recurring problem that the agent has now fixed across multiple endpoints. It remains a complex and sensitive area of the application.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend**: React.js, TailwindCSS,  for API calls,  for icons.
--   **Backend**: Python, FastAPI, Motor (async MongoDB driver), Pydantic, , .
--   **Data Sources**: Wikipedia API, Wikidata API (for entity verification), Public RSS Feeds.
--   **Key Logic**: Wikidata human verification (P31=Q5), dynamic pricing based on a buzz score, transfer window timing.
+-   **Frontend**: React.js, TailwindCSS, , .
+-   **Backend**: Python, FastAPI, Motor (async MongoDB driver), Pydantic, , , .
+-   **Data Sources**: Wikipedia API (OpenSearch), Wikidata API (SPARQL), Public RSS Feeds.
+-   **Key Logic**: Wikidata human verification (P31=Q5), dynamic pricing with news-based multipliers, transfer window timing, passwordless auth (magic link), Google OAuth.
 
 **key DB schema**
 -   **celebrities**: 
 -   **teams**: 
 -   **leagues**: 
--   **price_history**:  **(New)**
+-   **price_history**: 
 -   **news_cache / trending_cache**: 
+-   **users**:  **(New)**
+-   **auth_tokens**:  **(New)**
 
 **changes in tech stack**
--   No new libraries were added, but the backend workflow was significantly changed to incorporate calls to the Wikidata SPARQL endpoint for search result verification.
+-   Added  to the backend for sending magic link emails.
 
 **All files of reference**
--   : Major changes.  was rewritten to use Wikidata. Endpoints like , , and  were refactored for price consistency. A new endpoint for price history was added.
--   : Major changes. A  component was added. The main layout was updated to move the  to the top. State management for the new modal was added.
--   : Minor style adjustments for component spacing and text size.
--   : Kept up-to-date with completed tasks and future backlog.
+-   : Heavily modified. All auth routes, models, and logic were added. The , , and  endpoints were significantly refactored to ensure price consistency.
+-   : Heavily modified. A new  and  were added. The main layout was reordered multiple times. Numerous components were updated to reflect new features and UI feedback (e.g., , , Header/Title).
+-   : Minor changes for font sizes and colors.
+-   : New file created to store the testing playbook for the new authentication flow.
 
 **Areas that need refactoring**:
--   **Critical**: The  file is over 2,000 lines long and contains all components, state logic, and effects. It must be broken down into smaller, reusable components (e.g., , , , , ) and organized into a  directory.
--   **High Priority**: The  file contains all API routes, database models, and business logic. It should be refactored into a standard FastAPI project structure with separate modules for routes, models, and services.
+-   **Critical**:  is now well over 2,500 lines and contains all application logic and components. It MUST be broken down into a proper component structure (e.g., , , ).
+-   **Critical**:  is also extremely large. It should be restructured into separate modules for routes, models, services, and database configuration.
 
 **key api endpoints**
--   : Now powered by the new Wikidata-based search logic.
--   : Fetches full details for a celebrity selected from autocomplete.
--   : **(New)** Fetches the price history for a celebrity.
--   : **(Fixed)** Now correctly calculates dynamic price when adding a celebrity to a team.
--   : Updated for price consistency.
+-   : **(New)** Sends a magic link login email.
+-   : **(New)** Verifies a magic link token.
+-   : **(New)** Initiates Google OAuth flow.
+-   : **(New)** Handles the callback from Google.
+-   : **(New)** Gets the currently authenticated user.
+-   : **(New)** Logs out the user.
+-   : **(Modified)** Updated to use  and apply premium/hot celeb pricing.
+-   : **(Modified)** Updated to apply all premium pricing consistently.
+-   : **(Modified)** Now dynamically generates a list from news and applies a price premium.
 
 **Critical Info for New Agent**
--   The user's current request is to implement automatic scrolling for the Hot Celebs banner. This is a frontend task that will likely require CSS animations.
--   The Wikidata-based search filter ( and  in ) is the new, definitive way to get celebrity results. Do not revert to the old keyword-based filtering logic, which has been removed.
--   Price consistency across the app was a major pain point that has now been resolved. When making any changes that involve celebrity prices, ensure the dynamic price is recalculated on-demand rather than trusting a stored value.
--   The codebase is highly monolithic. Proposing a refactoring task after completing the current user request is highly recommended for future maintainability.
+-   The user's absolute top priority is to **make the website title on the desktop version larger**. This feedback has been repeated multiple times. Address this before any other task.
+-   After fixing the title, resume and complete the authentication implementation. The backend routes are in place; the main work is on the frontend integration. Refer to  for guidance.
+-   Price consistency across the application is a historically sensitive area. Any changes to celebrity data or pricing logic must be carefully tested across the , , and  endpoints to avoid regressions.
+-   The monolithic codebase is a major liability. Strongly recommend proposing a refactoring phase after completing the current user requests.
 
 **documents and test reports created in this job**
--   
--   
--   
--   
+-    (Continuously updated)
 -   
 -   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **LATEST (Pending):** I want the hot celebs this week to scroll along automatically and i want the how it works find any celeb etc a bit bigger again. i also want the celeb news to show 3 lines of text and also to update every 24hours. also remove the player count at the top - **Status: Not Started.**
-2.  put the older version of hot celebs back but move it to the top where the scrolling celebs are, i do not want that there anymore.prices next to the names still come up wrong when putting them into my team for example leonardo says he costs 10.3m but when added to my team he costs 19m - **Status: Completed.**
-3.  add another 2 celebs to the hot celebs list but they must be hot because of news coverage that week. also the prices are still wrong, the price on the hot celeb is different from the price when you search them. please fix this. also remove the scroll banner from the top and put hot celebs there but make it scroll. also some celebs are coming up as royals when theyre not - michael caine and ian mckellen, also morgan freeman is not a singer. the price when searched for brown bread watch celebs also doesnt match. make the words under the how it works, like the find any celeb, tier pricing etc bigger" - **Status: Completed.**
-4.  “Update the Wikipedia search API call so it only returns results where the page is about a human (instance of human). Filter out places, bands, objects, companies and other non-person entities.” “add price history tracking too” - **Status: Completed.**
-5.  "i also want a bit of space in between the how it works bit before the search bar and then another bit of space before the hot celebs. also i want the how it works text underneath each box to show what it is, not a line of text. i dont want any shop names or clothing names or book or magazine names or animals or anything other than celebrities coming up in the search. no school names or university names or brand names or car names or companies to come into the search, just celebrities. pricing is still wrong when clicking on the categories and also remove the buzz points on each picture - **Status: Completed.**
+1.  **LATEST (Pending):** yes option four [Google/Magic Link auth] sounds good and i still need title bigger on the mobile version!!! - **Status: IN PROGRESS**. The agent started the auth work but was redirected by a subsequent message to fix the title size again.
+2.  website title on the mobile version is still too small! Make it larger please. I also want the team tab on the mobile version to show your buzz team when clicked but i also still want it to be shown on the main screen - **Status: Completed**. The agent made the title bigger and implemented the mobile team UI.
+3.  why is margot robbie a hot celeb she hasnt been in any news and also it still shows the incorrect price on their cards when clicked to what is shown on the hot celebs banner, it needs to be fixed for all celebs i cannot have incorrect pricing, all of the celebs prices on hot celebs do not match their prices on their cards when clicked" - **Status: Completed**. The agent fixed the price consistency issue across all endpoints and verified Margot Robbie was in the news.
+4.  "website title is still too small and make it clearer with the colours and the chart next to the name on the hot celebs that the price has gone up - use green instead of orange" - **Status: Completed**. Agent increased title size and changed premium price indicators to green.
+5.  "my buzz team should be moved underneath the search box above celeb news and I want the title to show bigger on a mobile, its too small. there are still celebs in hot celebs list that havent been in the news recently and there should be a premium added to them if they have been in the news a lot despite their tier price. prince andrew for example is too cheap despite being in the news a lot" - **Status: Completed**. Agent implemented all layout changes and the "news premium" pricing system.
+6.  "prices on the search MUST match the same price shown on the hot celebs this week. also how it works should be underneath the title celebrity buzz index. the cards that appear do not match the price that shows when appearing in the search" - **Status: Completed**. Agent fixed price consistency and layout.
+7.  "no, still when I type in a name thats on the brown bread list it comes up with 0.06 mil in the search and when I click on him it shows 10.3 mil but on the brown bread list he costs 15m I also want a better search, when i type in most of a name like david att... it brings up other davids before it shows him even when ive mostly typed his full name. also move the title celebrity buzz index under the transfer window banner, above the hot celebs this week banner" - **Status: Completed**. Agent fixed Brown Bread pricing, improved search with `opensearch`, and moved the title.
+8.  "I want the title to look better and not so spaced out on the mobile version and the no celebrities yet should go underneath the search categories so you dont have to scroll down underneath the celeb news to see the celeb youve clicked on. also add somewhere that you can only make 2 transfers during the transfer window" - **Status: Completed**.
+9.  "premium pricing for the brown bread list dont show when searching for a celeb + i want the transfer window open banner to show for the full 24 hours with a countdown, it should automatically start every saturday at 12pm gmt - **Status: Completed**.
+10. david attenborough is not searchable and neither is ghislaine maxwell, i need everyone - **Status: Completed**. Agent fixed the search logic.
 
 **Project Health Check:**
--   **Broken**: None.
--   **Mocked**: None.
+-   **Broken**: None
+-   **Mocked**: None
 
 **3rd Party Integrations**
--   **OpenAI GPT-4o**: Used for news analysis via . (Uses Emergent LLM Key)
--   **Wikipedia API**: Used for initial celebrity search and data sourcing.
--   **Wikidata API**: Used via SPARQL query to verify search results are human entities.
+-   **OpenAI GPT-4o**: Used for news analysis. (Uses Emergent LLM Key)
+-   **Wikipedia API**: Used for celebrity data sourcing (via OpenSearch endpoint).
+-   **Wikidata API**: Used for SPARQL queries to verify search results are human.
 -   **Public RSS Feeds**: Used for news aggregation ().
+-   **Google Auth**: **(New - In Progress)** For social login. Requires user-provided credentials.
+-   **Resend**: **(New - In Progress)** For sending magic link emails. Requires user-provided API key.
 
 **Testing status**
--   **Testing agent used after significant changes**: YES, multiple test reports ( through ) were generated and passed.
+-   **Testing agent used after significant changes**: YES
 -   **Troubleshoot agent used after agent stuck in loop**: NO
 -   **Test files created**: None
--   **Known regressions**: None.
+-   **Known regressions**: None currently, but price consistency is a fragile area.
 
 **Credentials to test flow:**
-None required. The application does not have a user authentication flow.
+-   User will need to provide a **Resend API Key** to complete the magic link implementation.
+-   User will need to provide **Google OAuth Client ID and Secret** to complete the Google login implementation.
 
 **What agent forgot to execute**
-None. The agent has been diligent in addressing all user requests from the provided history. The upcoming and future tasks from the PRD are pending as expected.</analysis>
+-   The agent was in the middle of a large feature (authentication) when interrupted by high-priority UI feedback. The work is not forgotten, but paused.</analysis>
