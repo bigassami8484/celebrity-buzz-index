@@ -1443,6 +1443,7 @@ function App() {
   const [brownBreadWatch, setBrownBreadWatch] = useState([]);
   const [hotCelebs, setHotCelebs] = useState([]);
   const [priceAlerts, setPriceAlerts] = useState([]);
+  const [hotStreaks, setHotStreaks] = useState([]);
   
   // League state
   const [leagues, setLeagues] = useState([]);
