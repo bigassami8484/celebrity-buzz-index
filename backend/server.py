@@ -1412,17 +1412,24 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     # Check if already in database
     existing = await db.celebrities.find_one({"name": {"$regex": f"^{name}$", "$options": "i"}}, {"_id": 0})
     if existing:
+        # Check if this is a guaranteed A-lister (mega-star override)
+        celeb_name = existing.get("name", name)
+        is_mega_star = celeb_name.lower() in GUARANTEED_A_LIST
+        
         # If this celeb is in Hot Celebs, use that price (includes news premium)
         if hot_celeb_match:
             existing["price"] = hot_celeb_match["price"]
-            existing["tier"] = hot_celeb_match.get("tier", existing.get("tier", "D"))
+            # Use A-tier for mega-stars regardless of what's in cache
+            existing["tier"] = "A" if is_mega_star else hot_celeb_match.get("tier", existing.get("tier", "D"))
             existing["news_premium"] = hot_celeb_match.get("news_premium", False)
             existing["trending_tag"] = hot_celeb_match.get("trending_tag", "")
         else:
             # Use CONSISTENT pricing - same as Hot Celebs (buzz_score = 50)
-            tier = existing.get("tier", "D")
+            # Use A-tier for mega-stars
+            tier = "A" if is_mega_star else existing.get("tier", "D")
+            existing["tier"] = tier
             default_buzz = 50
-            new_price = get_dynamic_price(tier, default_buzz, existing.get("name", ""))
+            new_price = get_dynamic_price(tier, default_buzz, celeb_name)
             
             # Check if this celeb qualifies for Brown Bread premium pricing
             new_price = await apply_brown_bread_premium(existing, new_price)
