@@ -1189,14 +1189,47 @@ async def get_celebrities_by_category(category: str):
 
 @api_router.get("/stats")
 async def get_stats():
-    """Get site statistics including player count"""
+    """Get site statistics including player count and transfer window"""
     team_count = await db.teams.count_documents({})
-    celeb_count = await db.celebrities.count_documents({})
+    transfer_window = is_transfer_window_open()
     
     return {
         "player_count": team_count,
-        "celebrity_count": celeb_count,
-        "transfer_window": get_week_number()
+        "transfer_window": transfer_window
+    }
+
+@api_router.get("/pricing-info")
+async def get_pricing_info():
+    """Get pricing tier information for the game"""
+    return {
+        "tiers": [
+            {
+                "tier": "A-List",
+                "price_range": "£9m-£12m",
+                "description": "High scoring but expensive",
+                "strategy": "Star players with guaranteed buzz"
+            },
+            {
+                "tier": "B-List", 
+                "price_range": "£5m-£8m",
+                "description": "Balanced steady picks",
+                "strategy": "Reliable performers with consistent coverage"
+            },
+            {
+                "tier": "C-List",
+                "price_range": "£2m-£4m", 
+                "description": "Risk/reward",
+                "strategy": "Could break out or fade away"
+            },
+            {
+                "tier": "D-List",
+                "price_range": "£0.5m-£1.5m",
+                "description": "Cheap wildcards",
+                "strategy": "High upside if they hit headlines"
+            }
+        ],
+        "dynamic_pricing": "Prices fluctuate weekly based on media coverage. Hot celebs cost more, quiet celebs cost less.",
+        "transfer_window": "Opens every Saturday at 12pm GMT for 24 hours"
     }
 
 @api_router.get("/hot-celebs")
