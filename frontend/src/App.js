@@ -169,15 +169,10 @@ const TodaysNews = ({ news }) => {
             href={item.url || "#"} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="bg-[#1A1A1A] p-4 hover:bg-[#222] transition-colors block group"
+            className="bg-[#1A1A1A] p-2 hover:bg-[#222] transition-colors block group"
           >
-            <p className="text-xs text-[#00F0FF] uppercase mb-1">{item.source}</p>
-            <p className="font-bold text-sm text-white mb-2 line-clamp-2 group-hover:text-[#FF0099]">{item.headline}</p>
-            <p className="text-xs text-[#A1A1AA] line-clamp-2">{item.summary}</p>
-            <div className="flex justify-between items-center mt-2">
-              <p className="text-xs text-[#FFD700]">{item.celebrity}</p>
-              <span className="text-xs text-[#FF0099] opacity-0 group-hover:opacity-100 transition-opacity">Read →</span>
-            </div>
+            <p className="text-[10px] text-[#00F0FF] uppercase mb-1">{item.source}</p>
+            <p className="font-bold text-xs text-white line-clamp-2 group-hover:text-[#FF0099]">{item.headline}</p>
           </a>
         ))}
       </div>
@@ -185,28 +180,27 @@ const TodaysNews = ({ news }) => {
   );
 };
 
-// Hot Celebs This Week Banner Component
+// Hot Celebs This Week Banner Component - Compact
 const HotCelebsBanner = ({ celebs, onSelect }) => {
   if (!celebs || celebs.length === 0) return null;
   
   return (
-    <div className="bg-gradient-to-r from-[#FF0099]/20 via-[#0A0A0A] to-[#00F0FF]/20 border border-[#FF0099]/50 p-6 mb-8" data-testid="hot-celebs-banner">
-      <h3 className="font-anton text-2xl uppercase tracking-tight text-white mb-4 flex items-center gap-2">
-        🔥 Hot Celebs This Week
-        <span className="text-sm font-normal text-[#A1A1AA] lowercase ml-2">- Making headlines</span>
+    <div className="bg-gradient-to-r from-[#FF0099]/20 via-[#0A0A0A] to-[#00F0FF]/20 border border-[#FF0099]/50 p-4 mb-4" data-testid="hot-celebs-banner">
+      <h3 className="font-anton text-lg uppercase tracking-tight text-white mb-3 flex items-center gap-2">
+        🔥 Hot Celebs
       </h3>
-      <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
         {celebs.map((celeb, idx) => (
           <div 
             key={idx}
             onClick={() => onSelect(celeb.name)}
-            className="flex-shrink-0 w-40 bg-[#1A1A1A] border border-[#262626] p-3 cursor-pointer hover:border-[#FF0099] transition-colors group"
+            className="flex-shrink-0 w-28 bg-[#1A1A1A] border border-[#262626] p-2 cursor-pointer hover:border-[#FF0099] transition-colors group"
           >
-            <div className="relative mb-2">
+            <div className="relative mb-1">
               <img 
                 src={celeb.image} 
                 alt={celeb.name}
-                className="w-full h-24 object-cover"
+                className="w-full h-20 object-cover"
                 onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${celeb.name}&size=128&background=FF0099&color=fff`; }}
               />
               <div className={`absolute top-1 right-1 px-1 py-0.5 text-[8px] font-bold ${
