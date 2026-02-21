@@ -486,13 +486,16 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     if not query_in_name:
                         continue
                     
+                    # Skip known location names
+                    if title_lower in known_locations:
+                        continue
+                    
                     # Skip if title contains non-person keywords
                     if any(kw in title_lower for kw in non_person_title_keywords):
                         continue
                     
                     # Skip if title has dashes with location patterns (Paris–Brest–Paris)
                     if "–" in title or "—" in title:
-                        pass  # Filtered out
                         continue
                     
                     # Skip if title has parentheses UNLESS it's a role descriptor like (musician), (actor)
