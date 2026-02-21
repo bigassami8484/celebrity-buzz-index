@@ -1993,16 +1993,17 @@ async def get_hot_celebs():
                         
                         if image and "wikipedia" in image.lower():
                             bio = wiki_data.get("extract", "")
-                            tier = determine_tier_from_bio(bio)
-                            category = get_category_from_bio(bio, name)
-                            price = get_dynamic_price(tier, 50, name)
+                            actual_name = wiki_data.get("title", name)
+                            tier = determine_tier_from_bio(bio, actual_name)
+                            category = get_category_from_bio(bio, actual_name)
+                            price = get_dynamic_price(tier, 50, actual_name)
                             
                             # Find reason from pool
                             pool_entry = next((c for c in HOT_CELEBS_POOL if c["name"] == name), None)
                             hot_reason = pool_entry["reason"] if pool_entry else "Always making headlines"
                             
                             hot_list.append({
-                                "name": wiki_data.get("title", name),
+                                "name": actual_name,
                                 "tier": tier,
                                 "category": category,
                                 "price": price,
@@ -2016,13 +2017,14 @@ async def get_hot_celebs():
                 except:
                     continue
     
-    # Cache the results
+    # Cache the results with week tracking
     if hot_list:
         await db.news_cache.update_one(
-            {"type": "hot_celebs_from_news_v2"},
+            {"type": "hot_celebs_from_news_v3"},
             {"$set": {
                 "hot_celebs": hot_list,
-                "updated_at": datetime.now(timezone.utc).isoformat()
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+                "week_start": week_start.isoformat()
             }},
             upsert=True
         )
