@@ -519,6 +519,28 @@ async def apply_brown_bread_premium(celeb: dict, base_price: float) -> float:
     return base_price
 
 
+async def get_brown_bread_premium_by_name(name: str) -> float:
+    """
+    Check if a celebrity name matches a Brown Bread premium celebrity.
+    Returns the premium price if they're in top 3 oldest, otherwise 0.
+    """
+    name_lower = name.lower().strip()
+    
+    # Get top 3 oldest living celebrities from DB
+    top_elderly = await db.celebrities.find(
+        {"is_deceased": False, "age": {"$gte": 60}},
+        {"_id": 0, "name": 1, "age": 1}
+    ).sort("age", -1).limit(3).to_list(3)
+    
+    brown_bread_premium_prices = [15.0, 13.0, 11.0]
+    
+    for idx, elderly in enumerate(top_elderly):
+        if elderly.get("name", "").lower() == name_lower:
+            return brown_bread_premium_prices[idx]
+    
+    return 0.0
+
+
 # ==================== CELEBRITY CATEGORIES ====================
 CATEGORIES = [
     {"id": "movie_stars", "name": "Movie Stars", "icon": "film"},
