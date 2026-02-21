@@ -155,7 +155,7 @@ if RESEND_API_KEY:
     resend.api_key = RESEND_API_KEY
 
 # Frontend URL for magic links
-FRONTEND_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://starpower-draft.preview.emergentagent.com")
+FRONTEND_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://star-draft-game.preview.emergentagent.com")
 
 # Banned words for team names (racist, offensive)
 BANNED_WORDS = [
