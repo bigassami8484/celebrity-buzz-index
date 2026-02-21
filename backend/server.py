@@ -1370,8 +1370,14 @@ async def get_hot_celebs():
             )
             
             if celeb and celeb.get("image") and not celeb.get("image", "").startswith("https://ui-avatars"):
+                # Recalculate price with dynamic pricing based on tier and buzz
+                tier = celeb.get("tier", celeb_info["tier"])
+                buzz_score = celeb.get("buzz_score", 50)
+                price = get_dynamic_price(tier, buzz_score, celeb.get("name", celeb_info["name"]))
                 hot_list.append({
                     **celeb,
+                    "tier": tier,
+                    "price": price,
                     "hot_reason": celeb_info["reason"]
                 })
             else:
