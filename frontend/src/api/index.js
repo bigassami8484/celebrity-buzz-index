@@ -92,6 +92,16 @@ export const fetchPriceHistory = async (celebrityName) => {
   return res.data;
 };
 
+export const generateAiImage = async (name, description = "") => {
+  const res = await axios.post(`${API}/celebrity/generate-image`, { name, description });
+  return res.data;
+};
+
+export const getAiImage = async (name) => {
+  const res = await axios.get(`${API}/celebrity/ai-image/${encodeURIComponent(name)}`);
+  return res.data;
+};
+
 export const fetchLeaderboard = async () => {
   const res = await axios.get(`${API}/leaderboard`);
   return res.data.leaderboard || [];
