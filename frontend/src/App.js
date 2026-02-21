@@ -318,10 +318,15 @@ const HotCelebsBanner = ({ celebs, onSelect }) => {
                     </div>
                   )}
                 </div>
-                <p className="font-bold text-xs text-white truncate group-hover:text-[#FF0099]">{celeb.name}</p>
-                <p className={`text-[10px] font-bold ${celeb.news_premium ? 'text-[#FF6B00]' : 'text-[#00FF00]'}`}>
+                <div className="flex items-center gap-1">
+                  <p className="font-bold text-xs text-white truncate group-hover:text-[#FF0099] flex-1">{celeb.name}</p>
+                  {celeb.news_premium && (
+                    <TrendingUp className="w-3 h-3 text-[#00FF00] flex-shrink-0" />
+                  )}
+                </div>
+                <p className={`text-[10px] font-bold ${celeb.news_premium ? 'text-[#00FF00]' : 'text-[#00FF00]'}`}>
                   £{celeb.price}M
-                  {celeb.news_premium && <span className="text-[8px] ml-1">📈</span>}
+                  {celeb.news_premium && <span className="text-[8px] ml-1 text-[#00FF00]">▲</span>}
                 </p>
               </div>
             ))}
