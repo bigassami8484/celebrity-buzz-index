@@ -8,8 +8,8 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 const AUTH_API = `${BACKEND_URL}/api/auth`;
 
-// Google OAuth Client ID (for Google Sign-In button)
-const GOOGLE_CLIENT_ID = "your-google-client-id"; // Will be replaced with actual ID
+// Configure axios to include credentials for all requests
+axios.defaults.withCredentials = true;
 
 // Category Icons
 const categoryIcons = {
