@@ -145,6 +145,12 @@ Response format:
     - `/src/components/modals/` - ShareModal, PointsMethodology, PriceHistoryModal, HallOfFameModal, PriceAlerts, HotStreaks
     - `/src/components/layout/` - Header, Footer, TransferWindowBanner, HowItWorks
     - `/src/components/common/` - TierBadge, LoadingCard, CategoryFilter
+- ✅ **AI Image Generation for Celebrities** - COMPLETED Dec 2025
+  - Uses OpenAI gpt-image-1 via Emergent LLM key
+  - Generates professional portraits when Wikipedia has no photo
+  - Images cached in MongoDB `ai_images` collection
+  - On-demand generation via "AI Photo" button on celebrity cards
+  - API endpoints: POST `/api/celebrity/generate-image`, GET `/api/celebrity/ai-image/{name}`
 
 ### P3 (Nice to Have)
 - Dark/light mode toggle
