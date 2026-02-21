@@ -1249,31 +1249,47 @@ async def get_pricing_info():
 
 @api_router.get("/hot-celebs")
 async def get_hot_celebs():
-    """Get hot celebrities making headlines this week - big names only"""
+    """Get hot celebrities making headlines this week - big names only with real photos"""
     hot_list = []
+    headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (contact@example.com)"}
     
-    for celeb_info in HOT_CELEBS_THIS_WEEK:
-        # Check if celeb exists in DB
-        celeb = await db.celebrities.find_one(
-            {"name": {"$regex": f"^{celeb_info['name']}$", "$options": "i"}},
-            {"_id": 0}
-        )
-        
-        if celeb:
-            hot_list.append({
-                **celeb,
-                "hot_reason": celeb_info["reason"]
-            })
-        else:
-            # Return basic info even if not in DB yet
-            hot_list.append({
-                "name": celeb_info["name"],
-                "tier": celeb_info["tier"],
-                "category": celeb_info["category"],
-                "hot_reason": celeb_info["reason"],
-                "price": 9 if celeb_info["tier"] == "A" else 6,
-                "image": f"https://ui-avatars.com/api/?name={celeb_info['name'].replace(' ', '+')}&size=128&background=FF0099&color=fff"
-            })
+    async with httpx.AsyncClient() as client:
+        for celeb_info in HOT_CELEBS_THIS_WEEK:
+            # Check if celeb exists in DB
+            celeb = await db.celebrities.find_one(
+                {"name": {"$regex": f"^{celeb_info['name']}$", "$options": "i"}},
+                {"_id": 0}
+            )
+            
+            if celeb and celeb.get("image") and not celeb.get("image", "").startswith("https://ui-avatars"):
+                hot_list.append({
+                    **celeb,
+                    "hot_reason": celeb_info["reason"]
+                })
+            else:
+                # Fetch real image from Wikipedia
+                try:
+                    wiki_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{celeb_info['name'].replace(' ', '_')}"
+                    response = await client.get(wiki_url, timeout=5.0, headers=headers)
+                    
+                    if response.status_code == 200:
+                        wiki_data = response.json()
+                        image = wiki_data.get("thumbnail", {}).get("source", "")
+                        if not image:
+                            image = f"https://ui-avatars.com/api/?name={celeb_info['name'].replace(' ', '+')}&size=200&background=FF0099&color=fff"
+                    else:
+                        image = f"https://ui-avatars.com/api/?name={celeb_info['name'].replace(' ', '+')}&size=200&background=FF0099&color=fff"
+                except:
+                    image = f"https://ui-avatars.com/api/?name={celeb_info['name'].replace(' ', '+')}&size=200&background=FF0099&color=fff"
+                
+                hot_list.append({
+                    "name": celeb_info["name"],
+                    "tier": celeb_info["tier"],
+                    "category": celeb_info["category"],
+                    "hot_reason": celeb_info["reason"],
+                    "price": get_base_price_for_tier(celeb_info["tier"]),
+                    "image": image
+                })
     
     return {"hot_celebs": hot_list}
 
