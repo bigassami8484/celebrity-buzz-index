@@ -2692,6 +2692,52 @@ async def get_brown_bread_watch():
     
     return {"watch_list": watch_list}
 
+@api_router.post("/celebrity/generate-image")
+async def generate_celebrity_ai_image(data: dict):
+    """Generate an AI image for a celebrity without a Wikipedia photo.
+    
+    Request body: {"name": "Celebrity Name", "description": "Optional description"}
+    Returns: {"image": "data:image/png;base64,...", "cached": true/false}
+    """
+    name = data.get("name", "").strip()
+    description = data.get("description", "")
+    
+    if not name:
+        raise HTTPException(status_code=400, detail="Celebrity name required")
+    
+    # Check if already cached
+    cached = await db.ai_images.find_one({"name": name.lower()}, {"_id": 0})
+    if cached and cached.get("image"):
+        return {"image": cached["image"], "cached": True, "name": name}
+    
+    # Generate new image
+    image = await get_or_generate_celebrity_image(name, description)
+    
+    return {"image": image, "cached": False, "name": name}
+
+@api_router.get("/celebrity/ai-image/{name}")
+async def get_celebrity_ai_image(name: str):
+    """Get or generate an AI image for a celebrity.
+    
+    Returns cached image if available, otherwise generates a new one.
+    """
+    # URL decode the name
+    from urllib.parse import unquote
+    name = unquote(name)
+    
+    if not name:
+        raise HTTPException(status_code=400, detail="Celebrity name required")
+    
+    # Check cache first
+    cached = await db.ai_images.find_one({"name": name.lower()}, {"_id": 0})
+    if cached and cached.get("image"):
+        return {"image": cached["image"], "cached": True, "name": name}
+    
+    # Generate new image
+    image = await get_or_generate_celebrity_image(name, "")
+    
+    return {"image": image, "cached": False, "name": name}
+
 @api_router.get("/todays-news")
 async def get_todays_news():
     """Get today's top REAL celebrity news from RSS feeds"""
