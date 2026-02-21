@@ -733,6 +733,18 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             if re.search(r'is a (public|private|research)?.*(university|college|institute|school)', desc_lower[:150]):
                                 should_skip = True
                             
+                            # Check for brand/company patterns
+                            if re.search(r'(italian|french|american|british|german|spanish)?\s*(luxury|fashion|retail|clothing|footwear|sports|tech)', desc_lower[:150]):
+                                should_skip = True
+                            
+                            # Check for military/weapon patterns
+                            if re.search(r'(missile|rocket|weapon|army|military|project|guided|surface-to-air|anti-aircraft)', desc_lower[:200]):
+                                should_skip = True
+                            
+                            # Check for shoe/clothing patterns
+                            if re.search(r'(limited-edition)?\s*(shoe|sneaker|footwear|apparel|clothing)', desc_lower[:150]):
+                                should_skip = True
+                            
                             if should_skip:
                                 pass  # Filtered out
                                 continue
