@@ -2040,8 +2040,8 @@ function App() {
       <div className="noise-overlay"></div>
       
       <TransferWindowBanner stats={stats} />
-      <HotCelebsBanner celebs={hotCelebs} onSelect={handleCelebSearch} />
       <Header />
+      <HotCelebsBanner celebs={hotCelebs} onSelect={handleCelebSearch} />
       
       <div className="max-w-7xl mx-auto px-4 py-8">
         <HowItWorks onShowMethodology={() => setShowMethodology(true)} />
