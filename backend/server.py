@@ -1395,11 +1395,11 @@ async def get_celebrities_by_category(category: str):
             {"_id": 0}
         ).to_list(20)
     
-    # Recalculate dynamic prices for all celebrities
+    # Recalculate dynamic prices for all celebrities - use CONSISTENT buzz (50)
+    default_buzz = 50
     for celeb in celebrities:
         tier = celeb.get("tier", "D")
-        buzz_score = celeb.get("buzz_score", 5)
-        celeb["price"] = get_dynamic_price(tier, buzz_score, celeb.get("name", ""))
+        celeb["price"] = get_dynamic_price(tier, default_buzz, celeb.get("name", ""))
     
     return {"celebrities": celebrities}
 
