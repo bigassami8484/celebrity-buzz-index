@@ -704,7 +704,29 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                 "is a supermax", "is a maximum-security", "is a high-security",
                                 "is a federal", "is a state prison", "is a jail",
                                 "united states penitentiary", "administrative maximum",
-                                "is a hospital", "is a medical center", "is a clinic"
+                                "is a hospital", "is a medical center", "is a clinic",
+                                # Cars and vehicles - specific models
+                                "is a sports car", "is a sedan", "is a coupé", "is a coupe",
+                                "is a suv", "is a crossover", "is a hatchback", "is a pickup",
+                                "is a compact car", "is a subcompact", "is a mid-size",
+                                "is a full-size", "is a luxury car", "is a supercar",
+                                "is a hypercar", "is an electric car", "is a hybrid",
+                                "is a concept car", "is a prototype", "is a battery electric",
+                                "is a high-performance", "is an automobile", "is a motor vehicle",
+                                "is a range of vehicles", "is a line of vehicles",
+                                "produced by", "manufactured by", "designed by",
+                                # Tesla specific
+                                "autopilot", "cybertruck", "cybercab", "semi truck",
+                                "tesla, inc", "tesla motors", "electric vehicle",
+                                # Art installations
+                                "is an art installation", "is a sculpture", "is a permanent",
+                                "is located in", "is an installation", "is a land art",
+                                # Technology and software
+                                "is an advanced", "is a software", "is a feature",
+                                "is a driver assistance", "is a self-driving",
+                                # Phone models
+                                "is a smartphone", "is a mobile phone", "is a feature phone",
+                                "is a series of", "is a line of"
                             ]
                             
                             # Check if description starts with any skip phrase
