@@ -1908,9 +1908,10 @@ async def get_hot_celebs():
                     # ONLY include if they have a real photo
                     if image and "wikipedia" in image.lower():
                         bio = wiki_data.get("extract", "")
-                        tier = determine_tier_from_bio(bio)
-                        category = get_category_from_bio(bio, name)
-                        base_price = get_dynamic_price(tier, 50, name)
+                        actual_name = wiki_data.get("title", name)
+                        tier = determine_tier_from_bio(bio, actual_name)
+                        category = get_category_from_bio(bio, actual_name)
+                        base_price = get_dynamic_price(tier, 50, actual_name)
                         
                         # Apply NEWS PREMIUM based on mention count
                         # More mentions = higher price (capped at 3x base)
@@ -1940,7 +1941,7 @@ async def get_hot_celebs():
                             trending_tag = "🔥"
                         
                         hot_list.append({
-                            "name": wiki_data.get("title", name),
+                            "name": actual_name,
                             "tier": tier,
                             "category": category,
                             "price": price,
