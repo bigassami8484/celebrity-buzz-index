@@ -35,19 +35,18 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 
 ### Core Features
 - ✅ Full FastAPI backend with all endpoints
-- ✅ Wikipedia autocomplete search with **COMPREHENSIVE FILTERING**:
-  - No brands/shops (Gucci, Nike, Prada filtered)
-  - No cars/vehicles (Tesla, BMW filtered)
-  - No animals (Lion filtered)
-  - No locations/places/cities
-  - No films/TV shows/books/magazines
-  - No universities/schools
-  - No airlines/bands/TV channels
-  - **ONLY CELEBRITIES/PEOPLE**
+- ✅ **WIKIDATA-VERIFIED HUMAN SEARCH** (P31=Q5):
+  - Uses SPARQL query to verify entities are humans
+  - 100% accurate filtering - no brands, animals, places
+  - Verified: Gucci returns only people, Lion returns only Alfred Lion
 - ✅ A/B/C/D tier system with STRICT dynamic pricing (max £12M)
 - ✅ Dynamic pricing recalculated on every search/category view
 - ✅ Saturday 12pm GMT transfer window (24 hours)
 - ✅ Brown Bread Watch with PREMIUM pricing (top 3 up to £15M)
+- ✅ **PRICE HISTORY TRACKING**:
+  - MongoDB 'price_history' collection
+  - Records price changes automatically
+  - API endpoints: `/api/price-history/celebrity-name/{name}`, `/api/celebrity/{id}/price-history`
 - ✅ Price alerts system
 - ✅ Hot streak notifications (3+ days in news)
 - ✅ Profanity filter for team names
@@ -55,10 +54,68 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 ### UI Features
 - ✅ Scrolling banner shows CORRECT tier-based prices
 - ✅ "How It Works" with explanatory text under each icon
-- ✅ Proper spacing between components (mb-8 after How It Works, mb-6 after categories)
-- ✅ "Select a category or search for any celebrity" helper text (gold, under search)
+- ✅ Proper spacing between components
+- ✅ "Select a category or search for any celebrity" helper text
 - ✅ Category filter directly under search bar
 - ✅ Hot Celebs RANDOMIZED on each refresh with real Wikipedia photos
+- ✅ **PRICE HISTORY BUTTON** on each celebrity card (chart icon top-right)
+- ✅ **PRICE HISTORY MODAL** showing current price, tier, and historical entries with trend indicators
+
+### Search Verification (Wikidata P31=Q5)
+**Verified Test Cases:**
+- "gucci" → Gucci Mane, Maurizio Gucci, Guccio Gucci, Paolo Gucci, Aldo Gucci (NO BRAND) ✅
+- "lion" → Alfred Lion (NO ANIMAL) ✅
+- "beyonce" → Beyoncé ✅
+- "taylor" → Taylor Swift, Elizabeth Taylor, Angus Taylor, Teyana Taylor, Christine Taylor ✅
+- "nike" → Nike Ardilla and other people (NO BRAND) ✅
+- "tesla" → Nikola Tesla (NO CARS) ✅
+
+## API Endpoints
+
+### New Price History Endpoints
+- `GET /api/price-history/celebrity-name/{name}` - Get price history by celebrity name
+- `GET /api/celebrity/{id}/price-history` - Get price history by celebrity ID
+
+Response format:
+```json
+{
+  "celebrity_name": "Taylor Swift",
+  "current_price": 5.5,
+  "current_tier": "B",
+  "history": [
+    {
+      "celebrity_id": "xxx",
+      "celebrity_name": "Taylor Swift",
+      "price": 5.5,
+      "tier": "B",
+      "buzz_score": 21.5,
+      "recorded_at": "2026-02-21T..."
+    }
+  ]
+}
+```
+
+## Backlog / Future Features
+
+### P0 (Immediate - In Progress)
+- ✅ Wikidata-based search filtering - COMPLETED
+- ✅ Price history tracking - COMPLETED
+- 🔄 Hot Streak Notifications - Backend ready, needs full UI
+
+### P1 (High Priority)
+- User authentication for persistent teams
+- Real news API integration (NewsAPI)
+- Automated weekly badge awards
+
+### P2 (Medium Priority)
+- Celebrity comparison feature
+- Push notifications
+- Refactor App.js into smaller components
+
+### P3 (Nice to Have)
+- Dark/light mode toggle
+- Mobile app version
+- Celebrity draft mode (turn-based picking)
 - ✅ Hot Celebs uses DYNAMIC pricing based on tier and buzz
 - ✅ "How It Works" section with explainer text
 - ✅ News headlines cleaned (HTML entities decoded) - limited to 6 articles
