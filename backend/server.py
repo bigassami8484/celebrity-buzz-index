@@ -142,10 +142,20 @@ EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY', '')
 # Create the main app
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
+auth_router = APIRouter(prefix="/api/auth")
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Setup Resend for magic links
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "onboarding@resend.dev")
+if RESEND_API_KEY:
+    resend.api_key = RESEND_API_KEY
+
+# Frontend URL for magic links
+FRONTEND_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://media-mogul-game-1.preview.emergentagent.com")
 
 # Banned words for team names (racist, offensive)
 BANNED_WORDS = [
