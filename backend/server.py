@@ -1010,6 +1010,16 @@ def get_price_for_tier(tier: str) -> float:
 
 async def calculate_celebrity_tier(bio: str, name: str) -> tuple:
     """Calculate celebrity tier based on bio content and return (tier, base_price)"""
+    name_lower = name.lower() if name else ""
+    
+    # First check guaranteed lists (mega-star overrides)
+    if name_lower in GUARANTEED_A_LIST:
+        return ("A", get_base_price_for_tier("A"))
+    if name_lower in GUARANTEED_B_LIST:
+        return ("B", get_base_price_for_tier("B"))
+    if name_lower in GUARANTEED_C_LIST:
+        return ("C", get_base_price_for_tier("C"))
+    
     bio_lower = bio.lower()
     
     # A-list: Major awards, billions in earnings, legendary status
