@@ -1533,16 +1533,73 @@ async def autocomplete_search(q: str):
     if len(q) < 2:
         return {"suggestions": []}
     
+    query_lower = q.lower().strip()
+    
+    # Check if query matches a known alias - add canonical version to results first
+    priority_suggestions = []
+    if query_lower in CELEBRITY_ALIASES:
+        canonical_name = CELEBRITY_ALIASES[query_lower]
+        # Fetch info for the canonical celebrity
+        wiki_info = await fetch_wikipedia_info(canonical_name)
+        if wiki_info and wiki_info.get("name"):
+            tier = determine_tier_from_bio(wiki_info.get("bio", ""), wiki_info["name"])
+            price = get_dynamic_price(tier, 50, wiki_info["name"])
+            priority_suggestions.append({
+                "name": wiki_info["name"],
+                "bio": wiki_info.get("bio", "")[:100] + "...",
+                "image": wiki_info.get("image", ""),
+                "tier": tier,
+                "price": price,
+                "estimated_price": price,
+                "is_alias_match": True
+            })
+    
+    # Also check partial matches for common search terms
+    alias_partial_matches = {
+        "prince william": "William, Prince of Wales",
+        "prince harry": "Prince Harry, Duke of Sussex", 
+        "kate middleton": "Catherine, Princess of Wales",
+        "king charles": "Charles III",
+        "meghan markle": "Meghan, Duchess of Sussex",
+        "the rock": "Dwayne Johnson",
+    }
+    
+    for alias, canonical in alias_partial_matches.items():
+        if alias.startswith(query_lower) or query_lower in alias:
+            # Check if already in priority suggestions
+            if not any(s.get("name") == canonical for s in priority_suggestions):
+                wiki_info = await fetch_wikipedia_info(canonical)
+                if wiki_info and wiki_info.get("name"):
+                    tier = determine_tier_from_bio(wiki_info.get("bio", ""), wiki_info["name"])
+                    price = get_dynamic_price(tier, 50, wiki_info["name"])
+                    priority_suggestions.append({
+                        "name": wiki_info["name"],
+                        "bio": wiki_info.get("bio", "")[:100] + "...",
+                        "image": wiki_info.get("image", ""),
+                        "tier": tier,
+                        "price": price,
+                        "estimated_price": price,
+                        "is_alias_match": True
+                    })
+    
+    # Get Wikipedia autocomplete suggestions
     suggestions = await fetch_wikipedia_autocomplete(q)
     
+    # Filter out any duplicates from Wikipedia results that are already in priority suggestions
+    priority_names = {s["name"].lower() for s in priority_suggestions}
+    filtered_suggestions = [s for s in suggestions if s.get("name", "").lower() not in priority_names]
+    
+    # Combine: priority first, then Wikipedia results
+    all_suggestions = priority_suggestions + filtered_suggestions
+    
     # Check for Brown Bread premium pricing on each suggestion
-    for suggestion in suggestions:
+    for suggestion in all_suggestions:
         premium_price = await get_brown_bread_premium_by_name(suggestion.get("name", ""))
         if premium_price > 0:
             suggestion["estimated_price"] = premium_price
             suggestion["is_brown_bread_premium"] = True
     
-    return {"suggestions": suggestions}
+    return {"suggestions": all_suggestions[:10]}  # Limit to 10 results
 
 @api_router.post("/seed")
 async def seed_initial_data():
