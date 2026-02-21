@@ -261,3 +261,52 @@ Response format:
 - `POST /api/auth/logout` - Log out user
 - `POST /api/auth/magic-link/send` - Send magic link email
 - `POST /api/auth/magic-link/verify` - Verify magic link token
+
+
+## Code Architecture (Updated Dec 2025)
+
+### Frontend Structure (Refactored)
+```
+/app/frontend/src/
+├── App.js                    # Main app (730 lines, refactored from 2674)
+├── App.css                   # All styles
+├── api/
+│   └── index.js              # All API functions (191 lines)
+├── components/
+│   ├── auth/                 # AuthModal, AuthCallback, UserMenu, SaveTeamPrompt
+│   ├── celebrities/          # SearchBar, CelebrityCard, HotCelebsBanner, TopPickedCelebs, BrownBreadWatch, TodaysNews
+│   ├── team/                 # TeamPanel, TeamCustomizeModal
+│   ├── leagues/              # LeaguePanel, LeagueDetailModal, Leaderboard
+│   ├── modals/               # ShareModal, PointsMethodology, PriceHistoryModal, HallOfFameModal, PriceAlerts, HotStreaks
+│   ├── layout/               # Header, Footer, TransferWindowBanner, HowItWorks
+│   ├── common/               # TierBadge, LoadingCard, CategoryFilter
+│   └── ui/                   # Shadcn components
+```
+
+### Backend Structure (Preparation for Refactoring)
+```
+/app/backend/
+├── server.py                 # Monolithic server (3,772 lines) - NEEDS REFACTORING
+├── config/
+│   ├── __init__.py           # Config exports
+│   ├── database.py           # MongoDB connection
+│   └── settings.py           # Constants, badges, team options
+├── models/
+│   └── __init__.py           # Pydantic models
+├── utils/
+│   └── __init__.py           # Utility functions (pricing, profanity filter, etc.)
+├── routes/                   # (Prepared - not yet migrated)
+├── services/                 # (Prepared - not yet migrated)
+└── tests/                    # Test files
+```
+
+### Key Technical Details
+- **Frontend**: React.js, TailwindCSS, axios, lucide-react, sonner (toasts)
+- **Backend**: Python, FastAPI, Motor (async MongoDB), Pydantic, httpx, feedparser
+- **Authentication**: Emergent-managed Google OAuth, guest sessions with JWT
+- **Data Sources**: Wikipedia API (OpenSearch), Wikidata API (SPARQL), Public RSS Feeds, OpenAI (news generation)
+
+## Remaining Backend Refactoring Tasks
+- [ ] Split server.py routes into `/routes/` modules (auth.py, celebrities.py, teams.py, leagues.py)
+- [ ] Move services into `/services/` (wikipedia.py, news.py, pricing.py)
+- [ ] Test thoroughly after migration to ensure no regressions
