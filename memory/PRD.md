@@ -56,15 +56,14 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 
 ### UI Features
 - ✅ **HOT CELEBS BANNER** at top of page with **HORIZONTAL AUTO-SCROLL**
-  - **NOW SHOWS CELEBRITIES ACTUALLY IN THE NEWS THIS WEEK**
-  - Scans RSS feeds from BBC, Guardian, TMZ, People, Page Six, Daily Mail
-  - Extracts celebrity names from headlines and verifies via Wikipedia
+  - **18+ CELEBRITIES ACTUALLY IN THE NEWS THIS WEEK**
+  - Checks 150+ known celebrities against 6 RSS news feeds
+  - Only shows celebrities with REAL Wikipedia photos (no placeholders)
+  - Sources: BBC, TMZ, People, Page Six, Daily Mail, Guardian
+  - Shows actual news headline as "hot reason"
   - Auto-scrolling marquee animation (25s linear infinite)
-  - Shows photos, names, tiers (A/B/C/D-LIST), and prices
-  - Clickable - clicking triggers a search
-  - Pauses on hover
+  - Pauses on hover, clickable to search
   - 1-hour cache for performance
-  - Falls back to static pool if no news celebs found
 - ✅ **CONSISTENT PRICING EVERYWHERE**:
   - Hot Celebs card price = Search result price = Team panel price
   - Fixed bug where Leonardo DiCaprio showed £19M in team (now £10.3M everywhere)
