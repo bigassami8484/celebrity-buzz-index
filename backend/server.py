@@ -1661,9 +1661,9 @@ async def get_todays_news():
                     logger.error(f"Error fetching RSS from {source_name}: {e}")
                     continue
         
-        # Sort by major news first, then limit to 8 items
+        # Sort by major news first, then limit to 6 items
         news_items.sort(key=lambda x: (not x.get("is_major", False)))
-        news_items = news_items[:8]
+        news_items = news_items[:6]
         
         if news_items:
             # Cache it
