@@ -637,13 +637,13 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
     """
     Search Wikipedia for celebrity suggestions - ONLY returns humans (verified via Wikidata P31=Q5).
     Uses OpenSearch API for better partial name matching, then Wikidata for human verification.
+    Preserves OpenSearch relevance order.
     """
     try:
         headers = {
             "User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com; contact@example.com) httpx/0.27"
         }
         query_lower = query.lower().strip()
-        query_parts = query_lower.split()
         
         logger.info(f"Autocomplete search for: {query}")
         
@@ -666,10 +666,10 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 "filmography", "discography", "bibliography", "awards", "album", 
                 "list of", "category:", "template:", "wikipedia:", "soundtrack",
                 "video game", "tour", "concert", "episode", "series", "season",
-                "fc", "cf", "afc", "united", "club", "team", "stadium", "'s ", " of "
+                "fc", "cf", "afc", "united", "club", "team", "stadium"
             ]
             
-            # Filter candidates
+            # Filter candidates - PRESERVE ORDER from OpenSearch
             candidates = []
             for title in titles:
                 title_lower = title.lower()
@@ -702,13 +702,13 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
             pageids_data = pageids_response.json()
             pages = pageids_data.get("query", {}).get("pages", {})
             
-            # Map titles to page IDs
+            # Map titles to page IDs - preserve candidate order
             title_to_pageid = {}
             for page_id, page_info in pages.items():
                 if page_id != "-1":
                     title_to_pageid[page_info.get("title", "")] = int(page_id)
             
-            page_ids = list(title_to_pageid.values())
+            page_ids = [title_to_pageid.get(t) for t in candidates if title_to_pageid.get(t)]
             
             if not page_ids:
                 return []
@@ -716,8 +716,8 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
             # Step 3: Use Wikidata to verify which are humans (P31 = Q5)
             human_status = await check_wikidata_is_human(page_ids)
             
-            # Filter to only humans
-            human_titles = [t for t, pid in title_to_pageid.items() if human_status.get(pid, False)]
+            # Filter to only humans - PRESERVE ORIGINAL CANDIDATE ORDER
+            human_titles = [t for t in candidates if human_status.get(title_to_pageid.get(t), False)]
             
             if not human_titles:
                 logger.info(f"No humans found for query: {query}")
@@ -735,40 +735,40 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
             info_data = info_response.json()
             pages = info_data.get("query", {}).get("pages", {})
             
+            # Build a lookup by title (case-insensitive)
+            page_info_by_title = {}
+            for pid, pinfo in pages.items():
+                page_info_by_title[pinfo.get("title", "").lower()] = pinfo
+            
             results = []
             seen_names = set()
             
-            # Process in order of human_titles (which preserves opensearch relevance)
-            for title in human_titles[:10]:
-                # Find the page info for this title
-                page_info = None
-                for pid, pinfo in pages.items():
-                    if pinfo.get("title", "").lower() == title.lower():
-                        page_info = pinfo
-                        break
+            # Process in order of human_titles (preserves OpenSearch relevance)
+            for title in human_titles:
+                page_info = page_info_by_title.get(title.lower())
                 
                 if not page_info:
                     continue
                 
-                title = page_info.get("title", title)
+                actual_title = page_info.get("title", title)
                 extract = page_info.get("extract", "")[:300]
                 image = page_info.get("thumbnail", {}).get("source", "")
-                wiki_url = page_info.get("fullurl", f"https://en.wikipedia.org/wiki/{title.replace(' ', '_')}")
+                wiki_url = page_info.get("fullurl", f"https://en.wikipedia.org/wiki/{actual_title.replace(' ', '_')}")
                 
                 # Skip duplicates
-                base_name = title.split("(")[0].strip().lower()
+                base_name = actual_title.split("(")[0].strip().lower()
                 if base_name in seen_names:
                     continue
                 seen_names.add(base_name)
                 
                 # Estimate tier and price
                 tier = estimate_tier_from_description(extract)
-                price = get_dynamic_price(tier, 50, title)
+                price = get_dynamic_price(tier, 50, actual_title)
                 
                 results.append({
-                    "name": title,
-                    "description": extract or f"{title} is a notable person.",
-                    "image": image or f"https://ui-avatars.com/api/?name={title}&size=150&background=FF0099&color=fff",
+                    "name": actual_title,
+                    "description": extract or f"{actual_title} is a notable person.",
+                    "image": image or f"https://ui-avatars.com/api/?name={actual_title}&size=150&background=FF0099&color=fff",
                     "wiki_url": wiki_url,
                     "estimated_tier": tier,
                     "estimated_price": price
