@@ -739,13 +739,44 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             
                             # Additional filter for non-person entities (plants, animals, objects, locations)
                             non_person_description_keywords = [
+                                # Plants and animals
                                 "is a genus", "is a species", "is a family of", "is a type of",
                                 "is a plant", "is a tree", "is a flower", "is a shrub",
                                 "is a bird", "is a fish", "is a mammal", "is an animal",
+                                "is a dog", "is a cat", "is a horse", "is a breed",
+                                "is a reptile", "is an insect", "is a butterfly", "is a moth",
+                                "flowering plants", "is a genus of", "are a genus", "is a common name",
+                                # Objects and products
                                 "is a guitar", "is an instrument", "is a car", "is a vehicle",
                                 "is a brand", "is a company", "is a product", "is a software",
-                                "is a website", "is a game", "is an app", "flowering plants",
-                                "is a genus of", "are a genus", "is a common name",
+                                "is a website", "is a game", "is an app", 
+                                "is a automobile", "is a motorcycle", "is a truck", "is a bus",
+                                "is a train", "is a ship", "is a boat", "is a plane", "is an aircraft",
+                                # Shops, stores, brands, clothing
+                                "is a retailer", "is a store", "is a shop", "is a chain",
+                                "is a supermarket", "is a department store", "is a mall",
+                                "is a fashion", "is a clothing", "is a footwear", "is a shoe",
+                                "is a luxury brand", "is a fashion brand", "is a clothing brand",
+                                "is a fashion house", "is a luxury goods", "is an apparel",
+                                "fashion company", "retail company", "clothing company",
+                                # Books, magazines, publications
+                                "is a book", "is a novel", "is a magazine", "is a newspaper",
+                                "is a publication", "is a journal", "is a periodical",
+                                "is an autobiography", "is a biography", "is a memoir",
+                                "is a comic", "is a graphic novel", "is a manga",
+                                # Schools and universities
+                                "is a school", "is a high school", "is a primary school",
+                                "is a secondary school", "is a college", "is a university",
+                                "is an academy", "is an institute", "educational institution",
+                                # Companies and organizations
+                                "is a corporation", "is a multinational", "is a conglomerate",
+                                "is an organization", "is an organisation", "is a nonprofit",
+                                "is a charity", "is a foundation", "is an association",
+                                "is a manufacturer", "is a producer", "is a supplier",
+                                "is a technology company", "is a tech company",
+                                "is a pharmaceutical", "is a bank", "is a financial",
+                                "is an insurance", "is a telecommunications",
+                                # Locations
                                 "is the capital", "is a capital", "is the largest city",
                                 "is a seaport", "is a port", "is located on", "is situated",
                                 "with a population", "inhabitants", "square kilometres",
@@ -754,7 +785,6 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                 "is a spanish", "is a german", "is a french", "is a english",
                                 "football club", "soccer club", "basketball team", "hockey team",
                                 "baseball team", "plays in the",
-                                # More location keywords
                                 "is an area", "is a suburb", "is a neighborhood", "is a neighbourhood",
                                 "is a region", "is a territory", "is a census", "is a county",
                                 "is a borough", "is a parish", "is a locality", "is a postal",
@@ -766,7 +796,14 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                 # Awards and objects
                                 "is the highest", "is the most prestigious", "is a military decoration",
                                 "is a medal", "is an award", "is a trophy", "is a prize",
-                                "is a decoration of the"
+                                "is a decoration of the",
+                                # Cars and vehicles
+                                "is a sports car", "is a sedan", "is a coupe", "is a suv",
+                                "is a hatchback", "is a pickup", "automobile manufactured",
+                                "car manufactured", "vehicle manufactured", "produced by",
+                                # Food and drinks
+                                "is a food", "is a drink", "is a beverage", "is a wine",
+                                "is a beer", "is a cocktail", "is a dish", "is a cuisine"
                             ]
                             
                             if any(kw in desc_lower for kw in non_person_description_keywords):
