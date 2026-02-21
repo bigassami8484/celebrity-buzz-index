@@ -1145,9 +1145,16 @@ async def get_trending():
                 {"_id": 0}
             )
             if celeb:
-                # Recalculate price with dynamic pricing
-                tier = celeb.get("tier", "D")
+                # Recalculate tier from bio if needed
+                bio = celeb.get("bio", "")
+                recalc_tier = estimate_tier_from_description(bio)
+                
+                # Use recalculated tier
+                tier = recalc_tier
                 buzz_score = celeb.get("buzz_score", 5)
+                
+                # Recalculate price with STRICT tier-based pricing
+                celeb["tier"] = tier
                 celeb["price"] = get_dynamic_price(tier, buzz_score, name)
                 trending.append(celeb)
     
