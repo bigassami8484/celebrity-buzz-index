@@ -833,9 +833,8 @@ const TrendingTicker = ({ celebrities }) => {
               }}
             />
             <span className="font-bold">{celeb.name}</span>
-            <ChevronUp className="w-4 h-4 text-green-400" />
-            <span className="text-[#FFD700]">{celeb.buzz_score?.toFixed(1)}</span>
             {celeb.tier && <TierBadge tier={celeb.tier} />}
+            <span className="text-[#FFD700] font-bold">£{celeb.price}M</span>
           </span>
         ))}
       </div>
