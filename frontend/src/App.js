@@ -943,7 +943,7 @@ const SearchBar = ({ onSearch, loading }) => {
   }, []);
   
   return (
-    <div ref={searchRef} className="search-container mb-8 px-4 relative">
+    <div ref={searchRef} className="search-container mb-4 px-4 relative">
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -959,9 +959,14 @@ const SearchBar = ({ onSearch, loading }) => {
         </button>
       </form>
       
+      {/* Helper text */}
+      <p className="text-center text-sm text-[#A1A1AA] mt-2">
+        Search for any celebrity or select a category below
+      </p>
+      
       {/* Autocomplete Suggestions */}
       {showSuggestions && (suggestions.length > 0 || loadingSuggestions) && (
-        <div className="absolute left-4 right-4 top-full mt-1 bg-[#0A0A0A] border border-[#262626] max-h-96 overflow-y-auto z-50" data-testid="autocomplete-dropdown">
+        <div className="absolute left-4 right-4 top-[60px] mt-1 bg-[#0A0A0A] border border-[#262626] max-h-96 overflow-y-auto z-50" data-testid="autocomplete-dropdown">
           {loadingSuggestions ? (
             <div className="p-4 text-center text-[#A1A1AA]">Searching Wikipedia...</div>
           ) : (
