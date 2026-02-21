@@ -1859,6 +1859,7 @@ function App() {
               onViewLeague={viewLeague}
             />
             <PriceAlerts alerts={priceAlerts} teamId={team?.id} />
+            <HotStreaks streaks={hotStreaks} teamId={team?.id} />
             <TopPickedCelebs celebs={topPicked} onSelect={searchCelebrity} />
             <BrownBreadWatch watchList={brownBreadWatch} onSelect={searchCelebrity} />
             <Leaderboard entries={leaderboard} />
