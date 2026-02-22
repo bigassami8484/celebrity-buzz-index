@@ -2799,7 +2799,9 @@ async def get_price_history_by_name(name: str, limit: int = 30):
 
 @api_router.get("/celebrities/category/{category}")
 async def get_celebrities_by_category(category: str, response: Response):
-    """Get 8 random celebrities by category using MongoDB $sample for true randomness"""
+    """Get 8 random celebrities by category using MongoDB $sample for true randomness.
+    Only includes celebrities with valid Wikipedia data (bio and wiki_url).
+    """
     import random
     
     # Prevent any caching
@@ -2809,11 +2811,13 @@ async def get_celebrities_by_category(category: str, response: Response):
     
     # Get random sample from ALL celebrities in this category
     # MongoDB $sample provides true randomness from the entire collection
+    # FILTER: Only include celebs with valid Wikipedia data
     pipeline = [
         {"$match": {
             "category": category,
             "name": {"$ne": None, "$exists": True},
-            "bio": {"$exists": True, "$ne": ""}
+            "bio": {"$exists": True, "$ne": "", "$ne": "Celebrity profile"},  # Must have real bio
+            "wiki_url": {"$exists": True, "$ne": ""}  # Must have Wikipedia page
         }},
         {"$sample": {"size": 50}},  # Get more than needed for variety
         {"$project": {"_id": 0}}
