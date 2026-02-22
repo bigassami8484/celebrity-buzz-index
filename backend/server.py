@@ -2325,52 +2325,60 @@ async def get_celebrities_by_category(category: str, response: Response):
     if not pool:
         return {"celebrities": []}
     
+    # Remove duplicates from pool
+    pool = list(set(pool))
+    
     # Shuffle the entire pool
     shuffled_pool = pool.copy()
     random.shuffle(shuffled_pool)
     
     celebrities = []
-    names_to_fetch = []
+    checked_names = set()
     
-    # First pass: get celebrities already in database (fast)
+    # Go through shuffled pool until we have 10 valid celebrities
     for name in shuffled_pool:
         if len(celebrities) >= 10:
             break
-            
+        
+        # Skip if we already checked this name
+        name_lower = name.lower().strip()
+        if name_lower in checked_names:
+            continue
+        checked_names.add(name_lower)
+        
+        # Check if already in database
         existing = await db.celebrities.find_one(
             {"name": {"$regex": f"^{name}$", "$options": "i"}},
             {"_id": 0}
         )
         
-        if existing and existing.get("news"):
+        if existing and existing.get("name") and existing.get("news"):
+            # Valid existing celebrity with news
             celebrities.append(existing)
-        elif len(names_to_fetch) < 5:
-            # Queue up to 5 new celebs to fetch
-            names_to_fetch.append(name)
+        elif not existing:
+            # Try to fetch new celebrity (limit fetches to keep it fast)
+            if len([c for c in celebrities if c]) < 7:  # Only fetch if we need more
+                try:
+                    search = CelebritySearch(name=name)
+                    result = await search_celebrity(search, override_category=category)
+                    if result and result.get("name"):
+                        celebrities.append(result)
+                except Exception as e:
+                    logger.error(f"Error fetching {name}: {e}")
     
-    # If we don't have enough, fetch a few new ones (limit to 3 to keep response fast)
-    if len(celebrities) < 10 and names_to_fetch:
-        for name in names_to_fetch[:3]:
-            if len(celebrities) >= 10:
-                break
-            try:
-                search = CelebritySearch(name=name)
-                result = await search_celebrity(search, override_category=category)
-                if result:
-                    celebrities.append(result)
-            except Exception as e:
-                logger.error(f"Error fetching {name}: {e}")
+    # Filter out any None or invalid entries
+    valid_celebrities = [c for c in celebrities if c and c.get("name") and c.get("category")]
     
     # Recalculate dynamic prices
     default_buzz = 50
-    for celeb in celebrities:
+    for celeb in valid_celebrities:
         tier = celeb.get("tier", "D")
         celeb["price"] = get_dynamic_price(tier, default_buzz, celeb.get("name", ""))
     
-    # Final shuffle to ensure randomness
-    random.shuffle(celebrities)
+    # Final shuffle
+    random.shuffle(valid_celebrities)
     
-    return {"celebrities": celebrities[:10]}
+    return {"celebrities": valid_celebrities[:10]}
 
 @api_router.get("/stats")
 async def get_stats():
