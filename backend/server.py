@@ -2174,20 +2174,30 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
             
             # Sort news by date (most recent first)
             if isinstance(news, list):
+                # Mark AI-generated news
+                for article in news:
+                    article["is_real"] = False
+                
                 def parse_date(article):
                     try:
                         return datetime.strptime(article.get("date", "Jan 1, 2020"), "%b %d, %Y")
                     except:
                         return datetime.min
                 news.sort(key=parse_date, reverse=True)
-                return news
-            return []
+                
+                # Combine real news (first) with AI news (to fill up to 5 total)
+                combined_news = existing_real_news + news[:num_ai_needed]
+                combined_news.sort(key=parse_date, reverse=True)
+                return combined_news[:5]
+            
+            # If AI generation failed, return whatever real news we have
+            return existing_real_news
         except json.JSONDecodeError:
             logger.error(f"JSON parse error for {name}")
-            return []
+            return existing_real_news if existing_real_news else []
     except Exception as e:
         logger.error(f"News generation error: {e}")
-        return []
+        return existing_real_news if existing_real_news else []
 
 def calculate_buzz_score(news: List[dict]) -> float:
     """Calculate buzz score based on news coverage"""
