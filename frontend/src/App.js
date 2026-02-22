@@ -733,10 +733,13 @@ function App() {
                 {/* News Articles Section */}
                 {searchedCeleb.news && searchedCeleb.news.length > 0 && (
                   <div className="mb-4">
-                    <h3 className="text-[#00F0FF] text-sm font-bold uppercase mb-3 flex items-center gap-2">
+                    <h3 className="text-[#00F0FF] text-sm font-bold uppercase mb-2 flex items-center gap-2">
                       <Newspaper className="w-4 h-4" />
                       Latest News
                     </h3>
+                    <p className="text-[#666] text-xs mb-3">
+                      ✓ Real = actual news (clickable) | ⚡ Buzz = AI-predicted headlines. Both count towards points!
+                    </p>
                     <div className="space-y-2 max-h-48 overflow-y-auto">
                       {[...searchedCeleb.news]
                         .sort((a, b) => new Date(b.date) - new Date(a.date))
@@ -753,9 +756,9 @@ function App() {
                                 <span className="text-[#A1A1AA] flex items-center gap-1">
                                   {article.source}
                                   {isRealNews ? (
-                                    <span className="text-green-400 ml-1" title="Real news article">✓ Real</span>
+                                    <span className="text-green-400 ml-1" title="Real news article - click to read">✓ Real</span>
                                   ) : (
-                                    <span className="text-yellow-400 ml-1" title="AI-generated buzz">⚡ Buzz</span>
+                                    <span className="text-yellow-400 ml-1" title="AI-predicted buzz - counts towards points">⚡ Buzz</span>
                                   )}
                                 </span>
                                 <span className={`px-2 py-0.5 rounded ${
