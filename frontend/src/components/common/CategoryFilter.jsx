@@ -12,13 +12,6 @@ const categoryIcons = {
 
 const CategoryFilter = ({ categories, activeCategory, onSelect }) => (
   <div className="flex flex-wrap gap-3 justify-center py-6 px-4 mb-6" data-testid="category-filter">
-    <button
-      className={`category-pill ${!activeCategory ? 'active' : ''}`}
-      onClick={() => onSelect(null)}
-      data-testid="category-all"
-    >
-      All
-    </button>
     {categories.map((cat) => {
       const Icon = categoryIcons[cat.id] || Star;
       return (
