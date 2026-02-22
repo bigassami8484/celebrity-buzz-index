@@ -384,11 +384,11 @@ export const PriceAlerts = ({ alerts, teamId }) => {
 
 // Hot Streaks Component - Shows celebrities on fire in the news
 export const HotStreaks = ({ streaks, teamId }) => {
-  const [dismissed, setDismissed] = React.useState([]);
-  const [showNotification, setShowNotification] = React.useState(false);
+  const [dismissed, setDismissed] = useState([]);
+  const [showNotification, setShowNotification] = useState(false);
   
   // Request notification permission and show browser notification for new streaks
-  React.useEffect(() => {
+  useEffect(() => {
     if (streaks && streaks.length > 0) {
       // Check if we have new hot streaks
       const newStreaks = streaks.filter(s => !dismissed.includes(s.celebrity_id));
