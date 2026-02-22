@@ -2580,6 +2580,25 @@ async def get_celebrities_by_category(category: str, response: Response):
     
     all_celebs = await db.celebrities.aggregate(pipeline).to_list(50)
     
+    # For celebs with placeholder images, try to fetch real images
+    for celeb in all_celebs:
+        image = celeb.get("image", "")
+        if not image or "ui-avatars" in image:
+            # Try to fetch from Wikipedia
+            try:
+                wiki_info = await fetch_wikipedia_info(celeb.get("name", ""))
+                if wiki_info and wiki_info.get("image"):
+                    new_image = wiki_info.get("image")
+                    if "wikipedia" in new_image.lower() or "wikimedia" in new_image.lower():
+                        celeb["image"] = new_image
+                        # Update in database too
+                        await db.celebrities.update_one(
+                            {"id": celeb.get("id")},
+                            {"$set": {"image": new_image}}
+                        )
+            except:
+                pass
+    
     # Sort by image quality - prioritize real Wikipedia images but include others
     with_images = [c for c in all_celebs if c.get("image") and ("wikipedia" in c.get("image", "").lower() or "wikimedia" in c.get("image", "").lower())]
     without_images = [c for c in all_celebs if c not in with_images]
