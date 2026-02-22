@@ -2510,6 +2510,30 @@ async def get_trending():
     
     return {"trending": trending[:15]}
 
+
+async def refresh_celeb_image_background(celeb_id: str, celeb_name: str):
+    """Background task to refresh celebrity image without blocking the search response"""
+    try:
+        logger.info(f"Background: Refreshing Wikipedia image for {celeb_name}")
+        wiki_info = await fetch_wikipedia_info(celeb_name)
+        new_image = wiki_info.get("image", "")
+        if new_image and "ui-avatars" not in new_image.lower():
+            await db.celebrities.update_one(
+                {"id": celeb_id},
+                {"$set": {"image": new_image}}
+            )
+            logger.info(f"Background: Updated image for {celeb_name}")
+        # Also update bio if it was placeholder
+        celeb = await db.celebrities.find_one({"id": celeb_id}, {"_id": 0})
+        if celeb and celeb.get("bio") == "Celebrity profile" and wiki_info.get("bio"):
+            await db.celebrities.update_one(
+                {"id": celeb_id},
+                {"$set": {"bio": wiki_info["bio"][:500]}}
+            )
+    except Exception as e:
+        logger.error(f"Background: Failed to refresh image for {celeb_name}: {e}")
+
+
 @api_router.post("/celebrity/search")
 async def search_celebrity(search: CelebritySearch, override_category: str = None):
     """Search for a celebrity and get their buzz data"""
