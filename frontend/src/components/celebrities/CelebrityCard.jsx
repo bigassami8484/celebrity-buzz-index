@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Film, Tv, Music, Trophy, Crown, Star, Users, LineChart } from "lucide-react";
+import { Film, Tv, Music, Trophy, Crown, Star, Users, LineChart, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import TierBadge from "../common/TierBadge";
 
 const categoryIcons = {
@@ -10,6 +10,38 @@ const categoryIcons = {
   royals: Crown,
   reality_tv: Star,
   other: Users,
+};
+
+// Price change indicator component
+const PriceChangeIndicator = ({ currentPrice, previousPrice }) => {
+  if (!previousPrice || previousPrice === 0) return null;
+  
+  const diff = currentPrice - previousPrice;
+  const percentChange = ((diff / previousPrice) * 100).toFixed(0);
+  
+  if (Math.abs(diff) < 0.1) {
+    return (
+      <span className="flex items-center gap-0.5 text-[#666] text-xs">
+        <Minus className="w-3 h-3" />
+      </span>
+    );
+  }
+  
+  if (diff > 0) {
+    return (
+      <span className="flex items-center gap-0.5 text-green-400 text-xs font-bold">
+        <TrendingUp className="w-3 h-3" />
+        +{percentChange}%
+      </span>
+    );
+  }
+  
+  return (
+    <span className="flex items-center gap-0.5 text-red-400 text-xs font-bold">
+      <TrendingDown className="w-3 h-3" />
+      {percentChange}%
+    </span>
+  );
 };
 
 const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford, onShowPriceHistory }) => {
