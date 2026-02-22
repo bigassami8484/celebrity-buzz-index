@@ -6,7 +6,10 @@ const getPriceChange = (current, previous) => {
   if (!previous || previous === 0) return null;
   const diff = current - previous;
   if (Math.abs(diff) < 0.1) return null;
-  return { diff, percent: ((diff / previous) * 100).toFixed(0) };
+  const percent = ((diff / previous) * 100).toFixed(0);
+  // Format the money difference
+  const moneyDiff = diff >= 1 ? `£${diff.toFixed(1)}M` : `£${(diff * 1000).toFixed(0)}K`;
+  return { diff, percent, moneyDiff };
 };
 
 const TeamPanel = ({ team, onRemove, onShare, onCustomize, onSubmitTeam, isTransferWindowOpen }) => {
