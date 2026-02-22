@@ -4065,6 +4065,69 @@ async def get_news_summary():
     without_news = []
 
 
+@api_router.post("/admin/refresh-placeholder-images")
+async def refresh_placeholder_images(limit: int = 50):
+    """
+    Admin endpoint to refresh images for celebrities with placeholder avatars.
+    Fetches real Wikipedia images for celebrities that have ui-avatars placeholders.
+    """
+    # Find celebrities with placeholder images
+    cursor = db.celebrities.find({
+        "$or": [
+            {"image": {"$regex": "ui-avatars", "$options": "i"}},
+            {"image": ""},
+            {"image": None}
+        ]
+    }, {"_id": 0}).limit(limit)
+    
+    celebs_to_update = await cursor.to_list(length=limit)
+    
+    updated = []
+    failed = []
+    
+    for celeb in celebs_to_update:
+        name = celeb.get("name", "")
+        try:
+            wiki_info = await fetch_wikipedia_info(name)
+            new_image = wiki_info.get("image", "")
+            
+            if new_image and "ui-avatars" not in new_image.lower():
+                # Update in database
+                update_data = {"image": new_image}
+                
+                # Also update bio if it was placeholder
+                if celeb.get("bio") == "Celebrity profile" and wiki_info.get("bio"):
+                    update_data["bio"] = wiki_info["bio"][:500]
+                
+                await db.celebrities.update_one(
+                    {"id": celeb.get("id")},
+                    {"$set": update_data}
+                )
+                updated.append({
+                    "name": name,
+                    "old_image": celeb.get("image", "")[:50],
+                    "new_image": new_image[:80]
+                })
+            else:
+                failed.append({
+                    "name": name,
+                    "reason": "Wikipedia returned no image or placeholder"
+                })
+        except Exception as e:
+            failed.append({
+                "name": name,
+                "reason": str(e)
+            })
+    
+    return {
+        "message": f"Processed {len(celebs_to_update)} celebrities",
+        "updated_count": len(updated),
+        "failed_count": len(failed),
+        "updated": updated,
+        "failed": failed
+    }
+
+
 @api_router.post("/admin/populate-category/{category}")
 async def populate_category(category: str, count: int = 20):
     """
