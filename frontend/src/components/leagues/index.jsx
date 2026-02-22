@@ -238,7 +238,10 @@ export const Leaderboard = ({ entries }) => {
   
   return (
     <div className="leaderboard" data-testid="leaderboard">
-      <h3 className="font-anton text-2xl uppercase tracking-tight mb-4">Leaderboard</h3>
+      <h3 className="font-anton text-2xl uppercase tracking-tight mb-2">Leaderboard</h3>
+      <p className="text-xs text-[#A1A1AA] mb-4 flex items-center gap-1">
+        <span className="text-[#00F0FF]">⟳</span> Weekly rankings • Resets Monday
+      </p>
       {placeholderRows.map((rank) => (
         <div key={rank} className="leaderboard-row">
           <span className={`leaderboard-rank ${rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : ''}`}>
