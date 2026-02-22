@@ -91,7 +91,13 @@ const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford, onShowPriceHisto
               <Icon className="w-3 h-3" />
               {celebrity.category?.replace("_", " ")}
             </span>
-            <span className="price-tag">£{celebrity.price}M</span>
+            <span className="price-tag flex items-center gap-1">
+              £{celebrity.price}M
+              <PriceChangeIndicator 
+                currentPrice={celebrity.price} 
+                previousPrice={celebrity.previous_week_price} 
+              />
+            </span>
           </div>
           <h3 className="font-anton text-2xl uppercase tracking-tight">{celebrity.name}</h3>
           <p className="text-sm text-[#A1A1AA] line-clamp-2 mt-1">{celebrity.bio?.slice(0, 100)}...</p>
