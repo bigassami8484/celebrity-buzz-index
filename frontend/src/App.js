@@ -972,15 +972,25 @@ function App() {
           
           <div className="space-y-4">
             {/* FAQ Item 1 */}
-            <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
+            <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group" open>
               <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
                 How do points work?
                 <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
               </summary>
-              <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
-                <p>Points are calculated based on your celebrities' <strong className="text-white">real news coverage</strong>. The more they're in the headlines, the more points you earn!</p>
-                <p><strong className="text-white">Scandal bonus:</strong> Negative/controversial news earns significantly more points than positive coverage - controversy sells!</p>
-                <p><strong className="text-white">Automatic updates:</strong> Points are recalculated automatically as new articles are published. Check back regularly to see your score change.</p>
+              <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-3">
+                <p>Points are earned based on your celebrities' <strong className="text-white">real news coverage</strong>. Every time one of your celebs appears in the headlines, you score!</p>
+                
+                <div className="bg-[#0D0D0D] p-3 rounded border border-[#333]">
+                  <p className="text-white font-bold mb-2">Point Scoring:</p>
+                  <ul className="list-disc list-inside space-y-1 ml-1">
+                    <li>Each news article = base points</li>
+                    <li><span className="text-red-400 font-bold">Scandal/Controversy bonus!</span> Negative news earns significantly more (arrests, feuds, lawsuits = big points)</li>
+                    <li><span className="text-green-400">Positive news</span> = smaller bonus</li>
+                    <li><span className="text-yellow-400">💀 Brown Bread Bonus</span> = 100 points when a celeb passes away</li>
+                  </ul>
+                </div>
+                
+                <p><strong className="text-[#00F0FF]">Auto-updates:</strong> Points recalculate automatically as new articles are published throughout the day.</p>
               </div>
             </details>
             
