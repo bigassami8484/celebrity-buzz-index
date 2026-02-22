@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Minus, Share2 } from "lucide-react";
+import { Minus, Share2, RotateCcw } from "lucide-react";
 
 const TeamPanel = ({ team, onRemove, onShare, onCustomize }) => {
   if (!team) return null;
@@ -29,6 +29,12 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize }) => {
   
   return (
     <div className="team-panel" data-testid="team-panel">
+      {/* Weekly Reset Notice */}
+      <div className="bg-[#1A1A1A] border border-[#262626] p-2 mb-4 flex items-center justify-center gap-2 text-xs">
+        <RotateCcw className="w-3 h-3 text-[#00F0FF]" />
+        <span className="text-[#A1A1AA]">Points reset every <span className="text-[#FFD700] font-bold">Monday</span> at midnight GMT</span>
+      </div>
+      
       <div className="team-header">
         <div className="flex items-center gap-3">
           {/* Team Icon */}
@@ -43,7 +49,7 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize }) => {
           <div>
             <h3 className="font-anton text-2xl uppercase tracking-tight">{team.team_name}</h3>
             <p className="text-sm text-[#A1A1AA] font-space">
-              {team.celebrities?.length || 0} celebrities • {team.total_points?.toFixed(1)} points
+              {team.celebrities?.length || 0} celebrities • {team.total_points?.toFixed(1)} weekly pts
             </p>
           </div>
         </div>
