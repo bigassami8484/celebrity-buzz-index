@@ -4407,6 +4407,141 @@ async def get_category_summary():
     }
 
 
+@api_router.post("/admin/weekly-price-reset")
+async def weekly_price_reset():
+    """
+    Admin endpoint to perform weekly price reset.
+    This should be called every Monday to:
+    1. Store current price as previous_week_price
+    2. Calculate new price based on accumulated buzz_score
+    3. Reset buzz_score to 0 for the new week
+    
+    Returns summary of price changes.
+    """
+    logger.info("Starting weekly price reset...")
+    
+    # Get all celebrities
+    all_celebs = await db.celebrities.find({}, {"_id": 0}).to_list(2000)
+    
+    price_changes = []
+    increased = 0
+    decreased = 0
+    unchanged = 0
+    
+    for celeb in all_celebs:
+        celeb_id = celeb.get("id")
+        name = celeb.get("name", "")
+        tier = celeb.get("tier", "D")
+        buzz_score = celeb.get("buzz_score", 0)
+        current_price = celeb.get("price", 5.0)
+        
+        # Calculate new price based on buzz score
+        new_price = get_dynamic_price(tier, buzz_score, name)
+        
+        # Determine price change
+        price_diff = new_price - current_price
+        
+        if price_diff > 0:
+            increased += 1
+            change_direction = "up"
+        elif price_diff < 0:
+            decreased += 1
+            change_direction = "down"
+        else:
+            unchanged += 1
+            change_direction = "unchanged"
+        
+        # Update celebrity in database
+        await db.celebrities.update_one(
+            {"id": celeb_id},
+            {
+                "$set": {
+                    "previous_week_price": current_price,
+                    "price": new_price,
+                    "buzz_score": 0  # Reset buzz score for new week
+                }
+            }
+        )
+        
+        # Record price history if there was a change
+        if price_diff != 0:
+            await record_price_history(celeb_id, name, new_price, tier, buzz_score)
+            
+            price_changes.append({
+                "name": name,
+                "tier": tier,
+                "old_price": current_price,
+                "new_price": new_price,
+                "change": round(price_diff, 1),
+                "direction": change_direction,
+                "buzz_score_before_reset": buzz_score
+            })
+    
+    # Sort by absolute change magnitude
+    price_changes.sort(key=lambda x: abs(x["change"]), reverse=True)
+    
+    logger.info(f"Weekly price reset complete: {increased} up, {decreased} down, {unchanged} unchanged")
+    
+    return {
+        "success": True,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "summary": {
+            "total_celebrities": len(all_celebs),
+            "prices_increased": increased,
+            "prices_decreased": decreased,
+            "prices_unchanged": unchanged
+        },
+        "top_changes": price_changes[:20],  # Return top 20 biggest changes
+        "all_changes": price_changes
+    }
+
+
+@api_router.get("/admin/price-change-preview")
+async def preview_price_changes():
+    """
+    Preview what would happen if weekly price reset ran now.
+    Doesn't modify any data.
+    """
+    # Get all celebrities
+    all_celebs = await db.celebrities.find({}, {"_id": 0}).to_list(2000)
+    
+    preview = []
+    
+    for celeb in all_celebs:
+        name = celeb.get("name", "")
+        tier = celeb.get("tier", "D")
+        buzz_score = celeb.get("buzz_score", 0)
+        current_price = celeb.get("price", 5.0)
+        previous_week_price = celeb.get("previous_week_price", 0)
+        
+        # Calculate what new price would be
+        projected_price = get_dynamic_price(tier, buzz_score, name)
+        price_diff = projected_price - current_price
+        
+        if price_diff != 0:
+            preview.append({
+                "name": name,
+                "tier": tier,
+                "current_price": current_price,
+                "previous_week_price": previous_week_price,
+                "projected_price": projected_price,
+                "projected_change": round(price_diff, 1),
+                "direction": "up" if price_diff > 0 else "down",
+                "current_buzz_score": buzz_score
+            })
+    
+    # Sort by absolute change
+    preview.sort(key=lambda x: abs(x["projected_change"]), reverse=True)
+    
+    return {
+        "preview_count": len(preview),
+        "would_increase": len([p for p in preview if p["direction"] == "up"]),
+        "would_decrease": len([p for p in preview if p["direction"] == "down"]),
+        "top_changes": preview[:20],
+        "all_projected_changes": preview
+    }
+
+
 # ==================== AUTH ENDPOINTS ====================
 
 async def get_current_user(request: Request) -> Optional[dict]:
