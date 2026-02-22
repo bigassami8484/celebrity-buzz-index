@@ -1894,29 +1894,41 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
     
     try:
         async with httpx.AsyncClient() as client:
-            for rss_url, source_name in rss_sources:
+            # Fetch all RSS feeds concurrently for speed
+            async def fetch_rss(url, source):
                 try:
-                    response = await client.get(rss_url, timeout=10.0, headers=headers)
-                    if response.status_code != 200:
-                        continue
-                    
-                    content = response.text
-                    items = content.split("<item>")[1:50]  # Get up to 50 items per source
-                    
-                    for item in items:
-                        try:
-                            # Extract title
-                            title_start = item.find("<title>") + 7
-                            title_end = item.find("</title>")
-                            if title_start < 7 or title_end < 0:
-                                continue
-                            title = item[title_start:title_end].replace("<![CDATA[", "").replace("]]>", "").strip()
-                            title = decode_html_entities(title)
-                            title_lower = title.lower()
-                            
-                            # Also check description/content for mentions
-                            desc_text = ""
-                            if "<description>" in item:
+                    response = await client.get(url, timeout=5.0, headers=headers)
+                    if response.status_code == 200:
+                        return (source, response.text)
+                except:
+                    pass
+                return None
+            
+            # Run all fetches in parallel
+            tasks = [fetch_rss(url, source) for url, source in rss_sources]
+            results = await asyncio.gather(*tasks)
+            
+            for result in results:
+                if not result:
+                    continue
+                source_name, content = result
+                items = content.split("<item>")[1:30]  # Get up to 30 items per source
+                
+                for item in items:
+                    try:
+                        # Extract title
+                        title_start = item.find("<title>") + 7
+                        title_end = item.find("</title>")
+                        if title_start < 7 or title_end < 0:
+                            continue
+                        title = item[title_start:title_end].replace("<![CDATA[", "").replace("]]>", "").strip()
+                        title = decode_html_entities(title)
+                        title_lower = title.lower()
+                        
+                        # Also check description/content for mentions
+                        desc_text = ""
+                        if "<description>" in item:
+                            desc_start = item.find("<description>") + 13
                                 desc_start = item.find("<description>") + 13
                                 desc_end = item.find("</description>")
                                 if desc_end > desc_start:
