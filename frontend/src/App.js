@@ -592,6 +592,15 @@ function App() {
     fetchTransferWindowStatus();
   }, [checkAuth, fetchCategories, fetchTrending, initTeam, fetchLeaderboard, fetchStats, fetchTodaysNews, fetchTopPicked, fetchBrownBreadWatch, fetchHotCelebs]);
 
+  // Load team-related data when team changes
+  useEffect(() => {
+    if (team?.id) {
+      fetchTeamLeaguesData(team.id);
+      fetchPriceAlerts(team.id);
+      fetchHotStreaks(team.id);
+    }
+  }, [team?.id, fetchTeamLeaguesData, fetchPriceAlerts, fetchHotStreaks]);
+
   // Auto-select first category when categories load
   useEffect(() => {
     if (categories.length > 0 && !activeCategory) {
