@@ -21,6 +21,8 @@ import html
 import random
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 def normalize_text(text: str) -> str:
     """Remove accents and normalize text for matching"""
