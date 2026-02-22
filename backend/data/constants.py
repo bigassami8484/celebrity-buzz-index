@@ -48,6 +48,9 @@ STARTING_BUDGET = 50.0
 # Maximum team size
 MAX_TEAM_SIZE = 10
 
+# Transfers allowed per week during transfer window
+MAX_WEEKLY_TRANSFERS = 3
+
 # Price tiers based on celebrity tier
 PRICE_TIERS = {
     "A": {"min": 8.0, "max": 20.0},
