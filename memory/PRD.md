@@ -88,6 +88,12 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
   - Added category override system for 40+ commonly miscategorized celebrities
   - Added bio-based detection for "chat show", "talk show", "broadcaster" keywords
 - ✅ **24-HOUR NEWS CACHE** - News feed refreshes every 24 hours (was 15 min)
+- ✅ **REAL NEWS FROM RSS FEEDS** (Feb 22, 2026):
+  - Individual celebrity news now fetches REAL articles from RSS feeds first
+  - Searches 18 news sources (BBC, TMZ, People, Daily Mail, The Sun, etc.)
+  - Only supplements with AI-generated news when real news is insufficient
+  - News articles marked with `is_real: true/false` flag
+  - Real news prioritized and shown first in the feed
 
 ### UI Features
 - ✅ **HOT CELEBS BANNER** at top of page with **HORIZONTAL AUTO-SCROLL**
