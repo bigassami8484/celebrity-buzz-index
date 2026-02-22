@@ -3704,6 +3704,97 @@ async def recategorize_all_celebrities():
     }
 
 
+@api_router.post("/admin/regenerate-news")
+async def regenerate_all_news(force_all: bool = False):
+    """
+    Admin endpoint to regenerate news for all celebrities.
+    By default only regenerates for celebrities with empty/missing news.
+    Set force_all=True to regenerate for ALL celebrities.
+    """
+    # Get all celebrities
+    all_celebs = await db.celebrities.find({}).to_list(1000)
+    
+    regenerated = []
+    skipped = []
+    errors = []
+    
+    for celeb in all_celebs:
+        try:
+            name = celeb.get("name", "")
+            category = celeb.get("category", "other")
+            existing_news = celeb.get("news", [])
+            
+            # Skip if already has news and not forcing regeneration
+            if not force_all and existing_news and len(existing_news) > 0:
+                skipped.append(name)
+                continue
+            
+            # Generate new news (2 months coverage)
+            news = await generate_celebrity_news(name, category)
+            
+            if news and len(news) > 0:
+                # Update the celebrity with new news
+                await db.celebrities.update_one(
+                    {"_id": celeb["_id"]},
+                    {"$set": {"news": news}}
+                )
+                regenerated.append({
+                    "name": name,
+                    "news_count": len(news),
+                    "first_headline": news[0].get("title", "")[:60] if news else ""
+                })
+            else:
+                errors.append({"name": name, "error": "News generation returned empty"})
+                
+        except Exception as e:
+            errors.append({"name": celeb.get("name", "unknown"), "error": str(e)})
+    
+    return {
+        "success": True,
+        "summary": {
+            "total_processed": len(all_celebs),
+            "regenerated_count": len(regenerated),
+            "skipped_count": len(skipped),
+            "error_count": len(errors)
+        },
+        "regenerated": regenerated,
+        "skipped": skipped[:10] if len(skipped) > 10 else skipped,  # Only show first 10 skipped
+        "errors": errors if errors else None
+    }
+
+
+@api_router.get("/admin/news-summary")
+async def get_news_summary():
+    """
+    Admin endpoint to see which celebrities have news and which don't.
+    """
+    all_celebs = await db.celebrities.find({}, {"_id": 0, "name": 1, "news": 1}).to_list(1000)
+    
+    with_news = []
+    without_news = []
+    
+    for celeb in all_celebs:
+        name = celeb.get("name", "Unknown")
+        news = celeb.get("news", [])
+        
+        if news and len(news) > 0:
+            with_news.append({
+                "name": name,
+                "news_count": len(news),
+                "latest_headline": news[0].get("title", "")[:50] if news else ""
+            })
+        else:
+            without_news.append(name)
+    
+    return {
+        "total_celebrities": len(all_celebs),
+        "with_news": len(with_news),
+        "without_news": len(without_news),
+        "celebrities_without_news": sorted(without_news),
+        "celebrities_with_news": sorted(with_news, key=lambda x: x["name"])
+    }
+
+
 @api_router.get("/admin/category-summary")
 async def get_category_summary():
     """
