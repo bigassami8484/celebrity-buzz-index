@@ -565,11 +565,11 @@ function App() {
         {/* Floating Search Result Card */}
         {searchedCeleb && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSearchedCeleb(null)}>
-            <div className="bg-[#0A0A0A] border border-[#FF0099] rounded-lg max-w-md w-full shadow-2xl shadow-[#FF0099]/20" onClick={e => e.stopPropagation()}>
+            <div className="relative bg-[#0A0A0A] border border-[#FF0099] rounded-lg max-w-md w-full shadow-2xl shadow-[#FF0099]/20" onClick={e => e.stopPropagation()}>
               {/* Close button */}
               <button 
                 onClick={() => setSearchedCeleb(null)}
-                className="absolute top-4 right-4 text-white/60 hover:text-white"
+                className="absolute top-3 right-3 text-white/60 hover:text-white z-10"
               >
                 <X className="w-6 h-6" />
               </button>
