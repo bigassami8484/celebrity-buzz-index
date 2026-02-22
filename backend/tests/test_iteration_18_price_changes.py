@@ -219,7 +219,9 @@ class TestTeamCelebrityPriceChange:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         team_data = response.json()
-        team_id = team_data.get("id")
+        # Team is wrapped in "team" object
+        team = team_data.get("team", team_data)
+        team_id = team.get("id")
         assert team_id, "Team should have an ID"
         print(f"✓ Created test team: {team_id}")
         
