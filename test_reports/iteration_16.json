@@ -79,6 +79,6 @@
       "/api/auth/magic-link/send": "Sends magic link email (requires RESEND_API_KEY)",
       "/api/auth/magic-link/verify": "Verifies magic link token"
     },
-    "google_oauth_redirect": "https://auth.emergentagent.com/?redirect=https://starpower-fantasy.preview.emergentagent.com"
+    "google_oauth_redirect": "https://auth.emergentagent.com/?redirect=https://fame-squad-game.preview.emergentagent.com"
   }
 }
