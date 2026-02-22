@@ -1914,7 +1914,16 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
                             past_date = now - timedelta(days=days_ago)
                             article["date"] = past_date.strftime("%b %d, %Y")
             
-            return news if isinstance(news, list) else []
+            # Sort news by date (most recent first)
+            if isinstance(news, list):
+                def parse_date(article):
+                    try:
+                        return datetime.strptime(article.get("date", "Jan 1, 2020"), "%b %d, %Y")
+                    except:
+                        return datetime.min
+                news.sort(key=parse_date, reverse=True)
+                return news
+            return []
         except json.JSONDecodeError:
             logger.error(f"JSON parse error for {name}")
             return []
