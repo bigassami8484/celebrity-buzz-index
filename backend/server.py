@@ -3927,7 +3927,11 @@ async def add_to_team(data: AddToTeam):
 
 @api_router.post("/team/transfer")
 async def transfer_celebrity(data: TransferRequest):
-    """Transfer window: sell one celebrity and buy another (1 per week)"""
+    """Transfer window: sell one celebrity and buy another (3 per week)
+    
+    IMPORTANT: When you sell, you get the CURRENT market price, not what you paid!
+    So if you bought at £6M and they're now worth £15M, you get £15M back.
+    """
     team = await db.teams.find_one({"id": data.team_id})
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
@@ -3961,8 +3965,15 @@ async def transfer_celebrity(data: TransferRequest):
         if c["celebrity_id"] == data.buy_celebrity_id:
             raise HTTPException(status_code=400, detail="Celebrity already in team")
     
-    # Calculate budget after sale
-    budget_after_sale = team.get("budget_remaining", 0) + sell_celeb["price"]
+    # Get CURRENT market price of celebrity being sold (not what they paid)
+    sell_celeb_current = await db.celebrities.find_one({"id": data.sell_celebrity_id})
+    if sell_celeb_current:
+        current_sell_price = sell_celeb_current.get("price", sell_celeb["price"])
+    else:
+        current_sell_price = sell_celeb["price"]
+    
+    # Calculate budget after sale at CURRENT market price
+    budget_after_sale = team.get("budget_remaining", 0) + current_sell_price
     
     # Check if can afford new celebrity
     if budget_after_sale < buy_celeb.get("price", 5):
