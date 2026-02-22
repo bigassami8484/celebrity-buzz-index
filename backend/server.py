@@ -2995,6 +2995,27 @@ async def get_team(team_id: str):
         team["transfers_this_week"] = 0
         team["last_transfer_reset"] = current_week
     
+    # Check if weekly points reset needed (resets every Monday)
+    current_points_week = get_monday_reset_week()
+    if team.get("points_week") != current_points_week:
+        # Reset weekly points to 0
+        await db.teams.update_one(
+            {"id": team_id},
+            {"$set": {
+                "weekly_points": 0,
+                "points_week": current_points_week
+            }}
+        )
+        team["weekly_points"] = 0
+        team["points_week"] = current_points_week
+    
+    # Use weekly_points for display (defaults to 0 if not set)
+    if "weekly_points" not in team:
+        team["weekly_points"] = 0
+    
+    # Set total_points to weekly_points for display
+    team["total_points"] = team.get("weekly_points", 0)
+    
     return {"team": team}
 
 @api_router.post("/team/add")
