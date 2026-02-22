@@ -978,17 +978,25 @@ function App() {
                 <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
               </summary>
               <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
-                <p>Points are calculated based on your celebrities' <strong className="text-white">real news coverage</strong>:</p>
-                <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li><strong className="text-white">Source reputation:</strong> TMZ/Daily Mail = +3 pts, People/Variety = +2 pts, BBC/CNN = +1.5 pts</li>
-                  <li><strong className="text-white">Sentiment bonus:</strong> Negative/controversial news = +25 pts (scandal bonus!), Positive = +0.5 pts</li>
-                  <li><strong className="text-white">Brown Bread Bonus:</strong> Deceased celebrities (💀) earn bonus points</li>
-                </ul>
-                <p className="mt-2">The more your celebrities are in the news, the more points you earn!</p>
+                <p>Points are calculated based on your celebrities' <strong className="text-white">real news coverage</strong>. The more they're in the headlines, the more points you earn!</p>
+                <p><strong className="text-white">Scandal bonus:</strong> Negative/controversial news earns significantly more points than positive coverage - controversy sells!</p>
+                <p><strong className="text-white">Automatic updates:</strong> Points are recalculated automatically as new articles are published. Check back regularly to see your score change.</p>
               </div>
             </details>
             
             {/* FAQ Item 2 */}
+            <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
+              <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
+                How are scandals detected?
+                <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
+                <p>We analyse the <strong className="text-white">sentiment</strong> of each news article. Headlines containing words like arrest, scandal, lawsuit, feud, divorce, rehab, or controversy are flagged as <strong className="text-red-400">negative</strong>.</p>
+                <p>Negative news = bigger points! A celebrity embroiled in scandal will shoot up the leaderboard.</p>
+              </div>
+            </details>
+            
+            {/* FAQ Item 3 */}
             <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
               <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
                 How does celebrity pricing work?
@@ -1002,11 +1010,11 @@ function App() {
                   <li><strong className="text-[#CD7F32]">C-LIST:</strong> £500K - £2M</li>
                   <li><strong className="text-[#666]">D-LIST:</strong> £100K - £500K</li>
                 </ul>
-                <p className="mt-2">Prices fluctuate based on news coverage - buy low when they're out of the spotlight, sell high when they're trending!</p>
+                <p className="mt-2">Prices fluctuate based on news coverage - buy low when they're out of the spotlight!</p>
               </div>
             </details>
             
-            {/* FAQ Item 3 */}
+            {/* FAQ Item 4 */}
             <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
               <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
                 When can I make transfers?
@@ -1022,14 +1030,14 @@ function App() {
               </div>
             </details>
             
-            {/* FAQ Item 4 */}
+            {/* FAQ Item 5 */}
             <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
               <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
                 What is the Brown Bread Watch?
                 <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
               </summary>
               <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
-                <p>The <strong className="text-white">Brown Bread Watch</strong> 💀 tracks elderly celebrities (60+) who may... shuffle off this mortal coil.</p>
+                <p>The <strong className="text-white">Brown Bread Watch</strong> 💀 tracks elderly celebrities (80+) who may... shuffle off this mortal coil.</p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
                   <li>Deceased celebrities are marked with a skull icon 💀</li>
                   <li>They receive a <strong className="text-white">Brown Bread Bonus</strong> - extra points!</li>
@@ -1038,7 +1046,7 @@ function App() {
               </div>
             </details>
             
-            {/* FAQ Item 5 */}
+            {/* FAQ Item 6 */}
             <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
               <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
                 How do I save my team?
