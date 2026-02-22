@@ -857,33 +857,45 @@ CELEBRITY_POOLS = {
         "Richard Branson", "Alan Sugar", "Warren Buffett", "Oprah Winfrey", "Martha Stewart",
         "Pope Francis", "Dalai Lama", "Neil deGrasse Tyson", "Bill Nye", "Dr Phil"
     ],
-    "other": [
-        # TV Presenters UK
+    "tv_personalities": [
+        # UK TV Presenters
         "Graham Norton", "Jonathan Ross", "Alan Carr", "James Corden", "Piers Morgan",
         "Holly Willoughby", "Phillip Schofield", "Ant McPartlin", "Dec Donnelly", "Dermot O'Leary",
         "Claudia Winkleman", "Tess Daly", "Rylan Clark", "Alison Hammond", "Rochelle Humes",
         "Vernon Kay", "Lorraine Kelly", "Susanna Reid", "Kate Garraway", "Ben Shephard",
-        # Chefs
-        "Gordon Ramsay", "Jamie Oliver", "Nigella Lawson", "Mary Berry", "Paul Hollywood",
-        "Prue Leith", "Ainsley Harriott", "Gino D'Acampo", "James Martin", "Nadiya Hussain",
-        # Entertainment
+        "Davina McCall", "Emma Willis", "Paddy McGuinness", "Keith Lemon", "Fearne Cotton",
+        "Christine Lampard", "Ruth Langsford", "Eamonn Holmes", "Nadia Sawalha", "Coleen Nolan",
+        # Entertainment Show Hosts
         "Simon Cowell", "Amanda Holden", "David Walliams", "Alesha Dixon", "Bruno Tonioli",
         "Craig Revel Horwood", "Shirley Ballas", "Motsi Mabuse", "Anton Du Beke", "Oti Mabuse",
         # Sports Presenters
         "Gary Lineker", "Ian Wright", "Alan Shearer", "Gabby Logan", "Clare Balding",
         "Alex Scott", "Micah Richards", "Rio Ferdinand", "Jamie Carragher", "Gary Neville",
-        # Comedians & Others
-        "David Attenborough", "Stephen Fry", "Michael Palin", "Joanna Lumley", "Bear Grylls",
-        "Jeremy Clarkson", "Richard Hammond", "James May", "Peter Kay", "Michael McIntyre",
-        "Ricky Gervais", "Jimmy Carr", "Russell Howard", "Jack Whitehall", "Rob Beckett",
+        # Science/Documentary Presenters
+        "David Attenborough", "Brian Cox", "Stephen Fry", "Michael Palin",
+        # US TV Personalities
+        "Oprah Winfrey", "Ellen DeGeneres", "Jimmy Fallon", "Jimmy Kimmel", "Stephen Colbert",
+        "Trevor Noah", "James Corden", "Ryan Seacrest", "Carson Daly", "Kelly Clarkson"
+    ],
+    "other": [
+        # Chefs
+        "Gordon Ramsay", "Jamie Oliver", "Nigella Lawson", "Mary Berry", "Paul Hollywood",
+        "Prue Leith", "Ainsley Harriott", "Gino D'Acampo", "James Martin", "Nadiya Hussain",
+        # Comedians
+        "Peter Kay", "Michael McIntyre", "Ricky Gervais", "Jimmy Carr", "Russell Howard",
+        "Jack Whitehall", "Rob Beckett", "Romesh Ranganathan", "Kevin Hart", "Chris Rock",
+        "Dave Chappelle", "Joe Rogan", "Russell Brand", "Eddie Izzard", "Sarah Millican",
+        # Adventurers/Explorers
+        "Bear Grylls", "Jeremy Clarkson", "Richard Hammond", "James May", "Ranulph Fiennes",
         # Beckham Family
         "David Beckham", "Victoria Beckham", "Brooklyn Beckham", "Romeo Beckham", "Cruz Beckham",
         # Models & Influencers  
         "Naomi Campbell", "Kate Moss", "Cara Delevingne", "Rosie Huntington-Whiteley", "Daisy Lowe",
-        "Molly-Mae Hague", "Zoe Sugg", "Tanya Burr", "Mrs Hinch", "Stacey Solomon",
-        # More TV Personalities
-        "Davina McCall", "Emma Willis", "Paddy McGuinness", "Keith Lemon", "Fearne Cotton",
-        "Christine Lampard", "Ruth Langsford", "Eamonn Holmes", "Nadia Sawalha", "Coleen Nolan"
+        "Zoe Sugg", "Tanya Burr", "Mrs Hinch", "Stacey Solomon", "Joe Wicks",
+        # Writers/Authors
+        "J.K. Rowling", "Stephen King", "George R.R. Martin", "Neil Gaiman", "Dan Brown",
+        # Business/Entrepreneurs (non-political)
+        "Richard Branson", "Alan Sugar", "Deborah Meaden", "Peter Jones", "Theo Paphitis"
     ]
 }
 
