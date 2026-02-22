@@ -802,10 +802,10 @@ CELEBRITY_POOLS = {
         "Vladimir Putin", "Volodymyr Zelenskyy", "Emmanuel Macron", "Angela Merkel", "Justin Trudeau",
         "Mark Zuckerberg", "Jeff Bezos", "Bill Gates", "Warren Buffett", "Tim Cook",
         "Sundar Pichai", "Satya Nadella", "Jack Dorsey", "Reed Hastings", "Bob Iger",
-        "Oprah Winfrey", "Ellen DeGeneres", "Dr Phil", "Dr Oz", "Deepak Chopra",
+        "Dr Phil", "Dr Oz", "Deepak Chopra",
         "Tony Robbins", "Gary Vaynerchuk", "Grant Cardone", "Dave Ramsey", "Suze Orman",
-        "Pope Francis", "Dalai Lama", "Malala Yousafzai", "Greta Thunberg", "David Attenborough",
-        "Neil deGrasse Tyson", "Bill Nye", "Elon Musk", "Richard Branson", "Alan Sugar"
+        "Pope Francis", "Dalai Lama", "Malala Yousafzai", "Richard Branson", "Alan Sugar",
+        "Neil deGrasse Tyson", "Bill Nye", "Keir Starmer", "Liz Truss", "Theresa May"
     ],
     "other": [
         "Gordon Ramsay", "Bear Grylls", "Jeremy Clarkson", "James Corden", "Graham Norton",
