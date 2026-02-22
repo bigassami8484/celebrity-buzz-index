@@ -2624,11 +2624,9 @@ async def get_celebrities_by_category(category: str, response: Response):
     # Final shuffle to mix them up
     random.shuffle(selected)
     
-    # Recalculate dynamic prices
-    default_buzz = 50
-    for celeb in selected:
-        tier = celeb.get("tier", "D")
-        celeb["price"] = get_dynamic_price(tier, default_buzz, celeb.get("name", ""))
+    # Use stored prices from database (don't recalculate)
+    # This ensures consistency with previous_week_price for accurate change display
+    # Prices are already set during weekly reset based on buzz scores
     
     return {"celebrities": selected[:8]}
 
