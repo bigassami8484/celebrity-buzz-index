@@ -2660,6 +2660,15 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     if any(known in celeb_name_lower for known in known_deceased):
         is_deceased = True
     
+    # Known LIVING celebrities - override false positives from "was" detection
+    known_living = [
+        "willie colon", "ozzy osbourne", "eric dane", "james van der beek",
+        "kate garraway", "dolly parton", "cher", "mick jagger", "keith richards",
+        "paul mccartney", "ringo starr", "bob dylan", "elton john"
+    ]
+    if any(known in celeb_name_lower for known in known_living):
+        is_deceased = False
+    
     # Extract birth year - prefer wiki_info birth_year, fallback to bio extraction
     birth_year = wiki_info.get("birth_year", 0)
     if not birth_year:
