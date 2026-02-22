@@ -1419,13 +1419,19 @@ def get_base_price_for_tier(tier: str) -> float:
     return base_prices.get(tier, 0.5)
 
 def get_dynamic_price(tier: str, buzz_score: float, name: str = "") -> float:
-    """Calculate dynamic price based on tier, buzz score
+    """Calculate dynamic price based on tier and buzz score
     
     Pricing Tiers (STRICT - MAX £12M for any celeb):
     - A-List: £9m-£12m (high scoring but expensive)
     - B-List: £5m-£8m (balanced steady picks)  
     - C-List: £2m-£4m (risk/reward)
     - D-List: £0.5m-£1.5m (cheap wildcards)
+    
+    Buzz Score Impact:
+    - buzz_score 0-25: Price at lower end of tier range
+    - buzz_score 25-50: Price at mid-low range
+    - buzz_score 50-75: Price at mid-high range
+    - buzz_score 75-100+: Price at higher end of tier range
     """
     # Define STRICT price ranges for each tier
     price_ranges = {
@@ -1439,9 +1445,16 @@ def get_dynamic_price(tier: str, buzz_score: float, name: str = "") -> float:
     price_range = max_price - min_price
     
     # Dynamic pricing based on buzz score
-    # Buzz score typically ranges from 5 (minimum) to 150 (very high)
-    # Map this to a 0-1 scale for price adjustment
-    buzz_factor = min(1.0, max(0.0, (buzz_score - 5) / 100))
+    # Buzz score typically ranges from 0 (minimum) to 100+ (very high)
+    # Map this to a 0-1 scale for price adjustment within the tier
+    # Using a more aggressive curve to make buzz score more impactful
+    if buzz_score <= 0:
+        buzz_factor = 0.0
+    elif buzz_score >= 100:
+        buzz_factor = 1.0
+    else:
+        # Smooth curve that makes mid-range buzz scores have significant impact
+        buzz_factor = min(1.0, buzz_score / 100.0)
     
     # Calculate dynamic price within the tier's range
     dynamic_price = min_price + (price_range * buzz_factor)
