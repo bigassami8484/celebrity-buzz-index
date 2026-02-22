@@ -25,6 +25,19 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - #3 oldest celebrity: £11M
 - Rest: normal tier pricing
 
+## Weekly Price Reset System (NEW - Feb 22, 2026)
+- **Admin endpoint**: `POST /api/admin/weekly-price-reset`
+- **Preview endpoint**: `GET /api/admin/price-change-preview`
+- **Schedule**: Should be run every Monday
+- **Process**:
+  1. Stores current price as `previous_week_price`
+  2. Calculates new price based on `buzz_score` using `get_dynamic_price(tier, buzz_score, name)`
+  3. Resets `buzz_score` to 0 for the new week
+- **UI Display**: Price change indicators show:
+  - Green +X% arrow for price increases
+  - Red -X% arrow for price decreases
+  - Visible on: Celebrity cards, Hot celebs ticker, Search modal, Team panel
+
 ## Transfer Window
 - **Opens**: Every Saturday at 12:00 GMT
 - **Duration**: 24 hours
@@ -44,6 +57,11 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - ✅ A/B/C/D tier system with STRICT dynamic pricing (max £12M)
 - ✅ **CONSISTENT PRICING** - uses default buzz score (50) for Hot Celebs, search, and categories
 - ✅ Saturday 12pm GMT transfer window (24 hours)
+- ✅ **BUZZ-SCORE-BASED DYNAMIC PRICING** (NEW Feb 22, 2026):
+  - Prices fluctuate based on weekly buzz score accumulation
+  - `previous_week_price` field tracks last week's price
+  - Price change indicators (↑↓) shown in UI
+  - Admin endpoints for weekly reset and preview
 - ✅ **BROWN BREAD PREMIUM PRICING IN SEARCH**:
   - Top 3 oldest celebrities show premium prices when searched
   - David Attenborough (Age 100): £15M
