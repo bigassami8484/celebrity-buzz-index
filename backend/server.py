@@ -1933,13 +1933,10 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     
     # Check if already in database (try both original name and Wikipedia name)
     existing = await db.celebrities.find_one({"name": {"$regex": f"^{name}$", "$options": "i"}}, {"_id": 0})
-    logger.info(f"Search for {name}: existing={existing is not None}")
     if not existing and wikipedia_search_name != name:
         existing = await db.celebrities.find_one({"name": {"$regex": f"^{wikipedia_search_name}$", "$options": "i"}}, {"_id": 0})
-        logger.info(f"Search for {wikipedia_search_name}: existing={existing is not None}")
     
     if existing:
-        logger.info(f"Returning existing celebrity: {existing.get('name')} with category: {existing.get('category')}")
         # Check if this is a guaranteed A-lister (mega-star override)
         celeb_name = existing.get("name", name)
         is_mega_star = celeb_name.lower() in GUARANTEED_A_LIST
