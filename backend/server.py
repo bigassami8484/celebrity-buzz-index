@@ -829,11 +829,11 @@ CELEBRITY_POOLS = {
         "Mark Wright", "Michelle Keegan", "Amy Childs", "Lauren Goodger", "Billie Faiers",
         "Vicky Pattison", "Charlotte Crosby", "Holly Hagan", "Chloe Ferry", "Marnie Simpson",
         # Made in Chelsea
-        "Georgia Toffolo", "Jamie Laing", "Louise Thompson", "Spencer Matthews", "Binky Felstead",
+        "Georgia Toffolo", "Jamie Laing", "Spencer Matthews", "Binky Felstead",
         "Ollie Locke", "Sam Thompson", "Zara McDermott", "Lucy Watson", "Proudlock",
         # Love Island UK
         "Molly-Mae Hague", "Tommy Fury", "Maura Higgins", "Amber Gill", "Dani Dyer",
-        "Jack Fincham", "Ekin-Su Culculoglu", "Davide Sanclimenti", "Olivia Attwood", "Chris Hughes",
+        "Jack Fincham", "Ekin-Su Culculoglu", "Davide Sanclimenti", "Olivia Attwood",
         "Amber Davies", "Kem Cetinay", "Cara De La Hoyde", "Nathan Massey", "Olivia Buckland",
         # Kardashians & US Reality
         "Kim Kardashian", "Khloe Kardashian", "Kourtney Kardashian", "Kylie Jenner", "Kendall Jenner",
@@ -841,7 +841,9 @@ CELEBRITY_POOLS = {
         "Lauren Conrad", "Kristin Cavallari", "Spencer Pratt", "Heidi Montag", "Brody Jenner",
         "Lisa Vanderpump", "Kyle Richards", "Teresa Giudice", "NeNe Leakes", "Bethenny Frankel"
     ],
-    "public_figure": [
+    "other": [
+        # Chris Hughes moved here from reality_tv
+        "Chris Hughes",
         # Tech billionaires
         "Elon Musk", "Mark Zuckerberg", "Jeff Bezos", "Bill Gates", "Tim Cook",
         "Sundar Pichai", "Satya Nadella", "Jack Dorsey", "Reed Hastings", "Jensen Huang",
