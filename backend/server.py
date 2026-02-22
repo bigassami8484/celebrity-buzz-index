@@ -2182,17 +2182,28 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
             new_price = await apply_brown_bread_premium(existing, new_price)
             existing["price"] = new_price
         
-        # Regenerate news if empty or missing
+        # Regenerate news if empty, missing, or older than 24 hours
+        should_refresh_news = False
         if not existing.get("news") or len(existing.get("news", [])) == 0:
+            should_refresh_news = True
+        elif existing.get("news_updated_at"):
+            try:
+                news_time = datetime.fromisoformat(existing["news_updated_at"].replace("Z", "+00:00"))
+                if (datetime.now(timezone.utc) - news_time).total_seconds() > 86400:  # 24 hours
+                    should_refresh_news = True
+            except:
+                should_refresh_news = True
+        
+        if should_refresh_news:
             category = existing.get("category", "other")
             # Get real news context from hot celebs if available
             real_news_context = hot_celeb_match.get("hot_reason") if hot_celeb_match else None
             news = await generate_celebrity_news(celeb_name, category, real_news_context)
             existing["news"] = news
-            # Update in database
+            # Update in database with timestamp
             await db.celebrities.update_one(
                 {"id": existing.get("id")},
-                {"$set": {"news": news}}
+                {"$set": {"news": news, "news_updated_at": datetime.now(timezone.utc).isoformat()}}
             )
         
         # Record price history
