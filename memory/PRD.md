@@ -26,13 +26,17 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Rest: normal tier pricing
 
 ## Weekly Price Reset System (NEW - Feb 22, 2026)
-- **Admin endpoint**: `POST /api/admin/weekly-price-reset`
-- **Preview endpoint**: `GET /api/admin/price-change-preview`
-- **Schedule**: Should be run every Monday
+- **Automated Scheduler**: Runs every Monday at 00:00 UTC using APScheduler
+- **Admin endpoints**:
+  - `POST /api/admin/weekly-price-reset` - Manual trigger
+  - `POST /api/admin/trigger-weekly-reset` - Manual trigger (same result)
+  - `GET /api/admin/price-change-preview` - Preview without modifying data
+  - `GET /api/admin/scheduler-status` - Check scheduler status and next run time
 - **Process**:
   1. Stores current price as `previous_week_price`
   2. Calculates new price based on `buzz_score` using `get_dynamic_price(tier, buzz_score, name)`
   3. Resets `buzz_score` to 0 for the new week
+  4. Logs execution to `scheduled_tasks` collection for auditing
 - **UI Display**: Price change indicators show:
   - Green +X% arrow for price increases
   - Red -X% arrow for price decreases
