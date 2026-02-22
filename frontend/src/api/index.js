@@ -38,8 +38,9 @@ export const fetchTrending = async () => {
 };
 
 export const fetchCelebritiesByCategory = async (category) => {
-  // Add timestamp to prevent browser caching - get fresh random celebrities each time
-  const res = await axios.get(`${API}/celebrities/category/${category}?_t=${Date.now()}`);
+  // Strong cache busting - random number + timestamp ensures no caching
+  const cacheBuster = `${Date.now()}_${Math.random()}`;
+  const res = await axios.get(`${API}/celebrities/category/${category}?_nocache=${cacheBuster}`);
   return res.data.celebrities || [];
 };
 
