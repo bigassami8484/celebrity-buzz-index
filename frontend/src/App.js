@@ -565,7 +565,7 @@ function App() {
         {/* Floating Search Result Card */}
         {searchedCeleb && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSearchedCeleb(null)}>
-            <div className="relative bg-[#0A0A0A] border border-[#FF0099] rounded-lg max-w-md w-full shadow-2xl shadow-[#FF0099]/20" onClick={e => e.stopPropagation()}>
+            <div className="relative bg-[#0A0A0A] border border-[#FF0099] rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl shadow-[#FF0099]/20" onClick={e => e.stopPropagation()}>
               {/* Close button */}
               <button 
                 onClick={() => setSearchedCeleb(null)}
@@ -580,7 +580,7 @@ function App() {
                   <img 
                     src={searchedCeleb.image} 
                     alt={searchedCeleb.name}
-                    className="w-full h-64 object-cover rounded-lg"
+                    className="w-full h-48 object-cover rounded-lg"
                     onError={(e) => {
                       e.target.src = `https://ui-avatars.com/api/?name=${searchedCeleb.name}&size=400&background=1a1a1a&color=FF0099&bold=true`;
                     }}
@@ -595,7 +595,7 @@ function App() {
                 
                 {/* Info */}
                 <h2 className="font-anton text-2xl text-white uppercase mb-2">{searchedCeleb.name}</h2>
-                <p className="text-[#A1A1AA] text-sm mb-4 line-clamp-3">{searchedCeleb.bio}</p>
+                <p className="text-[#A1A1AA] text-sm mb-4 line-clamp-2">{searchedCeleb.bio}</p>
                 
                 {/* Category tag */}
                 <div className="flex items-center gap-2 mb-4">
@@ -604,6 +604,34 @@ function App() {
                   </span>
                   <span className="text-[#666] text-xs">Buzz: {searchedCeleb.buzz_score}</span>
                 </div>
+                
+                {/* News Articles Section */}
+                {searchedCeleb.news && searchedCeleb.news.length > 0 && (
+                  <div className="mb-4">
+                    <h3 className="text-[#00F0FF] text-sm font-bold uppercase mb-3 flex items-center gap-2">
+                      <Newspaper className="w-4 h-4" />
+                      Latest News
+                    </h3>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {searchedCeleb.news.slice(0, 5).map((article, idx) => (
+                        <div key={idx} className="bg-[#1A1A1A] p-3 rounded border border-[#262626]">
+                          <p className="text-white text-sm font-medium mb-1 line-clamp-2">{article.title}</p>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-[#A1A1AA]">{article.source}</span>
+                            <span className={`px-2 py-0.5 rounded ${
+                              article.sentiment === 'positive' ? 'bg-green-500/20 text-green-400' :
+                              article.sentiment === 'negative' ? 'bg-red-500/20 text-red-400' :
+                              'bg-gray-500/20 text-gray-400'
+                            }`}>
+                              {article.sentiment}
+                            </span>
+                          </div>
+                          <p className="text-[#666] text-xs mt-1">{article.date}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 
                 {/* Add to Team Button */}
                 <button
