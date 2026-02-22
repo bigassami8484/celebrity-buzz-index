@@ -588,8 +588,19 @@ function App() {
                   <div className="absolute top-3 left-3">
                     <TierBadge tier={searchedCeleb.tier} />
                   </div>
-                  <div className="absolute top-3 right-3 bg-[#FFD700] text-black px-3 py-1 rounded font-bold">
+                  <div className="absolute top-3 right-3 bg-[#FFD700] text-black px-3 py-1 rounded font-bold flex items-center gap-1">
                     £{searchedCeleb.price}M
+                    {searchedCeleb.previous_week_price > 0 && (
+                      <>
+                        {searchedCeleb.price > searchedCeleb.previous_week_price ? (
+                          <TrendingUp className="w-4 h-4 text-green-600" />
+                        ) : searchedCeleb.price < searchedCeleb.previous_week_price ? (
+                          <TrendingDown className="w-4 h-4 text-red-600" />
+                        ) : (
+                          <Minus className="w-4 h-4 text-gray-600" />
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
                 
