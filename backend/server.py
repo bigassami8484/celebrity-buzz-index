@@ -4066,6 +4066,7 @@ async def transfer_celebrity(data: TransferRequest):
         price=buy_celeb["price"],
         buzz_score=buy_celeb["buzz_score"],
         tier=buy_celeb.get("tier", "D"),
+        is_deceased=buy_celeb.get("is_deceased", False),  # Include deceased status
         added_at=datetime.now(timezone.utc).isoformat()
     )
     
