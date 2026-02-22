@@ -4008,6 +4008,57 @@ async def get_news_summary():
     
     with_news = []
     without_news = []
+
+
+@api_router.post("/admin/populate-category/{category}")
+async def populate_category(category: str, count: int = 20):
+    """
+    Admin endpoint to pre-populate celebrities in a category from the pool.
+    Fetches 'count' new celebrities that aren't already in the database.
+    """
+    import random
+    
+    pool = CELEBRITY_POOLS.get(category, [])
+    if not pool:
+        return {"error": f"No pool found for category: {category}"}
+    
+    # Shuffle pool
+    random.shuffle(pool)
+    
+    added = []
+    skipped = []
+    errors = []
+    
+    for name in pool:
+        if len(added) >= count:
+            break
+        
+        # Check if already exists
+        existing = await db.celebrities.find_one(
+            {"name": {"$regex": f"^{name}$", "$options": "i"}}
+        )
+        
+        if existing:
+            skipped.append(name)
+            continue
+        
+        # Fetch new celebrity
+        try:
+            search = CelebritySearch(name=name)
+            result = await search_celebrity(search, override_category=category)
+            if result and result.get("name"):
+                added.append(result.get("name"))
+        except Exception as e:
+            errors.append({"name": name, "error": str(e)})
+    
+    return {
+        "success": True,
+        "category": category,
+        "added_count": len(added),
+        "added": added,
+        "skipped_count": len(skipped),
+        "errors": errors if errors else None
+    }
     
     for celeb in all_celebs:
         name = celeb.get("name", "Unknown")
