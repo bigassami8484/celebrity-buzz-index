@@ -1843,6 +1843,169 @@ def get_category_from_bio(bio: str, name: str) -> str:
     return detect_category_from_bio(bio, name)
 
 
+async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[dict]:
+    """
+    Fetch REAL news about a specific celebrity from RSS feeds.
+    Searches multiple entertainment news sources for mentions of the celebrity.
+    Returns list of real news articles from the last 2 months.
+    """
+    headers = {"User-Agent": "CelebrityBuzzIndex/1.0"}
+    
+    # RSS feeds to search - comprehensive list
+    rss_sources = [
+        # UK Sources
+        ("https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "BBC News"),
+        ("https://www.theguardian.com/lifeandstyle/celebrities/rss", "The Guardian"),
+        ("https://www.mirror.co.uk/3am/rss.xml", "Daily Mirror"),
+        ("https://www.thesun.co.uk/tvandshowbiz/feed/", "The Sun"),
+        ("https://www.dailymail.co.uk/tvshowbiz/index.rss", "Daily Mail"),
+        ("https://metro.co.uk/entertainment/feed/", "Metro"),
+        # US Sources
+        ("https://www.tmz.com/rss.xml", "TMZ"),
+        ("https://people.com/feed/", "People"),
+        ("https://pagesix.com/feed/", "Page Six"),
+        ("https://www.etonline.com/news/rss", "Entertainment Tonight"),
+        ("https://www.usmagazine.com/feed/", "Us Weekly"),
+        ("https://www.hollywoodreporter.com/feed/", "Hollywood Reporter"),
+        ("https://variety.com/feed/", "Variety"),
+        ("https://www.billboard.com/feed/", "Billboard"),
+        ("https://www.rollingstone.com/feed/", "Rolling Stone"),
+        ("http://rss.cnn.com/rss/cnn_showbiz.rss", "CNN"),
+        ("https://www.eonline.com/syndication/feeds/rssfeeds/topstories.xml", "E! News"),
+        ("https://deadline.com/feed/", "Deadline"),
+    ]
+    
+    # Name variations to search for
+    name_lower = name.lower()
+    name_parts = name_lower.split()
+    
+    # Create search variations
+    search_terms = [name_lower]  # Full name
+    if len(name_parts) > 1:
+        search_terms.append(name_parts[-1])  # Last name
+        # Handle special cases like "Millie Bobby Brown"
+        if len(name_parts) == 3:
+            search_terms.append(f"{name_parts[0]} {name_parts[1]}")  # First two names
+    
+    # Cutoff date - 2 months ago
+    cutoff_date = datetime.now(timezone.utc) - timedelta(days=60)
+    
+    real_news = []
+    seen_titles = set()  # Avoid duplicates
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            for rss_url, source_name in rss_sources:
+                try:
+                    response = await client.get(rss_url, timeout=10.0, headers=headers)
+                    if response.status_code != 200:
+                        continue
+                    
+                    content = response.text
+                    items = content.split("<item>")[1:50]  # Get up to 50 items per source
+                    
+                    for item in items:
+                        try:
+                            # Extract title
+                            title_start = item.find("<title>") + 7
+                            title_end = item.find("</title>")
+                            if title_start < 7 or title_end < 0:
+                                continue
+                            title = item[title_start:title_end].replace("<![CDATA[", "").replace("]]>", "").strip()
+                            title = decode_html_entities(title)
+                            title_lower = title.lower()
+                            
+                            # Check if celebrity is mentioned in title
+                            celeb_mentioned = False
+                            for term in search_terms:
+                                if term in title_lower:
+                                    # Avoid false positives for common last names
+                                    common_names = ["smith", "jones", "williams", "brown", "davis", "miller", "wilson", "moore", "taylor", "martin", "king", "lee", "white", "harris"]
+                                    if term in common_names and term != name_lower:
+                                        # Only match if full name is used
+                                        if name_lower in title_lower:
+                                            celeb_mentioned = True
+                                            break
+                                    else:
+                                        celeb_mentioned = True
+                                        break
+                            
+                            if not celeb_mentioned:
+                                continue
+                            
+                            # Avoid duplicates
+                            if title in seen_titles:
+                                continue
+                            seen_titles.add(title)
+                            
+                            # Extract publication date
+                            pub_date = None
+                            pub_date_str = ""
+                            if "<pubDate>" in item:
+                                date_start = item.find("<pubDate>") + 9
+                                date_end = item.find("</pubDate>")
+                                date_raw = item[date_start:date_end].strip()
+                                try:
+                                    from email.utils import parsedate_to_datetime
+                                    pub_date = parsedate_to_datetime(date_raw)
+                                    pub_date_str = pub_date.strftime("%b %d, %Y")
+                                except:
+                                    pub_date_str = datetime.now(timezone.utc).strftime("%b %d, %Y")
+                            
+                            # Skip if older than 2 months
+                            if pub_date and pub_date < cutoff_date:
+                                continue
+                            
+                            # Extract description/summary
+                            summary = ""
+                            if "<description>" in item:
+                                desc_start = item.find("<description>") + 13
+                                desc_end = item.find("</description>")
+                                if desc_end > desc_start:
+                                    summary = item[desc_start:desc_end].replace("<![CDATA[", "").replace("]]>", "").strip()
+                                    summary = decode_html_entities(summary)
+                                    # Remove HTML tags from summary
+                                    summary = re.sub(r'<[^>]+>', '', summary)
+                                    summary = summary[:200] + "..." if len(summary) > 200 else summary
+                            
+                            if not summary:
+                                summary = title
+                            
+                            # Determine sentiment based on keywords
+                            sentiment = "neutral"
+                            positive_words = ["wins", "award", "celebrates", "engaged", "married", "baby", "pregnant", "success", "triumph", "praised", "honored", "birthday", "milestone"]
+                            negative_words = ["arrested", "charged", "scandal", "controversy", "feud", "slams", "accused", "dies", "dead", "fired", "axed", "split", "divorce", "lawsuit"]
+                            
+                            if any(word in title_lower for word in positive_words):
+                                sentiment = "positive"
+                            elif any(word in title_lower for word in negative_words):
+                                sentiment = "negative"
+                            
+                            real_news.append({
+                                "title": title,
+                                "summary": summary,
+                                "source": source_name,
+                                "date": pub_date_str or datetime.now(timezone.utc).strftime("%b %d, %Y"),
+                                "sentiment": sentiment,
+                                "is_real": True  # Flag to indicate this is real news
+                            })
+                            
+                        except Exception as e:
+                            continue
+                            
+                except Exception as e:
+                    logger.debug(f"Error fetching RSS from {source_name}: {e}")
+                    continue
+        
+        # Sort by date (most recent first) and limit
+        real_news.sort(key=lambda x: datetime.strptime(x.get("date", "Jan 1, 2020"), "%b %d, %Y"), reverse=True)
+        return real_news[:max_articles]
+        
+    except Exception as e:
+        logger.error(f"Error fetching real news for {name}: {e}")
+        return []
+
+
 async def generate_celebrity_news(name: str, category: str, real_news_context: str = None) -> List[dict]:
     """Generate AI-powered news summaries for celebrity, incorporating real news if available"""
     # Get current date for context
