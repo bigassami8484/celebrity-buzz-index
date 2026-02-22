@@ -142,7 +142,7 @@ function App() {
         if (guestTeamId) {
           try {
             // Link the guest team to the user's account
-            const linkResult = await fetch(`${API}/api/auth/guest/convert`, {
+            const linkResult = await fetch(`${AUTH_API}/guest/convert`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               credentials: 'include',
