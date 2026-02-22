@@ -2120,7 +2120,7 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
             BE REALISTIC - celebrities often have controversial news. Include at least 1-2 negative/controversial items unless they have a squeaky clean image.
             Tabloids like The Sun, Daily Mirror, TMZ love scandal stories!
             
-            Return a JSON array with 5 news items. Each item should have:
+            Return a JSON array with {num_ai_needed} news items. Each item should have:
             - title: A catchy tabloid-style headline (controversial headlines get clicks!)
             - summary: 1-2 sentence summary
             - source: A realistic news source name from this list:
@@ -2134,7 +2134,7 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
             ONLY return valid JSON array, no other text."""
         ).with_model("openai", "gpt-4o")
 
-        prompt = f"Generate 5 realistic tabloid news headlines about {name} ({category}) from the past 2 months. Include a mix of positive AND negative/controversial news (scandals, arrests, feuds, lawsuits if realistic for this celeb). Today is {current_date_str}. Dates should be spread across the last 60 days."
+        prompt = f"Generate {num_ai_needed} realistic tabloid news headlines about {name} ({category}) from the past 2 months. Include a mix of positive AND negative/controversial news (scandals, arrests, feuds, lawsuits if realistic for this celeb). Today is {current_date_str}. Dates should be spread across the last 60 days."
         if real_news_context:
             prompt += f" The most important current news is: {real_news_context}"
         prompt += " Return ONLY a JSON array."
