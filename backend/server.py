@@ -2206,32 +2206,32 @@ async def get_price_history_by_name(name: str, limit: int = 30):
 
 @api_router.get("/celebrities/category/{category}")
 async def get_celebrities_by_category(category: str):
-    """Get celebrities by category - random selection each time, with news from past 2 months"""
-    import random
+    """Get 10 random celebrities by category - true random selection each request"""
     
     # Calculate date threshold (2 months ago)
     two_months_ago = datetime.now(timezone.utc) - timedelta(days=60)
     
-    # Get all celebrities in this category
-    all_celebrities = await db.celebrities.find(
-        {"category": category},
-        {"_id": 0}
-    ).to_list(500)
+    # First, check how many we have in this category
+    count = await db.celebrities.count_documents({"category": category})
     
     # If we don't have enough, seed with trending celebrities
-    if len(all_celebrities) < 10 and category in TRENDING_CELEBRITIES:
+    if count < 10 and category in TRENDING_CELEBRITIES:
         for name in TRENDING_CELEBRITIES[category]:
             # Check if already exists
-            exists = any(c.get("name", "").lower() == name.lower() for c in all_celebrities)
+            exists = await db.celebrities.find_one({"name": {"$regex": f"^{name}$", "$options": "i"}})
             if not exists:
                 search = CelebritySearch(name=name)
                 await search_celebrity(search, override_category=category)
-        
-        # Re-fetch
-        all_celebrities = await db.celebrities.find(
-            {"category": category},
-            {"_id": 0}
-        ).to_list(500)
+    
+    # Use MongoDB $sample for TRUE random selection directly from database
+    # This guarantees different results each time
+    pipeline = [
+        {"$match": {"category": category}},
+        {"$sample": {"size": 50}},  # Get random 50 from category
+        {"$project": {"_id": 0}}
+    ]
+    
+    all_celebrities = await db.celebrities.aggregate(pipeline).to_list(50)
     
     # Deduplicate by name
     seen_names = set()
@@ -2250,7 +2250,6 @@ async def get_celebrities_by_category(category: str):
     for celeb in unique_celebrities:
         news = celeb.get("news", [])
         if news and len(news) > 0:
-            # Check if any news is from the past 2 months
             has_recent_news = False
             for article in news:
                 try:
@@ -2262,31 +2261,20 @@ async def get_celebrities_by_category(category: str):
                             has_recent_news = True
                             break
                 except:
-                    # If date parsing fails, assume it's recent
                     has_recent_news = True
                     break
             
             if has_recent_news:
                 celebrities_with_recent_news.append(celeb)
     
-    # Randomly select 10-15 celebrities from the pool (new selection each time)
-    pool_size = len(celebrities_with_recent_news)
-    if pool_size > 15:
-        # Random sample of 10-15 celebrities
-        sample_size = random.randint(10, 15)
-        selected = random.sample(celebrities_with_recent_news, sample_size)
-    else:
-        # If pool is small, shuffle and return all
-        selected = celebrities_with_recent_news.copy()
-        random.shuffle(selected)
-    
-    # Recalculate dynamic prices - use CONSISTENT buzz (50)
+    # Recalculate dynamic prices
     default_buzz = 50
-    for celeb in selected:
+    for celeb in celebrities_with_recent_news:
         tier = celeb.get("tier", "D")
         celeb["price"] = get_dynamic_price(tier, default_buzz, celeb.get("name", ""))
     
-    return {"celebrities": selected}
+    # Return exactly 10 (or all if less than 10 available)
+    return {"celebrities": celebrities_with_recent_news[:10]}
 
 @api_router.get("/stats")
 async def get_stats():
