@@ -3451,14 +3451,14 @@ async def get_brown_bread_watch():
     - #3 oldest: £11M
     - Rest: normal tier pricing (max £12M)
     """
-    # Find living celebrities with known age >= 60
+    # Find living celebrities with known age >= 60 - get 10 for display
     elderly_celebs = await db.celebrities.find(
         {
             "is_deceased": False,
             "age": {"$gte": 60}
         },
         {"_id": 0}
-    ).sort("age", -1).to_list(20)
+    ).sort("age", -1).to_list(10)
     
     # Special pricing for top 3 oldest (Brown Bread premium)
     brown_bread_premium_prices = [15.0, 13.0, 11.0]  # Top 3 get premium pricing
