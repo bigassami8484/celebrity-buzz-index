@@ -1616,13 +1616,14 @@ async def fetch_wikipedia_info(name: str) -> dict:
                     "bio": bio,
                     "image": wiki_image,
                     "wiki_url": data.get("content_urls", {}).get("desktop", {}).get("page", ""),
-                    "birth_year": birth_year
+                    "birth_year": birth_year,
+                    "is_deceased": is_deceased_from_wikidata
                 }
             else:
                 logger.error(f"Wikipedia returned status {response.status_code}: {response.text[:200]}")
     except Exception as e:
         logger.error(f"Wikipedia fetch error for {name}: {type(e).__name__}: {e}")
-    return {"name": name, "bio": "Celebrity profile", "image": "", "wiki_url": "", "birth_year": 0}
+    return {"name": name, "bio": "Celebrity profile", "image": "", "wiki_url": "", "birth_year": 0, "is_deceased": False}
 
 def detect_category_from_bio(bio: str, name: str) -> str:
     """Detect celebrity category from bio text"""
