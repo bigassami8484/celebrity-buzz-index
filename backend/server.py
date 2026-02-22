@@ -2312,7 +2312,7 @@ async def get_price_history_by_name(name: str, limit: int = 30):
 
 @api_router.get("/celebrities/category/{category}")
 async def get_celebrities_by_category(category: str, response: Response):
-    """Get 10 random celebrities by category from large pool"""
+    """Get 10 random celebrities by category - prioritizes cached data for speed"""
     import random
     
     # Prevent any caching
@@ -2327,58 +2327,60 @@ async def get_celebrities_by_category(category: str, response: Response):
     
     # Remove duplicates from pool
     pool = list(set(pool))
+    random.shuffle(pool)
     
-    # Shuffle the entire pool
-    shuffled_pool = pool.copy()
-    random.shuffle(shuffled_pool)
+    # FAST PATH: Get all celebrities from this category already in DB
+    db_celebs = await db.celebrities.find(
+        {"category": category, "name": {"$ne": None}, "news": {"$exists": True, "$ne": []}},
+        {"_id": 0}
+    ).to_list(100)
     
-    celebrities = []
-    checked_names = set()
+    # Filter valid ones
+    valid_db_celebs = [c for c in db_celebs if c.get("name") and c.get("category")]
     
-    # Go through shuffled pool until we have 10 valid celebrities
-    for name in shuffled_pool:
-        if len(celebrities) >= 10:
-            break
+    # If we have enough in DB, just return random selection
+    if len(valid_db_celebs) >= 10:
+        random.shuffle(valid_db_celebs)
+        selected = valid_db_celebs[:10]
+    else:
+        # Need to fetch more - but limit to keep response fast
+        selected = valid_db_celebs.copy()
+        fetched_count = 0
         
-        # Skip if we already checked this name
-        name_lower = name.lower().strip()
-        if name_lower in checked_names:
-            continue
-        checked_names.add(name_lower)
-        
-        # Check if already in database
-        existing = await db.celebrities.find_one(
-            {"name": {"$regex": f"^{name}$", "$options": "i"}},
-            {"_id": 0}
-        )
-        
-        if existing and existing.get("name") and existing.get("news"):
-            # Valid existing celebrity with news
-            celebrities.append(existing)
-        elif not existing:
-            # Try to fetch new celebrity (limit fetches to keep it fast)
-            if len([c for c in celebrities if c]) < 7:  # Only fetch if we need more
+        for name in pool:
+            if len(selected) >= 10 or fetched_count >= 3:
+                break
+            
+            # Skip if already in selected
+            if any(c.get("name", "").lower() == name.lower() for c in selected):
+                continue
+            
+            # Check if in DB but not in our list
+            existing = await db.celebrities.find_one(
+                {"name": {"$regex": f"^{name}$", "$options": "i"}, "news": {"$exists": True, "$ne": []}},
+                {"_id": 0}
+            )
+            
+            if existing and existing.get("name"):
+                selected.append(existing)
+            elif fetched_count < 2:  # Only fetch 2 new ones max
                 try:
                     search = CelebritySearch(name=name)
                     result = await search_celebrity(search, override_category=category)
                     if result and result.get("name"):
-                        celebrities.append(result)
-                except Exception as e:
-                    logger.error(f"Error fetching {name}: {e}")
-    
-    # Filter out any None or invalid entries
-    valid_celebrities = [c for c in celebrities if c and c.get("name") and c.get("category")]
+                        selected.append(result)
+                        fetched_count += 1
+                except:
+                    pass
     
     # Recalculate dynamic prices
     default_buzz = 50
-    for celeb in valid_celebrities:
+    for celeb in selected:
         tier = celeb.get("tier", "D")
         celeb["price"] = get_dynamic_price(tier, default_buzz, celeb.get("name", ""))
     
-    # Final shuffle
-    random.shuffle(valid_celebrities)
-    
-    return {"celebrities": valid_celebrities[:10]}
+    random.shuffle(selected)
+    return {"celebrities": selected[:10]}
 
 @api_router.get("/stats")
 async def get_stats():
