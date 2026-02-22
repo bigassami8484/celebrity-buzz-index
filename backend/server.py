@@ -1120,6 +1120,11 @@ CELEBRITY_ALIASES = {
     "cheryl tweedy": "Cheryl (singer)",
     "cheryl fernandez-versini": "Cheryl (singer)",
     "cheryl ann tweedy": "Cheryl (singer)",
+    # Willie Colon - footballer not trombonist
+    "willie colon": "Willie Colon (American football)",
+    "willie colón": "Willie Colon (American football)",
+    # Mark Wright - reality TV star
+    "mark wright": "Mark Wright (television personality)",
 }
 
 # Reverse mapping - canonical name to all aliases (for duplicate checking)
