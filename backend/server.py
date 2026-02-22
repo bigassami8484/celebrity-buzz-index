@@ -1373,6 +1373,31 @@ def detect_category_from_bio(bio: str, name: str) -> str:
     bio_lower = bio.lower()
     name_lower = name.lower()
     
+    # SPECIFIC CELEBRITY CATEGORY OVERRIDES - takes highest priority
+    category_overrides = {
+        # Musicians - people known primarily for singing
+        "peter andre": "musicians",
+        "victoria beckham": "musicians",
+        "kerry katona": "musicians",
+        "jessica simpson": "musicians",
+        "paris hilton": "other",  # More socialite than musician
+        
+        # Royals
+        "meghan markle": "royals",
+        "meghan, duchess of sussex": "royals",
+        
+        # Other - notorious/infamous figures
+        "ghislaine maxwell": "other",
+        "harvey weinstein": "other",
+        "jeffrey epstein": "other",
+        "elizabeth holmes": "other",
+    }
+    
+    for override_name, override_category in category_overrides.items():
+        if override_name in name_lower:
+            logger.info(f"Category detection: {name} matched override '{override_name}' - returning {override_category}")
+            return override_category
+    
     # Check for specific known celebrities first - ACTORS should be checked before royals
     known_actors = ["michael caine", "ian mckellen", "morgan freeman", "judi dench", 
                     "al pacino", "helen mirren", "anthony hopkins", "maggie smith",
