@@ -2557,7 +2557,7 @@ async def get_price_history_by_name(name: str, limit: int = 30):
 
 @api_router.get("/celebrities/category/{category}")
 async def get_celebrities_by_category(category: str, response: Response):
-    """Get 10 random celebrities by category - prioritizes cached data for speed"""
+    """Get 8 random celebrities by category using MongoDB $sample for true randomness"""
     import random
     
     # Prevent any caching
@@ -2565,58 +2565,43 @@ async def get_celebrities_by_category(category: str, response: Response):
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     
-    # Get the large pool for this category
-    pool = CELEBRITY_POOLS.get(category, [])
-    if not pool:
-        return {"celebrities": []}
+    # Use MongoDB $sample aggregation for TRUE random selection
+    # This ensures different results on each request
+    pipeline = [
+        {"$match": {
+            "category": category,
+            "name": {"$ne": None, "$exists": True},
+            "bio": {"$exists": True, "$ne": ""}
+        }},
+        {"$sample": {"size": 8}},  # MongoDB's random sampling
+        {"$project": {"_id": 0}}
+    ]
     
-    # Remove duplicates from pool
-    pool = list(set(pool))
-    random.shuffle(pool)
+    selected = await db.celebrities.aggregate(pipeline).to_list(8)
     
-    # FAST PATH: Get all celebrities from this category already in DB
-    db_celebs = await db.celebrities.find(
-        {"category": category, "name": {"$ne": None}, "news": {"$exists": True, "$ne": []}},
-        {"_id": 0}
-    ).to_list(100)
-    
-    # Filter valid ones
-    valid_db_celebs = [c for c in db_celebs if c.get("name") and c.get("category")]
-    
-    # If we have enough in DB, just return random selection
-    if len(valid_db_celebs) >= 8:
-        random.shuffle(valid_db_celebs)
-        selected = valid_db_celebs[:8]
-    else:
-        # Need to fetch more - but limit to keep response fast
-        selected = valid_db_celebs.copy()
-        fetched_count = 0
+    # If we don't have enough in DB, fall back to fetching from pools
+    if len(selected) < 8:
+        pool = CELEBRITY_POOLS.get(category, [])
+        pool = list(set(pool))
+        random.shuffle(pool)
+        
+        existing_names = {c.get("name", "").lower() for c in selected}
         
         for name in pool:
-            if len(selected) >= 8 or fetched_count >= 3:
+            if len(selected) >= 8:
                 break
-            
-            # Skip if already in selected
-            if any(c.get("name", "").lower() == name.lower() for c in selected):
+            if name.lower() in existing_names:
                 continue
             
-            # Check if in DB but not in our list
+            # Try to find in DB first
             existing = await db.celebrities.find_one(
-                {"name": {"$regex": f"^{name}$", "$options": "i"}, "news": {"$exists": True, "$ne": []}},
+                {"name": {"$regex": f"^{name}$", "$options": "i"}},
                 {"_id": 0}
             )
             
             if existing and existing.get("name"):
                 selected.append(existing)
-            elif fetched_count < 2:  # Only fetch 2 new ones max
-                try:
-                    search = CelebritySearch(name=name)
-                    result = await search_celebrity(search, override_category=category)
-                    if result and result.get("name"):
-                        selected.append(result)
-                        fetched_count += 1
-                except:
-                    pass
+                existing_names.add(name.lower())
     
     # Recalculate dynamic prices
     default_buzz = 50
@@ -2624,8 +2609,7 @@ async def get_celebrities_by_category(category: str, response: Response):
         tier = celeb.get("tier", "D")
         celeb["price"] = get_dynamic_price(tier, default_buzz, celeb.get("name", ""))
     
-    random.shuffle(selected)
-    return {"celebrities": selected[:8]}
+    return {"celebrities": selected}
 
 @api_router.get("/stats")
 async def get_stats():
