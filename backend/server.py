@@ -2623,7 +2623,7 @@ async def get_celebrities_by_category(category: str, response: Response):
         celeb["price"] = get_dynamic_price(tier, default_buzz, celeb.get("name", ""))
     
     random.shuffle(selected)
-    return {"celebrities": selected[:10]}
+    return {"celebrities": selected[:8]}
 
 @api_router.get("/stats")
 async def get_stats():
