@@ -5,6 +5,7 @@ import { UserPlus, X, Users, Search, Newspaper, TrendingUp, TrendingDown, Minus 
 
 // API
 import {
+  API,
   fetchCategories as fetchCategoriesAPI,
   fetchTrending as fetchTrendingAPI,
   fetchCelebritiesByCategory as fetchCelebritiesByCategoryAPI,
