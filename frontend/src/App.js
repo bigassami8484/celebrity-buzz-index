@@ -155,11 +155,19 @@ function App() {
       const res = await checkAuthStatus();
       if (res.is_authenticated && res.user) {
         setUser(res.user);
+        // If user has a team linked to their account, use that
+        if (res.team) {
+          setTeam(res.team);
+          localStorage.setItem("teamId", res.team.id);
+          fetchTeamLeaguesData(res.team.id);
+          fetchPriceAlerts(res.team.id);
+          fetchHotStreaks(res.team.id);
+        }
       }
     } catch (error) {
       console.log("Not authenticated");
     }
-  }, []);
+  }, [fetchTeamLeaguesData, fetchPriceAlerts, fetchHotStreaks]);
   
   // Handler to show price history
   const handleShowPriceHistory = (celebrityName) => {
