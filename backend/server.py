@@ -2222,6 +2222,17 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
                         {"$set": {"image": new_image}}
                     )
                     logger.info(f"Updated image for {celeb_name}: {new_image[:50]}...")
+                else:
+                    # Wikipedia doesn't have an image, try AI generation
+                    logger.info(f"No Wikipedia image for {celeb_name}, trying AI generation")
+                    ai_image = await get_or_generate_celebrity_image(celeb_name, existing.get("bio", ""))
+                    if ai_image:
+                        existing["image"] = ai_image
+                        await db.celebrities.update_one(
+                            {"id": existing.get("id")},
+                            {"$set": {"image": ai_image}}
+                        )
+                        logger.info(f"Generated AI image for {celeb_name}")
                 # Also update bio if it was placeholder
                 if existing.get("bio") == "Celebrity profile" and wiki_info.get("bio"):
                     existing["bio"] = wiki_info["bio"][:500]
