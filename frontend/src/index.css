@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* PWA Safe Area Support */
+:root {
+    --sat: env(safe-area-inset-top);
+    --sar: env(safe-area-inset-right);
+    --sab: env(safe-area-inset-bottom);
+    --sal: env(safe-area-inset-left);
+}
+
+html, body {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+}
+
 body {
     margin: 0;
     font-family:
@@ -10,6 +23,33 @@ body {
         sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    padding-top: var(--sat);
+    padding-bottom: var(--sab);
+    padding-left: var(--sal);
+    padding-right: var(--sar);
+    background: #0A0A0A;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+}
+
+/* Prevent pull-to-refresh on mobile */
+body.no-pull-refresh {
+    overscroll-behavior-y: contain;
+}
+
+/* Hide scrollbar but allow scrolling */
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Touch feedback for buttons */
+button, a {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 code {
