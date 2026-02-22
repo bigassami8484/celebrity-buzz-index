@@ -2093,8 +2093,19 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
                             
                             if alias_match:
                                 celeb_mentioned = True
-                            elif has_word_boundary_match(search_text, first_name) and has_word_boundary_match(search_text, last_name):
-                                celeb_mentioned = True
+                            else:
+                                # Check if first and last name appear CLOSE TOGETHER (within 50 chars)
+                                # This prevents "dad Peter" + "Princess Andre" from matching "Peter Andre"
+                                first_idx = search_text.find(first_name)
+                                last_idx = search_text.find(last_name)
+                                
+                                if first_idx >= 0 and last_idx >= 0:
+                                    # Names should be within 50 characters of each other
+                                    distance = abs(first_idx - last_idx)
+                                    if distance < 50:
+                                        # Verify word boundaries for both
+                                        if has_word_boundary_match(search_text, first_name) and has_word_boundary_match(search_text, last_name):
+                                            celeb_mentioned = True
                         
                         if not celeb_mentioned:
                             continue
