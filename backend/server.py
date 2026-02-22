@@ -1391,6 +1391,31 @@ def detect_category_from_bio(bio: str, name: str) -> str:
         "harvey weinstein": "other",
         "jeffrey epstein": "other",
         "elizabeth holmes": "other",
+        
+        # TV Presenters / Talk Show Hosts - categorize as "other" (their primary job)
+        "graham norton": "other",
+        "james corden": "other",
+        "jonathan ross": "other",
+        "alan carr": "other",
+        "piers morgan": "other",
+        "david letterman": "other",
+        "jimmy fallon": "other",
+        "jimmy kimmel": "other",
+        "ellen degeneres": "other",
+        "oprah winfrey": "other",
+        "conan o'brien": "other",
+        "stephen colbert": "other",
+        "trevor noah": "other",
+        "holly willoughby": "other",
+        "phillip schofield": "other",
+        "ant and dec": "other",
+        "ant mcpartlin": "other",
+        "dec donnelly": "other",
+        "declan donnelly": "other",
+        "lorraine kelly": "other",
+        "rylan clark": "other",
+        "claudia winkleman": "other",
+        "dermot o'leary": "other",
     }
     
     for override_name, override_category in category_overrides.items():
