@@ -2100,7 +2100,7 @@ async def get_celebrities_by_category(category: str):
     celebrities = await db.celebrities.find(
         {"category": category},
         {"_id": 0}
-    ).to_list(20)
+    ).to_list(50)
     
     # If empty, seed with trending (force correct category)
     if not celebrities and category in TRENDING_CELEBRITIES:
@@ -2111,15 +2111,28 @@ async def get_celebrities_by_category(category: str):
         celebrities = await db.celebrities.find(
             {"category": category},
             {"_id": 0}
-        ).to_list(20)
+        ).to_list(50)
+    
+    # Deduplicate by name (keep first occurrence)
+    seen_names = set()
+    unique_celebrities = []
+    for celeb in celebrities:
+        name_lower = celeb.get("name", "").lower().strip()
+        # Also check aliases to catch duplicates like "Prince Harry" vs "Prince Harry, Duke of Sussex"
+        canonical = get_canonical_name(celeb.get("name", ""))
+        check_name = canonical.lower() if canonical else name_lower
+        
+        if check_name not in seen_names:
+            seen_names.add(check_name)
+            unique_celebrities.append(celeb)
     
     # Recalculate dynamic prices for all celebrities - use CONSISTENT buzz (50)
     default_buzz = 50
-    for celeb in celebrities:
+    for celeb in unique_celebrities:
         tier = celeb.get("tier", "D")
         celeb["price"] = get_dynamic_price(tier, default_buzz, celeb.get("name", ""))
     
-    return {"celebrities": celebrities}
+    return {"celebrities": unique_celebrities[:20]}
 
 @api_router.get("/stats")
 async def get_stats():
