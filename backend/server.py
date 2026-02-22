@@ -1416,6 +1416,13 @@ def detect_category_from_bio(bio: str, name: str) -> str:
         "rylan clark": "other",
         "claudia winkleman": "other",
         "dermot o'leary": "other",
+        "amanda holden": "other",
+        "simon cowell": "other",
+        "david attenborough": "other",
+        
+        # Movie Stars - actors who may have "musician" keywords in bio due to film soundtracks
+        "timothée chalamet": "movie_stars",
+        "shia labeouf": "movie_stars",
     }
     
     for override_name, override_category in category_overrides.items():
