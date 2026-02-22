@@ -3434,7 +3434,7 @@ async def get_top_picked():
 
 @api_router.get("/brown-bread-watch")
 async def get_brown_bread_watch():
-    """Get elderly celebrities for Brown Bread Watch - strategic picks for the bonus!
+    """Get elderly celebrities (80+) for Brown Bread Watch - strategic picks for the bonus!
     
     SPECIAL PRICING: Top 3 oldest celebs can cost up to £15M (decreasing)
     - #1 oldest: £15M
@@ -3442,11 +3442,11 @@ async def get_brown_bread_watch():
     - #3 oldest: £11M
     - Rest: normal tier pricing (max £12M)
     """
-    # Find living celebrities with known age >= 60 - get 10 for display
+    # Find living celebrities with known age >= 80 - get 10 for display
     elderly_celebs = await db.celebrities.find(
         {
             "is_deceased": False,
-            "age": {"$gte": 60}
+            "age": {"$gte": 80}
         },
         {"_id": 0}
     ).sort("age", -1).to_list(10)
