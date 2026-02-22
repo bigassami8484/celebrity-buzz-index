@@ -1578,7 +1578,7 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
     # Get current date for context
     now = datetime.now(timezone.utc)
     current_date_str = now.strftime("%b %d, %Y")  # e.g., "Feb 21, 2026"
-    one_week_ago = (now - timedelta(days=7)).strftime("%b %d, %Y")
+    two_months_ago = (now - timedelta(days=60)).strftime("%b %d, %Y")  # 2 months back
     
     # Build context about real news events
     real_news_instruction = ""
@@ -1592,24 +1592,24 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"news-{uuid.uuid4()}",
-            system_message=f"""You are a celebrity news aggregator. Generate realistic celebrity news headlines and summaries based on CURRENT events.
+            system_message=f"""You are a celebrity news aggregator. Generate realistic celebrity news headlines and summaries based on events from the PAST 2 MONTHS.
             
-            IMPORTANT: Today's date is {current_date_str}. All news dates MUST be from the PAST 7 days (between {one_week_ago} and {current_date_str}). 
-            DO NOT use any future dates!
+            IMPORTANT: Today's date is {current_date_str}. All news dates MUST be from the PAST 2 MONTHS (between {two_months_ago} and {current_date_str}). 
+            DO NOT use any future dates! Spread the news dates across the 2 month period for variety.
             {real_news_instruction}
             
             Return a JSON array with 5 news items. Each item should have:
             - title: A catchy headline
             - summary: 1-2 sentence summary
             - source: A realistic news source name (e.g., "Entertainment Weekly", "TMZ", "People", "BBC News", "Daily Mail")
-            - date: A date from the past week in format "Feb 15, 2026" - MUST be before or on {current_date_str}
+            - date: A date from the past 2 months in format "Feb 15, 2026" - MUST be before or on {current_date_str}
             - sentiment: "positive", "neutral", or "negative"
             
-            Make the news realistic and relevant to current events.
+            Make the news realistic and relevant to events that could have happened in this time period.
             ONLY return valid JSON array, no other text."""
         ).with_model("openai", "gpt-4o")
 
-        prompt = f"Generate 5 recent news headlines about {name} ({category}). Today is {current_date_str}. All dates must be from the past week."
+        prompt = f"Generate 5 news headlines about {name} ({category}) from the past 2 months. Today is {current_date_str}. Dates should be spread across the last 60 days."
         if real_news_context:
             prompt += f" The most important current news is: {real_news_context}"
         prompt += " Return ONLY a JSON array."
@@ -1636,14 +1636,14 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
                         try:
                             # Try to parse the date
                             article_date = datetime.strptime(article["date"], "%b %d, %Y")
-                            # If it's in the future, set it to a random past date
+                            # If it's in the future, set it to a random past date within 2 months
                             if article_date > now:
-                                days_ago = random.randint(1, 7)
+                                days_ago = random.randint(1, 60)
                                 past_date = now - timedelta(days=days_ago)
                                 article["date"] = past_date.strftime("%b %d, %Y")
                         except:
-                            # If parsing fails, set a default past date
-                            days_ago = random.randint(1, 7)
+                            # If parsing fails, set a default past date within 2 months
+                            days_ago = random.randint(1, 60)
                             past_date = now - timedelta(days=days_ago)
                             article["date"] = past_date.strftime("%b %d, %Y")
             
