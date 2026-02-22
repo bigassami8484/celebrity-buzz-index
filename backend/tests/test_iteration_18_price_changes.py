@@ -6,6 +6,8 @@ Tests:
 2. Admin endpoint GET /api/admin/price-change-preview
 3. Celebrity API responses include previous_week_price field
 4. Price change calculations based on buzz scores
+5. Hot celebs ticker shows prices
+6. Team panel shows price changes
 """
 
 import pytest
@@ -87,16 +89,20 @@ class TestCelebrityPreviousWeekPrice:
     
     def test_celebrity_search_includes_previous_week_price(self):
         """Test that searching for a celebrity returns previous_week_price"""
-        # Search for a well-known celebrity
-        response = requests.get(f"{BASE_URL}/api/celebrities/search?name=Taylor%20Swift")
+        # Search for a well-known celebrity (POST endpoint)
+        response = requests.post(
+            f"{BASE_URL}/api/celebrity/search",
+            json={"name": "Taylor Swift"}
+        )
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
+        celebrity = data.get("celebrity", {})
         # Check if previous_week_price field exists
-        assert "previous_week_price" in data, "Celebrity should have previous_week_price field"
-        print(f"✓ Celebrity search includes previous_week_price: £{data.get('previous_week_price', 0)}M")
-        print(f"  - Current price: £{data.get('price', 0)}M")
-        print(f"  - Tier: {data.get('tier', 'N/A')}")
+        assert "previous_week_price" in celebrity, "Celebrity should have previous_week_price field"
+        print(f"✓ Celebrity search includes previous_week_price: £{celebrity.get('previous_week_price', 0)}M")
+        print(f"  - Current price: £{celebrity.get('price', 0)}M")
+        print(f"  - Tier: {celebrity.get('tier', 'N/A')}")
     
     def test_category_celebrities_include_previous_week_price(self):
         """Test that category endpoint returns celebrities with previous_week_price"""
@@ -104,27 +110,30 @@ class TestCelebrityPreviousWeekPrice:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
-        assert isinstance(data, list), "Response should be a list"
+        celebrities = data.get("celebrities", [])
+        assert isinstance(celebrities, list), "Response should contain celebrities list"
         
-        if len(data) > 0:
-            celeb = data[0]
+        if len(celebrities) > 0:
+            celeb = celebrities[0]
             assert "previous_week_price" in celeb, "Celebrity should have previous_week_price field"
             print(f"✓ Category celebrities include previous_week_price")
             print(f"  - Sample: {celeb.get('name', 'Unknown')} - £{celeb.get('price', 0)}M (prev: £{celeb.get('previous_week_price', 0)}M)")
     
-    def test_trending_celebrities_include_previous_week_price(self):
-        """Test that trending endpoint returns celebrities with previous_week_price"""
-        response = requests.get(f"{BASE_URL}/api/celebrities/trending")
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+    def test_multiple_categories_have_previous_week_price(self):
+        """Test that multiple categories return celebrities with previous_week_price"""
+        categories = ["movie_stars", "athletes", "royals"]
         
-        data = response.json()
-        assert isinstance(data, list), "Response should be a list"
-        
-        if len(data) > 0:
-            celeb = data[0]
-            # Note: trending might not have previous_week_price if it's from hot celebs pool
-            print(f"✓ Trending celebrities endpoint working")
-            print(f"  - Sample: {celeb.get('name', 'Unknown')} - £{celeb.get('price', 0)}M")
+        for category in categories:
+            response = requests.get(f"{BASE_URL}/api/celebrities/category/{category}")
+            assert response.status_code == 200, f"Expected 200 for {category}, got {response.status_code}"
+            
+            data = response.json()
+            celebrities = data.get("celebrities", [])
+            
+            if len(celebrities) > 0:
+                celeb = celebrities[0]
+                assert "previous_week_price" in celeb, f"Celebrity in {category} should have previous_week_price"
+                print(f"✓ {category}: {celeb.get('name', 'Unknown')} - £{celeb.get('price', 0)}M (prev: £{celeb.get('previous_week_price', 0)}M)")
 
 
 class TestHotCelebsWithPrices:
@@ -136,15 +145,30 @@ class TestHotCelebsWithPrices:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
-        assert isinstance(data, list), "Response should be a list"
+        hot_celebs = data.get("hot_celebs", [])
+        assert isinstance(hot_celebs, list), "Response should contain hot_celebs list"
         
-        if len(data) > 0:
-            celeb = data[0]
+        if len(hot_celebs) > 0:
+            celeb = hot_celebs[0]
             assert "price" in celeb, "Hot celeb should have price field"
             assert "tier" in celeb, "Hot celeb should have tier field"
             print(f"✓ Hot celebs include prices")
-            for c in data[:5]:
+            for c in hot_celebs[:5]:
                 print(f"  - {c.get('name', 'Unknown')}: £{c.get('price', 0)}M ({c.get('tier', 'N/A')}-list)")
+    
+    def test_hot_celebs_have_news_premium(self):
+        """Test that hot celebs have news premium indicator"""
+        response = requests.get(f"{BASE_URL}/api/hot-celebs")
+        assert response.status_code == 200
+        
+        data = response.json()
+        hot_celebs = data.get("hot_celebs", [])
+        
+        if len(hot_celebs) > 0:
+            celeb = hot_celebs[0]
+            assert "news_premium" in celeb, "Hot celeb should have news_premium field"
+            assert "hot_reason" in celeb, "Hot celeb should have hot_reason field"
+            print(f"✓ Hot celebs have news premium indicators")
 
 
 class TestPriceChangeCalculation:
@@ -191,7 +215,7 @@ class TestTeamCelebrityPriceChange:
     def test_create_team_and_check_price_data(self):
         """Test that team celebrities have price change data"""
         # Create a new team
-        response = requests.post(f"{BASE_URL}/api/teams", json={"team_name": "TEST_Price_Team"})
+        response = requests.post(f"{BASE_URL}/api/team/create", json={"team_name": "TEST_Price_Team"})
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         team_data = response.json()
@@ -200,15 +224,19 @@ class TestTeamCelebrityPriceChange:
         print(f"✓ Created test team: {team_id}")
         
         # Search for a celebrity to add
-        search_response = requests.get(f"{BASE_URL}/api/celebrities/search?name=Ed%20Sheeran")
+        search_response = requests.post(
+            f"{BASE_URL}/api/celebrity/search",
+            json={"name": "Ed Sheeran"}
+        )
         if search_response.status_code == 200:
-            celeb = search_response.json()
+            celeb_data = search_response.json()
+            celeb = celeb_data.get("celebrity", {})
             celeb_id = celeb.get("id")
             
             if celeb_id:
                 # Add celebrity to team
                 add_response = requests.post(
-                    f"{BASE_URL}/api/teams/{team_id}/add",
+                    f"{BASE_URL}/api/team/add",
                     json={"team_id": team_id, "celebrity_id": celeb_id}
                 )
                 
@@ -224,9 +252,44 @@ class TestTeamCelebrityPriceChange:
                         print(f"  - Current price: £{team_celeb.get('price', 0)}M")
                 else:
                     print(f"⚠ Could not add celebrity to team: {add_response.status_code}")
+                    print(f"  Response: {add_response.text[:200]}")
+
+
+class TestPriceChangeIndicatorData:
+    """Test that price change indicator data is available for UI"""
+    
+    def test_price_change_can_be_calculated(self):
+        """Test that we can calculate price change from API data"""
+        # Get a celebrity with previous_week_price
+        response = requests.post(
+            f"{BASE_URL}/api/celebrity/search",
+            json={"name": "Taylor Swift"}
+        )
+        assert response.status_code == 200
         
-        # Cleanup - delete the test team (if endpoint exists)
-        # Note: No delete endpoint, so we leave the test team
+        data = response.json()
+        celeb = data.get("celebrity", {})
+        
+        current_price = celeb.get("price", 0)
+        previous_price = celeb.get("previous_week_price", 0)
+        
+        if previous_price > 0:
+            diff = current_price - previous_price
+            percent_change = ((diff / previous_price) * 100)
+            
+            if diff > 0:
+                direction = "up"
+            elif diff < 0:
+                direction = "down"
+            else:
+                direction = "unchanged"
+            
+            print(f"✓ Price change calculation works:")
+            print(f"  - {celeb.get('name')}: £{previous_price}M → £{current_price}M")
+            print(f"  - Change: {'+' if diff > 0 else ''}{diff:.1f}M ({'+' if percent_change > 0 else ''}{percent_change:.0f}%)")
+            print(f"  - Direction: {direction}")
+        else:
+            print(f"⚠ No previous_week_price set for {celeb.get('name')}")
 
 
 if __name__ == "__main__":
