@@ -1871,27 +1871,33 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
     name_lower = name.lower()
     name_parts = name_lower.split()
     
-    # Create search variations
-    search_terms = [name_lower]  # Full name
-    if len(name_parts) > 1:
-        search_terms.append(name_parts[-1])  # Last name
-        # Handle special cases like "Millie Bobby Brown" or "James Van Der Beek"
-        if len(name_parts) == 3:
-            search_terms.append(f"{name_parts[0]} {name_parts[1]}")  # First two names
-            search_terms.append(f"{name_parts[1]} {name_parts[2]}")  # Last two names (e.g., "Van Der")
-        if len(name_parts) >= 4:
-            # For names like "James Van Der Beek"
-            search_terms.append(" ".join(name_parts[1:]))  # "Van Der Beek"
-            search_terms.append(" ".join(name_parts[-2:]))  # "Der Beek"
-        # Also add first name for very famous people
-        if name_parts[0] not in ["the", "a", "an"]:
-            search_terms.append(name_parts[0])  # First name only
+    # Create search variations - PRIORITIZE FULL NAME to avoid false matches
+    # For "Penelope Cruz", we don't want to match "Cruz Beckham"
+    search_terms = [name_lower]  # Full name is always primary
     
-    # Common last names that need full name match to avoid false positives
-    common_names = ["smith", "jones", "williams", "brown", "davis", "miller", "wilson", 
-                    "moore", "taylor", "martin", "king", "lee", "white", "harris", "james",
-                    "scott", "adams", "hill", "green", "baker", "nelson", "carter", "mitchell",
-                    "roberts", "turner", "phillips", "campbell", "parker", "evans", "edwards"]
+    # Only add partial name matches for very unique names
+    # Skip single-word last names that could match other celebrities
+    ambiguous_last_names = [
+        "cruz", "smith", "jones", "williams", "brown", "davis", "miller", "wilson", 
+        "moore", "taylor", "martin", "king", "lee", "white", "harris", "james",
+        "scott", "adams", "hill", "green", "baker", "nelson", "carter", "mitchell",
+        "roberts", "turner", "phillips", "campbell", "parker", "evans", "edwards",
+        "jackson", "johnson", "thomas", "robinson", "clark", "lewis", "walker",
+        "hall", "allen", "young", "wright", "lopez", "gonzalez", "martinez",
+        "beckham", "swift", "styles", "jonas", "bieber", "gomez", "grande"
+    ]
+    
+    if len(name_parts) > 1:
+        last_name = name_parts[-1]
+        # Only add last name as search term if it's unique enough
+        if last_name not in ambiguous_last_names:
+            search_terms.append(last_name)
+        
+        # Handle multi-part last names like "Van Der Beek"
+        if len(name_parts) == 3:
+            search_terms.append(f"{name_parts[1]} {name_parts[2]}")  # Last two names
+        if len(name_parts) >= 4:
+            search_terms.append(" ".join(name_parts[1:]))  # Full last name
     
     # Cutoff date - 2 months ago
     cutoff_date = datetime.now(timezone.utc) - timedelta(days=60)
