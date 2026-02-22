@@ -520,9 +520,16 @@ def contains_banned_words(text: str) -> bool:
     return False
 
 def get_week_number() -> str:
-    """Get current week identifier for transfer window"""
+    """Get current ISO week number as string for transfer window tracking"""
     now = datetime.now(timezone.utc)
-    return f"{now.year}-W{now.isocalendar()[1]}"
+    return f"{now.year}-W{now.isocalendar()[1]:02d}"
+
+def get_monday_reset_week() -> str:
+    """Get the current week identifier for Monday resets (points reset every Monday)"""
+    now = datetime.now(timezone.utc)
+    # Get the Monday of the current week
+    monday = now - timedelta(days=now.weekday())
+    return f"{monday.year}-W{monday.isocalendar()[1]:02d}"
 
 def is_transfer_window_open() -> dict:
     """Check if transfer window is open (Saturday 12pm GMT for 24 hours)"""
