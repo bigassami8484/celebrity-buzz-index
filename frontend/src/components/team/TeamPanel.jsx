@@ -42,11 +42,19 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize, onSubmitTeam, isTrans
   
   return (
     <div className="team-panel" data-testid="team-panel">
-      {/* Weekly Reset Notice */}
-      <div className="bg-[#1A1A1A] border border-[#262626] p-2 mb-4 flex items-center justify-center gap-2 text-xs">
-        <RotateCcw className="w-3 h-3 text-[#00F0FF]" />
-        <span className="text-[#A1A1AA]">Points reset every <span className="text-[#FFD700] font-bold">Monday</span> at midnight GMT</span>
-      </div>
+      {/* Team Lock Status */}
+      {isTeamLocked && (
+        <div className="bg-red-500/10 border border-red-500/50 p-2 mb-4 flex items-center justify-center gap-2 text-xs">
+          <Lock className="w-3 h-3 text-red-400" />
+          <span className="text-red-400">Team locked until transfer window (Saturday)</span>
+        </div>
+      )}
+      {isTransferWindowOpen && (
+        <div className="bg-green-500/10 border border-green-500/50 p-2 mb-4 flex items-center justify-center gap-2 text-xs">
+          <Unlock className="w-3 h-3 text-green-400" />
+          <span className="text-green-400 font-bold">Transfer window OPEN! Make changes now.</span>
+        </div>
+      )}
       
       <div className="team-header">
         <div className="flex items-center gap-3">
