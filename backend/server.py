@@ -1071,6 +1071,17 @@ CELEBRITY_ALIASES = {
     # Reality TV Personalities
     "sam thompson": "Sam Thompson (TV personality)",
     "spencer matthews": "Spencer Matthews",
+    # Musicians with disambiguation
+    "drake": "Drake (musician)",
+    "usher": "Usher (musician)",
+    "chris brown": "Chris Brown",
+    # Sports presenters
+    "alex scott": "Alex Scott (footballer, born 1984)",
+    "george russell": "George Russell (racing driver)",
+    # Royals with disambiguation
+    "prince edward": "Prince Edward, Duke of Edinburgh",
+    "prince frederick": "Frederik X",
+    "prince frederik of denmark": "Frederik X",
     # Royal Children - Prince William's kids
     "prince george": "Prince George of Wales",
     "george cambridge": "Prince George of Wales",
