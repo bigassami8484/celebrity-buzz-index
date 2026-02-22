@@ -1929,85 +1929,75 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
                         desc_text = ""
                         if "<description>" in item:
                             desc_start = item.find("<description>") + 13
-                                desc_start = item.find("<description>") + 13
-                                desc_end = item.find("</description>")
-                                if desc_end > desc_start:
-                                    desc_text = item[desc_start:desc_end].replace("<![CDATA[", "").replace("]]>", "").strip()
-                                    desc_text = decode_html_entities(desc_text).lower()
-                            
-                            # Combined text to search
-                            search_text = f"{title_lower} {desc_text}"
-                            
-                            # Check if celebrity is mentioned - STRICT matching
-                            # Prioritize full name match to avoid "Cruz" matching "Cruz Beckham"
-                            celeb_mentioned = False
-                            
-                            # First, check for full name match (most reliable)
-                            if name_lower in search_text:
-                                celeb_mentioned = True
-                            else:
-                                # Only check partial matches for unique name parts
-                                for term in search_terms[1:]:  # Skip full name (already checked)
-                                    if term in search_text:
-                                        # Make sure we're not matching a different celebrity
-                                        # e.g., "Cruz" should not match "Cruz Beckham" for "Penelope Cruz"
-                                        # Check if the term appears as part of another celebrity name
-                                        term_idx = search_text.find(term)
-                                        if term_idx >= 0:
-                                            # Check context around the match
-                                            before = search_text[max(0, term_idx-15):term_idx]
-                                            after = search_text[term_idx+len(term):term_idx+len(term)+15]
-                                            context = before + term + after
-                                            
-                                            # If full name appears in context, it's a match
-                                            if name_lower in context:
-                                                celeb_mentioned = True
-                                                break
-                                            # If term is at word boundary and context seems right
-                                            elif len(term) > 4:  # Only for longer terms
-                                                celeb_mentioned = True
-                                                break
-                            
-                            if not celeb_mentioned:
-                                continue
-                            
-                            # Avoid duplicates
-                            if title in seen_titles:
-                                continue
-                            seen_titles.add(title)
-                            
-                            # Extract publication date
-                            pub_date = None
-                            pub_date_str = ""
-                            if "<pubDate>" in item:
-                                date_start = item.find("<pubDate>") + 9
-                                date_end = item.find("</pubDate>")
-                                date_raw = item[date_start:date_end].strip()
-                                try:
-                                    from email.utils import parsedate_to_datetime
-                                    pub_date = parsedate_to_datetime(date_raw)
-                                    pub_date_str = pub_date.strftime("%b %d, %Y")
-                                except:
-                                    pub_date_str = datetime.now(timezone.utc).strftime("%b %d, %Y")
-                            
-                            # Skip if older than 2 months
-                            if pub_date and pub_date < cutoff_date:
-                                continue
-                            
-                            # Extract description/summary
-                            summary = ""
-                            if "<description>" in item:
-                                desc_start = item.find("<description>") + 13
-                                desc_end = item.find("</description>")
-                                if desc_end > desc_start:
-                                    summary = item[desc_start:desc_end].replace("<![CDATA[", "").replace("]]>", "").strip()
-                                    summary = decode_html_entities(summary)
-                                    # Remove HTML tags from summary
-                                    summary = re.sub(r'<[^>]+>', '', summary)
-                                    summary = summary[:200] + "..." if len(summary) > 200 else summary
-                            
-                            if not summary:
-                                summary = title
+                            desc_end = item.find("</description>")
+                            if desc_end > desc_start:
+                                desc_text = item[desc_start:desc_end].replace("<![CDATA[", "").replace("]]>", "").strip()
+                                desc_text = decode_html_entities(desc_text).lower()
+                        
+                        # Combined text to search
+                        search_text = f"{title_lower} {desc_text}"
+                        
+                        # Check if celebrity is mentioned - STRICT matching
+                        celeb_mentioned = False
+                        
+                        # First, check for full name match (most reliable)
+                        if name_lower in search_text:
+                            celeb_mentioned = True
+                        else:
+                            # Only check partial matches for unique name parts
+                            for term in search_terms[1:]:
+                                if term in search_text:
+                                    term_idx = search_text.find(term)
+                                    if term_idx >= 0:
+                                        before = search_text[max(0, term_idx-15):term_idx]
+                                        after = search_text[term_idx+len(term):term_idx+len(term)+15]
+                                        context = before + term + after
+                                        if name_lower in context:
+                                            celeb_mentioned = True
+                                            break
+                                        elif len(term) > 4:
+                                            celeb_mentioned = True
+                                            break
+                        
+                        if not celeb_mentioned:
+                            continue
+                        
+                        # Avoid duplicates
+                        if title in seen_titles:
+                            continue
+                        seen_titles.add(title)
+                        
+                        # Extract publication date
+                        pub_date = None
+                        pub_date_str = ""
+                        if "<pubDate>" in item:
+                            date_start = item.find("<pubDate>") + 9
+                            date_end = item.find("</pubDate>")
+                            date_raw = item[date_start:date_end].strip()
+                            try:
+                                from email.utils import parsedate_to_datetime
+                                pub_date = parsedate_to_datetime(date_raw)
+                                pub_date_str = pub_date.strftime("%b %d, %Y")
+                            except:
+                                pub_date_str = datetime.now(timezone.utc).strftime("%b %d, %Y")
+                        
+                        # Skip if older than 2 months
+                        if pub_date and pub_date < cutoff_date:
+                            continue
+                        
+                        # Extract description/summary
+                        summary = ""
+                        if "<description>" in item:
+                            d_start = item.find("<description>") + 13
+                            d_end = item.find("</description>")
+                            if d_end > d_start:
+                                summary = item[d_start:d_end].replace("<![CDATA[", "").replace("]]>", "").strip()
+                                summary = decode_html_entities(summary)
+                                summary = re.sub(r'<[^>]+>', '', summary)
+                                summary = summary[:200] + "..." if len(summary) > 200 else summary
+                        
+                        if not summary:
+                            summary = title
                             
                             # Determine sentiment based on keywords
                             sentiment = "neutral"
