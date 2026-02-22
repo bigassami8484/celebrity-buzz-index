@@ -2178,8 +2178,6 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     if not existing and wikipedia_search_name != name:
         existing = await db.celebrities.find_one({"name": {"$regex": f"^{wikipedia_search_name}$", "$options": "i"}}, {"_id": 0})
     
-    logger.info(f"SEARCH: Existing in DB: {existing is not None}, name={name}")
-    
     if existing:
         # Check if this is a guaranteed A-lister (mega-star override)
         celeb_name = existing.get("name", name)
