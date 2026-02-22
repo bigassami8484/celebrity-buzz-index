@@ -2206,10 +2206,8 @@ async def get_price_history_by_name(name: str, limit: int = 30):
 
 @api_router.get("/celebrities/category/{category}")
 async def get_celebrities_by_category(category: str):
-    """Get 10 random celebrities by category - true random selection each request"""
-    
-    # Calculate date threshold (2 months ago)
-    two_months_ago = datetime.now(timezone.utc) - timedelta(days=60)
+    """Get 10 random celebrities by category - guaranteed different each request"""
+    import random
     
     # First, check how many we have in this category
     count = await db.celebrities.count_documents({"category": category})
@@ -2217,64 +2215,39 @@ async def get_celebrities_by_category(category: str):
     # If we don't have enough, seed with trending celebrities
     if count < 10 and category in TRENDING_CELEBRITIES:
         for name in TRENDING_CELEBRITIES[category]:
-            # Check if already exists
             exists = await db.celebrities.find_one({"name": {"$regex": f"^{name}$", "$options": "i"}})
             if not exists:
                 search = CelebritySearch(name=name)
                 await search_celebrity(search, override_category=category)
     
-    # Use MongoDB $sample for TRUE random selection directly from database
-    # This guarantees different results each time
+    # Use MongoDB $sample for TRUE random selection
     pipeline = [
-        {"$match": {"category": category}},
-        {"$sample": {"size": 50}},  # Get random 50 from category
+        {"$match": {"category": category, "news": {"$exists": True, "$ne": []}}},
+        {"$sample": {"size": 10}},
         {"$project": {"_id": 0}}
     ]
     
-    all_celebrities = await db.celebrities.aggregate(pipeline).to_list(50)
+    celebrities = await db.celebrities.aggregate(pipeline).to_list(10)
     
-    # Deduplicate by name
-    seen_names = set()
-    unique_celebrities = []
-    for celeb in all_celebrities:
-        name_lower = celeb.get("name", "").lower().strip()
-        canonical = get_canonical_name(celeb.get("name", ""))
-        check_name = canonical.lower() if canonical else name_lower
-        
-        if check_name not in seen_names:
-            seen_names.add(check_name)
-            unique_celebrities.append(celeb)
-    
-    # Filter to only those with news from the past 2 months
-    celebrities_with_recent_news = []
-    for celeb in unique_celebrities:
-        news = celeb.get("news", [])
-        if news and len(news) > 0:
-            has_recent_news = False
-            for article in news:
-                try:
-                    article_date_str = article.get("date", "")
-                    if article_date_str:
-                        article_date = datetime.strptime(article_date_str, "%b %d, %Y")
-                        article_date = article_date.replace(tzinfo=timezone.utc)
-                        if article_date >= two_months_ago:
-                            has_recent_news = True
-                            break
-                except:
-                    has_recent_news = True
-                    break
-            
-            if has_recent_news:
-                celebrities_with_recent_news.append(celeb)
+    # If not enough with news, get any from this category
+    if len(celebrities) < 10:
+        pipeline_fallback = [
+            {"$match": {"category": category}},
+            {"$sample": {"size": 10}},
+            {"$project": {"_id": 0}}
+        ]
+        celebrities = await db.celebrities.aggregate(pipeline_fallback).to_list(10)
     
     # Recalculate dynamic prices
     default_buzz = 50
-    for celeb in celebrities_with_recent_news:
+    for celeb in celebrities:
         tier = celeb.get("tier", "D")
         celeb["price"] = get_dynamic_price(tier, default_buzz, celeb.get("name", ""))
     
-    # Return exactly 10 (or all if less than 10 available)
-    return {"celebrities": celebrities_with_recent_news[:10]}
+    # Add a random sort key to ensure frontend sees different order
+    random.shuffle(celebrities)
+    
+    return {"celebrities": celebrities[:10]}
 
 @api_router.get("/stats")
 async def get_stats():
