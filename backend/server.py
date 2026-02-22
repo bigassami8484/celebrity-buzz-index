@@ -2344,24 +2344,64 @@ async def autocomplete_search(q: str):
     
     query_lower = q.lower().strip()
     
-    # Check if query matches a known alias - add canonical version to results first
+    # PRIORITY 1: Check database for exact match first (most likely what user wants)
+    exact_match = await db.celebrities.find_one(
+        {"name": {"$regex": f"^{q}$", "$options": "i"}},
+        {"_id": 0}
+    )
+    
     priority_suggestions = []
+    if exact_match:
+        tier = exact_match.get("tier", "D")
+        price = get_dynamic_price(tier, 50, exact_match["name"])
+        priority_suggestions.append({
+            "name": exact_match["name"],
+            "bio": exact_match.get("bio", "")[:100] + "..." if exact_match.get("bio") else "",
+            "image": exact_match.get("image", ""),
+            "tier": tier,
+            "price": price,
+            "estimated_price": price,
+            "is_exact_match": True
+        })
+    
+    # PRIORITY 2: Check database for partial matches (starts with query)
+    if not exact_match:
+        partial_matches = await db.celebrities.find(
+            {"name": {"$regex": f"^{q}", "$options": "i"}},
+            {"_id": 0}
+        ).limit(5).to_list(5)
+        
+        for match in partial_matches:
+            if not any(s.get("name") == match["name"] for s in priority_suggestions):
+                tier = match.get("tier", "D")
+                price = get_dynamic_price(tier, 50, match["name"])
+                priority_suggestions.append({
+                    "name": match["name"],
+                    "bio": match.get("bio", "")[:100] + "..." if match.get("bio") else "",
+                    "image": match.get("image", ""),
+                    "tier": tier,
+                    "price": price,
+                    "estimated_price": price,
+                    "is_db_match": True
+                })
+    
+    # PRIORITY 3: Check if query matches a known alias
     if query_lower in CELEBRITY_ALIASES:
         canonical_name = CELEBRITY_ALIASES[query_lower]
-        # Fetch info for the canonical celebrity
-        wiki_info = await fetch_wikipedia_info(canonical_name)
-        if wiki_info and wiki_info.get("name"):
-            tier = determine_tier_from_bio(wiki_info.get("bio", ""), wiki_info["name"])
-            price = get_dynamic_price(tier, 50, wiki_info["name"])
-            priority_suggestions.append({
-                "name": wiki_info["name"],
-                "bio": wiki_info.get("bio", "")[:100] + "...",
-                "image": wiki_info.get("image", ""),
-                "tier": tier,
-                "price": price,
-                "estimated_price": price,
-                "is_alias_match": True
-            })
+        if not any(s.get("name", "").lower() == canonical_name.lower() for s in priority_suggestions):
+            wiki_info = await fetch_wikipedia_info(canonical_name)
+            if wiki_info and wiki_info.get("name"):
+                tier = determine_tier_from_bio(wiki_info.get("bio", ""), wiki_info["name"])
+                price = get_dynamic_price(tier, 50, wiki_info["name"])
+                priority_suggestions.append({
+                    "name": wiki_info["name"],
+                    "bio": wiki_info.get("bio", "")[:100] + "...",
+                    "image": wiki_info.get("image", ""),
+                    "tier": tier,
+                    "price": price,
+                    "estimated_price": price,
+                    "is_alias_match": True
+                })
     
     # Also check partial matches for common search terms
     alias_partial_matches = {
