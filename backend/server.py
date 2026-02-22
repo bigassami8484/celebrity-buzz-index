@@ -1843,28 +1843,15 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
     """
     headers = {"User-Agent": "CelebrityBuzzIndex/1.0"}
     
-    # RSS feeds to search - comprehensive list
+    # RSS feeds to search - top sources for fast response
     rss_sources = [
-        # UK Sources
+        # High-speed, reliable sources
         ("https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "BBC News"),
-        ("https://www.theguardian.com/lifeandstyle/celebrities/rss", "The Guardian"),
-        ("https://www.mirror.co.uk/3am/rss.xml", "Daily Mirror"),
-        ("https://www.thesun.co.uk/tvandshowbiz/feed/", "The Sun"),
         ("https://www.dailymail.co.uk/tvshowbiz/index.rss", "Daily Mail"),
-        ("https://metro.co.uk/entertainment/feed/", "Metro"),
-        # US Sources
-        ("https://www.tmz.com/rss.xml", "TMZ"),
         ("https://people.com/feed/", "People"),
-        ("https://pagesix.com/feed/", "Page Six"),
-        ("https://www.etonline.com/news/rss", "Entertainment Tonight"),
         ("https://www.usmagazine.com/feed/", "Us Weekly"),
         ("https://www.hollywoodreporter.com/feed/", "Hollywood Reporter"),
         ("https://variety.com/feed/", "Variety"),
-        ("https://www.billboard.com/feed/", "Billboard"),
-        ("https://www.rollingstone.com/feed/", "Rolling Stone"),
-        ("http://rss.cnn.com/rss/cnn_showbiz.rss", "CNN"),
-        ("https://www.eonline.com/syndication/feeds/rssfeeds/topstories.xml", "E! News"),
-        ("https://deadline.com/feed/", "Deadline"),
     ]
     
     # Name variations to search for
