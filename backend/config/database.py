@@ -1,6 +1,15 @@
-"""Database configuration and connection"""
+"""
+Database configuration and connection.
+This module provides the shared MongoDB connection for all routes.
+"""
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables
+ROOT_DIR = Path(__file__).parent.parent
+load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB Connection
 MONGO_URL = os.environ.get("MONGO_URL")
@@ -13,16 +22,11 @@ if not MONGO_URL:
 client = AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
 
-# Export collections for easy access
-celebrities_collection = db.celebrities
-teams_collection = db.teams
-leagues_collection = db.leagues
-users_collection = db.users
-user_sessions_collection = db.user_sessions
-magic_links_collection = db.magic_links
-news_cache_collection = db.news_cache
-trending_cache_collection = db.trending_cache
-price_history_collection = db.price_history
+# Environment variables for auth
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "onboarding@resend.dev")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "")
+EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY", "")
 
 async def close_db():
     """Close database connection"""
