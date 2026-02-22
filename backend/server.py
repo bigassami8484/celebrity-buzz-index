@@ -2018,27 +2018,47 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
                         # Combined text to search
                         search_text = f"{title_lower} {desc_text}"
                         
-                        # Check if celebrity is mentioned - STRICT matching
+                        # Check if celebrity is mentioned - IMPROVED MATCHING
                         celeb_mentioned = False
                         
-                        # First, check for full name match (most reliable)
+                        # Method 1: Full name exact match (most reliable)
                         if name_lower in search_text:
                             celeb_mentioned = True
-                        else:
-                            # Only check partial matches for unique name parts
-                            for term in search_terms[1:]:
+                        
+                        # Method 2: Check each search term with word boundary awareness
+                        if not celeb_mentioned:
+                            for term in search_terms:
+                                if len(term) < 3:
+                                    continue  # Skip very short terms
+                                
                                 if term in search_text:
+                                    # For last names, check word boundaries to reduce false positives
+                                    # E.g., "Beckham" should match "Beckhams" but not "Beckhamshire"
                                     term_idx = search_text.find(term)
                                     if term_idx >= 0:
-                                        before = search_text[max(0, term_idx-15):term_idx]
-                                        after = search_text[term_idx+len(term):term_idx+len(term)+15]
-                                        context = before + term + after
-                                        if name_lower in context:
-                                            celeb_mentioned = True
-                                            break
-                                        elif len(term) > 4:
-                                            celeb_mentioned = True
-                                            break
+                                        # Check character before term (should be space, start, or punctuation)
+                                        char_before = search_text[term_idx - 1] if term_idx > 0 else " "
+                                        # Check character after term
+                                        end_idx = term_idx + len(term)
+                                        char_after = search_text[end_idx] if end_idx < len(search_text) else " "
+                                        
+                                        # Valid word boundaries: space, punctuation, possessive 's
+                                        valid_before = char_before in " .,!?;:'\"()-\n\t<>"
+                                        valid_after = char_after in " .,!?;:'\"()-\n\t<>s"  # 's for possessives
+                                        
+                                        if valid_before and valid_after:
+                                            # For short or common last names, require additional context
+                                            common_surnames = ["smith", "jones", "brown", "king", "lee", "white", "taylor", "young", "martin"]
+                                            if term in common_surnames and len(term) < 6:
+                                                # Need first name nearby for common surnames
+                                                first_name = name_parts[0] if name_parts else ""
+                                                if first_name and first_name in search_text:
+                                                    celeb_mentioned = True
+                                                    break
+                                            else:
+                                                # Distinctive enough name
+                                                celeb_mentioned = True
+                                                break
                         
                         if not celeb_mentioned:
                             continue
