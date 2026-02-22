@@ -70,7 +70,7 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize, onSubmitTeam, isTrans
           <div>
             <h3 className="font-anton text-2xl uppercase tracking-tight">{team.team_name}</h3>
             <p className="text-sm text-[#A1A1AA] font-space">
-              {team.celebrities?.length || 0} celebrities • {team.total_points?.toFixed(1)} weekly pts
+              {team.celebrities?.length || 0}/10 celebrities • £{(team.budget_remaining || 50).toFixed(1)}M remaining
             </p>
           </div>
         </div>
