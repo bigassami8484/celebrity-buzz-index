@@ -1569,6 +1569,8 @@ async def fetch_wikipedia_info(name: str) -> dict:
                         pass
                 
                 # Try Wikidata P18 (image) property as another backup
+                # Also check P570 (date of death) to detect deceased status
+                is_deceased_from_wikidata = False
                 if not wiki_image:
                     try:
                         wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={name.replace(' ', '_')}&props=claims&format=json"
@@ -1583,7 +1585,23 @@ async def fetch_wikipedia_info(name: str) -> dict:
                                     # URL encode the filename for Commons
                                     img_file_encoded = img_file.replace(" ", "_")
                                     wiki_image = f"https://commons.wikimedia.org/wiki/Special:FilePath/{img_file_encoded}?width=400"
-                                    break
+                                # Check for death date (P570)
+                                if "P570" in claims:
+                                    is_deceased_from_wikidata = True
+                    except:
+                        pass
+                else:
+                    # Still check Wikidata for death date even if we have an image
+                    try:
+                        wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={name.replace(' ', '_')}&props=claims&format=json"
+                        wd_response = await client.get(wikidata_url, timeout=5.0, headers=headers)
+                        if wd_response.status_code == 200:
+                            wd_data = wd_response.json()
+                            entities = wd_data.get("entities", {})
+                            for entity in entities.values():
+                                claims = entity.get("claims", {})
+                                if "P570" in claims:  # P570 is date of death
+                                    is_deceased_from_wikidata = True
                     except:
                         pass
                 
