@@ -12,7 +12,7 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 ## Backend Architecture (Refactored Feb 22, 2026)
 ```
 /app/backend/
-├── server.py          # Main FastAPI app (5300 lines - routes + business logic)
+├── server.py          # Main FastAPI app (5355 lines - routes + business logic)
 ├── config.py          # Configuration module
 ├── data/
 │   ├── __init__.py    # Data exports
@@ -24,22 +24,28 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 │   ├── team.py        # Team models
 │   ├── league.py      # League models
 │   └── auth.py        # Auth models
-├── routes/            # (Future: extract routes from server.py)
+├── routes/            # Route templates (ready for migration)
+│   ├── auth.py        # Auth route template
+│   ├── celebrities.py # Celebrity route template
+│   ├── teams.py       # Team route template
+│   ├── leagues.py     # League route template
+│   └── admin.py       # Admin route template
 ├── services/          # (Future: extract business logic)
 └── utils/
     ├── __init__.py
     └── helpers.py     # normalize_text, decode_html_entities, sanitize_team_name
 ```
 
-**Completed Refactoring:**
+**Completed Refactoring (Phase 1 & 2):**
 - ✅ Extracted celebrity data pools (9 categories, 50+ celebs each)
 - ✅ Extracted constants (banned words, pricing tiers, team options)
 - ✅ Extracted utility functions (text normalization, HTML decoding)
 - ✅ Created Pydantic models in separate files
 - ✅ Server imports from modular structure
+- ✅ Created route template files (auth, celebrities, teams, leagues, admin)
 
-**Remaining Refactoring (Future):**
-- Extract API routes into routes/ directory
+**Remaining Refactoring (Phase 3 - Future):**
+- Fully migrate routes from server.py to routes/ directory
 - Extract business logic into services/
 - Split celebrity search/news generation into separate service
 
