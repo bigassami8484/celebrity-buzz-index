@@ -323,3 +323,32 @@ Response format:
 - [ ] Split server.py routes into `/routes/` modules (auth.py, celebrities.py, teams.py, leagues.py)
 - [ ] Move services into `/services/` (wikipedia.py, news.py, pricing.py)
 - [ ] Test thoroughly after migration to ensure no regressions
+
+## Recent Updates (Feb 22, 2026)
+
+### Celebrity Image Fix - COMPLETED
+- ✅ **Image Auto-Refresh**: When searching for a celebrity with a placeholder image, the system now automatically:
+  1. Re-fetches from Wikipedia to get real image
+  2. Falls back to AI image generation (OpenAI gpt-image-1) if Wikipedia has no image
+- ✅ **Name Disambiguation**: Added aliases for ambiguous celebrity names:
+  - "Brian Cox" → Brian Cox (physicist) - gets correct Wikipedia page
+  - "Drake" → Drake (musician)
+  - "Alex Scott" → Alex Scott (footballer, born 1984)
+  - "George Russell" → George Russell (racing driver)
+  - "Sam Thompson" → Sam Thompson (TV personality)
+  - "Queen Camilla" → Queen Camilla
+  - "Prince Edward" → Prince Edward, Duke of Edinburgh
+  - And many more...
+- ✅ **Admin Endpoint**: `/api/admin/refresh-placeholder-images` to batch refresh images
+- ✅ **Current Status**: 
+  - 95% of celebrities have Wikipedia images (515 out of 540)
+  - 2% have AI-generated images (13 celebrities)
+  - Only 2% still have placeholders (12 celebrities - these lack both Wikipedia and successful AI generation)
+
+### User-Requested Celebrities Verified:
+- ✅ Scarlett Johansson: Wikipedia image
+- ✅ Brian Cox (physicist): Wikipedia image
+- ✅ Queen Camilla: Wikipedia image  
+- ✅ Spencer Matthews: AI-generated image
+- ✅ Sam Thompson: Wikipedia image
+
