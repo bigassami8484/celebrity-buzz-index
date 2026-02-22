@@ -57,7 +57,14 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - ✅ Price alerts system
 - ✅ Hot streak notifications (3+ days in news)
 - ✅ Profanity filter for team names
-- ✅ **CATEGORY DETECTION FIX**: Known actors (Michael Caine, Ian McKellen, Morgan Freeman, etc.) correctly classified as movie_stars
+- ✅ **CATEGORY DETECTION FIX** (Feb 22, 2026):
+  - Known actors (Michael Caine, Ian McKellen, Morgan Freeman, etc.) correctly classified as movie_stars
+  - **TV Presenters** correctly categorized as "other": Graham Norton, Holly Willoughby, Amanda Holden, Simon Cowell, David Attenborough
+  - **Musicians** correctly categorized: Peter Andre, Victoria Beckham, Kerry Katona
+  - **Movie Stars** fixed: Timothée Chalamet, Shia LaBeouf (were incorrectly in musicians)
+  - **Athletes** fixed: Jonathan Owens, Tyreek Hill (were incorrectly in other)
+  - Added category override system for 40+ commonly miscategorized celebrities
+  - Added bio-based detection for "chat show", "talk show", "broadcaster" keywords
 - ✅ **24-HOUR NEWS CACHE** - News feed refreshes every 24 hours (was 15 min)
 
 ### UI Features
