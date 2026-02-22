@@ -2034,30 +2034,27 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
     """
     Fetch REAL news first from RSS feeds, then supplement with AI-generated news if needed.
     Priority: Real news > AI-generated news
+    OPTIMIZED: Skip AI generation if we have any real news (for speed)
     """
     # Get current date for context
     now = datetime.now(timezone.utc)
-    current_date_str = now.strftime("%b %d, %Y")  # e.g., "Feb 21, 2026"
-    two_months_ago = (now - timedelta(days=60)).strftime("%b %d, %Y")  # 2 months back
+    current_date_str = now.strftime("%b %d, %Y")
+    two_months_ago = (now - timedelta(days=60)).strftime("%b %d, %Y")
     
     # STEP 1: Try to fetch REAL news from RSS feeds first
     logger.info(f"Fetching real news for {name}...")
     real_news = await fetch_real_celebrity_news(name, max_articles=10)
     
-    if real_news and len(real_news) >= 3:
-        # We have enough real news - return it directly (limit to 5)
-        logger.info(f"Found {len(real_news)} real news articles for {name}")
+    # OPTIMIZATION: If we have ANY real news, return it immediately (skip slow AI generation)
+    if real_news and len(real_news) >= 1:
+        logger.info(f"Found {len(real_news)} real news articles for {name} - returning fast")
         return real_news[:5]
     
-    # STEP 2: If we have some real news but not enough, supplement with AI
-    # If we have 1-2 real articles, we'll add AI-generated ones to reach 5 total
-    existing_real_news = real_news if real_news else []
-    num_ai_needed = 5 - len(existing_real_news)
+    # STEP 2: Only generate AI news if we have NO real news at all
+    existing_real_news = []
+    num_ai_needed = 5
     
-    if len(existing_real_news) > 0:
-        logger.info(f"Found {len(existing_real_news)} real news for {name}, generating {num_ai_needed} AI articles to supplement")
-    else:
-        logger.info(f"No real news found for {name}, generating AI news")
+    logger.info(f"No real news found for {name}, generating AI news")
     
     # Build context about real news events for AI generation
     real_news_instruction = ""
