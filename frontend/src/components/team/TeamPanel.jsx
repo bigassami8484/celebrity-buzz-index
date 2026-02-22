@@ -129,13 +129,13 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize, onSubmitTeam, isTrans
                 <p className="text-sm text-[#A1A1AA] flex items-center gap-2">
                   <span className="text-[#FFD700]">£{celeb.price}M</span>
                   {priceChange && (
-                    <span className={`flex items-center gap-0.5 text-xs font-bold ${priceChange.diff > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    <span className={`flex items-center gap-0.5 text-xs font-bold ${priceChange.diff > 0 ? 'text-green-400' : 'text-red-400'}`} title={`Transfer value: ${priceChange.diff > 0 ? '+' : ''}${priceChange.moneyDiff}`}>
                       {priceChange.diff > 0 ? (
                         <TrendingUp className="w-3 h-3" />
                       ) : (
                         <TrendingDown className="w-3 h-3" />
                       )}
-                      {priceChange.diff > 0 ? '+' : ''}{priceChange.percent}%
+                      {priceChange.diff > 0 ? '+' : ''}{priceChange.moneyDiff}
                     </span>
                   )}
                 </p>
