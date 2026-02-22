@@ -2372,12 +2372,12 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     real_news_context = hot_celeb_match.get("hot_reason") if hot_celeb_match else None
     news = await generate_celebrity_news(wiki_info["name"], category, real_news_context)
     
-    # Calculate buzz score
-    buzz_score = calculate_buzz_score(news)
+    # Buzz score starts at 0 - will accumulate weekly points based on news mentions
+    # Resets every Monday
+    buzz_score = 0
     
-    # Final price using CONSISTENT buzz (50) for initial display price
-    default_buzz = 50
-    price = get_dynamic_price(tier, default_buzz, wiki_info["name"])
+    # Final price using tier-based pricing
+    price = get_dynamic_price(tier, 50, wiki_info["name"])  # Price based on tier, not buzz
     
     # If this celeb is in Hot Celebs, use that price (includes news premium)
     if hot_celeb_match:
