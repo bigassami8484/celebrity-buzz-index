@@ -1994,10 +1994,8 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     # Use override category if provided, otherwise detect from bio
     if override_category:
         category = override_category
-        logger.info(f"Using override category: {category} for {wiki_info['name']}")
     else:
         category = detect_category_from_bio(wiki_info.get("bio", ""), wiki_info["name"])
-        logger.info(f"Detected category: {category} for {wiki_info['name']}")
     
     # Calculate celebrity tier based on bio
     tier, base_price = await calculate_celebrity_tier(wiki_info.get("bio", ""), wiki_info["name"])
