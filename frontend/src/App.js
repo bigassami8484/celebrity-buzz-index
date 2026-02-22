@@ -666,8 +666,8 @@ function App() {
           )}
         </div>
         
-        {/* Team Panel - Desktop only (mobile uses floating button + modal) */}
-        <div className="hidden md:block mb-6">
+        {/* Team Panel - Visible on ALL screens with responsive layout */}
+        <div className="mb-6">
           <TeamPanel 
             team={team} 
             onRemove={removeFromTeam}
