@@ -2565,43 +2565,36 @@ async def get_celebrities_by_category(category: str, response: Response):
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     
-    # Use MongoDB $sample aggregation for TRUE random selection
-    # This ensures different results on each request
-    pipeline = [
+    # Prioritize celebrities with REAL Wikipedia images (not placeholders)
+    # First try to get 8 celebs with real images
+    pipeline_with_images = [
         {"$match": {
             "category": category,
             "name": {"$ne": None, "$exists": True},
-            "bio": {"$exists": True, "$ne": ""}
+            "bio": {"$exists": True, "$ne": ""},
+            "image": {"$regex": "wikipedia|wikimedia", "$options": "i"}  # Real Wikipedia images
         }},
-        {"$sample": {"size": 8}},  # MongoDB's random sampling
+        {"$sample": {"size": 8}},
         {"$project": {"_id": 0}}
     ]
     
-    selected = await db.celebrities.aggregate(pipeline).to_list(8)
+    selected = await db.celebrities.aggregate(pipeline_with_images).to_list(8)
     
-    # If we don't have enough in DB, fall back to fetching from pools
+    # If we don't have enough with real images, add some with placeholders
     if len(selected) < 8:
-        pool = CELEBRITY_POOLS.get(category, [])
-        pool = list(set(pool))
-        random.shuffle(pool)
-        
-        existing_names = {c.get("name", "").lower() for c in selected}
-        
-        for name in pool:
-            if len(selected) >= 8:
-                break
-            if name.lower() in existing_names:
-                continue
-            
-            # Try to find in DB first
-            existing = await db.celebrities.find_one(
-                {"name": {"$regex": f"^{name}$", "$options": "i"}},
-                {"_id": 0}
-            )
-            
-            if existing and existing.get("name"):
-                selected.append(existing)
-                existing_names.add(name.lower())
+        existing_ids = {c.get("id") for c in selected}
+        pipeline_any = [
+            {"$match": {
+                "category": category,
+                "name": {"$ne": None, "$exists": True},
+                "bio": {"$exists": True, "$ne": ""},
+                "id": {"$nin": list(existing_ids)}
+            }},
+            {"$sample": {"size": 8 - len(selected)}},
+            {"$project": {"_id": 0}}
+        ]
+        more = await db.celebrities.aggregate(pipeline_any).to_list(8 - len(selected))
+        selected.extend(more)
     
     # Recalculate dynamic prices
     default_buzz = 50
