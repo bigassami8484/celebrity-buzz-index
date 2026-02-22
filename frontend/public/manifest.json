@@ -1,7 +1,7 @@
 {
-  "name": "Celebrity Buzz Index",
-  "short_name": "Buzz Index",
-  "description": "Draft your dream team of celebrities with a £50M budget. Earn points based on real-world media buzz!",
+  "name": "Celebrity Buzz Index - Fantasy Celebrity Draft Game",
+  "short_name": "Celeb Buzz",
+  "description": "Build your dream team of 10 celebrities with £50M! Earn points from real news coverage & media buzz. Free to play fantasy celebrity game.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0A0A0A",
@@ -9,6 +9,8 @@
   "orientation": "portrait",
   "scope": "/",
   "id": "/",
+  "lang": "en-GB",
+  "dir": "ltr",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -23,7 +25,7 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["games", "entertainment"],
+  "categories": ["games", "entertainment", "sports"],
   "prefer_related_applications": false,
   "related_applications": [],
   "screenshots": [
@@ -31,7 +33,22 @@
       "src": "/og-image.png",
       "sizes": "1200x630",
       "type": "image/png",
-      "form_factor": "wide"
+      "form_factor": "wide",
+      "label": "Celebrity Buzz Index Homepage"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "My Team",
+      "short_name": "Team",
+      "description": "View and manage your celebrity team",
+      "url": "/#team"
+    },
+    {
+      "name": "Leaderboard",
+      "short_name": "Leaders",
+      "description": "Check the top teams",
+      "url": "/#leaderboard"
     }
   ]
 }
