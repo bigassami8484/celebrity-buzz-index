@@ -2907,12 +2907,18 @@ async def create_team(team_data: TeamCreate):
     if contains_banned_words(team_data.team_name):
         raise HTTPException(status_code=400, detail="Team name contains inappropriate language. Please choose another name.")
     
+    current_points_week = get_monday_reset_week()
+    
     team = UserTeam(
         team_name=team_data.team_name,
         last_transfer_reset=get_week_number()
     )
     doc = team.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
+    doc['weekly_points'] = 0
+    doc['points_week'] = current_points_week
+    doc['total_points'] = 0
+    
     await db.teams.insert_one(doc)
     if '_id' in doc:
         del doc['_id']
