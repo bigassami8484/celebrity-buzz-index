@@ -596,6 +596,11 @@ function App() {
         
         <TodaysNews news={todaysNews} />
         
+        {/* Hot Streaks - Full width */}
+        <div className="mt-8">
+          <HotStreaks streaks={hotStreaks} teamId={team?.id} />
+        </div>
+        
         {/* Brown Bread, Most Picked, Leaderboard - Show on ALL screen sizes */}
         <div className="mt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -620,7 +625,6 @@ function App() {
           {/* Sidebar */}
           <div className="lg:col-span-4 space-y-6">
             <PriceAlerts alerts={priceAlerts} teamId={team?.id} />
-            <HotStreaks streaks={hotStreaks} teamId={team?.id} />
             
             {/* Hall of Fame Button */}
             <button
