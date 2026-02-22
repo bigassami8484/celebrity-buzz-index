@@ -3971,6 +3971,7 @@ async def add_to_team(data: AddToTeam):
         buzz_score=celebrity["buzz_score"],
         tier=celebrity.get("tier", "D"),
         previous_week_price=celebrity.get("previous_week_price", 0.0),  # Include price change data
+        is_deceased=celebrity.get("is_deceased", False),  # Include deceased status for skull icon
         added_at=datetime.now(timezone.utc).isoformat()
     )
     
