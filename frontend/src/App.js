@@ -350,11 +350,8 @@ function App() {
     try {
       const celeb = await searchCelebrityAPI(name);
       if (celeb) {
-        setCelebrities(prev => {
-          const exists = prev.find(c => c.id === celeb.id);
-          if (exists) return prev;
-          return [celeb, ...prev];
-        });
+        // Show in floating card instead of adding to grid
+        setSearchedCeleb(celeb);
         toast.success(`Found ${celeb.name}!`);
       }
     } catch (e) {
