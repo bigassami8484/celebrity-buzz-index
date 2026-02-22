@@ -1010,7 +1010,7 @@ function App() {
                   <li><strong className="text-[#CD7F32]">C-LIST:</strong> £500K - £2M</li>
                   <li><strong className="text-[#666]">D-LIST:</strong> £100K - £500K</li>
                 </ul>
-                <p className="mt-2"><strong className="text-[#00F0FF]">Profit from price rises!</strong> When you sell a celebrity, you get their <em>current</em> market price - not what you paid. Buy at £6M, sell at £15M, pocket the £9M profit!</p>
+                <p className="mt-2"><strong className="text-[#00F0FF]">Price changes affect transfers!</strong> When you transfer a celebrity out, you get their <em>current</em> market value. If their price went up, you profit. If it dropped, you lose money. Buy low, transfer high!</p>
               </div>
             </details>
             
