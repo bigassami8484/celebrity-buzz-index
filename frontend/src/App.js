@@ -602,7 +602,6 @@ function App() {
                   <span className="bg-[#FF0099]/20 text-[#FF0099] px-3 py-1 rounded text-xs uppercase">
                     {searchedCeleb.category?.replace(/_/g, ' ')}
                   </span>
-                  <span className="text-[#666] text-xs">Buzz: {searchedCeleb.buzz_score}</span>
                 </div>
                 
                 {/* News Articles Section */}
