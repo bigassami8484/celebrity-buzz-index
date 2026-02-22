@@ -2580,11 +2580,15 @@ async def get_celebrities_by_category(category: str, response: Response):
     
     all_celebs = await db.celebrities.aggregate(pipeline).to_list(50)
     
-    # For celebs with placeholder images, try to fetch real images
-    for celeb in all_celebs:
+    # Sort by image quality - prioritize real Wikipedia images but include others
+    with_images = [c for c in all_celebs if c.get("image") and ("wikipedia" in c.get("image", "").lower() or "wikimedia" in c.get("image", "").lower())]
+    without_images = [c for c in all_celebs if c not in with_images]
+    
+    # Try to fetch real images for up to 5 celebs with placeholders (background refresh)
+    refresh_count = 0
+    for celeb in without_images[:5]:
         image = celeb.get("image", "")
         if not image or "ui-avatars" in image:
-            # Try to fetch from Wikipedia
             try:
                 wiki_info = await fetch_wikipedia_info(celeb.get("name", ""))
                 if wiki_info and wiki_info.get("image"):
@@ -2596,12 +2600,12 @@ async def get_celebrities_by_category(category: str, response: Response):
                             {"id": celeb.get("id")},
                             {"$set": {"image": new_image}}
                         )
+                        # Move to with_images list
+                        with_images.append(celeb)
+                        without_images.remove(celeb)
+                        refresh_count += 1
             except:
                 pass
-    
-    # Sort by image quality - prioritize real Wikipedia images but include others
-    with_images = [c for c in all_celebs if c.get("image") and ("wikipedia" in c.get("image", "").lower() or "wikimedia" in c.get("image", "").lower())]
-    without_images = [c for c in all_celebs if c not in with_images]
     
     # Shuffle both lists
     random.shuffle(with_images)
