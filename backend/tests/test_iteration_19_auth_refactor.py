@@ -150,19 +150,20 @@ class TestTransferWindowEndpoint:
             print(f"   Next window: {data['next_window']}")
 
 
-class TestHealthEndpoint:
-    """Test health check endpoint"""
+class TestRootEndpoint:
+    """Test root API endpoint"""
     
-    def test_health_check(self):
-        """Test /api/health returns OK"""
-        response = requests.get(f"{BASE_URL}/api/health")
+    def test_root_api(self):
+        """Test /api/ returns API info"""
+        response = requests.get(f"{BASE_URL}/api/")
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
-        assert data.get("status") == "healthy", f"Expected healthy status, got {data}"
+        assert "message" in data, "Response should contain 'message' field"
+        assert "Celebrity Buzz Index" in data.get("message", ""), f"Expected API message, got {data}"
         
-        print(f"✅ /api/health returns healthy status")
+        print(f"✅ /api/ returns API info: {data}")
 
 
 class TestAuthRouterIntegration:
