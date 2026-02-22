@@ -796,43 +796,6 @@ function App() {
         />
       )}
       
-      {/* Mobile Team Floating Button */}
-      <button
-        onClick={() => setShowMobileTeam(true)}
-        className="md:hidden fixed bottom-20 right-4 z-40 bg-gradient-to-r from-[#FF0099] to-[#00F0FF] text-white p-4 rounded-full shadow-lg flex items-center justify-center"
-        data-testid="mobile-team-btn"
-      >
-        <Users className="w-6 h-6" />
-        {team?.celebrities?.length > 0 && (
-          <span className="absolute -top-1 -right-1 bg-[#FFD700] text-black text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-            {team.celebrities.length}
-          </span>
-        )}
-      </button>
-      
-      {/* Mobile Team Modal */}
-      {showMobileTeam && (
-        <div className="md:hidden fixed inset-0 z-50 bg-black/90 overflow-y-auto">
-          <div className="min-h-screen p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="font-anton text-2xl text-white uppercase">My Buzz Team</h2>
-              <button 
-                onClick={() => setShowMobileTeam(false)}
-                className="text-white p-2"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            <TeamPanel 
-              team={team} 
-              onRemove={removeFromTeam}
-              onShare={() => { setShowMobileTeam(false); setShowShareModal(true); }}
-              onCustomize={() => { setShowMobileTeam(false); fetchCustomOptions(); setShowCustomize(true); }}
-            />
-          </div>
-        </div>
-      )}
-      
       {/* Footer */}
       <Footer playerCount={stats?.player_count} />
     </div>
