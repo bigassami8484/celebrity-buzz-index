@@ -2125,6 +2125,19 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
     elif "lindsay lohan" in name_lower:
         controversial_context = """
             Include her history of legal issues and rehab stints in context, though recent news may be more positive about her comeback."""
+    elif "james van der beek" in name_lower or "van der beek" in name_lower:
+        controversial_context = """
+            CRITICAL: James Van Der Beek died on February 11, 2026 at age 48 after battling colorectal cancer.
+            All news MUST primarily focus on his death, tributes from Dawson's Creek cast, memorial services, and his cancer battle.
+            Include tributes from Katie Holmes, Michelle Williams, Joshua Jackson and other co-stars."""
+    elif "eric dane" in name_lower:
+        controversial_context = """
+            CRITICAL: Eric Dane died on February 18, 2026 at age 53.
+            All news should focus on his death, tributes from Grey's Anatomy cast, and his career legacy."""
+    elif "robert duvall" in name_lower:
+        controversial_context = """
+            CRITICAL: Robert Duvall died in February 2026 at age 95.
+            All news should focus on his death, career legacy, tributes from Hollywood, and his iconic roles in The Godfather, Apocalypse Now, etc."""
     
     try:
         chat = LlmChat(
