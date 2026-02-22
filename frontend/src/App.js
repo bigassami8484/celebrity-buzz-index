@@ -716,6 +716,20 @@ function App() {
                   </span>
                 </div>
                 
+                {/* Wikipedia Link */}
+                {searchedCeleb.wiki_url && (
+                  <a 
+                    href={searchedCeleb.wiki_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-[#00F0FF] hover:text-[#00F0FF]/80 text-sm mb-4 transition-colors"
+                    data-testid="wikipedia-link"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    View on Wikipedia
+                  </a>
+                )}
+                
                 {/* News Articles Section */}
                 {searchedCeleb.news && searchedCeleb.news.length > 0 && (
                   <div className="mb-4">
