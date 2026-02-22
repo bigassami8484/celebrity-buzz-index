@@ -322,6 +322,7 @@ class TeamCelebrity(BaseModel):
     buzz_score: float
     tier: str = "D"
     previous_week_price: float = 0.0  # Track price change from last week
+    is_deceased: bool = False  # For skull icon display
     added_at: str = ""
 
 # Team customization options
