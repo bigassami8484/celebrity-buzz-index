@@ -3190,14 +3190,37 @@ async def get_todays_news():
     news_items = []
     headers = {"User-Agent": "CelebrityBuzzIndex/1.0"}
     
-    # News sources with RSS feeds - prioritize major news sources
+    # News sources with RSS feeds - comprehensive list of UK and US outlets
     rss_sources = [
-        ("https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "BBC News", True),  # Priority
-        ("https://www.theguardian.com/lifeandstyle/celebrities/rss", "The Guardian", True),  # Priority
-        ("https://www.tmz.com/rss.xml", "TMZ", False),
-        ("https://people.com/feed/", "People", False),
-        ("https://pagesix.com/feed/", "Page Six", False),
-        ("https://www.dailymail.co.uk/tvshowbiz/index.rss", "Daily Mail", False),
+        # UK Priority Sources
+        ("https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "BBC News", True),
+        ("https://www.theguardian.com/lifeandstyle/celebrities/rss", "The Guardian", True),
+        ("https://www.mirror.co.uk/3am/rss.xml", "Daily Mirror", True),
+        ("https://www.thesun.co.uk/tvandshowbiz/feed/", "The Sun", True),
+        ("https://www.dailymail.co.uk/tvshowbiz/index.rss", "Daily Mail", True),
+        ("https://metro.co.uk/entertainment/feed/", "Metro", False),
+        ("https://www.express.co.uk/celebrity-news/feed", "Daily Express", False),
+        ("https://www.standard.co.uk/showbiz/rss", "Evening Standard", False),
+        
+        # US Entertainment Sources
+        ("https://www.tmz.com/rss.xml", "TMZ", True),
+        ("https://people.com/feed/", "People", True),
+        ("https://pagesix.com/feed/", "Page Six", True),
+        ("https://www.etonline.com/news/rss", "Entertainment Tonight", False),
+        ("https://www.eonline.com/syndication/feeds/rssfeeds/topstories.xml", "E! News", False),
+        ("https://www.usmagazine.com/feed/", "Us Weekly", False),
+        ("https://www.hollywoodreporter.com/feed/", "Hollywood Reporter", False),
+        ("https://variety.com/feed/", "Variety", False),
+        ("https://deadline.com/feed/", "Deadline", False),
+        ("https://www.billboard.com/feed/", "Billboard", False),
+        ("https://www.rollingstone.com/feed/", "Rolling Stone", False),
+        ("https://www.buzzfeed.com/celebrity.xml", "BuzzFeed", False),
+        
+        # General News with Entertainment
+        ("https://feeds.reuters.com/reuters/entertainmentNews", "Reuters", False),
+        ("https://rss.nytimes.com/services/xml/rss/nyt/Arts.xml", "New York Times", False),
+        ("https://feeds.washingtonpost.com/rss/entertainment", "Washington Post", False),
+        ("http://rss.cnn.com/rss/cnn_showbiz.rss", "CNN", False),
     ]
     
     # Words that indicate MAJOR news (scandals, legal, deaths, awards)
