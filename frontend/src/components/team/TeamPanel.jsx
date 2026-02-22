@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Minus, Share2, RotateCcw } from "lucide-react";
+import { Minus, Share2, RotateCcw, TrendingUp, TrendingDown } from "lucide-react";
+
+// Helper to calculate price change
+const getPriceChange = (current, previous) => {
+  if (!previous || previous === 0) return null;
+  const diff = current - previous;
+  if (Math.abs(diff) < 0.1) return null;
+  return { diff, percent: ((diff / previous) * 100).toFixed(0) };
+};
 
 const TeamPanel = ({ team, onRemove, onShare, onCustomize }) => {
   if (!team) return null;
