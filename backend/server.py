@@ -222,7 +222,9 @@ EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY', '')
 # Create the main app
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
-auth_router = APIRouter(prefix="/api/auth")
+
+# Import auth router from modular routes
+from routes import auth_router, get_current_user
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
