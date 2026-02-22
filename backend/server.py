@@ -2582,16 +2582,16 @@ async def get_celebrities_by_category(category: str, response: Response):
     valid_db_celebs = [c for c in db_celebs if c.get("name") and c.get("category")]
     
     # If we have enough in DB, just return random selection
-    if len(valid_db_celebs) >= 10:
+    if len(valid_db_celebs) >= 8:
         random.shuffle(valid_db_celebs)
-        selected = valid_db_celebs[:10]
+        selected = valid_db_celebs[:8]
     else:
         # Need to fetch more - but limit to keep response fast
         selected = valid_db_celebs.copy()
         fetched_count = 0
         
         for name in pool:
-            if len(selected) >= 10 or fetched_count >= 3:
+            if len(selected) >= 8 or fetched_count >= 3:
                 break
             
             # Skip if already in selected
