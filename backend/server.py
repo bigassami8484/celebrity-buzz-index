@@ -2598,16 +2598,23 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
                 logger.error(f"Failed to refresh image for {celeb_name}: {e}")
         
         # Regenerate news if empty, missing, or older than 24 hours
+        # OPTIMIZATION: Skip for hot celebs - they already have recent news context
         should_refresh_news = False
-        if not existing.get("news") or len(existing.get("news", [])) == 0:
-            should_refresh_news = True
-        elif existing.get("news_updated_at"):
-            try:
-                news_time = datetime.fromisoformat(existing["news_updated_at"].replace("Z", "+00:00"))
-                if (datetime.now(timezone.utc) - news_time).total_seconds() > 86400:  # 24 hours
-                    should_refresh_news = True
-            except:
+        if hot_celeb_match:
+            # Hot celebs have recent news - only refresh if completely empty
+            if not existing.get("news") or len(existing.get("news", [])) == 0:
                 should_refresh_news = True
+        else:
+            # Non-hot celebs - check 24 hour cache
+            if not existing.get("news") or len(existing.get("news", [])) == 0:
+                should_refresh_news = True
+            elif existing.get("news_updated_at"):
+                try:
+                    news_time = datetime.fromisoformat(existing["news_updated_at"].replace("Z", "+00:00"))
+                    if (datetime.now(timezone.utc) - news_time).total_seconds() > 86400:  # 24 hours
+                        should_refresh_news = True
+                except:
+                    should_refresh_news = True
         
         if should_refresh_news:
             category = existing.get("category", "other")
