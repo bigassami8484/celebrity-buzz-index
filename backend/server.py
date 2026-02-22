@@ -2171,30 +2171,38 @@ async def get_price_history_by_name(name: str, limit: int = 30):
 
 @api_router.get("/celebrities/category/{category}")
 async def get_celebrities_by_category(category: str):
-    """Get celebrities by category with correct dynamic pricing"""
-    # First check if we have any in DB
-    celebrities = await db.celebrities.find(
+    """Get celebrities by category - randomized, with news from past 2 months"""
+    import random
+    
+    # Calculate date threshold (2 months ago)
+    two_months_ago = datetime.now(timezone.utc) - timedelta(days=60)
+    
+    # Get all celebrities in this category
+    all_celebrities = await db.celebrities.find(
         {"category": category},
         {"_id": 0}
-    ).to_list(50)
+    ).to_list(200)
     
-    # If empty, seed with trending (force correct category)
-    if not celebrities and category in TRENDING_CELEBRITIES:
-        for name in TRENDING_CELEBRITIES[category][:5]:
-            search = CelebritySearch(name=name)
-            await search_celebrity(search, override_category=category)
+    # If we don't have enough, seed with trending celebrities
+    if len(all_celebrities) < 10 and category in TRENDING_CELEBRITIES:
+        for name in TRENDING_CELEBRITIES[category]:
+            # Check if already exists
+            exists = any(c.get("name", "").lower() == name.lower() for c in all_celebrities)
+            if not exists:
+                search = CelebritySearch(name=name)
+                await search_celebrity(search, override_category=category)
         
-        celebrities = await db.celebrities.find(
+        # Re-fetch
+        all_celebrities = await db.celebrities.find(
             {"category": category},
             {"_id": 0}
-        ).to_list(50)
+        ).to_list(200)
     
-    # Deduplicate by name (keep first occurrence)
+    # Deduplicate by name
     seen_names = set()
     unique_celebrities = []
-    for celeb in celebrities:
+    for celeb in all_celebrities:
         name_lower = celeb.get("name", "").lower().strip()
-        # Also check aliases to catch duplicates like "Prince Harry" vs "Prince Harry, Duke of Sussex"
         canonical = get_canonical_name(celeb.get("name", ""))
         check_name = canonical.lower() if canonical else name_lower
         
@@ -2202,13 +2210,43 @@ async def get_celebrities_by_category(category: str):
             seen_names.add(check_name)
             unique_celebrities.append(celeb)
     
-    # Recalculate dynamic prices for all celebrities - use CONSISTENT buzz (50)
-    default_buzz = 50
+    # Filter to only those with news from the past 2 months
+    celebrities_with_recent_news = []
     for celeb in unique_celebrities:
+        news = celeb.get("news", [])
+        if news and len(news) > 0:
+            # Check if any news is from the past 2 months
+            has_recent_news = False
+            for article in news:
+                try:
+                    article_date_str = article.get("date", "")
+                    if article_date_str:
+                        article_date = datetime.strptime(article_date_str, "%b %d, %Y")
+                        article_date = article_date.replace(tzinfo=timezone.utc)
+                        if article_date >= two_months_ago:
+                            has_recent_news = True
+                            break
+                except:
+                    # If date parsing fails, assume it's recent
+                    has_recent_news = True
+                    break
+            
+            if has_recent_news:
+                celebrities_with_recent_news.append(celeb)
+    
+    # Shuffle for randomization on each request
+    random.shuffle(celebrities_with_recent_news)
+    
+    # Recalculate dynamic prices - use CONSISTENT buzz (50)
+    default_buzz = 50
+    for celeb in celebrities_with_recent_news:
         tier = celeb.get("tier", "D")
         celeb["price"] = get_dynamic_price(tier, default_buzz, celeb.get("name", ""))
     
-    return {"celebrities": unique_celebrities[:20]}
+    # Return at least 10, or all available if less than 10
+    result = celebrities_with_recent_news[:max(10, len(celebrities_with_recent_news))]
+    
+    return {"celebrities": result}
 
 @api_router.get("/stats")
 async def get_stats():
