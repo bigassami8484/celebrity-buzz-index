@@ -2869,14 +2869,14 @@ async def get_hot_celebs():
                 logger.error(f"Error fetching {name}: {e}")
                 continue
         
-        # Only use fallback if we have very few celebs from news (less than 8)
-        # This ensures we prioritize actual news mentions
-        if len(hot_list) < 8:
+        # Only use fallback if we have very few celebs from news (less than 5)
+        # This ensures we prioritize actual news mentions over static lists
+        if len(hot_list) < 5:
             fallback_names = [c["name"] for c in HOT_CELEBS_POOL if c["name"] not in [h["name"] for h in hot_list]]
             random.shuffle(fallback_names)
             
             for name in fallback_names:
-                if len(hot_list) >= 12:  # Only fill up to 12 with fallback
+                if len(hot_list) >= 8:  # Only fill up to 8 with fallback
                     break
                 
                 try:
