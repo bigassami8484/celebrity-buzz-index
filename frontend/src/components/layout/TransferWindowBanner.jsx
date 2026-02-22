@@ -89,8 +89,8 @@ const TransferWindowBanner = ({ stats }) => {
       </div>
       <p className="text-[10px] sm:text-xs text-[#A1A1AA]/70 mt-1">
         {isOpen 
-          ? "Make up to 2 transfers now! Window closes Sunday 12pm GMT" 
-          : "2 transfers allowed per window • Every Saturday 12pm - Sunday 12pm GMT"
+          ? "Make up to 3 transfers now! Window closes Sunday 12pm GMT" 
+          : "3 transfers allowed per window • Every Saturday 12pm - Sunday 12pm GMT"
         }
       </p>
     </div>
