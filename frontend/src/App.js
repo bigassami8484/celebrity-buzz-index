@@ -200,15 +200,12 @@ function App() {
         if (res.team) {
           setTeam(res.team);
           localStorage.setItem("teamId", res.team.id);
-          fetchTeamLeaguesData(res.team.id);
-          fetchPriceAlerts(res.team.id);
-          fetchHotStreaks(res.team.id);
         }
       }
     } catch (error) {
       console.log("Not authenticated");
     }
-  }, [fetchTeamLeaguesData, fetchPriceAlerts, fetchHotStreaks]);
+  }, []);
   
   // Handler to show price history
   const handleShowPriceHistory = (celebrityName) => {
