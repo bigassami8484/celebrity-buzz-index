@@ -1847,7 +1847,10 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
             Return a JSON array with 5 news items. Each item should have:
             - title: A catchy headline
             - summary: 1-2 sentence summary
-            - source: A realistic news source name (e.g., "Entertainment Weekly", "TMZ", "People", "BBC News", "Daily Mail")
+            - source: A realistic news source name from this list:
+              UK: "The Sun", "Daily Mirror", "Daily Mail", "The Guardian", "BBC News", "Sky News", "The Telegraph", "Metro", "Evening Standard", "OK! Magazine", "Hello!", "Closer", "Heat"
+              US: "TMZ", "People", "Entertainment Weekly", "E! News", "Us Weekly", "Page Six", "Variety", "Hollywood Reporter", "Deadline", "Billboard", "Rolling Stone", "New York Times", "Washington Post", "USA Today", "CNN", "Fox News", "NBC News", "ABC News", "CBS News", "BuzzFeed", "HuffPost"
+              International: "Reuters", "Associated Press", "AFP"
             - date: A date from the past 2 months in format "Feb 15, 2026" - MUST be before or on {current_date_str}
             - sentiment: "positive", "neutral", or "negative"
             
