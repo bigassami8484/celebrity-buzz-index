@@ -2007,19 +2007,47 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
 
 
 async def generate_celebrity_news(name: str, category: str, real_news_context: str = None) -> List[dict]:
-    """Generate AI-powered news summaries for celebrity, incorporating real news if available"""
+    """
+    Fetch REAL news first from RSS feeds, then supplement with AI-generated news if needed.
+    Priority: Real news > AI-generated news
+    """
     # Get current date for context
     now = datetime.now(timezone.utc)
     current_date_str = now.strftime("%b %d, %Y")  # e.g., "Feb 21, 2026"
     two_months_ago = (now - timedelta(days=60)).strftime("%b %d, %Y")  # 2 months back
     
-    # Build context about real news events
+    # STEP 1: Try to fetch REAL news from RSS feeds first
+    logger.info(f"Fetching real news for {name}...")
+    real_news = await fetch_real_celebrity_news(name, max_articles=10)
+    
+    if real_news and len(real_news) >= 3:
+        # We have enough real news - return it directly (limit to 5)
+        logger.info(f"Found {len(real_news)} real news articles for {name}")
+        return real_news[:5]
+    
+    # STEP 2: If we have some real news but not enough, supplement with AI
+    # If we have 1-2 real articles, we'll add AI-generated ones to reach 5 total
+    existing_real_news = real_news if real_news else []
+    num_ai_needed = 5 - len(existing_real_news)
+    
+    if len(existing_real_news) > 0:
+        logger.info(f"Found {len(existing_real_news)} real news for {name}, generating {num_ai_needed} AI articles to supplement")
+    else:
+        logger.info(f"No real news found for {name}, generating AI news")
+    
+    # Build context about real news events for AI generation
     real_news_instruction = ""
     if real_news_context:
         real_news_instruction = f"""
             CRITICAL: This celebrity is currently in the news for: "{real_news_context}"
             The FIRST news item MUST be about this real event. Make sure to accurately reflect this news.
             If the news mentions death, illness, or a major event, this MUST be the primary focus."""
+    elif existing_real_news:
+        # Use the real news headlines as context for AI
+        headlines = [article.get("title", "") for article in existing_real_news[:3]]
+        real_news_instruction = f"""
+            CONTEXT: Recent real headlines about this celebrity include: {'; '.join(headlines)}
+            Generate news that is CONSISTENT with these real events. Do NOT contradict them."""
     
     # Special handling for controversial figures - ensure news reflects reality
     controversial_context = ""
