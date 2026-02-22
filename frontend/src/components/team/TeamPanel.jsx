@@ -102,18 +102,27 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize, onSubmitTeam, isTrans
         <>
           {team.celebrities.map((celeb) => {
             const priceChange = getPriceChange(celeb.price, celeb.previous_week_price);
+            const dailyPoints = celeb.daily_points || 0;
             return (
-            <div key={celeb.celebrity_id} className="team-celeb" data-testid={`team-celeb-${celeb.celebrity_id}`}>
+            <div key={celeb.celebrity_id} className={`team-celeb ${isTeamLocked ? 'opacity-80' : ''}`} data-testid={`team-celeb-${celeb.celebrity_id}`}>
               <img 
                 src={celeb.image || `https://ui-avatars.com/api/?name=${celeb.name}&size=100&background=FF0099&color=fff`} 
                 alt={celeb.name}
                 className="team-celeb-image"
               />
               <div className="flex-1">
-                <p className="font-bold">
-                  {celeb.name}
-                  {celeb.is_deceased && <span className="ml-1" title="Deceased">💀</span>}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="font-bold">
+                    {celeb.name}
+                    {celeb.is_deceased && <span className="ml-1" title="Deceased">💀</span>}
+                  </p>
+                  {dailyPoints > 0 && (
+                    <span className="flex items-center gap-1 text-xs font-bold text-[#00F0FF] bg-[#00F0FF]/10 px-2 py-0.5 rounded-full">
+                      <Zap className="w-3 h-3" />
+                      +{dailyPoints.toFixed(1)}
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-[#A1A1AA] flex items-center gap-2">
                   <span className="text-[#FFD700]">£{celeb.price}M</span>
                   {priceChange && (
@@ -128,23 +137,46 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize, onSubmitTeam, isTrans
                   )}
                 </p>
               </div>
-              <button 
-                onClick={() => onRemove(celeb.celebrity_id)}
-                className="remove-btn"
-                data-testid={`remove-btn-${celeb.celebrity_id}`}
-              >
-                <Minus className="w-5 h-5" />
-              </button>
+              {canEdit ? (
+                <button 
+                  onClick={() => onRemove(celeb.celebrity_id)}
+                  className="remove-btn"
+                  data-testid={`remove-btn-${celeb.celebrity_id}`}
+                >
+                  <Minus className="w-5 h-5" />
+                </button>
+              ) : (
+                <Lock className="w-5 h-5 text-[#666]" />
+              )}
             </div>
           )})}
-          <button 
-            onClick={onShare}
-            className="add-button flex items-center justify-center gap-2 mt-4"
-            data-testid="share-team-btn"
-          >
-            <Share2 className="w-4 h-4" />
-            Share Team
-          </button>
+          
+          {/* Submit Team / Share Buttons */}
+          <div className="flex gap-2 mt-4">
+            {!team.is_locked && team.celebrities?.length >= 5 && (
+              <button 
+                onClick={async () => {
+                  setIsSubmitting(true);
+                  await onSubmitTeam?.();
+                  setIsSubmitting(false);
+                }}
+                disabled={isSubmitting}
+                className="flex-1 bg-gradient-to-r from-[#FF0099] to-[#FF6600] text-white font-bold py-3 px-4 rounded flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
+                data-testid="submit-team-btn"
+              >
+                <Lock className="w-4 h-4" />
+                {isSubmitting ? 'Submitting...' : 'Submit & Lock Team'}
+              </button>
+            )}
+            <button 
+              onClick={onShare}
+              className={`${!team.is_locked && team.celebrities?.length >= 5 ? 'flex-1' : 'w-full'} add-button flex items-center justify-center gap-2`}
+              data-testid="share-team-btn"
+            >
+              <Share2 className="w-4 h-4" />
+              Share Team
+            </button>
+          </div>
         </>
       ) : (
         <p className="text-center text-[#A1A1AA] py-8">
