@@ -2806,7 +2806,7 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         "elizabeth ii", "prince philip", "matthew perry", "lisa marie presley", "tina turner",
         "sinead o'connor", "tony bennett", "olivia newton-john", "ray liotta", "bob saget",
         "betty white", "cory monteith", "natalie wood", "lucille ball", "johnny cash",
-        "june carter cash", "waylon jennings", "patsy cline", "hank williams", "dolly parton"
+        "june carter cash", "waylon jennings", "patsy cline", "hank williams"
     ]
     celeb_name_lower = wiki_info["name"].lower()
     if any(known in celeb_name_lower for known in known_deceased):
