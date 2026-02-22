@@ -1481,22 +1481,27 @@ def detect_category_from_bio(bio: str, name: str) -> str:
                                      "recording artist"]):
         return "musicians"
     
-    # TV actors
+    # TV Presenters / Talk Show Hosts - check BEFORE generic "actor" check
+    # These people may have "actor" in bio but are primarily known as presenters
+    if any(x in bio_lower for x in ["chat show", "talk show", "television presenter", "tv presenter",
+                                     "broadcaster", "television host", "radio presenter", 
+                                     "game show host", "news anchor", "news presenter"]):
+        return "other"
+    
+    # TV actors - actual actors in TV series
     if any(x in bio_lower for x in ["television actor", "tv actor", "television series", "tv series", 
-                                     "sitcom", "soap opera", "tv show", "bbc", "itv", "channel 4",
-                                     "eastenders", "coronation street", "emmerdale", "doctor who",
-                                     "killing eve", "the crown"]):
+                                     "sitcom", "soap opera"]):
         return "tv_actors"
     
     # Movie stars - check for film/movie actors
     if any(x in bio_lower for x in ["actor", "actress", "film", "movie", "cinema", "hollywood", 
-                                     "oscar", "bafta", "academy award", "golden globe",
+                                     "oscar", "academy award", "golden globe",
                                      "box office", "marvel", "superhero", "spider-man"]):
         return "movie_stars"
     
-    # Other (businesspeople, chefs, presenters, etc.)
+    # Other (businesspeople, chefs, etc.)
     if any(x in bio_lower for x in ["chef", "presenter", "host", "businessman", "entrepreneur",
-                                     "tv presenter", "author", "journalist", "comedian"]):
+                                     "author", "journalist", "comedian"]):
         return "other"
     
     return "other"  # Default to other
