@@ -2668,14 +2668,27 @@ async def get_hot_celebs():
         "Kim Petras", "Sam Smith", "Lil Nas X", "Megan Thee Stallion", "Ice Spice",
     ]
     
-    # RSS feeds to scan
+    # RSS feeds to scan for hot celebs - expanded list
     rss_sources = [
+        # UK Sources
         ("https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "BBC News"),
+        ("https://www.theguardian.com/lifeandstyle/celebrities/rss", "The Guardian"),
+        ("https://www.mirror.co.uk/3am/rss.xml", "Daily Mirror"),
+        ("https://www.thesun.co.uk/tvandshowbiz/feed/", "The Sun"),
+        ("https://www.dailymail.co.uk/tvshowbiz/index.rss", "Daily Mail"),
+        ("https://metro.co.uk/entertainment/feed/", "Metro"),
+        # US Sources
         ("https://www.tmz.com/rss.xml", "TMZ"),
         ("https://people.com/feed/", "People"),
         ("https://pagesix.com/feed/", "Page Six"),
-        ("https://www.dailymail.co.uk/tvshowbiz/index.rss", "Daily Mail"),
-        ("https://www.theguardian.com/lifeandstyle/celebrities/rss", "The Guardian"),
+        ("https://www.etonline.com/news/rss", "Entertainment Tonight"),
+        ("https://www.usmagazine.com/feed/", "Us Weekly"),
+        ("https://www.hollywoodreporter.com/feed/", "Hollywood Reporter"),
+        ("https://variety.com/feed/", "Variety"),
+        ("https://www.billboard.com/feed/", "Billboard"),
+        ("https://www.rollingstone.com/feed/", "Rolling Stone"),
+        # General
+        ("http://rss.cnn.com/rss/cnn_showbiz.rss", "CNN"),
     ]
     
     # Collect all headlines
