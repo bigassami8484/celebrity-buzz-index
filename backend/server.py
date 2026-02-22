@@ -24,6 +24,15 @@ from emergentintegrations.llm.openai.image_generation import OpenAIImageGenerati
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
+# Import from modular structure
+from utils.helpers import normalize_text, decode_html_entities, sanitize_team_name
+from data import (
+    CELEBRITY_POOLS, HOT_CELEBS_POOL, A_LIST_INDICATORS, B_LIST_INDICATORS,
+    C_LIST_INDICATORS, GUARANTEED_A_LIST, ROYAL_A_LIST_KEYWORDS, CELEBRITY_ALIASES,
+    GUARANTEED_B_LIST, GUARANTEED_C_LIST, BANNED_WORDS, CONTROVERSIAL_CELEBS,
+    STARTING_BUDGET, MAX_TEAM_SIZE, PRICE_TIERS, TEAM_EMOJIS, TEAM_COLORS, CATEGORIES
+)
+
 def normalize_text(text: str) -> str:
     """Remove accents and normalize text for matching"""
     # Normalize to decomposed form (separate base characters from accents)
