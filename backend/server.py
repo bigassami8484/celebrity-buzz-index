@@ -3768,13 +3768,23 @@ async def get_todays_news():
         return {"news": []}
 
 @api_router.post("/team/create")
-async def create_team(team_data: TeamCreate):
+async def create_team(team_data: TeamCreate, request: Request):
     """Create a new team"""
     # Check for banned words
     if contains_banned_words(team_data.team_name):
         raise HTTPException(status_code=400, detail="Team name contains inappropriate language. Please choose another name.")
     
     current_points_week = get_monday_reset_week()
+    
+    # Check if user is authenticated
+    user = await get_current_user(request)
+    
+    # If user is logged in, check if they already have a team
+    if user:
+        existing_team = await db.teams.find_one({"owner_user_id": user["user_id"]}, {"_id": 0})
+        if existing_team:
+            # Return existing team instead of creating new one
+            return {"team": existing_team}
     
     team = UserTeam(
         team_name=team_data.team_name,
@@ -3785,6 +3795,13 @@ async def create_team(team_data: TeamCreate):
     doc['weekly_points'] = 0
     doc['points_week'] = current_points_week
     doc['total_points'] = 0
+    
+    # Link to user if authenticated
+    if user:
+        doc['owner_user_id'] = user["user_id"]
+        doc['is_guest'] = False
+    else:
+        doc['is_guest'] = True
     
     await db.teams.insert_one(doc)
     if '_id' in doc:
