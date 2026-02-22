@@ -1530,6 +1530,13 @@ def detect_category_from_bio(bio: str, name: str) -> str:
                                      "recording artist"]):
         return "musicians"
     
+    # Public Figures - politicians, business magnates, activists, influencers
+    if any(x in bio_lower for x in ["politician", "president", "prime minister", "senator", "congressman",
+                                     "member of parliament", "activist", "political commentator",
+                                     "business magnate", "billionaire", "ceo", "chief executive",
+                                     "podcaster", "influencer", "social media personality"]):
+        return "public_figure"
+    
     # TV Presenters / Talk Show Hosts - check BEFORE generic "actor" check
     # These people may have "actor" in bio but are primarily known as presenters
     if any(x in bio_lower for x in ["chat show", "talk show", "television presenter", "tv presenter",
