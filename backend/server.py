@@ -899,7 +899,9 @@ CELEBRITY_POOLS = {
         # Writers/Authors
         "J.K. Rowling", "Stephen King", "George R.R. Martin", "Neil Gaiman", "Dan Brown",
         # Business/Entrepreneurs (non-political)
-        "Richard Branson", "Alan Sugar", "Deborah Meaden", "Peter Jones", "Theo Paphitis"
+        "Richard Branson", "Alan Sugar", "Deborah Meaden", "Peter Jones", "Theo Paphitis",
+        # Other
+        "Chris Hughes"
     ]
 }
 
