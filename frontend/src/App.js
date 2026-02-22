@@ -540,7 +540,12 @@ function App() {
       <HotCelebsBanner celebs={hotCelebs} onSelect={handleCelebSearch} />
       
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <SearchBar onSearch={searchCelebrity} loading={searchLoading} />
+        <SearchBar 
+          onSearch={searchCelebrity} 
+          onQuickAdd={quickAddFromSearch}
+          loading={searchLoading} 
+          team={team}
+        />
         <CategoryFilter 
           categories={categories} 
           activeCategory={activeCategory} 
