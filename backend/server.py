@@ -4111,6 +4111,57 @@ async def remove_from_team(data: AddToTeam):
         updated_team["total_points"] = updated_team.get("weekly_points", 0)
     return {"team": updated_team}
 
+
+class TeamSubmit(BaseModel):
+    team_id: str
+
+
+@api_router.post("/team/submit")
+async def submit_team(data: TeamSubmit):
+    """Submit and lock team until next transfer window"""
+    team = await db.teams.find_one({"id": data.team_id})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    # Check minimum team size
+    if len(team.get("celebrities", [])) < 5:
+        raise HTTPException(status_code=400, detail="Need at least 5 celebrities to submit team")
+    
+    # Lock the team
+    await db.teams.update_one(
+        {"id": data.team_id},
+        {"$set": {
+            "is_locked": True,
+            "locked_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    updated_team = await db.teams.find_one({"id": data.team_id}, {"_id": 0})
+    return {"team": updated_team, "message": "Team submitted and locked until transfer window!"}
+
+
+@api_router.get("/transfer-window-status")
+async def get_transfer_window_status():
+    """Check if transfer window is currently open (Saturday 00:00 - Sunday 00:00 UTC)"""
+    now = datetime.now(timezone.utc)
+    is_saturday = now.weekday() == 5  # Saturday = 5
+    
+    # Calculate next transfer window
+    days_until_saturday = (5 - now.weekday()) % 7
+    if days_until_saturday == 0 and not is_saturday:
+        days_until_saturday = 7
+    
+    next_window = now + timedelta(days=days_until_saturday)
+    next_window = next_window.replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    return {
+        "is_open": is_saturday,
+        "next_window": next_window.isoformat(),
+        "current_day": now.strftime("%A"),
+        "message": "Transfer window open!" if is_saturday else f"Transfer window opens Saturday"
+    }
+
+
 @api_router.get("/leaderboard")
 async def get_leaderboard():
     """Get team leaderboard"""
