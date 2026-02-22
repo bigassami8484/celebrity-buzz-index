@@ -12,7 +12,7 @@ const categoryIcons = {
   other: Users,
 };
 
-// Price change indicator component
+// Price change indicator component - uses dark colors for visibility on yellow background
 const PriceChangeIndicator = ({ currentPrice, previousPrice }) => {
   if (!previousPrice || previousPrice === 0) return null;
   
@@ -29,7 +29,7 @@ const PriceChangeIndicator = ({ currentPrice, previousPrice }) => {
   
   if (diff > 0) {
     return (
-      <span className="flex items-center gap-0.5 text-green-400 text-xs font-bold">
+      <span className="flex items-center gap-0.5 text-emerald-700 text-xs font-bold">
         <TrendingUp className="w-3 h-3" />
         +{percentChange}%
       </span>
@@ -37,7 +37,7 @@ const PriceChangeIndicator = ({ currentPrice, previousPrice }) => {
   }
   
   return (
-    <span className="flex items-center gap-0.5 text-red-400 text-xs font-bold">
+    <span className="flex items-center gap-0.5 text-red-700 text-xs font-bold">
       <TrendingDown className="w-3 h-3" />
       {percentChange}%
     </span>
