@@ -384,43 +384,104 @@ export const PriceAlerts = ({ alerts, teamId }) => {
 
 // Hot Streaks Component - Shows celebrities on fire in the news
 export const HotStreaks = ({ streaks, teamId }) => {
-  if (!streaks || streaks.length === 0) {
-    return null; // Don't show anything if no hot streaks
+  const [dismissed, setDismissed] = React.useState([]);
+  const [showNotification, setShowNotification] = React.useState(false);
+  
+  // Request notification permission and show browser notification for new streaks
+  React.useEffect(() => {
+    if (streaks && streaks.length > 0) {
+      // Check if we have new hot streaks
+      const newStreaks = streaks.filter(s => !dismissed.includes(s.celebrity_id));
+      
+      if (newStreaks.length > 0 && "Notification" in window) {
+        // Request permission if not already granted
+        if (Notification.permission === "granted") {
+          // Show notification for the hottest streak
+          const hottest = newStreaks[0];
+          new Notification("🔥 Hot Streak Alert!", {
+            body: `${hottest.name} is ${hottest.streak_status} - ${hottest.streak_days} days of headlines!`,
+            icon: hottest.image || "/favicon.ico",
+            tag: `hot-streak-${hottest.celebrity_id}`,
+          });
+          setShowNotification(true);
+        } else if (Notification.permission !== "denied") {
+          Notification.requestPermission();
+        }
+      }
+    }
+  }, [streaks, dismissed]);
+  
+  const dismissStreak = (celebId) => {
+    setDismissed(prev => [...prev, celebId]);
+  };
+  
+  const activeStreaks = streaks?.filter(s => !dismissed.includes(s.celebrity_id)) || [];
+  
+  if (activeStreaks.length === 0) {
+    return null;
   }
   
   return (
-    <div className="bg-gradient-to-r from-orange-500/10 via-[#0A0A0A] to-red-500/10 border border-orange-500/50 p-4 mb-4" data-testid="hot-streaks">
-      <h4 className="font-anton text-lg uppercase tracking-tight text-orange-400 mb-3 flex items-center gap-2">
-        🔥 Hot Streaks
+    <div className="bg-gradient-to-r from-orange-500/20 via-[#0A0A0A] to-red-500/20 border border-orange-500/50 p-4 mb-4 rounded-lg animate-pulse-slow relative" data-testid="hot-streaks">
+      {/* Notification badge */}
+      {showNotification && (
+        <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-bounce">
+          NEW!
+        </div>
+      )}
+      
+      <h4 className="font-anton text-xl uppercase tracking-tight text-orange-400 mb-3 flex items-center gap-2">
+        <span className="animate-pulse">🔥</span> Hot Streak Alerts
+        <span className="text-sm font-normal text-orange-300">({activeStreaks.length} active)</span>
       </h4>
-      <p className="text-xs text-[#666] mb-3">Celebrities making headlines 3+ days in a row!</p>
-      <div className="space-y-2">
-        {streaks.slice(0, 5).map((streak, idx) => (
+      <p className="text-xs text-[#888] mb-3">Your team members making headlines 3+ days in a row! Price increases likely.</p>
+      <div className="space-y-3">
+        {activeStreaks.slice(0, 5).map((streak, idx) => (
           <div 
             key={idx}
-            className="flex items-center gap-3 p-2 bg-orange-500/5 border-l-2 border-orange-500"
+            className="flex items-center gap-3 p-3 bg-gradient-to-r from-orange-500/10 to-red-500/10 border-l-4 border-orange-500 rounded-r-lg hover:from-orange-500/20 hover:to-red-500/20 transition-all group"
           >
-            <img 
-              src={streak.image} 
-              alt={streak.name}
-              className="w-8 h-8 rounded-full object-cover"
-              onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${streak.name}&size=32&background=FF6600&color=fff`; }}
-            />
-            <div className="flex-1 min-w-0">
-              <span className="text-sm truncate block font-bold">{streak.name}</span>
-              <span className="text-xs text-orange-400">{streak.streak_status}</span>
+            <div className="relative">
+              <img 
+                src={streak.image} 
+                alt={streak.name}
+                className="w-12 h-12 rounded-full object-cover border-2 border-orange-500"
+                onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${streak.name}&size=48&background=FF6600&color=fff`; }}
+              />
+              <div className="absolute -bottom-1 -right-1 bg-orange-500 rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                {streak.streak_days}
+              </div>
             </div>
-            <div className="text-right">
-              <div className="text-sm font-bold text-orange-400">
-                {streak.streak_days} days
+            <div className="flex-1 min-w-0">
+              <span className="text-sm truncate block font-bold text-white">{streak.name}</span>
+              <span className="text-sm text-orange-400 font-semibold">{streak.streak_status}</span>
+              <span className="text-xs text-[#888] block mt-1">{streak.tip}</span>
+            </div>
+            <div className="text-right flex flex-col items-end gap-1">
+              <div className="text-lg font-bold text-orange-400 flex items-center gap-1">
+                <span className="text-2xl">{streak.streak_days}</span>
+                <span className="text-xs text-orange-300">DAYS</span>
               </div>
-              <div className="text-xs text-[#666]">
-                {streak.tip}
-              </div>
+              <button 
+                onClick={() => dismissStreak(streak.celebrity_id)}
+                className="text-xs text-[#666] hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                Dismiss
+              </button>
             </div>
           </div>
         ))}
       </div>
+      
+      {/* Enable notifications CTA */}
+      {"Notification" in window && Notification.permission === "default" && (
+        <button 
+          onClick={() => Notification.requestPermission()}
+          className="mt-3 text-xs text-orange-400 hover:text-orange-300 underline"
+        >
+          Enable browser notifications for hot streak alerts
+        </button>
+      )}
     </div>
   );
 };
