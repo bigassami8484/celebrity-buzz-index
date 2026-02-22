@@ -4962,6 +4962,94 @@ async def exchange_session(request: Request, response: Response):
 app.include_router(api_router)
 app.include_router(auth_router)
 
+# ==================== SCHEDULED TASKS ====================
+
+# Initialize the scheduler
+scheduler = AsyncIOScheduler(timezone="UTC")
+
+async def scheduled_weekly_price_reset():
+    """
+    Scheduled task to run weekly price reset every Monday at midnight UTC.
+    This updates all celebrity prices based on their accumulated buzz scores.
+    """
+    logger.info("🕐 Starting scheduled weekly price reset...")
+    
+    try:
+        # Get all celebrities
+        all_celebs = await db.celebrities.find({}, {"_id": 0}).to_list(2000)
+        
+        increased = 0
+        decreased = 0
+        unchanged = 0
+        
+        for celeb in all_celebs:
+            celeb_id = celeb.get("id")
+            name = celeb.get("name", "")
+            tier = celeb.get("tier", "D")
+            buzz_score = celeb.get("buzz_score", 0)
+            current_price = celeb.get("price", 5.0)
+            
+            # Calculate new price based on buzz score
+            new_price = get_dynamic_price(tier, buzz_score, name)
+            
+            # Determine price change
+            price_diff = new_price - current_price
+            
+            if price_diff > 0:
+                increased += 1
+            elif price_diff < 0:
+                decreased += 1
+            else:
+                unchanged += 1
+            
+            # Update celebrity in database
+            await db.celebrities.update_one(
+                {"id": celeb_id},
+                {
+                    "$set": {
+                        "previous_week_price": current_price,
+                        "price": new_price,
+                        "buzz_score": 0  # Reset buzz score for new week
+                    }
+                }
+            )
+            
+            # Record price history if there was a change
+            if price_diff != 0:
+                await record_price_history(celeb_id, name, new_price, tier, buzz_score)
+        
+        logger.info(f"✅ Weekly price reset complete: {increased} up, {decreased} down, {unchanged} unchanged")
+        
+        # Store the reset log in database for auditing
+        await db.scheduled_tasks.insert_one({
+            "task": "weekly_price_reset",
+            "executed_at": datetime.now(timezone.utc).isoformat(),
+            "summary": {
+                "total_celebrities": len(all_celebs),
+                "prices_increased": increased,
+                "prices_decreased": decreased,
+                "prices_unchanged": unchanged
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Weekly price reset failed: {e}")
+
+# Schedule the weekly price reset for every Monday at 00:00 UTC
+scheduler.add_job(
+    scheduled_weekly_price_reset,
+    CronTrigger(day_of_week='mon', hour=0, minute=0),
+    id='weekly_price_reset',
+    name='Weekly Celebrity Price Reset',
+    replace_existing=True
+)
+
+@app.on_event("startup")
+async def start_scheduler():
+    """Start the scheduler when the app starts"""
+    scheduler.start()
+    logger.info("📅 Scheduler started - Weekly price reset scheduled for Monday 00:00 UTC")
+
 # CORS
 app.add_middleware(
     CORSMiddleware,
