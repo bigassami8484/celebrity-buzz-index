@@ -2566,36 +2566,40 @@ async def get_celebrities_by_category(category: str, response: Response):
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     
-    # Prioritize celebrities with REAL Wikipedia images (not placeholders)
-    # First try to get 8 celebs with real images
-    pipeline_with_images = [
+    # Get random sample from ALL celebrities in this category
+    # MongoDB $sample provides true randomness from the entire collection
+    pipeline = [
         {"$match": {
             "category": category,
             "name": {"$ne": None, "$exists": True},
-            "bio": {"$exists": True, "$ne": ""},
-            "image": {"$regex": "wikipedia|wikimedia", "$options": "i"}  # Real Wikipedia images
+            "bio": {"$exists": True, "$ne": ""}
         }},
-        {"$sample": {"size": 8}},
+        {"$sample": {"size": 50}},  # Get more than needed for variety
         {"$project": {"_id": 0}}
     ]
     
-    selected = await db.celebrities.aggregate(pipeline_with_images).to_list(8)
+    all_celebs = await db.celebrities.aggregate(pipeline).to_list(50)
     
-    # If we don't have enough with real images, add some with placeholders
-    if len(selected) < 8:
-        existing_ids = {c.get("id") for c in selected}
-        pipeline_any = [
-            {"$match": {
-                "category": category,
-                "name": {"$ne": None, "$exists": True},
-                "bio": {"$exists": True, "$ne": ""},
-                "id": {"$nin": list(existing_ids)}
-            }},
-            {"$sample": {"size": 8 - len(selected)}},
-            {"$project": {"_id": 0}}
-        ]
-        more = await db.celebrities.aggregate(pipeline_any).to_list(8 - len(selected))
-        selected.extend(more)
+    # Sort by image quality - prioritize real Wikipedia images but include others
+    with_images = [c for c in all_celebs if c.get("image") and ("wikipedia" in c.get("image", "").lower() or "wikimedia" in c.get("image", "").lower())]
+    without_images = [c for c in all_celebs if c not in with_images]
+    
+    # Shuffle both lists
+    random.shuffle(with_images)
+    random.shuffle(without_images)
+    
+    # Take up to 6 with real images, fill rest with others
+    selected = with_images[:6]
+    remaining_slots = 8 - len(selected)
+    if remaining_slots > 0:
+        selected.extend(without_images[:remaining_slots])
+    
+    # If still not enough, just use what we have
+    if len(selected) < 8 and len(with_images) > 6:
+        selected.extend(with_images[6:8-len(selected)+6])
+    
+    # Final shuffle to mix them up
+    random.shuffle(selected)
     
     # Recalculate dynamic prices
     default_buzz = 50
@@ -2603,7 +2607,7 @@ async def get_celebrities_by_category(category: str, response: Response):
         tier = celeb.get("tier", "D")
         celeb["price"] = get_dynamic_price(tier, default_buzz, celeb.get("name", ""))
     
-    return {"celebrities": selected}
+    return {"celebrities": selected[:8]}
 
 @api_router.get("/stats")
 async def get_stats():
