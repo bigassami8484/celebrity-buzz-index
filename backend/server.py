@@ -1998,32 +1998,28 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
                         
                         if not summary:
                             summary = title
-                            
-                            # Determine sentiment based on keywords
-                            sentiment = "neutral"
-                            positive_words = ["wins", "award", "celebrates", "engaged", "married", "baby", "pregnant", "success", "triumph", "praised", "honored", "birthday", "milestone"]
-                            negative_words = ["arrested", "charged", "scandal", "controversy", "feud", "slams", "accused", "dies", "dead", "fired", "axed", "split", "divorce", "lawsuit"]
-                            
-                            if any(word in title_lower for word in positive_words):
-                                sentiment = "positive"
-                            elif any(word in title_lower for word in negative_words):
-                                sentiment = "negative"
-                            
-                            real_news.append({
-                                "title": title,
-                                "summary": summary,
-                                "source": source_name,
-                                "date": pub_date_str or datetime.now(timezone.utc).strftime("%b %d, %Y"),
-                                "sentiment": sentiment,
-                                "is_real": True  # Flag to indicate this is real news
-                            })
-                            
-                        except Exception as e:
-                            continue
-                            
-                except Exception as e:
-                    logger.debug(f"Error fetching RSS from {source_name}: {e}")
-                    continue
+                        
+                        # Determine sentiment based on keywords
+                        sentiment = "neutral"
+                        positive_words = ["wins", "award", "celebrates", "engaged", "married", "baby", "pregnant", "success", "triumph", "praised", "honored", "birthday", "milestone"]
+                        negative_words = ["arrested", "charged", "scandal", "controversy", "feud", "slams", "accused", "dies", "dead", "fired", "axed", "split", "divorce", "lawsuit"]
+                        
+                        if any(word in title_lower for word in positive_words):
+                            sentiment = "positive"
+                        elif any(word in title_lower for word in negative_words):
+                            sentiment = "negative"
+                        
+                        real_news.append({
+                            "title": title,
+                            "summary": summary,
+                            "source": source_name,
+                            "date": pub_date_str or datetime.now(timezone.utc).strftime("%b %d, %Y"),
+                            "sentiment": sentiment,
+                            "is_real": True
+                        })
+                        
+                    except Exception as e:
+                        continue
         
         # Sort by date (most recent first) and limit
         real_news.sort(key=lambda x: datetime.strptime(x.get("date", "Jan 1, 2020"), "%b %d, %Y"), reverse=True)
