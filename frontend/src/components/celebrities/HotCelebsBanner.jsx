@@ -55,7 +55,10 @@ const HotCelebsBanner = ({ celebs, onSelect }) => {
                     )}
                   </div>
                   <div className="flex items-center gap-1">
-                    <p className="font-bold text-xs text-white truncate group-hover:text-[#FF0099] flex-1">{celeb.name}</p>
+                    <p className="font-bold text-xs text-white truncate group-hover:text-[#FF0099] flex-1">
+                      {celeb.name}
+                      {celeb.is_deceased && <span className="ml-1" title="Deceased">💀</span>}
+                    </p>
                     {celeb.news_premium && (
                       <TrendingUp className="w-3 h-3 text-[#00FF00] flex-shrink-0" />
                     )}
