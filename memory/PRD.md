@@ -349,6 +349,16 @@ Response format:
 - ✅ Scarlett Johansson: Wikipedia image
 - ✅ Brian Cox (physicist): Wikipedia image
 - ✅ Queen Camilla: Wikipedia image  
-- ✅ Spencer Matthews: AI-generated image
+- ✅ Spencer Matthews: Initials placeholder (per user request)
+- ✅ Georgia Toffolo: Initials placeholder (per user request)
 - ✅ Sam Thompson: Wikipedia image
+
+### UI Improvements (Feb 22, 2026)
+- ✅ **Floating Search Result Card**: When searching for a celebrity, results now appear in a floating modal overlay instead of being added to the category grid
+  - Centered modal with blur backdrop
+  - Shows image, tier badge, price, bio, category
+  - "Add to Team" button
+  - Click outside or X to close
+- ✅ **Data Cleanup**: Removed duplicate celebrity entries, fixed TV Personalities categorization
+- ✅ **Category Counts**: 529 celebrities across all categories
 
