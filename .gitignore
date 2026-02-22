@@ -82,3 +82,4 @@ android-sdk/
 # The deployment system will auto-update them with production values
 frontend/node_modules/.cache/default-development/9.pack
 frontend/node_modules/.cache/default-development/4.pack
+frontend/node_modules/.cache/default-development/6.pack
