@@ -1964,6 +1964,11 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
         "adele": ["adele"],
         "ed sheeran": ["ed sheeran", "sheeran"],
         "rihanna": ["rihanna", "riri", "fenty"],
+        # Royals (to avoid false positives with common first names)
+        "prince andrew, duke of york": ["prince andrew", "duke of york", "andrew york"],
+        "andrew mountbatten-windsor": ["prince andrew", "duke of york"],
+        # Reality TV - avoid "Princess Andre" matching wrong person
+        "peter andre": ["peter andre"],  # Require full name only
     }
     
     # Start with full name as primary
