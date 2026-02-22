@@ -2042,47 +2042,54 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
                         # Combined text to search
                         search_text = f"{title_lower} {desc_text}"
                         
-                        # Check if celebrity is mentioned - IMPROVED MATCHING
+                        # Check if celebrity is mentioned - STRICT MATCHING
                         celeb_mentioned = False
                         
                         # Method 1: Full name exact match (most reliable)
                         if name_lower in search_text:
                             celeb_mentioned = True
                         
-                        # Method 2: Check each search term with word boundary awareness
-                        if not celeb_mentioned:
-                            for term in search_terms:
-                                if len(term) < 3:
-                                    continue  # Skip very short terms
-                                
-                                if term in search_text:
-                                    # For last names, check word boundaries to reduce false positives
-                                    # E.g., "Beckham" should match "Beckhams" but not "Beckhamshire"
-                                    term_idx = search_text.find(term)
-                                    if term_idx >= 0:
-                                        # Check character before term (should be space, start, or punctuation)
-                                        char_before = search_text[term_idx - 1] if term_idx > 0 else " "
-                                        # Check character after term
-                                        end_idx = term_idx + len(term)
-                                        char_after = search_text[end_idx] if end_idx < len(search_text) else " "
-                                        
-                                        # Valid word boundaries: space, punctuation, possessive 's
-                                        valid_before = char_before in " .,!?;:'\"()-\n\t<>"
-                                        valid_after = char_after in " .,!?;:'\"()-\n\t<>s"  # 's for possessives
-                                        
-                                        if valid_before and valid_after:
-                                            # For short or common last names, require additional context
-                                            common_surnames = ["smith", "jones", "brown", "king", "lee", "white", "taylor", "young", "martin"]
-                                            if term in common_surnames and len(term) < 6:
-                                                # Need first name nearby for common surnames
-                                                first_name = name_parts[0] if name_parts else ""
-                                                if first_name and first_name in search_text:
-                                                    celeb_mentioned = True
-                                                    break
-                                            else:
-                                                # Distinctive enough name
-                                                celeb_mentioned = True
-                                                break
+                        # Method 2: For multi-word names, require BOTH first AND last name
+                        # This prevents "Princess Andre" from matching "Peter Andre"
+                        # and "Andrew" from matching "Prince Andrew" news for wrong person
+                        if not celeb_mentioned and len(name_parts) >= 2:
+                            first_name = name_parts[0]
+                            last_name = name_parts[-1]
+                            
+                            # Both first and last name must appear with word boundaries
+                            def has_word_boundary_match(text, word):
+                                """Check if word appears with proper word boundaries"""
+                                if len(word) < 3:
+                                    return False
+                                idx = text.find(word)
+                                while idx >= 0:
+                                    char_before = text[idx - 1] if idx > 0 else " "
+                                    end_idx = idx + len(word)
+                                    char_after = text[end_idx] if end_idx < len(text) else " "
+                                    
+                                    # Valid boundaries
+                                    valid_before = char_before in " .,!?;:'\"()-\n\t<>"
+                                    valid_after = char_after in " .,!?;:'\"()-\n\t<>s"
+                                    
+                                    if valid_before and valid_after:
+                                        return True
+                                    # Try next occurrence
+                                    idx = text.find(word, idx + 1)
+                                return False
+                            
+                            # For celebrities, require BOTH first and last name
+                            # Exception: Use celebrity aliases if defined
+                            alias_match = False
+                            if name_lower in celebrity_news_aliases:
+                                for alias in celebrity_news_aliases[name_lower]:
+                                    if has_word_boundary_match(search_text, alias):
+                                        alias_match = True
+                                        break
+                            
+                            if alias_match:
+                                celeb_mentioned = True
+                            elif has_word_boundary_match(search_text, first_name) and has_word_boundary_match(search_text, last_name):
+                                celeb_mentioned = True
                         
                         if not celeb_mentioned:
                             continue
