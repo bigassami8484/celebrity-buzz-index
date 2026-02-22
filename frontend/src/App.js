@@ -605,7 +605,10 @@ function App() {
                 </div>
                 
                 {/* Info */}
-                <h2 className="font-anton text-2xl text-white uppercase mb-2">{searchedCeleb.name}</h2>
+                <h2 className="font-anton text-2xl text-white uppercase mb-2">
+                  {searchedCeleb.name}
+                  {searchedCeleb.is_deceased && <span className="ml-2" title="Deceased">💀</span>}
+                </h2>
                 <p className="text-[#A1A1AA] text-sm mb-4 line-clamp-2">{searchedCeleb.bio}</p>
                 
                 {/* Category tag */}
@@ -627,10 +630,20 @@ function App() {
                         .sort((a, b) => new Date(b.date) - new Date(a.date))
                         .slice(0, 5)
                         .map((article, idx) => (
-                        <div key={idx} className="bg-[#1A1A1A] p-3 rounded border border-[#262626]">
-                          <p className="text-white text-sm font-medium mb-1 line-clamp-2">{article.title}</p>
+                        <a 
+                          key={idx} 
+                          href={article.url || `https://www.google.com/search?q=${encodeURIComponent(article.title + ' ' + article.source)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block bg-[#1A1A1A] p-3 rounded border border-[#262626] hover:border-[#FF0099] hover:bg-[#1A1A1A]/80 transition-all cursor-pointer group"
+                          data-testid={`news-article-${idx}`}
+                        >
+                          <p className="text-white text-sm font-medium mb-1 line-clamp-2 group-hover:text-[#FF0099] transition-colors">{article.title}</p>
                           <div className="flex items-center justify-between text-xs">
-                            <span className="text-[#A1A1AA]">{article.source}</span>
+                            <span className="text-[#A1A1AA] flex items-center gap-1">
+                              {article.source}
+                              {article.is_real && <span className="text-green-400" title="Real news">✓</span>}
+                            </span>
                             <span className={`px-2 py-0.5 rounded ${
                               article.sentiment === 'positive' ? 'bg-green-500/20 text-green-400' :
                               article.sentiment === 'negative' ? 'bg-red-500/20 text-red-400' :
@@ -640,7 +653,7 @@ function App() {
                             </span>
                           </div>
                           <p className="text-[#666] text-xs mt-1">{article.date}</p>
-                        </div>
+                        </a>
                       ))}
                     </div>
                   </div>
