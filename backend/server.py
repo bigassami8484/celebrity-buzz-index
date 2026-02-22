@@ -1834,6 +1834,23 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
             The FIRST news item MUST be about this real event. Make sure to accurately reflect this news.
             If the news mentions death, illness, or a major event, this MUST be the primary focus."""
     
+    # Special handling for controversial figures - ensure news reflects reality
+    controversial_context = ""
+    name_lower = name.lower()
+    if "andrew" in name_lower and ("mountbatten" in name_lower or "windsor" in name_lower or "prince" in name_lower):
+        controversial_context = """
+            IMPORTANT: Prince Andrew has been involved in major scandals including the Jeffrey Epstein association and civil lawsuit settlement.
+            News about him should be predominantly NEGATIVE, reflecting ongoing public criticism, legal issues, stripped titles, and exile from public royal duties.
+            Most articles should have sentiment "negative" with sources like The Sun, Daily Mirror, and tabloids covering his controversies."""
+    elif "trump" in name_lower:
+        controversial_context = """
+            IMPORTANT: Generate news reflecting Donald Trump's controversial political career, legal battles, and divisive public statements.
+            Mix of positive (from supportive outlets) and negative (from critical outlets) sentiments."""
+    elif "kanye" in name_lower or "ye" == name_lower:
+        controversial_context = """
+            IMPORTANT: Generate news reflecting Kanye West's controversial statements, business issues, and public incidents.
+            News should be predominantly negative or neutral, reflecting real-world coverage."""
+    
     try:
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
@@ -1843,6 +1860,7 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
             IMPORTANT: Today's date is {current_date_str}. All news dates MUST be from the PAST 2 MONTHS (between {two_months_ago} and {current_date_str}). 
             DO NOT use any future dates! Spread the news dates across the 2 month period for variety.
             {real_news_instruction}
+            {controversial_context}
             
             Return a JSON array with 5 news items. Each item should have:
             - title: A catchy headline
