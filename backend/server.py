@@ -841,9 +841,7 @@ CELEBRITY_POOLS = {
         "Lauren Conrad", "Kristin Cavallari", "Spencer Pratt", "Heidi Montag", "Brody Jenner",
         "Lisa Vanderpump", "Kyle Richards", "Teresa Giudice", "NeNe Leakes", "Bethenny Frankel"
     ],
-    "other": [
-        # Chris Hughes moved here from reality_tv
-        "Chris Hughes",
+    "public_figure": [
         # Tech billionaires
         "Elon Musk", "Mark Zuckerberg", "Jeff Bezos", "Bill Gates", "Tim Cook",
         "Sundar Pichai", "Satya Nadella", "Jack Dorsey", "Reed Hastings", "Jensen Huang",
