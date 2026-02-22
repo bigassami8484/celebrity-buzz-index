@@ -1921,37 +1921,51 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
         ("https://www.reuters.com/news/archive/entertainmentNews?view=feed&type=rss", "Reuters"),
     ]
     
-    # Name variations to search for
-    name_lower = name.lower()
+    # Name variations to search for - IMPROVED MATCHING
+    name_lower = name.lower().strip()
     name_parts = name_lower.split()
     
-    # Create search variations - PRIORITIZE FULL NAME to avoid false matches
-    # For "Penelope Cruz", we don't want to match "Cruz Beckham"
-    search_terms = [name_lower]  # Full name is always primary
+    # Build comprehensive search terms
+    first_name = name_parts[0] if name_parts else ""
+    last_name = name_parts[-1] if len(name_parts) > 1 else ""
     
-    # Only add partial name matches for very unique names
-    # Skip single-word last names that could match other celebrities
-    ambiguous_last_names = [
-        "cruz", "smith", "jones", "williams", "brown", "davis", "miller", "wilson", 
-        "moore", "taylor", "martin", "king", "lee", "white", "harris", "james",
-        "scott", "adams", "hill", "green", "baker", "nelson", "carter", "mitchell",
-        "roberts", "turner", "phillips", "campbell", "parker", "evans", "edwards",
-        "jackson", "johnson", "thomas", "robinson", "clark", "lewis", "walker",
-        "hall", "allen", "young", "wright", "lopez", "gonzalez", "martinez",
-        "beckham", "swift", "styles", "jonas", "bieber", "gomez", "grande"
-    ]
+    # Celebrity-specific aliases (news often uses nicknames)
+    celebrity_news_aliases = {
+        "kanye west": ["kanye", "ye", "yeezy"],
+        "dwayne johnson": ["the rock", "dwayne johnson", "rock"],
+        "sean combs": ["diddy", "p diddy", "puff daddy", "sean combs"],
+        "taylor swift": ["taylor", "swift", "t-swift"],
+        "beyoncé": ["beyonce", "beyoncé", "queen bey", "bey"],
+        "beyonce": ["beyonce", "beyoncé", "queen bey", "bey"],
+        "jennifer lopez": ["j.lo", "jlo", "jennifer lopez", "j lo"],
+        "kim kardashian": ["kim k", "kardashian", "kim kardashian"],
+        "kanye": ["kanye west", "ye", "yeezy"],
+    }
     
+    # Start with full name as primary
+    search_terms = [name_lower]
+    
+    # Add celebrity-specific aliases
+    if name_lower in celebrity_news_aliases:
+        search_terms.extend(celebrity_news_aliases[name_lower])
+    
+    # For multi-word names, add last name (most news uses last names)
+    # E.g., "the Beckhams", "Swift's new album", "Kardashian drama"
     if len(name_parts) > 1:
-        last_name = name_parts[-1]
-        # Only add last name as search term if it's unique enough
-        if last_name not in ambiguous_last_names:
-            search_terms.append(last_name)
+        search_terms.append(last_name)
         
-        # Handle multi-part last names like "Van Der Beek"
-        if len(name_parts) == 3:
-            search_terms.append(f"{name_parts[1]} {name_parts[2]}")  # Last two names
-        if len(name_parts) >= 4:
-            search_terms.append(" ".join(name_parts[1:]))  # Full last name
+        # Also add first name for context matching
+        if len(first_name) > 3:  # Skip short names like "Kim" alone
+            search_terms.append(first_name)
+    
+    # Handle hyphenated and multi-part last names
+    if len(name_parts) == 3:
+        search_terms.append(f"{name_parts[1]} {name_parts[2]}")
+    if len(name_parts) >= 4:
+        search_terms.append(" ".join(name_parts[1:]))
+    
+    # Remove duplicates while preserving order
+    search_terms = list(dict.fromkeys(search_terms))
     
     # Cutoff date - 2 months ago
     cutoff_date = datetime.now(timezone.utc) - timedelta(days=60)
