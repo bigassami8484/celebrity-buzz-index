@@ -2312,7 +2312,7 @@ async def get_price_history_by_name(name: str, limit: int = 30):
 
 @api_router.get("/celebrities/category/{category}")
 async def get_celebrities_by_category(category: str, response: Response):
-    """Get 10 random celebrities by category - guaranteed different each request"""
+    """Get 10 NEW random celebrities by category - pulls fresh celebs from large pool"""
     import random
     
     # Prevent any caching
@@ -2320,34 +2320,40 @@ async def get_celebrities_by_category(category: str, response: Response):
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     
-    # First, check how many we have in this category
-    count = await db.celebrities.count_documents({"category": category})
+    # Get the large pool for this category
+    pool = CELEBRITY_POOLS.get(category, [])
+    if not pool:
+        return {"celebrities": []}
     
-    # If we don't have enough, seed with trending celebrities
-    if count < 10 and category in TRENDING_CELEBRITIES:
-        for name in TRENDING_CELEBRITIES[category]:
-            exists = await db.celebrities.find_one({"name": {"$regex": f"^{name}$", "$options": "i"}})
-            if not exists:
+    # Shuffle the pool and pick 10 random names
+    random.shuffle(pool)
+    selected_names = pool[:15]  # Get 15 to ensure we get 10 after filtering
+    
+    celebrities = []
+    
+    for name in selected_names:
+        if len(celebrities) >= 10:
+            break
+            
+        # Check if already in database
+        existing = await db.celebrities.find_one(
+            {"name": {"$regex": f"^{name}$", "$options": "i"}},
+            {"_id": 0}
+        )
+        
+        if existing:
+            # Use existing data
+            celebrities.append(existing)
+        else:
+            # Fetch new celebrity data from Wikipedia
+            try:
                 search = CelebritySearch(name=name)
-                await search_celebrity(search, override_category=category)
-    
-    # Use MongoDB $sample for TRUE random selection
-    pipeline = [
-        {"$match": {"category": category, "news": {"$exists": True, "$ne": []}}},
-        {"$sample": {"size": 10}},
-        {"$project": {"_id": 0}}
-    ]
-    
-    celebrities = await db.celebrities.aggregate(pipeline).to_list(10)
-    
-    # If not enough with news, get any from this category
-    if len(celebrities) < 10:
-        pipeline_fallback = [
-            {"$match": {"category": category}},
-            {"$sample": {"size": 10}},
-            {"$project": {"_id": 0}}
-        ]
-        celebrities = await db.celebrities.aggregate(pipeline_fallback).to_list(10)
+                result = await search_celebrity(search, override_category=category)
+                if result:
+                    celebrities.append(result)
+            except Exception as e:
+                logger.error(f"Error fetching {name}: {e}")
+                continue
     
     # Recalculate dynamic prices
     default_buzz = 50
@@ -2355,7 +2361,7 @@ async def get_celebrities_by_category(category: str, response: Response):
         tier = celeb.get("tier", "D")
         celeb["price"] = get_dynamic_price(tier, default_buzz, celeb.get("name", ""))
     
-    # Add a random sort key to ensure frontend sees different order
+    # Final shuffle
     random.shuffle(celebrities)
     
     return {"celebrities": celebrities[:10]}
