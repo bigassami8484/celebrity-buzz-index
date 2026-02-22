@@ -1046,8 +1046,8 @@ CELEBRITY_ALIASES = {
     "queen elizabeth ii": "Elizabeth II",
     "princess diana": "Diana, Princess of Wales",
     "lady diana": "Diana, Princess of Wales",
-    "camilla": "Camilla",
-    "queen camilla": "Camilla",
+    "camilla": "Queen Camilla",
+    "queen camilla": "Queen Camilla",
     # Other celebs with common alternate names
     "the rock": "Dwayne Johnson",
     "dwayne 'the rock' johnson": "Dwayne Johnson",
