@@ -9,6 +9,40 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Compete on leaderboards with friends
 - Social sharing (Twitter/X, Facebook, WhatsApp)
 
+## Backend Architecture (Refactored Feb 22, 2026)
+```
+/app/backend/
+├── server.py          # Main FastAPI app (5300 lines - routes + business logic)
+├── config.py          # Configuration module
+├── data/
+│   ├── __init__.py    # Data exports
+│   ├── celebrity_data.py  # Celebrity pools, A-list definitions, aliases (441 lines)
+│   └── constants.py   # Banned words, pricing config, team options (85 lines)
+├── models/
+│   ├── __init__.py    # Model exports
+│   ├── celebrity.py   # Celebrity Pydantic models
+│   ├── team.py        # Team models
+│   ├── league.py      # League models
+│   └── auth.py        # Auth models
+├── routes/            # (Future: extract routes from server.py)
+├── services/          # (Future: extract business logic)
+└── utils/
+    ├── __init__.py
+    └── helpers.py     # normalize_text, decode_html_entities, sanitize_team_name
+```
+
+**Completed Refactoring:**
+- ✅ Extracted celebrity data pools (9 categories, 50+ celebs each)
+- ✅ Extracted constants (banned words, pricing tiers, team options)
+- ✅ Extracted utility functions (text normalization, HTML decoding)
+- ✅ Created Pydantic models in separate files
+- ✅ Server imports from modular structure
+
+**Remaining Refactoring (Future):**
+- Extract API routes into routes/ directory
+- Extract business logic into services/
+- Split celebrity search/news generation into separate service
+
 ## Current Pricing Structure (DYNAMIC)
 | Tier | Price Range | Strategy Impact |
 |------|-------------|-----------------|
