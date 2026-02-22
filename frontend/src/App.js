@@ -541,6 +541,7 @@ function App() {
     fetchTopPicked();
     fetchBrownBreadWatch();
     fetchHotCelebs();
+    fetchTransferWindowStatus();
   }, [checkAuth, fetchCategories, fetchTrending, initTeam, fetchLeaderboard, fetchStats, fetchTodaysNews, fetchTopPicked, fetchBrownBreadWatch, fetchHotCelebs]);
 
   // Auto-select first category when categories load
