@@ -1944,12 +1944,11 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
                             # Check if celebrity is mentioned
                             celeb_mentioned = False
                             for term in search_terms:
-                                if term in title_lower:
+                                if term in search_text:
                                     # Avoid false positives for common last names
-                                    common_names = ["smith", "jones", "williams", "brown", "davis", "miller", "wilson", "moore", "taylor", "martin", "king", "lee", "white", "harris"]
                                     if term in common_names and term != name_lower:
                                         # Only match if full name is used
-                                        if name_lower in title_lower:
+                                        if name_lower in search_text:
                                             celeb_mentioned = True
                                             break
                                     else:
