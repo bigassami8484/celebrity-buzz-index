@@ -826,7 +826,7 @@ CELEBRITY_POOLS = {
     "reality_tv": [
         # TOWIE & UK Reality
         "Katie Price", "Gemma Collins", "Pete Wicks", "Joey Essex", "Sam Faiers",
-        "Mark Wright", "Michelle Keegan", "Amy Childs", "Lauren Goodger", "Billie Faiers",
+        "Mark Wright", "Amy Childs", "Lauren Goodger", "Billie Faiers",
         "Vicky Pattison", "Charlotte Crosby", "Holly Hagan", "Chloe Ferry", "Marnie Simpson",
         # Made in Chelsea
         "Georgia Toffolo", "Jamie Laing", "Spencer Matthews", "Binky Felstead",
