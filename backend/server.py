@@ -2583,7 +2583,7 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     if not wiki_info.get("wiki_url") or wiki_info.get("bio") == "Celebrity profile":
         raise HTTPException(
             status_code=404, 
-            detail=f"'{data.name}' doesn't have a Wikipedia page. Only celebrities with Wikipedia profiles are included in the game."
+            detail=f"'{search.name}' doesn't have a Wikipedia page. Only celebrities with Wikipedia profiles are included in the game."
         )
     
     # Use override category if provided, otherwise detect from bio
