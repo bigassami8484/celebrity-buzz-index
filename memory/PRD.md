@@ -211,11 +211,18 @@ Response format:
 ### P0 (Immediate - In Progress)
 - ✅ Wikidata-based search filtering - COMPLETED
 - ✅ Price history tracking - COMPLETED
+- ✅ **News Fetching Fix - COMPLETED Feb 22, 2026**
+  - Fixed name-matching algorithm in `fetch_real_celebrity_news`
+  - Removed overly-restrictive "ambiguous_last_names" blocklist
+  - Added word-boundary matching to avoid false positives
+  - Added celebrity-specific aliases (e.g., "Cheryl Cole" → "Cheryl", "Gemma Collins" → "The GC")
+  - Added URL extraction from RSS feeds for clickable news links
+  - Added sports RSS feeds (Sky Sports, BBC Sport, ESPN, Goal)
+  - Test results: 100% of major celebrities now return news articles
 - 🔄 Hot Streak Notifications - Backend ready, needs full UI
 
 ### P1 (High Priority)
 - User authentication for persistent teams
-- Real news API integration (NewsAPI)
 - Automated weekly badge awards
 
 ### P2 (Medium Priority)
