@@ -4103,6 +4103,7 @@ async def refresh_placeholder_images(limit: int = 50):
     """
     Admin endpoint to refresh images for celebrities with placeholder avatars.
     Fetches real Wikipedia images for celebrities that have ui-avatars placeholders.
+    If Wikipedia doesn't have an image, tries AI generation.
     """
     # Find celebrities with placeholder images
     cursor = db.celebrities.find({
@@ -4125,7 +4126,7 @@ async def refresh_placeholder_images(limit: int = 50):
             new_image = wiki_info.get("image", "")
             
             if new_image and "ui-avatars" not in new_image.lower():
-                # Update in database
+                # Update in database with Wikipedia image
                 update_data = {"image": new_image}
                 
                 # Also update bio if it was placeholder
@@ -4139,13 +4140,38 @@ async def refresh_placeholder_images(limit: int = 50):
                 updated.append({
                     "name": name,
                     "old_image": celeb.get("image", "")[:50],
-                    "new_image": new_image[:80]
+                    "new_image": new_image[:80],
+                    "source": "wikipedia"
                 })
             else:
-                failed.append({
-                    "name": name,
-                    "reason": "Wikipedia returned no image or placeholder"
-                })
+                # Try AI image generation
+                try:
+                    ai_image = await get_or_generate_celebrity_image(name, celeb.get("bio", ""))
+                    if ai_image:
+                        update_data = {"image": ai_image}
+                        if celeb.get("bio") == "Celebrity profile" and wiki_info.get("bio"):
+                            update_data["bio"] = wiki_info["bio"][:500]
+                        
+                        await db.celebrities.update_one(
+                            {"id": celeb.get("id")},
+                            {"$set": update_data}
+                        )
+                        updated.append({
+                            "name": name,
+                            "old_image": celeb.get("image", "")[:50],
+                            "new_image": "AI-generated",
+                            "source": "ai"
+                        })
+                    else:
+                        failed.append({
+                            "name": name,
+                            "reason": "Both Wikipedia and AI generation failed"
+                        })
+                except Exception as ai_error:
+                    failed.append({
+                        "name": name,
+                        "reason": f"AI generation error: {str(ai_error)[:50]}"
+                    })
         except Exception as e:
             failed.append({
                 "name": name,
