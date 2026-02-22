@@ -3220,7 +3220,7 @@ async def remove_from_team(data: AddToTeam):
         raise HTTPException(status_code=404, detail="Celebrity not in team")
     
     new_budget = team.get("budget_remaining", 0) + removed["price"]
-    new_points = team.get("total_points", 0) - removed["buzz_score"]
+    new_weekly_points = team.get("weekly_points", 0) - removed["buzz_score"]
     
     await db.teams.update_one(
         {"id": data.team_id},
@@ -3228,12 +3228,16 @@ async def remove_from_team(data: AddToTeam):
             "$pull": {"celebrities": {"celebrity_id": data.celebrity_id}},
             "$set": {
                 "budget_remaining": new_budget,
-                "total_points": max(0, new_points)
+                "weekly_points": max(0, new_weekly_points),
+                "total_points": max(0, new_weekly_points)
             }
         }
     )
     
     updated_team = await db.teams.find_one({"id": data.team_id}, {"_id": 0})
+    # Set total_points to weekly_points for display
+    if updated_team:
+        updated_team["total_points"] = updated_team.get("weekly_points", 0)
     return {"team": updated_team}
 
 @api_router.get("/leaderboard")
