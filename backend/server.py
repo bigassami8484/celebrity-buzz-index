@@ -2322,11 +2322,27 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         temp_celeb = {"name": wiki_info["name"], "age": age, "is_deceased": is_deceased}
         price = await apply_brown_bread_premium(temp_celeb, price)
     
+    # Determine image - prefer Wikipedia, fall back to AI generation
+    celebrity_image = wiki_info.get("image", "")
+    if not celebrity_image or "ui-avatars" in celebrity_image.lower():
+        logger.info(f"No Wikipedia image for {wiki_info['name']}, trying AI generation")
+        try:
+            ai_image = await get_or_generate_celebrity_image(wiki_info["name"], wiki_info.get("bio", ""))
+            if ai_image:
+                celebrity_image = ai_image
+                logger.info(f"Generated AI image for {wiki_info['name']}")
+        except Exception as e:
+            logger.error(f"AI image generation failed for {wiki_info['name']}: {e}")
+    
+    # Final fallback to placeholder
+    if not celebrity_image:
+        celebrity_image = f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&size=400&background=FF0099&color=fff"
+    
     # Create celebrity object
     celebrity = Celebrity(
         name=wiki_info["name"],
         bio=wiki_info["bio"][:500] if wiki_info["bio"] else "No biography available.",
-        image=wiki_info["image"] or f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&size=400&background=FF0099&color=fff",
+        image=celebrity_image,
         category=category,
         wiki_url=wiki_info["wiki_url"],
         buzz_score=buzz_score,
