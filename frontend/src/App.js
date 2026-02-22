@@ -474,9 +474,13 @@ function App() {
   // Category change handler - always fetch fresh random celebrities
   const handleCategoryChange = (category) => {
     if (category) {
-      // Always fetch fresh data, even if clicking the same category
+      // Clear current celebrities first to force re-render
+      setCelebrities([]);
       setActiveCategory(category);
-      fetchCelebritiesByCategory(category);
+      // Small delay to ensure state is cleared before fetching
+      setTimeout(() => {
+        fetchCelebritiesByCategory(category);
+      }, 50);
     } else {
       setActiveCategory(null);
       setCelebrities([]);
