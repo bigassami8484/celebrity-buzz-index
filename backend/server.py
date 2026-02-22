@@ -2137,6 +2137,7 @@ async def get_trending():
 async def search_celebrity(search: CelebritySearch, override_category: str = None):
     """Search for a celebrity and get their buzz data"""
     name = search.name.strip()
+    logger.info(f"SEARCH: Starting search for '{name}'")
     
     # Check if this is a common name that should redirect to Wikipedia name
     # e.g., "King Charles" -> "Charles III", "Prince William" -> search Wikipedia
