@@ -1871,15 +1871,37 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
     """
     headers = {"User-Agent": "CelebrityBuzzIndex/1.0"}
     
-    # RSS feeds to search - top sources for fast response
+    # RSS feeds to search - comprehensive showbiz sources
     rss_sources = [
-        # High-speed, reliable sources
+        # UK Showbiz
         ("https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "BBC News"),
         ("https://www.dailymail.co.uk/tvshowbiz/index.rss", "Daily Mail"),
+        ("https://www.thesun.co.uk/tvandshowbiz/feed/", "The Sun"),
+        ("https://www.mirror.co.uk/3am/rss.xml", "Daily Mirror"),
+        ("https://metro.co.uk/entertainment/feed/", "Metro"),
+        ("https://www.express.co.uk/celebrity-news/feed", "Express"),
+        ("https://www.independent.co.uk/topic/celebrities/rss", "The Independent"),
+        ("https://www.theguardian.com/lifeandstyle/celebrities/rss", "The Guardian"),
+        
+        # US Entertainment
+        ("https://variety.com/feed/", "Variety"),
+        ("https://www.hollywoodreporter.com/feed/", "Hollywood Reporter"),
+        ("https://www.buzzfeed.com/celebrity.xml", "BuzzFeed"),
         ("https://people.com/feed/", "People"),
         ("https://www.usmagazine.com/feed/", "Us Weekly"),
-        ("https://www.hollywoodreporter.com/feed/", "Hollywood Reporter"),
-        ("https://variety.com/feed/", "Variety"),
+        ("https://pagesix.com/feed/", "Page Six"),
+        ("https://www.eonline.com/syndication/feeds/rssfeeds/topstories.xml", "E! News"),
+        ("https://www.etonline.com/news/rss", "Entertainment Tonight"),
+        ("https://deadline.com/feed/", "Deadline"),
+        
+        # Music
+        ("https://www.billboard.com/feed/", "Billboard"),
+        ("https://www.rollingstone.com/feed/", "Rolling Stone"),
+        ("https://www.nme.com/feed", "NME"),
+        
+        # General news with entertainment
+        ("https://www.huffpost.com/section/entertainment/feed", "HuffPost"),
+        ("https://rss.cnn.com/rss/cnn_showbiz.rss", "CNN"),
     ]
     
     # Name variations to search for
