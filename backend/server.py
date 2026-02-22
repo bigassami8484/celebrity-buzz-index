@@ -873,7 +873,15 @@ CELEBRITY_POOLS = {
         # Comedians & Others
         "David Attenborough", "Stephen Fry", "Michael Palin", "Joanna Lumley", "Bear Grylls",
         "Jeremy Clarkson", "Richard Hammond", "James May", "Peter Kay", "Michael McIntyre",
-        "Ricky Gervais", "Jimmy Carr", "Russell Howard", "Jack Whitehall", "Rob Beckett"
+        "Ricky Gervais", "Jimmy Carr", "Russell Howard", "Jack Whitehall", "Rob Beckett",
+        # Beckham Family
+        "David Beckham", "Victoria Beckham", "Brooklyn Beckham", "Romeo Beckham", "Cruz Beckham",
+        # Models & Influencers  
+        "Naomi Campbell", "Kate Moss", "Cara Delevingne", "Rosie Huntington-Whiteley", "Daisy Lowe",
+        "Molly-Mae Hague", "Zoe Sugg", "Tanya Burr", "Mrs Hinch", "Stacey Solomon",
+        # More TV Personalities
+        "Davina McCall", "Emma Willis", "Paddy McGuinness", "Keith Lemon", "Fearne Cotton",
+        "Christine Lampard", "Ruth Langsford", "Eamonn Holmes", "Nadia Sawalha", "Coleen Nolan"
     ]
 }
 
