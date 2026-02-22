@@ -9,11 +9,14 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Compete on leaderboards with friends
 - Social sharing (Twitter/X, Facebook, WhatsApp)
 
-## Backend Architecture (Refactored Feb 22, 2026)
+## Backend Architecture (Updated Feb 22, 2026)
 ```
 /app/backend/
-├── server.py          # Main FastAPI app (5355 lines - routes + business logic)
-├── config.py          # Configuration module
+├── server.py          # Main FastAPI app (5080 lines - reduced from 5488)
+├── config/
+│   ├── __init__.py
+│   ├── database.py    # MongoDB connection, env vars (30 lines)
+│   └── settings.py    # Configuration settings
 ├── data/
 │   ├── __init__.py    # Data exports
 │   ├── celebrity_data.py  # Celebrity pools, A-list definitions, aliases (441 lines)
@@ -23,31 +26,37 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 │   ├── celebrity.py   # Celebrity Pydantic models
 │   ├── team.py        # Team models
 │   ├── league.py      # League models
-│   └── auth.py        # Auth models
-├── routes/            # Route templates (ready for migration)
-│   ├── auth.py        # Auth route template
-│   ├── celebrities.py # Celebrity route template
-│   ├── teams.py       # Team route template
-│   ├── leagues.py     # League route template
-│   └── admin.py       # Admin route template
+│   └── auth.py        # Auth models (User, UserSession, MagicLinkRequest, etc.)
+├── routes/            # Modular API routes
+│   ├── __init__.py    # Route exports
+│   ├── auth.py        # ✅ MIGRATED: Auth routes (449 lines)
+│   ├── celebrities.py # Template (pending migration)
+│   ├── teams.py       # Template (pending migration)
+│   ├── leagues.py     # Template (pending migration)
+│   └── admin.py       # Template (pending migration)
 ├── services/          # (Future: extract business logic)
 └── utils/
     ├── __init__.py
     └── helpers.py     # normalize_text, decode_html_entities, sanitize_team_name
 ```
 
-**Completed Refactoring (Phase 1 & 2):**
-- ✅ Extracted celebrity data pools (9 categories, 50+ celebs each)
-- ✅ Extracted constants (banned words, pricing tiers, team options)
-- ✅ Extracted utility functions (text normalization, HTML decoding)
-- ✅ Created Pydantic models in separate files
-- ✅ Server imports from modular structure
-- ✅ Created route template files (auth, celebrities, teams, leagues, admin)
+**Completed Refactoring:**
+- ✅ Phase 1: Extracted celebrity data pools (9 categories, 50+ celebs each)
+- ✅ Phase 1: Extracted constants (banned words, pricing tiers, team options)
+- ✅ Phase 1: Extracted utility functions (text normalization, HTML decoding)
+- ✅ Phase 1: Created Pydantic models in separate files
+- ✅ Phase 2: **AUTH ROUTES MIGRATED** (Feb 22, 2026):
+  - Moved all auth endpoints to `/routes/auth.py`
+  - Includes: /api/auth/me, magic-link/send, magic-link/verify, google/callback, guest/convert, logout, session
+  - Server.py reduced by ~408 lines
+  - Uses shared database config from `/config/database.py`
 
 **Remaining Refactoring (Phase 3 - Future):**
-- Fully migrate routes from server.py to routes/ directory
+- Migrate celebrity routes (search, categories, hot celebs) to `/routes/celebrities.py`
+- Migrate team routes to `/routes/teams.py`
+- Migrate league routes to `/routes/leagues.py`
+- Migrate admin routes to `/routes/admin.py`
 - Extract business logic into services/
-- Split celebrity search/news generation into separate service
 
 ## Current Pricing Structure (DYNAMIC)
 | Tier | Price Range | Strategy Impact |
