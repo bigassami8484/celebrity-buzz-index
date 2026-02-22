@@ -1082,6 +1082,13 @@ CELEBRITY_ALIASES = {
     "prince edward": "Prince Edward, Duke of Edinburgh",
     "prince frederick": "Frederik X",
     "prince frederik of denmark": "Frederik X",
+    "sophie duchess of edinburgh": "Sophie, Duchess of Edinburgh",
+    "sophie wessex": "Sophie, Duchess of Edinburgh",
+    "james viscount severn": "James, Earl of Wessex",
+    "king willem-alexander": "Willem-Alexander of the Netherlands",
+    "king willem-alexander of netherlands": "Willem-Alexander of the Netherlands",
+    "queen maxima": "Queen Máxima of the Netherlands",
+    "queen maxima of netherlands": "Queen Máxima of the Netherlands",
     # Royal Children - Prince William's kids
     "prince george": "Prince George of Wales",
     "george cambridge": "Prince George of Wales",
