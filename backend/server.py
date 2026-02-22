@@ -1113,10 +1113,9 @@ CELEBRITY_ALIASES = {
     "lilibet of sussex": "Princess Lilibet of Sussex",
     "lilibet diana": "Princess Lilibet of Sussex",
     # Actors with disambiguation
-    "chris evans": "Chris Evans (actor)",
-    "christopher evans": "Chris Evans (actor)",
-    "chris evans actor": "Chris Evans (actor)",
-    "chris evans captain america": "Chris Evans (actor)",
+    "christopher evans": "Chris Evans",
+    "chris evans actor": "Chris Evans",
+    "chris evans captain america": "Chris Evans",
 }
 
 # Reverse mapping - canonical name to all aliases (for duplicate checking)
