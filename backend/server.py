@@ -4545,6 +4545,55 @@ async def preview_price_changes():
     }
 
 
+@api_router.get("/admin/scheduler-status")
+async def get_scheduler_status():
+    """
+    Admin endpoint to check the status of scheduled tasks.
+    Returns info about the weekly price reset job.
+    """
+    jobs = scheduler.get_jobs()
+    job_info = []
+    
+    for job in jobs:
+        job_info.append({
+            "id": job.id,
+            "name": job.name,
+            "next_run_time": job.next_run_time.isoformat() if job.next_run_time else None,
+            "trigger": str(job.trigger)
+        })
+    
+    # Get last execution from database
+    last_execution = await db.scheduled_tasks.find_one(
+        {"task": "weekly_price_reset"},
+        {"_id": 0},
+        sort=[("executed_at", -1)]
+    )
+    
+    return {
+        "scheduler_running": scheduler.running,
+        "jobs": job_info,
+        "last_weekly_reset": last_execution
+    }
+
+
+@api_router.post("/admin/trigger-weekly-reset")
+async def trigger_weekly_reset_manually():
+    """
+    Admin endpoint to manually trigger the weekly price reset.
+    Use this if the scheduled task needs to be run outside of its normal schedule.
+    """
+    logger.info("Manual trigger of weekly price reset requested")
+    
+    # Run the scheduled task immediately
+    await scheduled_weekly_price_reset()
+    
+    return {
+        "success": True,
+        "message": "Weekly price reset triggered manually",
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+
 # ==================== AUTH ENDPOINTS ====================
 
 async def get_current_user(request: Request) -> Optional[dict]:
