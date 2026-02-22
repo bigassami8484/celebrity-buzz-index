@@ -561,6 +561,73 @@ function App() {
           loading={searchLoading} 
           team={team}
         />
+        
+        {/* Floating Search Result Card */}
+        {searchedCeleb && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSearchedCeleb(null)}>
+            <div className="bg-[#0A0A0A] border border-[#FF0099] rounded-lg max-w-md w-full shadow-2xl shadow-[#FF0099]/20" onClick={e => e.stopPropagation()}>
+              {/* Close button */}
+              <button 
+                onClick={() => setSearchedCeleb(null)}
+                className="absolute top-4 right-4 text-white/60 hover:text-white"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              
+              <div className="p-6">
+                {/* Image */}
+                <div className="relative mb-4">
+                  <img 
+                    src={searchedCeleb.image} 
+                    alt={searchedCeleb.name}
+                    className="w-full h-64 object-cover rounded-lg"
+                    onError={(e) => {
+                      e.target.src = `https://ui-avatars.com/api/?name=${searchedCeleb.name}&size=400&background=1a1a1a&color=FF0099&bold=true`;
+                    }}
+                  />
+                  <div className="absolute top-3 left-3">
+                    <TierBadge tier={searchedCeleb.tier} />
+                  </div>
+                  <div className="absolute top-3 right-3 bg-[#FFD700] text-black px-3 py-1 rounded font-bold">
+                    £{searchedCeleb.price}M
+                  </div>
+                </div>
+                
+                {/* Info */}
+                <h2 className="font-anton text-2xl text-white uppercase mb-2">{searchedCeleb.name}</h2>
+                <p className="text-[#A1A1AA] text-sm mb-4 line-clamp-3">{searchedCeleb.bio}</p>
+                
+                {/* Category tag */}
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="bg-[#FF0099]/20 text-[#FF0099] px-3 py-1 rounded text-xs uppercase">
+                    {searchedCeleb.category?.replace(/_/g, ' ')}
+                  </span>
+                  <span className="text-[#666] text-xs">Buzz: {searchedCeleb.buzz_score}</span>
+                </div>
+                
+                {/* Add to Team Button */}
+                <button
+                  onClick={() => {
+                    addToTeam(searchedCeleb);
+                    setSearchedCeleb(null);
+                  }}
+                  disabled={isInTeam(searchedCeleb.id) || !canAfford(searchedCeleb.price)}
+                  className={`w-full py-3 rounded font-bold uppercase transition-colors ${
+                    isInTeam(searchedCeleb.id) 
+                      ? 'bg-[#333] text-[#666] cursor-not-allowed' 
+                      : !canAfford(searchedCeleb.price)
+                        ? 'bg-[#333] text-[#666] cursor-not-allowed'
+                        : 'bg-[#FF0099] hover:bg-[#e6008a] text-white'
+                  }`}
+                  data-testid="add-to-team-btn"
+                >
+                  {isInTeam(searchedCeleb.id) ? 'Already in Team' : !canAfford(searchedCeleb.price) ? "Can't Afford" : 'Add to Team'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <CategoryFilter 
           categories={categories} 
           activeCategory={activeCategory} 
