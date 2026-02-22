@@ -1113,6 +1113,12 @@ CELEBRITY_ALIASES = {
     "christopher evans": "Chris Evans",
     "chris evans actor": "Chris Evans",
     "chris evans captain america": "Chris Evans",
+    # Cheryl (singer) - various name aliases
+    "cheryl cole": "Cheryl (singer)",
+    "cheryl singer": "Cheryl (singer)",
+    "cheryl tweedy": "Cheryl (singer)",
+    "cheryl fernandez-versini": "Cheryl (singer)",
+    "cheryl ann tweedy": "Cheryl (singer)",
 }
 
 # Reverse mapping - canonical name to all aliases (for duplicate checking)
