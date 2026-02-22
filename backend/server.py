@@ -1919,6 +1919,12 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
         ("https://www.cbsnews.com/latest/rss/entertainment", "CBS News"),
         ("https://abcnews.go.com/abcnews/entertainmentheadlines", "ABC News"),
         ("https://www.reuters.com/news/archive/entertainmentNews?view=feed&type=rss", "Reuters"),
+        
+        # SPORTS (for footballer celebrities)
+        ("https://www.skysports.com/rss/12040", "Sky Sports"),
+        ("https://www.bbc.co.uk/sport/rss.xml", "BBC Sport"),
+        ("https://www.espn.com/espn/rss/news", "ESPN"),
+        ("https://www.goal.com/en/feeds/news", "Goal"),
     ]
     
     # Name variations to search for - IMPROVED MATCHING
@@ -1931,15 +1937,33 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
     
     # Celebrity-specific aliases (news often uses nicknames)
     celebrity_news_aliases = {
+        # US Celebrities
         "kanye west": ["kanye", "ye", "yeezy"],
         "dwayne johnson": ["the rock", "dwayne johnson", "rock"],
         "sean combs": ["diddy", "p diddy", "puff daddy", "sean combs"],
-        "taylor swift": ["taylor", "swift", "t-swift"],
-        "beyoncé": ["beyonce", "beyoncé", "queen bey", "bey"],
-        "beyonce": ["beyonce", "beyoncé", "queen bey", "bey"],
+        "taylor swift": ["taylor swift", "swift", "t-swift"],
+        "beyoncé": ["beyonce", "beyoncé", "queen bey"],
+        "beyonce": ["beyonce", "beyoncé", "queen bey"],
         "jennifer lopez": ["j.lo", "jlo", "jennifer lopez", "j lo"],
         "kim kardashian": ["kim k", "kardashian", "kim kardashian"],
-        "kanye": ["kanye west", "ye", "yeezy"],
+        # UK Celebrities
+        "cheryl cole": ["cheryl", "cheryl cole", "cheryl tweedy"],
+        "cheryl (singer)": ["cheryl", "cheryl cole", "cheryl tweedy"],
+        "gemma collins": ["the gc", "gemma collins", "gemma"],
+        "stacey solomon": ["stacey solomon", "stacey", "solomon"],
+        "joe swash": ["joe swash", "swash"],
+        "peter andre": ["peter andre", "andre"],
+        "kerry katona": ["kerry katona", "katona"],
+        # Footballers
+        "cristiano ronaldo": ["ronaldo", "cr7", "cristiano"],
+        "lionel messi": ["messi", "lionel"],
+        "marcus rashford": ["rashford", "marcus rashford"],
+        "david beckham": ["beckham", "beckhams", "david beckham"],
+        # Musicians
+        "drake": ["drake", "drizzy", "champagne papi"],
+        "adele": ["adele"],
+        "ed sheeran": ["ed sheeran", "sheeran"],
+        "rihanna": ["rihanna", "riri", "fenty"],
     }
     
     # Start with full name as primary
