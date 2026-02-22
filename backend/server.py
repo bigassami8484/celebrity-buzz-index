@@ -1883,9 +1883,23 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
     search_terms = [name_lower]  # Full name
     if len(name_parts) > 1:
         search_terms.append(name_parts[-1])  # Last name
-        # Handle special cases like "Millie Bobby Brown"
+        # Handle special cases like "Millie Bobby Brown" or "James Van Der Beek"
         if len(name_parts) == 3:
             search_terms.append(f"{name_parts[0]} {name_parts[1]}")  # First two names
+            search_terms.append(f"{name_parts[1]} {name_parts[2]}")  # Last two names (e.g., "Van Der")
+        if len(name_parts) >= 4:
+            # For names like "James Van Der Beek"
+            search_terms.append(" ".join(name_parts[1:]))  # "Van Der Beek"
+            search_terms.append(" ".join(name_parts[-2:]))  # "Der Beek"
+        # Also add first name for very famous people
+        if name_parts[0] not in ["the", "a", "an"]:
+            search_terms.append(name_parts[0])  # First name only
+    
+    # Common last names that need full name match to avoid false positives
+    common_names = ["smith", "jones", "williams", "brown", "davis", "miller", "wilson", 
+                    "moore", "taylor", "martin", "king", "lee", "white", "harris", "james",
+                    "scott", "adams", "hill", "green", "baker", "nelson", "carter", "mitchell",
+                    "roberts", "turner", "phillips", "campbell", "parker", "evans", "edwards"]
     
     # Cutoff date - 2 months ago
     cutoff_date = datetime.now(timezone.utc) - timedelta(days=60)
@@ -1915,7 +1929,19 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
                             title = decode_html_entities(title)
                             title_lower = title.lower()
                             
-                            # Check if celebrity is mentioned in title
+                            # Also check description/content for mentions
+                            desc_text = ""
+                            if "<description>" in item:
+                                desc_start = item.find("<description>") + 13
+                                desc_end = item.find("</description>")
+                                if desc_end > desc_start:
+                                    desc_text = item[desc_start:desc_end].replace("<![CDATA[", "").replace("]]>", "").strip()
+                                    desc_text = decode_html_entities(desc_text).lower()
+                            
+                            # Combined text to search
+                            search_text = f"{title_lower} {desc_text}"
+                            
+                            # Check if celebrity is mentioned
                             celeb_mentioned = False
                             for term in search_terms:
                                 if term in title_lower:
