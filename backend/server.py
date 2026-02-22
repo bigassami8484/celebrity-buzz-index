@@ -1871,42 +1871,54 @@ def get_category_from_bio(bio: str, name: str) -> str:
 async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[dict]:
     """
     Fetch REAL news about a specific celebrity from RSS feeds.
-    Searches multiple entertainment news sources for mentions of the celebrity.
+    Searches ALL major entertainment news sources for mentions of the celebrity.
     Returns list of real news articles from the last 2 months.
     """
-    headers = {"User-Agent": "CelebrityBuzzIndex/1.0"}
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
     
-    # RSS feeds to search - comprehensive showbiz sources
+    # COMPREHENSIVE RSS feeds - ALL major entertainment sources
     rss_sources = [
-        # UK Showbiz
-        ("https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "BBC News"),
+        # UK TABLOIDS & SHOWBIZ
         ("https://www.dailymail.co.uk/tvshowbiz/index.rss", "Daily Mail"),
         ("https://www.thesun.co.uk/tvandshowbiz/feed/", "The Sun"),
         ("https://www.mirror.co.uk/3am/rss.xml", "Daily Mirror"),
         ("https://metro.co.uk/entertainment/feed/", "Metro"),
         ("https://www.express.co.uk/celebrity-news/feed", "Express"),
-        ("https://www.independent.co.uk/topic/celebrities/rss", "The Independent"),
+        ("https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml", "BBC News"),
         ("https://www.theguardian.com/lifeandstyle/celebrities/rss", "The Guardian"),
+        ("https://www.independent.co.uk/topic/celebrities/rss", "The Independent"),
+        ("https://www.ok.co.uk/celebrity-news/feed", "OK! Magazine"),
+        ("https://www.hellomagazine.com/celebrities/rss/", "Hello!"),
         
-        # US Entertainment
-        ("https://variety.com/feed/", "Variety"),
-        ("https://www.hollywoodreporter.com/feed/", "Hollywood Reporter"),
-        ("https://www.buzzfeed.com/celebrity.xml", "BuzzFeed"),
+        # US ENTERTAINMENT & GOSSIP
+        ("https://www.tmz.com/rss.xml", "TMZ"),
         ("https://people.com/feed/", "People"),
         ("https://www.usmagazine.com/feed/", "Us Weekly"),
         ("https://pagesix.com/feed/", "Page Six"),
         ("https://www.eonline.com/syndication/feeds/rssfeeds/topstories.xml", "E! News"),
         ("https://www.etonline.com/news/rss", "Entertainment Tonight"),
-        ("https://deadline.com/feed/", "Deadline"),
+        ("https://www.justjared.com/feed/", "Just Jared"),
+        ("https://www.buzzfeed.com/celebrity.xml", "BuzzFeed"),
+        ("https://www.huffpost.com/section/entertainment/feed", "HuffPost"),
         
-        # Music
+        # HOLLYWOOD TRADE
+        ("https://variety.com/feed/", "Variety"),
+        ("https://www.hollywoodreporter.com/feed/", "Hollywood Reporter"),
+        ("https://deadline.com/feed/", "Deadline"),
+        ("https://www.vanityfair.com/rss/news", "Vanity Fair"),
+        
+        # MUSIC
         ("https://www.billboard.com/feed/", "Billboard"),
         ("https://www.rollingstone.com/feed/", "Rolling Stone"),
         ("https://www.nme.com/feed", "NME"),
+        ("https://pitchfork.com/feed/feed-news/rss", "Pitchfork"),
         
-        # General news with entertainment
-        ("https://www.huffpost.com/section/entertainment/feed", "HuffPost"),
+        # GENERAL NEWS - ENTERTAINMENT SECTIONS
         ("https://rss.cnn.com/rss/cnn_showbiz.rss", "CNN"),
+        ("https://feeds.foxnews.com/foxnews/entertainment", "Fox News"),
+        ("https://www.cbsnews.com/latest/rss/entertainment", "CBS News"),
+        ("https://abcnews.go.com/abcnews/entertainmentheadlines", "ABC News"),
+        ("https://www.reuters.com/news/archive/entertainmentNews?view=feed&type=rss", "Reuters"),
     ]
     
     # Name variations to search for
