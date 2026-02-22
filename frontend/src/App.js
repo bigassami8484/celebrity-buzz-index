@@ -452,6 +452,12 @@ function App() {
   const removeFromTeam = async (celebrityId) => {
     if (!team) return;
     
+    // Check if team is locked
+    if (team.is_locked && !isTransferWindowOpen) {
+      toast.error("Team is locked! Wait for transfer window (Saturday)");
+      return;
+    }
+    
     try {
       const updatedTeam = await removeFromTeamAPI(team.id, celebrityId);
       setTeam(updatedTeam);
@@ -459,6 +465,41 @@ function App() {
       fetchLeaderboard();
     } catch (e) {
       toast.error("Failed to remove celebrity");
+    }
+  };
+  
+  // Submit and lock team
+  const submitTeam = async () => {
+    if (!team) return;
+    
+    try {
+      const response = await fetch(`${API}/api/team/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ team_id: team.id })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to submit team');
+      }
+      
+      const data = await response.json();
+      setTeam(data.team);
+      toast.success("Team submitted and locked! 🔒");
+    } catch (e) {
+      toast.error(e.message || "Failed to submit team");
+    }
+  };
+  
+  // Fetch transfer window status
+  const fetchTransferWindowStatus = async () => {
+    try {
+      const response = await fetch(`${API}/api/transfer-window-status`);
+      const data = await response.json();
+      setIsTransferWindowOpen(data.is_open);
+    } catch (e) {
+      console.error("Failed to fetch transfer window status");
     }
   };
 
