@@ -1062,6 +1062,12 @@ CELEBRITY_ALIASES = {
     "snoop dog": "Snoop Dogg",
     "lady gaga": "Lady Gaga",
     "stefani germanotta": "Lady Gaga",
+    # Brian Cox disambiguation
+    "brian cox": "Brian Cox (physicist)",
+    "brian cox physicist": "Brian Cox (physicist)",
+    "brian cox scientist": "Brian Cox (physicist)",
+    "professor brian cox": "Brian Cox (physicist)",
+    "brian cox actor": "Brian Cox (actor)",
     # Royal Children - Prince William's kids
     "prince george": "Prince George of Wales",
     "george cambridge": "Prince George of Wales",
