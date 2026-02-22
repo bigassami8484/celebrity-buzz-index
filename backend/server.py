@@ -3636,6 +3636,84 @@ async def get_hall_of_fame():
     return {"hall_of_fame": hall_of_fame[:20]}  # Top 20
 
 
+# ==================== ADMIN ENDPOINTS ====================
+
+@api_router.post("/admin/recategorize-all")
+async def recategorize_all_celebrities():
+    """
+    Admin endpoint to recategorize all celebrities in the database.
+    Re-runs the detect_category_from_bio function on each celebrity
+    and updates any that have changed.
+    """
+    # Get all celebrities
+    all_celebs = await db.celebrities.find({}).to_list(1000)
+    
+    updated = []
+    unchanged = []
+    errors = []
+    
+    for celeb in all_celebs:
+        try:
+            name = celeb.get("name", "")
+            bio = celeb.get("bio", "")
+            old_category = celeb.get("category", "other")
+            
+            # Detect the correct category
+            new_category = detect_category_from_bio(bio, name)
+            
+            if new_category != old_category:
+                # Update the celebrity
+                await db.celebrities.update_one(
+                    {"_id": celeb["_id"]},
+                    {"$set": {"category": new_category}}
+                )
+                updated.append({
+                    "name": name,
+                    "old_category": old_category,
+                    "new_category": new_category
+                })
+            else:
+                unchanged.append(name)
+        except Exception as e:
+            errors.append({"name": celeb.get("name", "unknown"), "error": str(e)})
+    
+    return {
+        "success": True,
+        "summary": {
+            "total_processed": len(all_celebs),
+            "updated_count": len(updated),
+            "unchanged_count": len(unchanged),
+            "error_count": len(errors)
+        },
+        "updated": updated,
+        "errors": errors if errors else None
+    }
+
+
+@api_router.get("/admin/category-summary")
+async def get_category_summary():
+    """
+    Admin endpoint to get a summary of all celebrities by category.
+    """
+    all_celebs = await db.celebrities.find({}, {"_id": 0, "name": 1, "category": 1}).to_list(1000)
+    
+    by_category = {}
+    for celeb in all_celebs:
+        cat = celeb.get("category", "unknown")
+        if cat not in by_category:
+            by_category[cat] = []
+        by_category[cat].append(celeb.get("name"))
+    
+    # Sort names within each category
+    for cat in by_category:
+        by_category[cat] = sorted(by_category[cat])
+    
+    return {
+        "total_celebrities": len(all_celebs),
+        "categories": {cat: {"count": len(names), "celebrities": names} for cat, names in sorted(by_category.items())}
+    }
+
+
 # ==================== AUTH ENDPOINTS ====================
 
 async def get_current_user(request: Request) -> Optional[dict]:
