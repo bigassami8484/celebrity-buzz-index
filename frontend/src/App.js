@@ -1010,7 +1010,7 @@ function App() {
                   <li><strong className="text-[#CD7F32]">C-LIST:</strong> £500K - £2M</li>
                   <li><strong className="text-[#666]">D-LIST:</strong> £100K - £500K</li>
                 </ul>
-                <p className="mt-2">Prices fluctuate based on news coverage - buy low when they're out of the spotlight!</p>
+                <p className="mt-2"><strong className="text-[#00F0FF]">Profit from price rises!</strong> When you sell a celebrity, you get their <em>current</em> market price - not what you paid. Buy at £6M, sell at £15M, pocket the £9M profit!</p>
               </div>
             </details>
             
