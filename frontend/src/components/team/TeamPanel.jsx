@@ -97,7 +97,10 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize }) => {
                 className="team-celeb-image"
               />
               <div className="flex-1">
-                <p className="font-bold">{celeb.name}</p>
+                <p className="font-bold">
+                  {celeb.name}
+                  {celeb.is_deceased && <span className="ml-1" title="Deceased">💀</span>}
+                </p>
                 <p className="text-sm text-[#A1A1AA] flex items-center gap-2">
                   <span className="text-[#FFD700]">£{celeb.price}M</span>
                   {priceChange && (
