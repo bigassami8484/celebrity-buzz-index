@@ -37,7 +37,10 @@ const BrownBreadWatch = ({ watchList, onSelect }) => {
               onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${celeb.name}&size=32&background=666&color=fff`; }}
             />
             <div className="flex-1 min-w-0">
-              <span className="text-sm truncate block">{celeb.name}</span>
+              <span className="text-sm truncate block">
+                {celeb.name}
+                {celeb.is_deceased && <span className="ml-1" title="Deceased">💀</span>}
+              </span>
               <span className="text-xs text-[#666]">Age {celeb.age}</span>
             </div>
             <div className="text-right">
