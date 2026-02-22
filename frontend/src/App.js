@@ -593,9 +593,9 @@ function App() {
                     {searchedCeleb.previous_week_price > 0 && (
                       <>
                         {searchedCeleb.price > searchedCeleb.previous_week_price ? (
-                          <TrendingUp className="w-4 h-4 text-green-600" />
+                          <TrendingUp className="w-4 h-4 text-emerald-700" />
                         ) : searchedCeleb.price < searchedCeleb.previous_week_price ? (
-                          <TrendingDown className="w-4 h-4 text-red-600" />
+                          <TrendingDown className="w-4 h-4 text-red-700" />
                         ) : (
                           <Minus className="w-4 h-4 text-gray-600" />
                         )}
