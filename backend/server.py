@@ -1068,6 +1068,9 @@ CELEBRITY_ALIASES = {
     "brian cox scientist": "Brian Cox (physicist)",
     "professor brian cox": "Brian Cox (physicist)",
     "brian cox actor": "Brian Cox (actor)",
+    # Reality TV Personalities
+    "sam thompson": "Sam Thompson (TV personality)",
+    "spencer matthews": "Spencer Matthews",
     # Royal Children - Prince William's kids
     "prince george": "Prince George of Wales",
     "george cambridge": "Prince George of Wales",
