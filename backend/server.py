@@ -2529,6 +2529,31 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         wikipedia_search_name = CELEBRITY_ALIASES[name.lower()]
         logger.info(f"Redirecting search from '{name}' to '{wikipedia_search_name}'")
     
+    # FILTER OUT BANDS/GROUPS - Only allow individual celebrities
+    banned_band_names = [
+        "twenty one pilots", "21 pilots", "the 1975", "1975", "coldplay", "maroon 5",
+        "one direction", "bts", "blackpink", "little mix", "fifth harmony",
+        "backstreet boys", "nsync", "spice girls", "destiny's child", "jonas brothers",
+        "imagine dragons", "fall out boy", "panic! at the disco", "panic at the disco",
+        "green day", "blink-182", "blink 182", "arctic monkeys", "oasis", "blur",
+        "take that", "westlife", "boyzone", "the beatles", "beatles", "rolling stones",
+        "the rolling stones", "queen", "abba", "fleetwood mac", "the who", "pink floyd",
+        "led zeppelin", "guns n roses", "nirvana", "pearl jam", "foo fighters",
+        "red hot chili peppers", "u2", "radiohead", "the killers", "killers", "muse",
+        "linkin park", "system of a down", "slipknot", "my chemical romance",
+        "paramore", "all time low", "pierce the veil", "sleeping with sirens",
+        "black veil brides", "bring me the horizon", "asking alexandria",
+        "of mice & men", "a day to remember", "the wanted", "the vamps",
+        "why don't we", "why dont we", "cnco", "prettymuch", "in real life",
+        "brockhampton", "nct", "exo", "got7", "stray kids", "twice", "red velvet",
+        "girls generation", "itzy", "aespa", "newjeans", "ive", "le sserafim",
+        "nmixx", "(g)i-dle", "g idle", "mamamoo", "everglow", "loona", "dreamcatcher"
+    ]
+    
+    if name.lower() in banned_band_names:
+        logger.info(f"Rejected band/group search: {name}")
+        raise HTTPException(status_code=400, detail=f"'{name}' is a band/group. This game is for individual celebrities only.")
+    
     # FIRST: Check if this celeb is in the Hot Celebs cache - use that price for consistency
     hot_celebs_cache = await db.news_cache.find_one(
         {"type": "hot_celebs_from_news_v4"},
