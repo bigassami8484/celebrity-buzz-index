@@ -325,6 +325,7 @@ class TeamCelebrity(BaseModel):
     price: float
     buzz_score: float
     tier: str = "D"
+    previous_week_price: float = 0.0  # Track price change from last week
     added_at: str = ""
 
 # Team customization options
