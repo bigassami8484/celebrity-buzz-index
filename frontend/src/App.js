@@ -727,6 +727,8 @@ function App() {
             onRemove={removeFromTeam}
             onShare={() => setShowShareModal(true)}
             onCustomize={() => { fetchCustomOptions(); setShowCustomize(true); }}
+            onSubmitTeam={submitTeam}
+            isTransferWindowOpen={isTransferWindowOpen}
           />
         </div>
         
