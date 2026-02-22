@@ -2312,7 +2312,7 @@ async def get_price_history_by_name(name: str, limit: int = 30):
 
 @api_router.get("/celebrities/category/{category}")
 async def get_celebrities_by_category(category: str, response: Response):
-    """Get 10 NEW random celebrities by category - pulls fresh celebs from large pool"""
+    """Get 10 random celebrities by category from large pool"""
     import random
     
     # Prevent any caching
@@ -2325,27 +2325,34 @@ async def get_celebrities_by_category(category: str, response: Response):
     if not pool:
         return {"celebrities": []}
     
-    # Shuffle the pool and pick 10 random names
-    random.shuffle(pool)
-    selected_names = pool[:15]  # Get 15 to ensure we get 10 after filtering
+    # Shuffle the entire pool
+    shuffled_pool = pool.copy()
+    random.shuffle(shuffled_pool)
     
     celebrities = []
+    names_to_fetch = []
     
-    for name in selected_names:
+    # First pass: get celebrities already in database (fast)
+    for name in shuffled_pool:
         if len(celebrities) >= 10:
             break
             
-        # Check if already in database
         existing = await db.celebrities.find_one(
             {"name": {"$regex": f"^{name}$", "$options": "i"}},
             {"_id": 0}
         )
         
-        if existing:
-            # Use existing data
+        if existing and existing.get("news"):
             celebrities.append(existing)
-        else:
-            # Fetch new celebrity data from Wikipedia
+        elif len(names_to_fetch) < 5:
+            # Queue up to 5 new celebs to fetch
+            names_to_fetch.append(name)
+    
+    # If we don't have enough, fetch a few new ones (limit to 3 to keep response fast)
+    if len(celebrities) < 10 and names_to_fetch:
+        for name in names_to_fetch[:3]:
+            if len(celebrities) >= 10:
+                break
             try:
                 search = CelebritySearch(name=name)
                 result = await search_celebrity(search, override_category=category)
@@ -2353,7 +2360,6 @@ async def get_celebrities_by_category(category: str, response: Response):
                     celebrities.append(result)
             except Exception as e:
                 logger.error(f"Error fetching {name}: {e}")
-                continue
     
     # Recalculate dynamic prices
     default_buzz = 50
@@ -2361,7 +2367,7 @@ async def get_celebrities_by_category(category: str, response: Response):
         tier = celeb.get("tier", "D")
         celeb["price"] = get_dynamic_price(tier, default_buzz, celeb.get("name", ""))
     
-    # Final shuffle
+    # Final shuffle to ensure randomness
     random.shuffle(celebrities)
     
     return {"celebrities": celebrities[:10]}
