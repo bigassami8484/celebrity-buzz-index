@@ -1,8 +1,9 @@
-import { Film, Tv, Music, Trophy, Crown, Star, Users, Megaphone } from "lucide-react";
+import { Film, Tv, Music, Trophy, Crown, Star, Users, Megaphone, Video } from "lucide-react";
 
 const categoryIcons = {
   movie_stars: Film,
   tv_actors: Tv,
+  tv_personalities: Video,
   musicians: Music,
   athletes: Trophy,
   royals: Crown,
