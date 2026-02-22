@@ -9,8 +9,8 @@ const TopPickedCelebs = ({ celebs, onSelect }) => {
         <TrendingUp className="w-5 h-5" />
         Most Picked
       </h4>
-      <div className="space-y-2">
-        {celebs.slice(0, 5).map((celeb, idx) => (
+      <div className="space-y-2 max-h-96 overflow-y-auto">
+        {celebs.slice(0, 10).map((celeb, idx) => (
           <div 
             key={celeb.id} 
             className="flex items-center gap-3 p-2 hover:bg-[#1A1A1A] cursor-pointer"
