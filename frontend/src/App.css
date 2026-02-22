@@ -641,7 +641,7 @@
   }
 }
 
-/* Extra Small Mobile */
+/* Extra Small Mobile - 480px and below */
 @media (max-width: 480px) {
   header h1 {
     font-size: 2.75rem !important;
@@ -675,6 +675,7 @@
   .add-button {
     padding: 10px;
     font-size: 11px;
+    min-height: 44px; /* Touch-friendly */
   }
   
   .team-celeb {
@@ -685,6 +686,52 @@
   .team-celeb-image {
     width: 40px;
     height: 40px;
+  }
+  
+  /* Mobile Team Panel - Compact */
+  .team-panel {
+    padding: 12px;
+  }
+  
+  .team-header {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+  
+  .team-header > div:first-child {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .team-header > div:last-child {
+    text-align: center;
+    width: 100%;
+  }
+  
+  .budget-display {
+    font-size: 24px;
+  }
+  
+  /* Ensure buttons are touch-friendly */
+  button, .btn, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Stack grids vertically */
+  .grid {
+    gap: 12px !important;
+  }
+  
+  /* Compact cards */
+  .leaderboard, .news-panel {
+    padding: 12px;
+  }
+  
+  /* Touch-friendly remove button */
+  .remove-btn {
+    padding: 8px 12px;
   }
 }
 
