@@ -733,67 +733,39 @@ function App() {
                 {/* News Articles Section */}
                 {searchedCeleb.news && searchedCeleb.news.length > 0 && (
                   <div className="mb-4">
-                    <h3 className="text-[#00F0FF] text-sm font-bold uppercase mb-2 flex items-center gap-2">
+                    <h3 className="text-[#00F0FF] text-sm font-bold uppercase mb-3 flex items-center gap-2">
                       <Newspaper className="w-4 h-4" />
                       Latest News
                     </h3>
-                    <p className="text-[#666] text-xs mb-3">
-                      ✓ Real = actual news (clickable) | ⚡ Buzz = AI-predicted headlines. Both count towards points!
-                    </p>
                     <div className="space-y-2 max-h-48 overflow-y-auto">
                       {[...searchedCeleb.news]
                         .sort((a, b) => new Date(b.date) - new Date(a.date))
                         .slice(0, 5)
-                        .map((article, idx) => {
-                          // Only make it a link if it has a real URL
-                          const hasRealUrl = article.url && article.url.startsWith('http');
-                          const isRealNews = article.is_real || article.is_real_news;
-                          
-                          const content = (
-                            <>
-                              <p className="text-white text-sm font-medium mb-1 line-clamp-2 group-hover:text-[#FF0099] transition-colors">{article.title}</p>
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="text-[#A1A1AA] flex items-center gap-1">
-                                  {article.source}
-                                  {isRealNews ? (
-                                    <span className="text-green-400 ml-1" title="Real news article - click to read">✓ Real</span>
-                                  ) : (
-                                    <span className="text-yellow-400 ml-1" title="AI-predicted buzz - counts towards points">⚡ Buzz</span>
-                                  )}
-                                </span>
-                                <span className={`px-2 py-0.5 rounded ${
-                                  article.sentiment === 'positive' ? 'bg-green-500/20 text-green-400' :
-                                  article.sentiment === 'negative' ? 'bg-red-500/20 text-red-400' :
-                                  'bg-gray-500/20 text-gray-400'
-                                }`}>
-                                  {article.sentiment}
-                                </span>
-                              </div>
-                              <p className="text-[#666] text-xs mt-1">{article.date}</p>
-                            </>
-                          );
-                          
-                          return hasRealUrl ? (
-                            <a 
-                              key={idx} 
-                              href={article.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="block bg-[#1A1A1A] p-3 rounded border border-[#262626] hover:border-[#FF0099] hover:bg-[#1A1A1A]/80 transition-all cursor-pointer group"
-                              data-testid={`news-article-${idx}`}
-                            >
-                              {content}
-                            </a>
-                          ) : (
-                            <div 
-                              key={idx} 
-                              className="block bg-[#1A1A1A] p-3 rounded border border-[#262626] group"
-                              data-testid={`news-article-${idx}`}
-                            >
-                              {content}
+                        .map((article, idx) => (
+                          <a 
+                            key={idx} 
+                            href={article.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block bg-[#1A1A1A] p-3 rounded border border-[#262626] hover:border-[#FF0099] hover:bg-[#1A1A1A]/80 transition-all cursor-pointer group"
+                            data-testid={`news-article-${idx}`}
+                          >
+                            <p className="text-white text-sm font-medium mb-1 line-clamp-2 group-hover:text-[#FF0099] transition-colors">{article.title}</p>
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-[#A1A1AA]">
+                                {article.source}
+                              </span>
+                              <span className={`px-2 py-0.5 rounded ${
+                                article.sentiment === 'positive' ? 'bg-green-500/20 text-green-400' :
+                                article.sentiment === 'negative' ? 'bg-red-500/20 text-red-400' :
+                                'bg-gray-500/20 text-gray-400'
+                              }`}>
+                                {article.sentiment}
+                              </span>
                             </div>
-                          );
-                        })}
+                            <p className="text-[#666] text-xs mt-1">{article.date}</p>
+                          </a>
+                        ))}
                     </div>
                   </div>
                 )}
