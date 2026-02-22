@@ -2573,29 +2573,11 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
             new_price = await apply_brown_bread_premium(existing, new_price)
             existing["price"] = new_price
         
-        # Check if image is a placeholder and try to refresh from Wikipedia
+        # Check if image is a placeholder - refresh in background (don't block response)
         current_image = existing.get("image", "")
         if "ui-avatars" in current_image.lower() or not current_image:
-            logger.info(f"Refreshing Wikipedia image for {celeb_name} (had placeholder)")
-            try:
-                wiki_info = await fetch_wikipedia_info(celeb_name)
-                new_image = wiki_info.get("image", "")
-                if new_image and "ui-avatars" not in new_image.lower():
-                    existing["image"] = new_image
-                    await db.celebrities.update_one(
-                        {"id": existing.get("id")},
-                        {"$set": {"image": new_image}}
-                    )
-                    logger.info(f"Updated image for {celeb_name}: {new_image[:50]}...")
-                # Also update bio if it was placeholder
-                if existing.get("bio") == "Celebrity profile" and wiki_info.get("bio"):
-                    existing["bio"] = wiki_info["bio"][:500]
-                    await db.celebrities.update_one(
-                        {"id": existing.get("id")},
-                        {"$set": {"bio": existing["bio"]}}
-                    )
-            except Exception as e:
-                logger.error(f"Failed to refresh image for {celeb_name}: {e}")
+            # Schedule image refresh in background - don't await
+            asyncio.create_task(refresh_celeb_image_background(existing.get("id"), celeb_name))
         
         # Regenerate news if empty, missing, or older than 24 hours
         # OPTIMIZATION: Skip for hot celebs - they already have recent news context
