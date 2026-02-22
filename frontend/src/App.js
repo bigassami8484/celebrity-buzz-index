@@ -471,12 +471,14 @@ function App() {
     return (team?.budget_remaining || 0) >= price;
   };
 
-  // Category change handler
+  // Category change handler - always fetch fresh random celebrities
   const handleCategoryChange = (category) => {
-    setActiveCategory(category);
     if (category) {
+      // Always fetch fresh data, even if clicking the same category
+      setActiveCategory(category);
       fetchCelebritiesByCategory(category);
     } else {
+      setActiveCategory(null);
       setCelebrities([]);
     }
   };
