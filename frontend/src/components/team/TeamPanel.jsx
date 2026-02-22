@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Minus, Share2, RotateCcw, TrendingUp, TrendingDown } from "lucide-react";
+import { Minus, Share2, Lock, Unlock, TrendingUp, TrendingDown, Zap } from "lucide-react";
 
 // Helper to calculate price change
 const getPriceChange = (current, previous) => {
@@ -9,8 +9,13 @@ const getPriceChange = (current, previous) => {
   return { diff, percent: ((diff / previous) * 100).toFixed(0) };
 };
 
-const TeamPanel = ({ team, onRemove, onShare, onCustomize }) => {
+const TeamPanel = ({ team, onRemove, onShare, onCustomize, onSubmitTeam, isTransferWindowOpen }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   if (!team) return null;
+  
+  const isTeamLocked = team.is_locked && !isTransferWindowOpen;
+  const canEdit = !isTeamLocked || isTransferWindowOpen;
   
   // Get team color and icon
   const teamColorHex = team.team_color === 'pink' ? '#FF0099' : 
