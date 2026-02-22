@@ -2086,6 +2086,28 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
                         if pub_date and pub_date < cutoff_date:
                             continue
                         
+                        # Extract article URL/link
+                        article_url = ""
+                        if "<link>" in item:
+                            link_start = item.find("<link>") + 6
+                            link_end = item.find("</link>")
+                            if link_end > link_start:
+                                article_url = item[link_start:link_end].replace("<![CDATA[", "").replace("]]>", "").strip()
+                        # Some feeds use guid as link
+                        if not article_url and '<guid isPermaLink="true">' in item:
+                            guid_start = item.find('<guid isPermaLink="true">') + 25
+                            guid_end = item.find("</guid>")
+                            if guid_end > guid_start:
+                                article_url = item[guid_start:guid_end].strip()
+                        # Fallback to guid without attribute
+                        if not article_url and "<guid>" in item:
+                            guid_start = item.find("<guid>") + 6
+                            guid_end = item.find("</guid>")
+                            if guid_end > guid_start:
+                                potential_url = item[guid_start:guid_end].strip()
+                                if potential_url.startswith("http"):
+                                    article_url = potential_url
+                        
                         # Extract description/summary
                         summary = ""
                         if "<description>" in item:
