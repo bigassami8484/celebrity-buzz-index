@@ -208,7 +208,7 @@ export const UserMenu = ({ user, onLogout }) => {
           alt={user.name}
           className="w-8 h-8 rounded-full object-cover border border-[#FF0099]"
         />
-        <span className="text-sm text-white hidden sm:block">{user.name}</span>
+        <span className="text-sm text-white truncate max-w-[100px]">{user.name}</span>
       </button>
       
       {isOpen && (
