@@ -613,7 +613,10 @@ function App() {
                       Latest News
                     </h3>
                     <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {searchedCeleb.news.slice(0, 5).map((article, idx) => (
+                      {[...searchedCeleb.news]
+                        .sort((a, b) => new Date(b.date) - new Date(a.date))
+                        .slice(0, 5)
+                        .map((article, idx) => (
                         <div key={idx} className="bg-[#1A1A1A] p-3 rounded border border-[#262626]">
                           <p className="text-white text-sm font-medium mb-1 line-clamp-2">{article.title}</p>
                           <div className="flex items-center justify-between text-xs">
