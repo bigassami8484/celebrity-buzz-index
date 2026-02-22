@@ -1844,12 +1844,47 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
             Most articles should have sentiment "negative" with sources like The Sun, Daily Mirror, and tabloids covering his controversies."""
     elif "trump" in name_lower:
         controversial_context = """
-            IMPORTANT: Generate news reflecting Donald Trump's controversial political career, legal battles, and divisive public statements.
-            Mix of positive (from supportive outlets) and negative (from critical outlets) sentiments."""
+            IMPORTANT: Generate news reflecting Donald Trump's controversial political career, legal battles, court cases, and divisive public statements.
+            Include news about trials, indictments, rallies, and political controversies. Mix of positive and negative sentiments."""
     elif "kanye" in name_lower or "ye" == name_lower:
         controversial_context = """
-            IMPORTANT: Generate news reflecting Kanye West's controversial statements, business issues, and public incidents.
-            News should be predominantly negative or neutral, reflecting real-world coverage."""
+            IMPORTANT: Generate news reflecting Kanye West's controversial antisemitic statements, erratic behavior, business collapses (Adidas, Gap), and public incidents.
+            News should be predominantly negative, reflecting real-world coverage of his controversies."""
+    elif "diddy" in name_lower or "sean combs" in name_lower or "p. diddy" in name_lower or "puff daddy" in name_lower:
+        controversial_context = """
+            IMPORTANT: Sean 'Diddy' Combs has faced serious legal issues including arrest, federal charges, and multiple lawsuits.
+            News should be predominantly NEGATIVE covering arrests, allegations, legal battles, and industry fallout."""
+    elif "chris brown" in name_lower:
+        controversial_context = """
+            IMPORTANT: Chris Brown has a history of legal issues and controversies including assault charges.
+            Include negative news about legal troubles, controversies alongside any music news."""
+    elif "armie hammer" in name_lower:
+        controversial_context = """
+            IMPORTANT: Armie Hammer faced serious allegations and career collapse. News should reflect his fall from grace."""
+    elif "ezra miller" in name_lower:
+        controversial_context = """
+            IMPORTANT: Ezra Miller has faced multiple arrests, legal issues, and controversies. Include negative news about their legal troubles."""
+    elif "shia labeouf" in name_lower:
+        controversial_context = """
+            IMPORTANT: Shia LaBeouf has had public incidents, legal issues, and relationship controversies. Include some negative/controversial news."""
+    elif "amber heard" in name_lower:
+        controversial_context = """
+            IMPORTANT: Amber Heard was involved in high-profile defamation trial with Johnny Depp. Include news about legal/career aftermath."""
+    elif "alec baldwin" in name_lower:
+        controversial_context = """
+            IMPORTANT: Alec Baldwin faces manslaughter charges related to Rust shooting. Include legal news and trial updates."""
+    elif "harvey weinstein" in name_lower:
+        controversial_context = """
+            IMPORTANT: Harvey Weinstein is a convicted sex offender. All news should be negative covering trials, prison, and accusations."""
+    elif "r kelly" in name_lower or "r. kelly" in name_lower:
+        controversial_context = """
+            IMPORTANT: R. Kelly is a convicted sex offender serving prison time. All news should be negative covering his crimes and sentencing."""
+    elif "katie price" in name_lower:
+        controversial_context = """
+            Include news about her financial troubles, court appearances, driving bans, and relationship drama alongside any positive news."""
+    elif "lindsay lohan" in name_lower:
+        controversial_context = """
+            Include her history of legal issues and rehab stints in context, though recent news may be more positive about her comeback."""
     
     try:
         chat = LlmChat(
