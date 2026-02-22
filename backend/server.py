@@ -639,7 +639,7 @@ def get_brown_bread_risk(age: int) -> str:
 async def apply_brown_bread_premium(celeb: dict, base_price: float) -> float:
     """
     Check if celebrity qualifies for Brown Bread premium pricing.
-    Top 3 oldest living celebrities get premium prices:
+    Top 3 oldest living celebrities (80+) get premium prices:
     - #1 oldest: £15M
     - #2 oldest: £13M
     - #3 oldest: £11M
@@ -647,13 +647,13 @@ async def apply_brown_bread_premium(celeb: dict, base_price: float) -> float:
     age = celeb.get("age", 0)
     is_deceased = celeb.get("is_deceased", False)
     
-    # Only living celebrities with known age qualify
-    if is_deceased or age < 60:
+    # Only living celebrities aged 80+ qualify
+    if is_deceased or age < 80:
         return base_price
     
     # Get top 3 oldest living celebrities from DB
     top_elderly = await db.celebrities.find(
-        {"is_deceased": False, "age": {"$gte": 60}},
+        {"is_deceased": False, "age": {"$gte": 80}},
         {"_id": 0, "name": 1, "age": 1}
     ).sort("age", -1).limit(3).to_list(3)
     
@@ -671,13 +671,13 @@ async def apply_brown_bread_premium(celeb: dict, base_price: float) -> float:
 async def get_brown_bread_premium_by_name(name: str) -> float:
     """
     Check if a celebrity name matches a Brown Bread premium celebrity.
-    Returns the premium price if they're in top 3 oldest, otherwise 0.
+    Returns the premium price if they're in top 3 oldest (80+), otherwise 0.
     """
     name_lower = name.lower().strip()
     
     # Get top 3 oldest living celebrities from DB
     top_elderly = await db.celebrities.find(
-        {"is_deceased": False, "age": {"$gte": 60}},
+        {"is_deceased": False, "age": {"$gte": 80}},
         {"_id": 0, "name": 1, "age": 1}
     ).sort("age", -1).limit(3).to_list(3)
     
