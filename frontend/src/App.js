@@ -75,6 +75,7 @@ function App() {
   const [hotCelebs, setHotCelebs] = useState([]);
   const [priceAlerts, setPriceAlerts] = useState([]);
   const [hotStreaks, setHotStreaks] = useState([]);
+  const [isTransferWindowOpen, setIsTransferWindowOpen] = useState(false);
   
   // Search result floating card state
   const [searchedCeleb, setSearchedCeleb] = useState(null);
