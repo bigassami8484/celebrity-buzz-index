@@ -2590,7 +2590,8 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         "brockhampton", "nct", "exo", "got7", "stray kids", "twice", "red velvet",
         "girls generation", "itzy", "aespa", "newjeans", "ive", "le sserafim",
         "nmixx", "(g)i-dle", "g idle", "mamamoo", "everglow", "loona", "dreamcatcher",
-        "il divo"
+        "il divo", "florence and the machine", "florence + the machine",
+        "onerepublic", "one republic", "jls", "mumford and sons", "mumford & sons"
     ]
     
     if name.lower() in banned_band_names:
