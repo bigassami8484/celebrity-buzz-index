@@ -2589,7 +2589,8 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         "why don't we", "why dont we", "cnco", "prettymuch", "in real life",
         "brockhampton", "nct", "exo", "got7", "stray kids", "twice", "red velvet",
         "girls generation", "itzy", "aespa", "newjeans", "ive", "le sserafim",
-        "nmixx", "(g)i-dle", "g idle", "mamamoo", "everglow", "loona", "dreamcatcher"
+        "nmixx", "(g)i-dle", "g idle", "mamamoo", "everglow", "loona", "dreamcatcher",
+        "il divo"
     ]
     
     if name.lower() in banned_band_names:
