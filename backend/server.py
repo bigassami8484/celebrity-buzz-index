@@ -2171,7 +2171,7 @@ async def get_price_history_by_name(name: str, limit: int = 30):
 
 @api_router.get("/celebrities/category/{category}")
 async def get_celebrities_by_category(category: str):
-    """Get celebrities by category - randomized, with news from past 2 months"""
+    """Get celebrities by category - random selection each time, with news from past 2 months"""
     import random
     
     # Calculate date threshold (2 months ago)
@@ -2181,7 +2181,7 @@ async def get_celebrities_by_category(category: str):
     all_celebrities = await db.celebrities.find(
         {"category": category},
         {"_id": 0}
-    ).to_list(200)
+    ).to_list(500)
     
     # If we don't have enough, seed with trending celebrities
     if len(all_celebrities) < 10 and category in TRENDING_CELEBRITIES:
@@ -2196,7 +2196,7 @@ async def get_celebrities_by_category(category: str):
         all_celebrities = await db.celebrities.find(
             {"category": category},
             {"_id": 0}
-        ).to_list(200)
+        ).to_list(500)
     
     # Deduplicate by name
     seen_names = set()
@@ -2234,19 +2234,24 @@ async def get_celebrities_by_category(category: str):
             if has_recent_news:
                 celebrities_with_recent_news.append(celeb)
     
-    # Shuffle for randomization on each request
-    random.shuffle(celebrities_with_recent_news)
+    # Randomly select 10-15 celebrities from the pool (new selection each time)
+    pool_size = len(celebrities_with_recent_news)
+    if pool_size > 15:
+        # Random sample of 10-15 celebrities
+        sample_size = random.randint(10, 15)
+        selected = random.sample(celebrities_with_recent_news, sample_size)
+    else:
+        # If pool is small, shuffle and return all
+        selected = celebrities_with_recent_news.copy()
+        random.shuffle(selected)
     
     # Recalculate dynamic prices - use CONSISTENT buzz (50)
     default_buzz = 50
-    for celeb in celebrities_with_recent_news:
+    for celeb in selected:
         tier = celeb.get("tier", "D")
         celeb["price"] = get_dynamic_price(tier, default_buzz, celeb.get("name", ""))
     
-    # Return at least 10, or all available if less than 10
-    result = celebrities_with_recent_news[:max(10, len(celebrities_with_recent_news))]
-    
-    return {"celebrities": result}
+    return {"celebrities": selected}
 
 @api_router.get("/stats")
 async def get_stats():
