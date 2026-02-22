@@ -87,7 +87,9 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize }) => {
       
       {team.celebrities?.length > 0 ? (
         <>
-          {team.celebrities.map((celeb) => (
+          {team.celebrities.map((celeb) => {
+            const priceChange = getPriceChange(celeb.price, celeb.previous_week_price);
+            return (
             <div key={celeb.celebrity_id} className="team-celeb" data-testid={`team-celeb-${celeb.celebrity_id}`}>
               <img 
                 src={celeb.image || `https://ui-avatars.com/api/?name=${celeb.name}&size=100&background=FF0099&color=fff`} 
@@ -96,8 +98,18 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize }) => {
               />
               <div className="flex-1">
                 <p className="font-bold">{celeb.name}</p>
-                <p className="text-sm text-[#A1A1AA]">
+                <p className="text-sm text-[#A1A1AA] flex items-center gap-2">
                   <span className="text-[#FFD700]">£{celeb.price}M</span>
+                  {priceChange && (
+                    <span className={`flex items-center gap-0.5 text-xs font-bold ${priceChange.diff > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {priceChange.diff > 0 ? (
+                        <TrendingUp className="w-3 h-3" />
+                      ) : (
+                        <TrendingDown className="w-3 h-3" />
+                      )}
+                      {priceChange.diff > 0 ? '+' : ''}{priceChange.percent}%
+                    </span>
+                  )}
                 </p>
               </div>
               <button 
@@ -108,7 +120,7 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize }) => {
                 <Minus className="w-5 h-5" />
               </button>
             </div>
-          ))}
+          )})}
           <button 
             onClick={onShare}
             className="add-button flex items-center justify-center gap-2 mt-4"
