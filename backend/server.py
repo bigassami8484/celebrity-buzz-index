@@ -2768,6 +2768,26 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     if re.search(date_range_pattern, wiki_info.get("bio", "")):
         is_deceased = True
     
+    # Known deceased celebrities - always mark as deceased
+    known_deceased = [
+        "amy winehouse", "michael jackson", "prince", "david bowie", "whitney houston",
+        "robin williams", "heath ledger", "paul walker", "chadwick boseman", "kobe bryant",
+        "aretha franklin", "elvis presley", "marilyn monroe", "john lennon", "george michael",
+        "carrie fisher", "alan rickman", "princess diana", "freddie mercury", "bob marley",
+        "tupac shakur", "notorious b.i.g.", "mac miller", "juice wrld", "xxxtentacion",
+        "avicii", "chester bennington", "chris cornell", "kurt cobain", "jimi hendrix",
+        "janis joplin", "jim morrison", "philip seymour hoffman", "brittany murphy",
+        "james dean", "audrey hepburn", "grace kelly", "elizabeth taylor", "marlon brando",
+        "frank sinatra", "dean martin", "gene wilder", "stan lee", "stephen hawking",
+        "nelson mandela", "muhammad ali", "diego maradona", "pele", "queen elizabeth",
+        "elizabeth ii", "prince philip", "matthew perry", "lisa marie presley", "tina turner",
+        "sinead o'connor", "tony bennett", "olivia newton-john", "ray liotta", "bob saget",
+        "betty white", "cory monteith", "natalie wood", "lucille ball"
+    ]
+    celeb_name_lower = wiki_info["name"].lower()
+    if any(known in celeb_name_lower for known in known_deceased):
+        is_deceased = True
+    
     # Extract birth year - prefer wiki_info birth_year, fallback to bio extraction
     birth_year = wiki_info.get("birth_year", 0)
     if not birth_year:
