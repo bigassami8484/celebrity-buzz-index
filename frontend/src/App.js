@@ -422,9 +422,6 @@ function App() {
       try {
         const existingTeam = await getTeam(storedTeamId);
         setTeam(prev => prev || existingTeam); // Don't overwrite if already set
-        fetchTeamLeaguesData(storedTeamId);
-        fetchPriceAlerts(storedTeamId);
-        fetchHotStreaks(storedTeamId);
         return;
       } catch (e) {
         localStorage.removeItem("teamId");
@@ -439,7 +436,7 @@ function App() {
     } catch (e) {
       console.error("Error creating team:", e);
     }
-  }, [fetchTeamLeaguesData, fetchPriceAlerts, fetchHotStreaks]);
+  }, []);
 
   // Fetch leaderboard
   const fetchLeaderboard = useCallback(async () => {
