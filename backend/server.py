@@ -2337,21 +2337,29 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         temp_celeb = {"name": wiki_info["name"], "age": age, "is_deceased": is_deceased}
         price = await apply_brown_bread_premium(temp_celeb, price)
     
-    # Determine image - prefer Wikipedia, fall back to AI generation
+    # Celebrities to skip AI generation for (use initials placeholder instead)
+    SKIP_AI_IMAGE_LIST = ["spencer matthews", "georgia toffolo"]
+    
+    # Determine image - prefer Wikipedia, fall back to AI generation (unless in skip list)
     celebrity_image = wiki_info.get("image", "")
     if not celebrity_image or "ui-avatars" in celebrity_image.lower():
-        logger.info(f"No Wikipedia image for {wiki_info['name']}, trying AI generation")
-        try:
-            ai_image = await get_or_generate_celebrity_image(wiki_info["name"], wiki_info.get("bio", ""))
-            if ai_image:
-                celebrity_image = ai_image
-                logger.info(f"Generated AI image for {wiki_info['name']}")
-        except Exception as e:
-            logger.error(f"AI image generation failed for {wiki_info['name']}: {e}")
+        celeb_name_lower = wiki_info["name"].lower()
+        if celeb_name_lower not in SKIP_AI_IMAGE_LIST:
+            logger.info(f"No Wikipedia image for {wiki_info['name']}, trying AI generation")
+            try:
+                ai_image = await get_or_generate_celebrity_image(wiki_info["name"], wiki_info.get("bio", ""))
+                if ai_image:
+                    celebrity_image = ai_image
+                    logger.info(f"Generated AI image for {wiki_info['name']}")
+            except Exception as e:
+                logger.error(f"AI image generation failed for {wiki_info['name']}: {e}")
+        else:
+            logger.info(f"Skipping AI generation for {wiki_info['name']} - using initials")
     
     # Final fallback to placeholder
     if not celebrity_image:
-        celebrity_image = f"https://ui-avatars.com/api/?name={name.replace(' ', '+')}&size=400&background=FF0099&color=fff"
+        clean_name = wiki_info["name"].replace(' ', '+')
+        celebrity_image = f"https://ui-avatars.com/api/?name={clean_name}&size=400&background=1a1a1a&color=FF0099&bold=true&format=png"
     
     # Create celebrity object
     celebrity = Celebrity(
