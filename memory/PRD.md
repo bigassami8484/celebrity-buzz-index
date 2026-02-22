@@ -94,6 +94,9 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
   - Only supplements with AI-generated news when real news is insufficient
   - News articles marked with `is_real: true/false` flag
   - Real news prioritized and shown first in the feed
+  - Improved search matching for multi-word names (e.g., "Van Der Beek")
+  - Special context for recently deceased celebrities ensures accurate news
+  - **RECENT DEATHS HANDLED**: James Van Der Beek (Feb 11), Eric Dane (Feb 18), Robert Duvall
 
 ### UI Features
 - ✅ **HOT CELEBS BANNER** at top of page with **HORIZONTAL AUTO-SCROLL**
