@@ -2165,8 +2165,11 @@ async def get_stats():
     team_count = await db.teams.count_documents({})
     transfer_window = is_transfer_window_open()
     
+    # Start player count at 1 minimum (for display purposes)
+    player_count = max(1, team_count)
+    
     return {
-        "player_count": team_count,
+        "player_count": player_count,
         "transfer_window": transfer_window
     }
 
