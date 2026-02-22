@@ -8,6 +8,7 @@
   "theme_color": "#FF0099",
   "orientation": "portrait",
   "scope": "/",
+  "id": "/",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -23,11 +24,14 @@
     }
   ],
   "categories": ["games", "entertainment"],
+  "prefer_related_applications": false,
+  "related_applications": [],
   "screenshots": [
     {
       "src": "/og-image.png",
       "sizes": "1200x630",
-      "type": "image/png"
+      "type": "image/png",
+      "form_factor": "wide"
     }
   ]
 }
