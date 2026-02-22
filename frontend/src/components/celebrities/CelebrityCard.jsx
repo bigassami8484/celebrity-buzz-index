@@ -87,7 +87,7 @@ const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford, onShowPriceHisto
               </div>
             ))
           ) : (
-            <p className="text-[#A1A1AA] text-sm">No recent news available</p>
+            <p className="text-[#A1A1AA] text-sm">No recent news stories</p>
           )}
         </div>
       </div>
