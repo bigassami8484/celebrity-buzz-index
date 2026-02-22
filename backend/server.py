@@ -3254,10 +3254,16 @@ async def get_leaderboard():
         color_info = next((c for c in TEAM_COLORS if c["id"] == team_color), TEAM_COLORS[0])
         icon_info = next((i for i in TEAM_ICONS if i["id"] == team_icon), TEAM_ICONS[0])
         
+        # Check if weekly points need reset
+        current_points_week = get_monday_reset_week()
+        weekly_points = team.get("weekly_points", 0)
+        if team.get("points_week") != current_points_week:
+            weekly_points = 0  # Reset for display if new week
+        
         leaderboard.append({
             "team_id": team["id"],
             "team_name": team.get("team_name", "Unknown"),
-            "total_points": team.get("total_points", 0),
+            "total_points": weekly_points,  # Use weekly points
             "celebrity_count": len(team.get("celebrities", [])),
             "brown_bread_bonus": team.get("brown_bread_bonus", 0),
             "team_color": color_info["hex"],
