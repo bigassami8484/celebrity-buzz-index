@@ -3076,8 +3076,11 @@ async def add_to_team(data: AddToTeam):
     )
     
     new_budget = team.get("budget_remaining", 50) - price
-    new_points = team.get("total_points", 0) + celeb_points
+    new_weekly_points = team.get("weekly_points", 0) + celeb_points
     new_brown_bread = team.get("brown_bread_bonus", 0) + brown_bread_bonus
+    
+    # Ensure points_week is set
+    current_points_week = get_monday_reset_week()
     
     await db.teams.update_one(
         {"id": data.team_id},
@@ -3085,8 +3088,10 @@ async def add_to_team(data: AddToTeam):
             "$push": {"celebrities": team_celeb.model_dump()},
             "$set": {
                 "budget_remaining": new_budget,
-                "total_points": new_points,
-                "brown_bread_bonus": new_brown_bread
+                "weekly_points": new_weekly_points,
+                "total_points": new_weekly_points,  # Keep in sync for display
+                "brown_bread_bonus": new_brown_bread,
+                "points_week": current_points_week
             }
         }
     )
