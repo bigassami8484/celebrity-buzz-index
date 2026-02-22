@@ -695,6 +695,7 @@ async def get_brown_bread_premium_by_name(name: str) -> float:
 CATEGORIES = [
     {"id": "movie_stars", "name": "Movie Stars", "icon": "film"},
     {"id": "tv_actors", "name": "TV Actors", "icon": "tv"},
+    {"id": "tv_personalities", "name": "TV Personalities", "icon": "video"},
     {"id": "musicians", "name": "Musicians", "icon": "music"},
     {"id": "athletes", "name": "Athletes", "icon": "trophy"},
     {"id": "royals", "name": "Royals", "icon": "crown"},
@@ -707,12 +708,13 @@ CATEGORIES = [
 TRENDING_CELEBRITIES = {
     "movie_stars": ["Tom Holland", "Florence Pugh", "Idris Elba", "Emily Blunt", "Dev Patel"],
     "tv_actors": ["Jenna Coleman", "Jodie Comer", "Richard Madden", "Ncuti Gatwa", "Olivia Colman"],
+    "tv_personalities": ["Graham Norton", "Holly Willoughby", "Ant McPartlin", "Dec Donnelly", "Phillip Schofield"],
     "musicians": ["Dua Lipa", "Ed Sheeran", "Adele", "Harry Styles", "Stormzy"],
     "athletes": ["Harry Kane", "Marcus Rashford", "Emma Raducanu", "Lewis Hamilton", "Raheem Sterling"],
     "royals": ["Prince William", "Kate Middleton", "Prince Harry", "Meghan Markle", "Prince Andrew"],
     "reality_tv": ["Katie Price", "Gemma Collins", "Pete Wicks", "Joey Essex", "Sam Faiers"],
     "public_figure": ["Elon Musk", "Donald Trump", "Boris Johnson", "Greta Thunberg", "Alexandria Ocasio-Cortez", "Joe Rogan", "Andrew Tate", "Jordan Peterson", "Nigel Farage", "Rishi Sunak"],
-    "other": ["David Beckham", "Gordon Ramsay", "Bear Grylls", "Jeremy Clarkson", "James Corden"],
+    "other": ["Gordon Ramsay", "Bear Grylls", "Jeremy Clarkson", "Jamie Oliver", "Nigella Lawson"],
 }
 
 # LARGE CELEBRITY POOLS - 50+ celebrities per category to pull from
