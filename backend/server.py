@@ -3989,8 +3989,8 @@ async def transfer_celebrity(data: TransferRequest):
         # Reset transfers for new week
         team["transfers_this_week"] = 0
     
-    if team.get("transfers_this_week", 0) >= 3:
-        raise HTTPException(status_code=400, detail="You've used all 3 transfers this week! Wait until next week.")
+    if team.get("transfers_this_week", 0) >= MAX_WEEKLY_TRANSFERS:
+        raise HTTPException(status_code=400, detail=f"You've used all {MAX_WEEKLY_TRANSFERS} transfers this week! Wait until next week.")
     
     # Find celebrity to sell
     sell_celeb = None
