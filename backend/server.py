@@ -699,6 +699,7 @@ CATEGORIES = [
     {"id": "athletes", "name": "Athletes", "icon": "trophy"},
     {"id": "royals", "name": "Royals", "icon": "crown"},
     {"id": "reality_tv", "name": "Reality TV", "icon": "star"},
+    {"id": "public_figure", "name": "Public Figure", "icon": "megaphone"},
     {"id": "other", "name": "Other", "icon": "users"},
 ]
 
@@ -710,6 +711,7 @@ TRENDING_CELEBRITIES = {
     "athletes": ["Harry Kane", "Marcus Rashford", "Emma Raducanu", "Lewis Hamilton", "Raheem Sterling"],
     "royals": ["Prince William", "Kate Middleton", "Prince Harry", "Meghan Markle", "Prince Andrew"],
     "reality_tv": ["Katie Price", "Gemma Collins", "Pete Wicks", "Joey Essex", "Sam Faiers"],
+    "public_figure": ["Elon Musk", "Donald Trump", "Boris Johnson", "Greta Thunberg", "Alexandria Ocasio-Cortez", "Joe Rogan", "Andrew Tate", "Jordan Peterson", "Nigel Farage", "Rishi Sunak"],
     "other": ["David Beckham", "Gordon Ramsay", "Bear Grylls", "Jeremy Clarkson", "James Corden"],
 }
 
