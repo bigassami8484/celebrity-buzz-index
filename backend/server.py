@@ -1960,26 +1960,26 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
     seen_titles = set()  # Avoid duplicates
     
     try:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=10.0) as client:
             # Fetch all RSS feeds concurrently for speed
             async def fetch_rss(url, source):
                 try:
-                    response = await client.get(url, timeout=5.0, headers=headers)
+                    response = await client.get(url, timeout=8.0, headers=headers, follow_redirects=True)
                     if response.status_code == 200:
                         return (source, response.text)
-                except:
-                    pass
+                except Exception as e:
+                    logger.debug(f"RSS fetch failed for {source}: {e}")
                 return None
             
             # Run all fetches in parallel
             tasks = [fetch_rss(url, source) for url, source in rss_sources]
-            results = await asyncio.gather(*tasks)
+            results = await asyncio.gather(*tasks, return_exceptions=True)
             
             for result in results:
-                if not result:
+                if not result or isinstance(result, Exception):
                     continue
                 source_name, content = result
-                items = content.split("<item>")[1:30]  # Get up to 30 items per source
+                items = content.split("<item>")[1:50]  # Get up to 50 items per source for better coverage
                 
                 for item in items:
                     try:
