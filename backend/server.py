@@ -718,106 +718,162 @@ TRENDING_CELEBRITIES = {
 # LARGE CELEBRITY POOLS - 50+ celebrities per category to pull from
 CELEBRITY_POOLS = {
     "movie_stars": [
+        # Current A-listers
         "Tom Holland", "Florence Pugh", "Idris Elba", "Emily Blunt", "Dev Patel",
         "Leonardo DiCaprio", "Brad Pitt", "Angelina Jolie", "Tom Cruise", "Jennifer Lawrence",
         "Margot Robbie", "Ryan Gosling", "Emma Stone", "Chris Hemsworth", "Scarlett Johansson",
         "Robert Downey Jr", "Chris Evans", "Zendaya", "Timothee Chalamet", "Sydney Sweeney",
         "Ana de Armas", "Austin Butler", "Jacob Elordi", "Glen Powell", "Jenna Ortega",
         "Anya Taylor-Joy", "Paul Mescal", "Barry Keoghan", "Daisy Edgar-Jones", "Josh O'Connor",
-        "Cillian Murphy", "Emily Ratajkowski", "Dakota Johnson", "Pedro Pascal", "Oscar Isaac",
+        "Cillian Murphy", "Dakota Johnson", "Pedro Pascal", "Oscar Isaac", "Florence Pugh",
         "Jason Momoa", "Gal Gadot", "Henry Cavill", "Dwayne Johnson", "Vin Diesel",
         "Keanu Reeves", "Sandra Bullock", "Julia Roberts", "George Clooney", "Matt Damon",
         "Ben Affleck", "Jennifer Garner", "Reese Witherspoon", "Nicole Kidman", "Cate Blanchett",
         "Meryl Streep", "Viola Davis", "Denzel Washington", "Samuel L Jackson", "Morgan Freeman",
         "Al Pacino", "Robert De Niro", "Michael Caine", "Anthony Hopkins", "Ian McKellen",
         "Patrick Stewart", "Judi Dench", "Helen Mirren", "Emma Thompson", "Kate Winslet",
-        "Rachel McAdams", "Anne Hathaway", "Natalie Portman", "Keira Knightley", "Saoirse Ronan"
+        "Rachel McAdams", "Anne Hathaway", "Natalie Portman", "Keira Knightley", "Saoirse Ronan",
+        # More stars
+        "Chris Pratt", "Ryan Reynolds", "Hugh Jackman", "Mark Wahlberg", "Will Smith",
+        "Johnny Depp", "Tom Hanks", "Harrison Ford", "Michael B Jordan", "John Boyega",
+        "Lupita Nyongo", "Awkwafina", "Simu Liu", "Gemma Chan", "Michelle Yeoh",
+        "Jamie Lee Curtis", "Brendan Fraser", "Ke Huy Quan", "Jessica Chastain", "Julianne Moore",
+        "Amy Adams", "Emily Ratajkowski", "Hailee Steinfeld", "Elle Fanning", "Dakota Fanning"
     ],
     "tv_actors": [
+        # British TV
         "Jenna Coleman", "Jodie Comer", "Richard Madden", "Ncuti Gatwa", "Olivia Colman",
         "David Tennant", "Matt Smith", "Peter Capaldi", "Jodie Whittaker", "Karen Gillan",
+        "Suranne Jones", "Martin Compston", "Vicky McClure", "Adrian Dunbar", "Keeley Hawes",
+        "Ruth Wilson", "Dominic West", "Gillian Anderson", "Jamie Dornan", "Cush Jumbo",
+        "David Oyelowo", "Thandiwe Newton", "Michaela Coel", "Phoebe Waller-Bridge", "Andrew Scott",
+        "Fleabag", "Rosamund Pike", "Maxine Peake", "Sheridan Smith", "Sarah Lancashire",
+        "Stephen Graham", "Sean Bean", "Jason Statham", "Gemma Arterton", "Naomie Harris",
+        # US TV
         "Kit Harington", "Emilia Clarke", "Sophie Turner", "Maisie Williams", "Nikolaj Coster-Waldau",
         "Bryan Cranston", "Aaron Paul", "Elisabeth Moss", "Steve Carell", "Jenna Fischer",
         "Rainn Wilson", "John Krasinski", "Sarah Snook", "Jeremy Strong", "Brian Cox",
         "Matthew Macfadyen", "Kieran Culkin", "Jason Sudeikis", "Hannah Waddingham", "Brett Goldstein",
         "Zooey Deschanel", "Kaley Cuoco", "Jim Parsons", "Johnny Galecki", "Kunal Nayyar",
-        "Suranne Jones", "Martin Compston", "Vicky McClure", "Adrian Dunbar", "Keeley Hawes",
-        "Idris Elba", "Ruth Wilson", "Dominic West", "Gillian Anderson", "Jamie Dornan",
-        "Cush Jumbo", "David Oyelowo", "Thandiwe Newton", "Michaela Coel", "Phoebe Waller-Bridge"
+        "Jennifer Aniston", "Courteney Cox", "Lisa Kudrow", "Matt LeBlanc", "David Schwimmer",
+        "Sofia Vergara", "Julie Bowen", "Ty Burrell", "Jesse Tyler Ferguson", "Eric Stonestreet",
+        "Zach Braff", "Donald Faison", "Neil Patrick Harris", "Jason Segel", "Alyson Hannigan"
     ],
     "musicians": [
+        # Current pop stars
         "Dua Lipa", "Ed Sheeran", "Adele", "Harry Styles", "Stormzy",
         "Taylor Swift", "Beyonce", "Rihanna", "Lady Gaga", "Ariana Grande",
         "Billie Eilish", "Olivia Rodrigo", "Doja Cat", "SZA", "Lizzo",
         "Post Malone", "Bad Bunny", "Drake", "Kendrick Lamar", "Travis Scott",
         "The Weeknd", "Bruno Mars", "Justin Bieber", "Shawn Mendes", "Charlie Puth",
-        "Sam Smith", "Lewis Capaldi", "Rag'n'Bone Man", "Tom Grennan", "George Ezra",
+        "Sam Smith", "Lewis Capaldi", "Tom Grennan", "George Ezra", "Rag'n'Bone Man",
+        # UK legends
         "Elton John", "Paul McCartney", "Mick Jagger", "Rod Stewart", "Ozzy Osbourne",
         "Noel Gallagher", "Liam Gallagher", "Robbie Williams", "Gary Barlow", "Olly Murs",
-        "Rita Ora", "Jessie J", "Little Mix", "Anne-Marie", "Ellie Goulding",
-        "Florence Welch", "Amy Winehouse", "Leona Lewis", "Cheryl", "Nicole Scherzinger",
+        "Rita Ora", "Jessie J", "Anne-Marie", "Ellie Goulding", "Dua Lipa",
+        "Florence Welch", "Leona Lewis", "Cheryl Cole", "Nicole Scherzinger", "Mel B",
+        # US & International
         "Cardi B", "Megan Thee Stallion", "Nicki Minaj", "Ice Spice", "Latto",
-        "Miley Cyrus", "Selena Gomez", "Demi Lovato", "Jonas Brothers", "One Direction"
+        "Miley Cyrus", "Selena Gomez", "Demi Lovato", "Katy Perry", "Pink",
+        "Justin Timberlake", "Usher", "Chris Brown", "Jason Derulo", "Ne-Yo",
+        "Kanye West", "Jay-Z", "Eminem", "50 Cent", "Snoop Dogg",
+        "Liza Minnelli", "Cher", "Madonna", "Britney Spears", "Christina Aguilera",
+        "Shakira", "Jennifer Lopez", "Mariah Carey", "Celine Dion", "Whitney Houston"
     ],
     "athletes": [
-        "Harry Kane", "Marcus Rashford", "Emma Raducanu", "Lewis Hamilton", "Raheem Sterling",
-        "David Beckham", "Wayne Rooney", "Steven Gerrard", "Frank Lampard", "John Terry",
-        "Jude Bellingham", "Phil Foden", "Bukayo Saka", "Jack Grealish", "Mason Mount",
+        # Football
+        "Harry Kane", "Marcus Rashford", "Raheem Sterling", "Jude Bellingham", "Phil Foden",
+        "Bukayo Saka", "Jack Grealish", "Mason Mount", "Declan Rice", "Trent Alexander-Arnold",
         "Mo Salah", "Virgil van Dijk", "Erling Haaland", "Kevin De Bruyne", "Bruno Fernandes",
         "Cristiano Ronaldo", "Lionel Messi", "Neymar", "Kylian Mbappe", "Robert Lewandowski",
-        "Andy Murray", "Roger Federer", "Rafael Nadal", "Novak Djokovic", "Serena Williams",
-        "Venus Williams", "Naomi Osaka", "Simona Halep", "Caroline Wozniacki", "Maria Sharapova",
+        "David Beckham", "Wayne Rooney", "Steven Gerrard", "Frank Lampard", "John Terry",
+        "Gary Lineker", "Alan Shearer", "Michael Owen", "Rio Ferdinand", "Paul Scholes",
+        # Tennis
+        "Andy Murray", "Roger Federer", "Rafael Nadal", "Novak Djokovic", "Emma Raducanu",
+        "Serena Williams", "Venus Williams", "Naomi Osaka", "Coco Gauff", "Maria Sharapova",
+        # Other sports
+        "Lewis Hamilton", "Max Verstappen", "Lando Norris", "George Russell", "Daniel Ricciardo",
         "Usain Bolt", "Mo Farah", "Jessica Ennis-Hill", "Dina Asher-Smith", "Katarina Johnson-Thompson",
-        "Anthony Joshua", "Tyson Fury", "Conor McGregor", "Floyd Mayweather", "Manny Pacquiao",
-        "LeBron James", "Steph Curry", "Kevin Durant", "Tom Brady", "Patrick Mahomes",
-        "Simone Biles", "Michael Phelps", "Katie Ledecky", "Adam Peaty", "Max Verstappen"
+        "Anthony Joshua", "Tyson Fury", "Conor McGregor", "Floyd Mayweather", "Mike Tyson",
+        "LeBron James", "Steph Curry", "Kevin Durant", "Michael Jordan", "Kobe Bryant",
+        "Tom Brady", "Patrick Mahomes", "Simone Biles", "Michael Phelps", "Adam Peaty"
     ],
     "royals": [
-        "Prince William", "Kate Middleton", "Prince Harry", "Meghan Markle", "Prince Andrew",
-        "King Charles III", "Queen Camilla", "Princess Anne", "Prince Edward", "Sophie Wessex",
-        "Princess Beatrice", "Princess Eugenie", "Zara Tindall", "Peter Phillips", "Lady Louise Windsor",
-        "Prince George", "Princess Charlotte", "Prince Louis", "Archie Mountbatten-Windsor", "Lilibet Mountbatten-Windsor",
-        "Sarah Ferguson", "Prince Michael of Kent", "Princess Michael of Kent", "Duke of Kent", "Duke of Gloucester",
-        "Crown Princess Victoria of Sweden", "Prince Carl Philip of Sweden", "Princess Madeleine of Sweden",
-        "King Felipe VI of Spain", "Queen Letizia of Spain", "Crown Princess Mary of Denmark",
-        "Prince Frederik of Denmark", "King Willem-Alexander", "Queen Maxima", "Princess Charlene of Monaco",
-        "Prince Albert of Monaco", "Grace Kelly", "Princess Diana", "Queen Elizabeth II"
+        # British Royal Family
+        "King Charles III", "Queen Camilla", "Prince William", "Catherine Princess of Wales",
+        "Prince Harry", "Meghan Markle", "Prince George", "Princess Charlotte", "Prince Louis",
+        "Princess Anne", "Prince Andrew", "Prince Edward", "Sophie Duchess of Edinburgh",
+        "Princess Beatrice", "Princess Eugenie", "Zara Tindall", "Peter Phillips",
+        "Lady Louise Windsor", "James Viscount Severn", "Sarah Ferguson",
+        "Archie Mountbatten-Windsor", "Lilibet Mountbatten-Windsor",
+        "Mike Tindall", "Edoardo Mapelli Mozzi", "Jack Brooksbank",
+        # Historical
+        "Queen Elizabeth II", "Princess Diana", "Prince Philip",
+        # European Royals
+        "King Felipe VI of Spain", "Queen Letizia of Spain",
+        "King Willem-Alexander of Netherlands", "Queen Maxima of Netherlands",
+        "Crown Princess Victoria of Sweden", "Prince Daniel of Sweden",
+        "Crown Princess Mary of Denmark", "King Frederik X of Denmark",
+        "Prince Albert of Monaco", "Princess Charlene of Monaco",
+        "King Carl XVI Gustaf of Sweden", "Queen Silvia of Sweden"
     ],
     "reality_tv": [
+        # TOWIE & UK Reality
         "Katie Price", "Gemma Collins", "Pete Wicks", "Joey Essex", "Sam Faiers",
+        "Mark Wright", "Michelle Keegan", "Amy Childs", "Lauren Goodger", "Billie Faiers",
+        "Vicky Pattison", "Charlotte Crosby", "Holly Hagan", "Chloe Ferry", "Marnie Simpson",
+        # Made in Chelsea
+        "Georgia Toffolo", "Jamie Laing", "Louise Thompson", "Spencer Matthews", "Binky Felstead",
+        "Ollie Locke", "Sam Thompson", "Zara McDermott", "Lucy Watson", "Proudlock",
+        # Love Island UK
+        "Molly-Mae Hague", "Tommy Fury", "Maura Higgins", "Amber Gill", "Dani Dyer",
+        "Jack Fincham", "Ekin-Su Culculoglu", "Davide Sanclimenti", "Olivia Attwood", "Chris Hughes",
+        "Amber Davies", "Kem Cetinay", "Cara De La Hoyde", "Nathan Massey", "Olivia Buckland",
+        # Kardashians & US Reality
         "Kim Kardashian", "Khloe Kardashian", "Kourtney Kardashian", "Kylie Jenner", "Kendall Jenner",
         "Kris Jenner", "Scott Disick", "Travis Barker", "Paris Hilton", "Nicole Richie",
         "Lauren Conrad", "Kristin Cavallari", "Spencer Pratt", "Heidi Montag", "Brody Jenner",
-        "Mark Wright", "Michelle Keegan", "Amy Childs", "Lauren Goodger", "Billie Faiers",
-        "Georgia Toffolo", "Jamie Laing", "Louise Thompson", "Spencer Matthews", "Binky Felstead",
-        "Molly-Mae Hague", "Tommy Fury", "Maura Higgins", "Amber Gill", "Dani Dyer",
-        "Jack Fincham", "Ekin-Su Culculoglu", "Davide Sanclimenti", "Olivia Attwood", "Chris Hughes",
-        "Vicky Pattison", "Charlotte Crosby", "Holly Hagan", "Chloe Ferry", "Marnie Simpson",
-        "Jax Taylor", "Brittany Cartwright", "Lisa Vanderpump", "Kyle Richards", "Teresa Giudice"
+        "Lisa Vanderpump", "Kyle Richards", "Teresa Giudice", "NeNe Leakes", "Bethenny Frankel"
     ],
     "public_figure": [
-        "Elon Musk", "Donald Trump", "Boris Johnson", "Greta Thunberg", "Alexandria Ocasio-Cortez",
-        "Joe Rogan", "Andrew Tate", "Jordan Peterson", "Nigel Farage", "Rishi Sunak",
-        "Joe Biden", "Barack Obama", "Michelle Obama", "Hillary Clinton", "Nancy Pelosi",
+        # Tech billionaires
+        "Elon Musk", "Mark Zuckerberg", "Jeff Bezos", "Bill Gates", "Tim Cook",
+        "Sundar Pichai", "Satya Nadella", "Jack Dorsey", "Reed Hastings", "Jensen Huang",
+        # US Politicians
+        "Donald Trump", "Joe Biden", "Barack Obama", "Michelle Obama", "Hillary Clinton",
+        "Nancy Pelosi", "Alexandria Ocasio-Cortez", "Bernie Sanders", "Kamala Harris", "Mike Pence",
+        # UK Politicians
+        "Boris Johnson", "Rishi Sunak", "Keir Starmer", "Nigel Farage", "Liz Truss",
+        "Theresa May", "David Cameron", "Tony Blair", "Jeremy Corbyn", "Sadiq Khan",
+        # World Leaders
         "Vladimir Putin", "Volodymyr Zelenskyy", "Emmanuel Macron", "Angela Merkel", "Justin Trudeau",
-        "Mark Zuckerberg", "Jeff Bezos", "Bill Gates", "Warren Buffett", "Tim Cook",
-        "Sundar Pichai", "Satya Nadella", "Jack Dorsey", "Reed Hastings", "Bob Iger",
-        "Dr Phil", "Dr Oz", "Deepak Chopra",
-        "Tony Robbins", "Gary Vaynerchuk", "Grant Cardone", "Dave Ramsey", "Suze Orman",
-        "Pope Francis", "Dalai Lama", "Malala Yousafzai", "Richard Branson", "Alan Sugar",
-        "Neil deGrasse Tyson", "Bill Nye", "Keir Starmer", "Liz Truss", "Theresa May"
+        "Xi Jinping", "Narendra Modi", "Jair Bolsonaro", "Benjamin Netanyahu", "Kim Jong-un",
+        # Activists & Influencers
+        "Greta Thunberg", "Malala Yousafzai", "Andrew Tate", "Jordan Peterson", "Joe Rogan",
+        "Ben Shapiro", "Tucker Carlson", "Piers Morgan", "Megyn Kelly", "Rachel Maddow",
+        # Business & Other
+        "Richard Branson", "Alan Sugar", "Warren Buffett", "Oprah Winfrey", "Martha Stewart",
+        "Pope Francis", "Dalai Lama", "Neil deGrasse Tyson", "Bill Nye", "Dr Phil"
     ],
     "other": [
-        "Gordon Ramsay", "Bear Grylls", "Jeremy Clarkson", "James Corden", "Graham Norton",
-        "Jonathan Ross", "Alan Carr", "Piers Morgan", "Lorraine Kelly", "Holly Willoughby",
-        "Phillip Schofield", "Ant McPartlin", "Dec Donnelly", "Dermot O'Leary", "Claudia Winkleman",
-        "Jamie Oliver", "Nigella Lawson", "Mary Berry", "Paul Hollywood", "Prue Leith",
+        # TV Presenters UK
+        "Graham Norton", "Jonathan Ross", "Alan Carr", "James Corden", "Piers Morgan",
+        "Holly Willoughby", "Phillip Schofield", "Ant McPartlin", "Dec Donnelly", "Dermot O'Leary",
+        "Claudia Winkleman", "Tess Daly", "Rylan Clark", "Alison Hammond", "Rochelle Humes",
+        "Vernon Kay", "Lorraine Kelly", "Susanna Reid", "Kate Garraway", "Ben Shephard",
+        # Chefs
+        "Gordon Ramsay", "Jamie Oliver", "Nigella Lawson", "Mary Berry", "Paul Hollywood",
+        "Prue Leith", "Ainsley Harriott", "Gino D'Acampo", "James Martin", "Nadiya Hussain",
+        # Entertainment
         "Simon Cowell", "Amanda Holden", "David Walliams", "Alesha Dixon", "Bruno Tonioli",
         "Craig Revel Horwood", "Shirley Ballas", "Motsi Mabuse", "Anton Du Beke", "Oti Mabuse",
-        "Rylan Clark", "Alison Hammond", "Rochelle Humes", "Vernon Kay", "Tess Daly",
+        # Sports Presenters
         "Gary Lineker", "Ian Wright", "Alan Shearer", "Gabby Logan", "Clare Balding",
-        "David Attenborough", "Brian Cox", "Stephen Fry", "Michael Palin", "Joanna Lumley",
-        "Dawn French", "Jennifer Saunders", "Miranda Hart", "Peter Kay", "Michael McIntyre"
+        "Alex Scott", "Micah Richards", "Rio Ferdinand", "Jamie Carragher", "Gary Neville",
+        # Comedians & Others
+        "David Attenborough", "Stephen Fry", "Michael Palin", "Joanna Lumley", "Bear Grylls",
+        "Jeremy Clarkson", "Richard Hammond", "James May", "Peter Kay", "Michael McIntyre",
+        "Ricky Gervais", "Jimmy Carr", "Russell Howard", "Jack Whitehall", "Rob Beckett"
     ]
 }
 
