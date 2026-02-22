@@ -1423,6 +1423,20 @@ def detect_category_from_bio(bio: str, name: str) -> str:
         # Movie Stars - actors who may have "musician" keywords in bio due to film soundtracks
         "timothée chalamet": "movie_stars",
         "shia labeouf": "movie_stars",
+        "richard madden": "movie_stars",  # Game of Thrones, Bodyguard
+        
+        # TV Actors - primarily known for TV roles
+        "jenna coleman": "tv_actors",
+        "jodie comer": "tv_actors",
+        "ncuti gatwa": "tv_actors",
+        "olivia colman": "tv_actors",
+        "jessica alba": "tv_actors",
+        
+        # Athletes - NFL players and sports figures
+        "jonathan owens": "athletes",
+        "tyreek hill": "athletes",
+        "simone biles": "athletes",
+        "lebron james": "athletes",
     }
     
     for override_name, override_category in category_overrides.items():
