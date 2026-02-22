@@ -76,6 +76,9 @@ function App() {
   const [priceAlerts, setPriceAlerts] = useState([]);
   const [hotStreaks, setHotStreaks] = useState([]);
   
+  // Search result floating card state
+  const [searchedCeleb, setSearchedCeleb] = useState(null);
+  
   // Auth state
   const [user, setUser] = useState(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
