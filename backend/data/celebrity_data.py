@@ -1,3 +1,7 @@
+"""
+Celebrity data pools, A-list definitions, aliases, and categories
+"""
+
 # LARGE CELEBRITY POOLS - 50+ celebrities per category to pull from
 CELEBRITY_POOLS = {
     "movie_stars": [
