@@ -378,11 +378,13 @@ function App() {
 
   // Create or get team
   const initTeam = useCallback(async () => {
+    // If we already have a team (from checkAuth), don't create a new one
+    // This prevents overwriting a logged-in user's team
     const storedTeamId = localStorage.getItem("teamId");
     if (storedTeamId) {
       try {
         const existingTeam = await getTeam(storedTeamId);
-        setTeam(existingTeam);
+        setTeam(prev => prev || existingTeam); // Don't overwrite if already set
         fetchTeamLeaguesData(storedTeamId);
         fetchPriceAlerts(storedTeamId);
         fetchHotStreaks(storedTeamId);
@@ -392,10 +394,11 @@ function App() {
       }
     }
     
+    // Only create a new team if we don't have one
     try {
       const newTeam = await createTeam("My Buzz Team");
       localStorage.setItem("teamId", newTeam.id);
-      setTeam(newTeam);
+      setTeam(prev => prev || newTeam); // Don't overwrite if already set
     } catch (e) {
       console.error("Error creating team:", e);
     }
