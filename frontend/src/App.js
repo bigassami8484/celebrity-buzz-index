@@ -752,7 +752,7 @@ function App() {
       )}
       
       {/* Footer */}
-      <Footer />
+      <Footer playerCount={stats?.player_count} />
     </div>
   );
 }
