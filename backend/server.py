@@ -33,23 +33,6 @@ from data import (
     STARTING_BUDGET, MAX_TEAM_SIZE, PRICE_TIERS, TEAM_EMOJIS, TEAM_COLORS, CATEGORIES
 )
 
-def normalize_text(text: str) -> str:
-    """Remove accents and normalize text for matching"""
-    # Normalize to decomposed form (separate base characters from accents)
-    normalized = unicodedata.normalize('NFD', text)
-    # Remove combining characters (accents)
-    return ''.join(c for c in normalized if not unicodedata.combining(c)).lower()
-
-def decode_html_entities(text: str) -> str:
-    """Decode HTML entities like &amp; &#8217; etc. to readable text"""
-    if not text:
-        return text
-    # Decode HTML entities
-    decoded = html.unescape(text)
-    # Clean up any remaining issues
-    decoded = decoded.replace('â€™', "'").replace('â€"', "—").replace('â€œ', '"').replace('â€', '"')
-    return decoded
-
 async def generate_ai_celebrity_image(name: str, description: str = "") -> Optional[str]:
     """
     Generate an AI portrait for a celebrity and return base64 encoded image.
