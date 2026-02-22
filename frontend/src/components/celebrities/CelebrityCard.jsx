@@ -122,10 +122,20 @@ const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford, onShowPriceHisto
           <h4 className="font-anton text-lg uppercase mb-4 text-[#00F0FF]">Latest News</h4>
           {celebrity.news?.length > 0 ? (
             celebrity.news.slice(0, 4).map((item, idx) => (
-              <div key={idx} className="news-item">
-                <p className="news-title">{item.title}</p>
-                <p className="news-source">{item.source} • {item.date}</p>
-              </div>
+              <a 
+                key={idx} 
+                href={item.url || `https://www.google.com/search?q=${encodeURIComponent(item.title + ' ' + item.source)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="news-item block hover:bg-[#262626] transition-colors cursor-pointer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <p className="news-title hover:text-[#FF0099] transition-colors">{item.title}</p>
+                <p className="news-source">
+                  {item.source} • {item.date}
+                  {item.is_real && <span className="text-green-400 ml-1" title="Real news">✓</span>}
+                </p>
+              </a>
             ))
           ) : (
             <p className="text-[#A1A1AA] text-sm">No recent news stories</p>
