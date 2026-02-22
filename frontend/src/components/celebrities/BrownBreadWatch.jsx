@@ -20,7 +20,7 @@ const BrownBreadWatch = ({ watchList, onSelect }) => {
         Brown Bread Watch
       </h4>
       <p className="text-xs text-[#666] mb-3">Strategic picks for the +100 bonus 💀</p>
-      <div className="space-y-2 max-h-96 overflow-y-auto">
+      <div className="space-y-2">
         {watchList.slice(0, 10).map((celeb, idx) => (
           <div 
             key={celeb.id} 
