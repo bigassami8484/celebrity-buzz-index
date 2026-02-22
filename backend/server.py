@@ -1855,15 +1855,23 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"news-{uuid.uuid4()}",
-            system_message=f"""You are a celebrity news aggregator. Generate realistic celebrity news headlines and summaries based on events from the PAST 2 MONTHS.
+            system_message=f"""You are a celebrity news aggregator creating REALISTIC tabloid news. Generate celebrity news headlines that reflect REAL types of celebrity coverage from the PAST 2 MONTHS.
             
             IMPORTANT: Today's date is {current_date_str}. All news dates MUST be from the PAST 2 MONTHS (between {two_months_ago} and {current_date_str}). 
             DO NOT use any future dates! Spread the news dates across the 2 month period for variety.
             {real_news_instruction}
             {controversial_context}
             
+            NEWS SHOULD BE A MIX OF:
+            - POSITIVE: Awards, new projects, charity work, relationships, career wins
+            - NEGATIVE/CONTROVERSIAL: Arrests, DUIs, scandals, lawsuits, feuds, breakups, rehab, tax issues, assault allegations, bad behavior, controversies, public meltdowns, leaked stories
+            - NEUTRAL: Sightings, appearances, interviews, fashion, rumors
+            
+            BE REALISTIC - celebrities often have controversial news. Include at least 1-2 negative/controversial items unless they have a squeaky clean image.
+            Tabloids like The Sun, Daily Mirror, TMZ love scandal stories!
+            
             Return a JSON array with 5 news items. Each item should have:
-            - title: A catchy headline
+            - title: A catchy tabloid-style headline (controversial headlines get clicks!)
             - summary: 1-2 sentence summary
             - source: A realistic news source name from this list:
               UK: "The Sun", "Daily Mirror", "Daily Mail", "The Guardian", "BBC News", "Sky News", "The Telegraph", "Metro", "Evening Standard", "OK! Magazine", "Hello!", "Closer", "Heat"
@@ -1876,7 +1884,7 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
             ONLY return valid JSON array, no other text."""
         ).with_model("openai", "gpt-4o")
 
-        prompt = f"Generate 5 news headlines about {name} ({category}) from the past 2 months. Today is {current_date_str}. Dates should be spread across the last 60 days."
+        prompt = f"Generate 5 realistic tabloid news headlines about {name} ({category}) from the past 2 months. Include a mix of positive AND negative/controversial news (scandals, arrests, feuds, lawsuits if realistic for this celeb). Today is {current_date_str}. Dates should be spread across the last 60 days."
         if real_news_context:
             prompt += f" The most important current news is: {real_news_context}"
         prompt += " Return ONLY a JSON array."
