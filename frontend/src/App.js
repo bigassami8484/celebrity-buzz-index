@@ -122,11 +122,51 @@ function App() {
   }, [user, team, savePromptDismissed]);
   
   // Auth handlers
-  const handleAuthSuccess = useCallback((userData) => {
+  const handleAuthSuccess = useCallback(async (userData) => {
     setUser(userData);
     setIsProcessingAuth(false);
-    toast.success(`Welcome, ${userData.name}!`);
-  }, []);
+    
+    // Fetch user's team from the server after login
+    try {
+      const res = await checkAuthStatus();
+      if (res.team) {
+        // User has a team linked to their account - use it
+        setTeam(res.team);
+        localStorage.setItem("teamId", res.team.id);
+        fetchTeamLeaguesData(res.team.id);
+        fetchPriceAlerts(res.team.id);
+        fetchHotStreaks(res.team.id);
+        toast.success(`Welcome back, ${userData.name}! Your team is loaded.`);
+      } else {
+        // User doesn't have a team yet - link their current guest team
+        const guestTeamId = localStorage.getItem("teamId");
+        if (guestTeamId && team) {
+          try {
+            // Link the guest team to the user's account
+            const linkResult = await fetch(`${API}/api/auth/guest/convert`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ guest_team_id: guestTeamId })
+            });
+            if (linkResult.ok) {
+              const data = await linkResult.json();
+              setTeam(data.team);
+              toast.success(`Welcome, ${userData.name}! Your team has been saved.`);
+            }
+          } catch (e) {
+            console.error("Failed to link guest team:", e);
+            toast.success(`Welcome, ${userData.name}!`);
+          }
+        } else {
+          toast.success(`Welcome, ${userData.name}!`);
+        }
+      }
+    } catch (e) {
+      console.error("Error fetching user team:", e);
+      toast.success(`Welcome, ${userData.name}!`);
+    }
+  }, [team, fetchTeamLeaguesData, fetchPriceAlerts, fetchHotStreaks]);
   
   const handleAuthError = useCallback((error) => {
     setIsProcessingAuth(false);
