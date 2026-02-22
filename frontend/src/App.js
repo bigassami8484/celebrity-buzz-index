@@ -540,7 +540,7 @@ function App() {
   // Fetch transfer window status
   const fetchTransferWindowStatus = async () => {
     try {
-      const response = await fetch(`${API}/api/transfer-window-status`);
+      const response = await fetch(`${API}/transfer-window-status`);
       const data = await response.json();
       setIsTransferWindowOpen(data.is_open);
     } catch (e) {
