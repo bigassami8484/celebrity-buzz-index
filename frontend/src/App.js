@@ -422,6 +422,31 @@ function App() {
     }
   };
 
+  // Quick add from search autocomplete - searches first then adds
+  const quickAddFromSearch = async (suggestion) => {
+    if (!team) return;
+    
+    try {
+      // First search for the celebrity to get full data
+      const celeb = await searchCelebrityAPI(suggestion.name);
+      if (celeb) {
+        // Then add to team
+        const result = await addToTeamAPI(team.id, celeb.id);
+        setTeam(result.team);
+        if (result.brown_bread_bonus) {
+          toast.success(`Added ${celeb.name} + 💀 Brown Bread Bonus!`, { duration: 5000 });
+        } else {
+          toast.success(`Added ${celeb.name} to your team!`);
+        }
+        fetchLeaderboard();
+        fetchTopPicked();
+        fetchStats();
+      }
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to add celebrity");
+    }
+  };
+
   // Remove celebrity from team
   const removeFromTeam = async (celebrityId) => {
     if (!team) return;
