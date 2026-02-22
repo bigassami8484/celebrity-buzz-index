@@ -304,6 +304,7 @@ class Celebrity(BaseModel):
     wiki_url: str = ""
     buzz_score: float = 0.0
     price: float = 5.0
+    previous_week_price: float = 0.0  # Track last week's price for change indicator
     tier: str = "D"  # A, B, C, or D list
     news: List[dict] = []
     page_views: int = 0
