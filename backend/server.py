@@ -2787,7 +2787,11 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     if re.search(date_range_pattern, wiki_info.get("bio", "")):
         is_deceased = True
     
-    # Known deceased celebrities - always mark as deceased
+    # MOST RELIABLE: Use Wikidata P570 (date of death) if available
+    if wiki_info.get("is_deceased"):
+        is_deceased = True
+    
+    # Known deceased celebrities - always mark as deceased (fallback)
     known_deceased = [
         "amy winehouse", "michael jackson", "prince", "david bowie", "whitney houston",
         "robin williams", "heath ledger", "paul walker", "chadwick boseman", "kobe bryant",
@@ -2801,7 +2805,8 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         "nelson mandela", "muhammad ali", "diego maradona", "pele", "queen elizabeth",
         "elizabeth ii", "prince philip", "matthew perry", "lisa marie presley", "tina turner",
         "sinead o'connor", "tony bennett", "olivia newton-john", "ray liotta", "bob saget",
-        "betty white", "cory monteith", "natalie wood", "lucille ball"
+        "betty white", "cory monteith", "natalie wood", "lucille ball", "johnny cash",
+        "june carter cash", "waylon jennings", "patsy cline", "hank williams", "dolly parton"
     ]
     celeb_name_lower = wiki_info["name"].lower()
     if any(known in celeb_name_lower for known in known_deceased):
