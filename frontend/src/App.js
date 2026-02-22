@@ -519,7 +519,7 @@ function App() {
     if (!team) return;
     
     try {
-      const response = await fetch(`${API}/api/team/submit`, {
+      const response = await fetch(`${API}/team/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ team_id: team.id })
