@@ -963,6 +963,100 @@ function App() {
         />
       )}
       
+      {/* FAQ Section */}
+      <section className="bg-[#0D0D0D] py-12 px-4" data-testid="faq-section">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-8 text-center">
+            Frequently Asked Questions
+          </h2>
+          
+          <div className="space-y-4">
+            {/* FAQ Item 1 */}
+            <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
+              <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
+                How do points work?
+                <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
+                <p>Points are calculated based on your celebrities' <strong className="text-white">real news coverage</strong>:</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li><strong className="text-white">Source reputation:</strong> TMZ/Daily Mail = +3 pts, People/Variety = +2 pts, BBC/CNN = +1.5 pts</li>
+                  <li><strong className="text-white">Sentiment bonus:</strong> Negative/controversial news = +25 pts (scandal bonus!), Positive = +0.5 pts</li>
+                  <li><strong className="text-white">Brown Bread Bonus:</strong> Deceased celebrities (💀) earn bonus points</li>
+                </ul>
+                <p className="mt-2">The more your celebrities are in the news, the more points you earn!</p>
+              </div>
+            </details>
+            
+            {/* FAQ Item 2 */}
+            <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
+              <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
+                How does celebrity pricing work?
+                <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
+                <p>Celebrities are priced based on their <strong className="text-white">tier</strong> and <strong className="text-white">current buzz</strong>:</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li><strong className="text-[#FFD700]">A-LIST:</strong> £5M - £15M (capped at £15M for all celebs)</li>
+                  <li><strong className="text-[#C0C0C0]">B-LIST:</strong> £2M - £5M</li>
+                  <li><strong className="text-[#CD7F32]">C-LIST:</strong> £500K - £2M</li>
+                  <li><strong className="text-[#666]">D-LIST:</strong> £100K - £500K</li>
+                </ul>
+                <p className="mt-2">Prices fluctuate based on news coverage - buy low when they're out of the spotlight, sell high when they're trending!</p>
+              </div>
+            </details>
+            
+            {/* FAQ Item 3 */}
+            <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
+              <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
+                When can I make transfers?
+                <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
+                <p>The <strong className="text-white">Transfer Window</strong> opens every <strong className="text-[#00F0FF]">Saturday at midnight</strong> and stays open for 24 hours.</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>You get <strong className="text-white">3 transfers</strong> per week</li>
+                  <li>Submit your team to lock it in before the window closes</li>
+                  <li>Unused transfers don't carry over</li>
+                </ul>
+              </div>
+            </details>
+            
+            {/* FAQ Item 4 */}
+            <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
+              <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
+                What is the Brown Bread Watch?
+                <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
+                <p>The <strong className="text-white">Brown Bread Watch</strong> 💀 tracks elderly celebrities (60+) who may... shuffle off this mortal coil.</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Deceased celebrities are marked with a skull icon 💀</li>
+                  <li>They receive a <strong className="text-white">Brown Bread Bonus</strong> - extra points!</li>
+                  <li>A morbid but strategic consideration for your team...</li>
+                </ul>
+              </div>
+            </details>
+            
+            {/* FAQ Item 5 */}
+            <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
+              <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
+                How do I save my team?
+                <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
+                <p>Sign in with <strong className="text-white">Google</strong> to save your team permanently!</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Guest teams are saved locally but may be lost if you clear your browser</li>
+                  <li>Signing in links your team to your account forever</li>
+                  <li>Create or join <strong className="text-white">Friends Leagues</strong> to compete with mates</li>
+                </ul>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+      
       {/* Footer */}
       <Footer playerCount={stats?.player_count} />
     </div>
