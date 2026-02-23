@@ -544,6 +544,8 @@ export const LeagueDetailModal = ({ league, leaderboard, onClose, teamId, apiUrl
               </div>
             </div>
           )}
+            </>
+          )}
         </div>
       </div>
     </div>
