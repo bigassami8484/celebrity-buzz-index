@@ -2437,15 +2437,44 @@ def determine_tier_from_bio(bio: str, name: str = "") -> str:
     if any(ind in bio_lower for ind in long_running_indicators):
         return "C"
     
-    # Check for famous long-running TV shows
+    # Check for famous long-running TV shows (UK Soaps, US Sitcoms, Major Dramas)
     famous_long_shows = [
+        # UK Soaps
         "coronation street", "eastenders", "emmerdale", "hollyoaks", "neighbours",
+        "home and away", "doctors", "casualty", "holby city", "the bill",
+        # UK Sitcoms & Comedy
+        "only fools and horses", "fawlty towers", "blackadder", "the vicar of dibley",
+        "absolutely fabulous", "the inbetweeners", "peep show", "the it crowd",
+        "gavin & stacey", "gavin and stacey", "benidorm", "mrs brown's boys",
+        "friday night dinner", "derry girls", "ghosts", "bad education",
+        # US Sitcoms
+        "friends", "the office", "parks and recreation", "brooklyn nine-nine",
+        "how i met your mother", "the big bang theory", "modern family", "seinfeld",
+        "everybody loves raymond", "two and a half men", "the fresh prince",
+        "will & grace", "frasier", "cheers", "new girl", "community", "schitt's creek",
+        "arrested development", "curb your enthusiasm", "it's always sunny",
+        # Major US Dramas
         "grey's anatomy", "ncis", "law & order", "csi", "criminal minds",
-        "parks and recreation", "the office", "brooklyn nine-nine", "friends",
-        "how i met your mother", "the big bang theory", "modern family",
-        "breaking bad", "game of thrones", "stranger things", "the crown"
+        "breaking bad", "game of thrones", "stranger things", "the crown",
+        "the sopranos", "the wire", "mad men", "lost", "desperate housewives",
+        "er", "house", "suits", "the good wife", "scandal", "how to get away with murder",
+        # Reality/Competition shows (long-running)
+        "strictly come dancing", "dancing with the stars", "the x factor", "american idol",
+        "the voice", "britain's got talent", "america's got talent", "big brother",
+        "i'm a celebrity", "the great british bake off", "masterchef", "the apprentice"
     ]
     if any(show in bio_lower for show in famous_long_shows):
+        return "C"
+    
+    # Check for celebrity families (if they're part of a famous family, not D-list)
+    celebrity_families = [
+        "osbourne", "kardashian", "jenner", "beckham", "gallagher", 
+        "redknapp", "lampard", "rooney", "wright", "faiers",
+        "hilton", "richie", "barrymore", "arquette", "sheen", "estevez",
+        "baldwin", "wayans", "smith", "pinkett"
+    ]
+    name_lower = name.lower() if name else ""
+    if any(family in name_lower or family in bio_lower for family in celebrity_families):
         return "C"
     
     # Check for multiple acting roles (count mentions of films/shows)
