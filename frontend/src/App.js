@@ -399,7 +399,6 @@ function App() {
       if (celeb) {
         // Show in floating card instead of adding to grid
         setSearchedCeleb(celeb);
-        toast.success(`Found ${celeb.name}!`);
       }
     } catch (e) {
       console.error("Search error:", e);
