@@ -2396,6 +2396,18 @@ def determine_tier_from_bio(bio: str, name: str = "") -> str:
     if awards_found >= 1:
         return "C"  # Single major award = C-list minimum
     
+    # Check for comedians - they should be at least C-list
+    comedian_indicators = [
+        "comedian", "stand-up comedian", "comedy", "comedic", "panel show",
+        "8 out of 10 cats", "mock the week", "qi", "taskmaster", "would i lie to you",
+        "have i got news", "live at the apollo", "comedy central", "edinburgh festival"
+    ]
+    comedian_score = sum(1 for ind in comedian_indicators if ind in bio_lower)
+    if comedian_score >= 2:
+        return "B"  # Established comedian with multiple credits
+    if comedian_score >= 1:
+        return "C"  # Comedian = at least C-list
+    
     # Check for chart/music success (for musicians)
     chart_indicators = [
         "number one", "number-one", "#1", "no. 1", "chart-topping",
