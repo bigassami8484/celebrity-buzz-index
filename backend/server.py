@@ -2061,8 +2061,8 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
                             'mary', 'elizabeth', 'victoria', 'charlotte', 'sophie', 'amy'
                         }
                         
-                        # Method 1: Full name exact match with word boundaries (REQUIRED for all)
-                        # Build regex for full name with word boundaries
+                        # Method 1: EXACT full name match with word boundaries (REQUIRED for all)
+                        # This is the primary and most reliable method
                         full_name_pattern = rf'\b{re.escape(name_lower)}\b'
                         if re.search(full_name_pattern, search_text):
                             celeb_mentioned = True
@@ -2075,21 +2075,22 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
                                     celeb_mentioned = True
                                     break
                         
-                        # Method 3: For multi-word names, ONLY match if first AND last name 
-                        # appear TOGETHER (within 15 chars) - prevents "Michael... Jordan" false positives
+                        # Method 3: For multi-word names with COMMON names, require EXACT full name
+                        # No fuzzy matching for names like "Michael Jordan" - too many false positives
+                        # This prevents "Michael B. Jordan" from matching "Michael Jordan"
                         if not celeb_mentioned and len(name_parts) >= 2:
                             first_name = name_parts[0]
                             last_name = name_parts[-1]
                             
-                            # Skip if either name is too common on its own
+                            # If EITHER name is common, we ONLY accept exact full name match
+                            # which was already checked above - so skip fuzzy matching
                             if first_name in common_names or last_name in common_names:
-                                # REQUIRE both names to appear adjacent (within 15 chars)
-                                pattern = rf'\b{re.escape(first_name)}\b.{{0,15}}\b{re.escape(last_name)}\b'
-                                if re.search(pattern, search_text):
-                                    celeb_mentioned = True
+                                # Already checked exact match above, don't do fuzzy
+                                pass
                             else:
-                                # For unusual names, still require adjacency but allow more distance
-                                pattern = rf'\b{re.escape(first_name)}\b.{{0,25}}\b{re.escape(last_name)}\b'
+                                # For unusual names, allow first + last with small gap (no middle initial)
+                                # Pattern: "FirstName LastName" with only spaces/hyphens between
+                                pattern = rf'\b{re.escape(first_name)}[\s\-]+{re.escape(last_name)}\b'
                                 if re.search(pattern, search_text):
                                     celeb_mentioned = True
                         
