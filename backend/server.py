@@ -5422,15 +5422,25 @@ def extract_category_from_description(description: str) -> str:
         if category:
             return category
     
-    # If first occupation is "personality" or similar, look for what kind
-    if first_occupation in ['personality', 'television', 'media', 'reality']:
-        # Check for more specific occupation later in the description
+    # If first occupation is ambiguous, check the full description for context
+    if first_occupation in ['personality', 'television', 'media', 'reality', 'celebrity', 'former', None]:
+        # Check for specific occupations anywhere in description
         if 'boxer' in desc_lower or 'boxing' in desc_lower:
+            return 'athletes'
+        if 'footballer' in desc_lower or 'football player' in desc_lower:
+            return 'athletes'
+        if 'racing driver' in desc_lower or 'formula one' in desc_lower or 'f1 driver' in desc_lower:
+            return 'athletes'
+        if 'tennis player' in desc_lower or 'cricketer' in desc_lower or 'golfer' in desc_lower:
             return 'athletes'
         if 'singer' in desc_lower or 'band' in desc_lower or 'musical' in desc_lower:
             return 'musicians'
-        if 'footballer' in desc_lower or 'football player' in desc_lower:
-            return 'athletes'
+        if 'chef' in desc_lower or 'restaurateur' in desc_lower:
+            return 'other'
+        if 'comedian' in desc_lower or 'stand-up' in desc_lower:
+            return 'other'
+        if 'actor' in desc_lower or 'actress' in desc_lower:
+            return 'movie_stars'
         if 'reality television' in desc_lower or 'reality tv' in desc_lower or 'love island' in desc_lower:
             return 'reality_tv'
         if 'television presenter' in desc_lower or 'tv presenter' in desc_lower:
