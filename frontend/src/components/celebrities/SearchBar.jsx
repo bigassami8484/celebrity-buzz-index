@@ -41,7 +41,7 @@ const SearchBar = ({ onSearch, onQuickAdd, loading, team }) => {
     }
   };
   
-  // Debounced search
+  // Debounced search - reduced to 150ms for faster response
   const handleInputChange = (e) => {
     const value = e.target.value;
     setQuery(value);
@@ -52,10 +52,10 @@ const SearchBar = ({ onSearch, onQuickAdd, loading, team }) => {
       clearTimeout(debounceRef.current);
     }
     
-    // Set new timeout for debounced search
+    // Set new timeout for debounced search - fast 150ms debounce
     debounceRef.current = setTimeout(() => {
       fetchSuggestions(value);
-    }, 300);
+    }, 150);
   };
   
   const handleSelectSuggestion = (suggestion) => {
