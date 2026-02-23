@@ -137,7 +137,7 @@ export const PointsMethodology = ({ onClose }) => (
         
         <div className="bg-[#FF0099]/20 border border-[#FF0099] p-4 mb-4">
           <h4 className="font-bold text-[#FF0099] mb-2">🕐 Transfer Window</h4>
-          <p className="text-sm text-[#A1A1AA]">Opens every <span className="text-white font-bold">Saturday at 12pm GMT</span> for 24 hours. Make your moves!</p>
+          <p className="text-sm text-[#A1A1AA]">Opens every <span className="text-white font-bold">Sunday 12pm - 12am GMT</span>. Make your moves!</p>
         </div>
         
         <h4 className="font-bold text-white mb-3">Points Multipliers</h4>

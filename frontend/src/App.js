@@ -499,7 +499,7 @@ function App() {
     
     // Check if team is locked
     if (team.is_locked && !isTransferWindowOpen) {
-      toast.error("Team is locked! Wait for transfer window (Saturday)");
+      toast.error("Team is locked! Wait for transfer window (Sunday 12pm)");
       return;
     }
     
@@ -1023,7 +1023,7 @@ function App() {
                 <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
               </summary>
               <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
-                <p>The <strong className="text-white">Transfer Window</strong> opens every <strong className="text-[#00F0FF]">Saturday at midnight</strong> and stays open for 24 hours.</p>
+                <p>The <strong className="text-white">Transfer Window</strong> opens every <strong className="text-[#00F0FF]">Sunday at 12pm GMT</strong> and stays open until midnight.</p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
                   <li>You get <strong className="text-white">3 transfers</strong> per week</li>
                   <li>Submit your team to lock it in before the window closes</li>
