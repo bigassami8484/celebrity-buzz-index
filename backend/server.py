@@ -5362,49 +5362,58 @@ def extract_category_from_description(description: str) -> str:
         if kw in desc_lower:
             return 'royals'
     
-    # Look for "is a(n) [occupation]" or "is a(n) [nationality] [occupation]" pattern
-    # This extracts the FIRST occupation after "is a" or "is an"
     import re
     
-    # Pattern to match "is a/an [nationality] [occupation]" 
-    # E.g., "is an American singer" -> singer
-    # E.g., "is a British boxer" -> boxer
-    is_a_pattern = r'is (?:a|an) (?:\w+ )?(\w+)'
+    # Extended pattern to capture compound occupations
+    # Matches: "is a/an [nationality] [adjective]? [occupation]" 
+    # E.g., "is an American singer-songwriter" -> singer-songwriter
+    # E.g., "is a British celebrity chef" -> celebrity chef  
+    # E.g., "is a British racing driver" -> racing driver
+    # E.g., "is an English former professional footballer" -> former professional footballer
+    is_a_pattern = r'is (?:a|an) (?:\w+ )?(?:former |professional |celebrity )?(\w+(?:[- ]\w+)?)'
     match = re.search(is_a_pattern, desc_lower)
     
     first_occupation = None
     if match:
-        first_occupation = match.group(1)
+        first_occupation = match.group(1).strip()
     
-    # Define occupation mappings - single words
+    # Define occupation mappings - including compound words
     occupation_to_category = {
         # Musicians
-        'singer': 'musicians', 'rapper': 'musicians', 'musician': 'musicians', 
-        'songwriter': 'musicians', 'composer': 'musicians', 'vocalist': 'musicians',
-        'saxophonist': 'musicians', 'drummer': 'musicians', 'guitarist': 'musicians',
-        'pianist': 'musicians', 'dj': 'musicians',
+        'singer': 'musicians', 'singer-songwriter': 'musicians', 'rapper': 'musicians', 
+        'musician': 'musicians', 'songwriter': 'musicians', 'composer': 'musicians', 
+        'vocalist': 'musicians', 'saxophonist': 'musicians', 'drummer': 'musicians', 
+        'guitarist': 'musicians', 'pianist': 'musicians', 'dj': 'musicians',
         # Athletes
-        'footballer': 'athletes', 'boxer': 'athletes', 'cricketer': 'athletes',
-        'golfer': 'athletes', 'swimmer': 'athletes', 'gymnast': 'athletes',
-        'athlete': 'athletes', 'sprinter': 'athletes', 'olympian': 'athletes',
-        'tennis': 'athletes',
+        'footballer': 'athletes', 'professional footballer': 'athletes',
+        'boxer': 'athletes', 'cricketer': 'athletes', 'golfer': 'athletes', 
+        'swimmer': 'athletes', 'gymnast': 'athletes', 'athlete': 'athletes', 
+        'sprinter': 'athletes', 'olympian': 'athletes', 'tennis player': 'athletes',
+        'racing driver': 'athletes', 'formula one': 'athletes',
+        'basketball player': 'athletes', 'baseball player': 'athletes',
         # Actors
         'actor': 'movie_stars', 'actress': 'movie_stars', 'filmmaker': 'movie_stars',
-        'director': 'movie_stars', 'screenwriter': 'movie_stars',
+        'director': 'movie_stars', 'screenwriter': 'movie_stars', 'film actor': 'movie_stars',
+        'film actress': 'movie_stars',
         # TV
-        'presenter': 'tv_personalities', 'host': 'tv_personalities', 
-        'broadcaster': 'tv_personalities', 'newsreader': 'tv_personalities',
-        'anchor': 'tv_personalities',
-        # Dancers/Performers
+        'presenter': 'tv_personalities', 'television presenter': 'tv_personalities',
+        'host': 'tv_personalities', 'broadcaster': 'tv_personalities', 
+        'newsreader': 'tv_personalities', 'news anchor': 'tv_personalities',
+        'television actor': 'tv_actors', 'television actress': 'tv_actors',
+        # Other professions
+        'chef': 'other', 'celebrity chef': 'other', 'restaurateur': 'other',
         'dancer': 'other', 'choreographer': 'other',
+        'comedian': 'other', 'comic': 'other', 'stand-up': 'other',
+        'author': 'other', 'writer': 'other', 'novelist': 'other',
+        'model': 'other', 'supermodel': 'other',
+        'journalist': 'other', 'youtuber': 'other', 'influencer': 'other',
         # Public figures
         'politician': 'public_figure', 'businessman': 'public_figure', 
         'businesswoman': 'public_figure', 'entrepreneur': 'public_figure',
         'activist': 'public_figure', 'lawyer': 'public_figure',
-        # Other
-        'chef': 'other', 'comedian': 'other', 'author': 'other', 'writer': 'other',
-        'model': 'other', 'journalist': 'other', 'youtuber': 'other',
-        'influencer': 'other', 'personality': None,  # personality needs context
+        # Ambiguous - need context
+        'personality': None, 'television': None, 'media': None, 'reality': None,
+        'celebrity': None, 'former': None,
     }
     
     # Check if first occupation is directly mapped
