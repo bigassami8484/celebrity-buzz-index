@@ -3399,7 +3399,7 @@ async def get_pricing_info():
             }
         ],
         "dynamic_pricing": "Prices fluctuate weekly based on media coverage. Hot celebs cost more, quiet celebs cost less.",
-        "transfer_window": "Opens every Saturday at 12pm GMT for 24 hours"
+        "transfer_window": "Opens every Sunday 12pm-12am GMT (before new week)"
     }
 
 @api_router.get("/hot-celebs")
@@ -3858,7 +3858,7 @@ async def get_price_alerts(team_id: str):
     return {
         "alerts": alerts,
         "team_id": team_id,
-        "next_price_update": "Saturday 12pm GMT"
+        "next_price_update": "Sunday 12pm GMT"
     }
 
 @api_router.get("/hot-streaks/{team_id}")
