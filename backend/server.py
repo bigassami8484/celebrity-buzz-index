@@ -471,6 +471,13 @@ BADGES = {
         "description": "Won a weekly league competition",
         "color": "#FFD700"
     },
+    "monthly_winner": {
+        "id": "monthly_winner",
+        "name": "Monthly Master",
+        "icon": "🌟",
+        "description": "Won a monthly league competition",
+        "color": "#FF0099"
+    },
     "first_pick": {
         "id": "first_pick",
         "name": "Trendsetter",
@@ -505,6 +512,20 @@ BADGES = {
         "icon": "👑",
         "description": "Won 3+ weeks in your league",
         "color": "#FFD700"
+    },
+    "league_founder": {
+        "id": "league_founder",
+        "name": "League Founder",
+        "icon": "🎯",
+        "description": "Created a league with 5+ members",
+        "color": "#00F0FF"
+    },
+    "undefeated": {
+        "id": "undefeated",
+        "name": "Undefeated",
+        "icon": "💪",
+        "description": "Won 4 weeks in a row",
+        "color": "#10B981"
     }
 }
 
