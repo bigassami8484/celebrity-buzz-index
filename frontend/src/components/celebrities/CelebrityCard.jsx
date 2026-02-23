@@ -44,9 +44,51 @@ const PriceChangeIndicator = ({ currentPrice, previousPrice }) => {
   );
 };
 
-const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford, onShowPriceHistory }) => {
+const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford, onShowPriceHistory, compact = false }) => {
   const [showNews, setShowNews] = useState(false);
   const Icon = categoryIcons[celebrity.category] || Star;
+  
+  // Compact mobile version
+  if (compact) {
+    return (
+      <div className="bg-[#0A0A0A] border border-[#262626] rounded-lg overflow-hidden" data-testid={`celebrity-card-${celebrity.id}`}>
+        <div className="relative">
+          <img
+            src={celebrity.image || `https://ui-avatars.com/api/?name=${celebrity.name}&size=200&background=FF0099&color=fff`}
+            alt={celebrity.name}
+            className="w-full h-32 object-cover"
+            onError={(e) => {
+              e.target.src = `https://ui-avatars.com/api/?name=${celebrity.name}&size=200&background=FF0099&color=fff`;
+            }}
+          />
+          <div className="absolute top-2 left-2">
+            <TierBadge tier={celebrity.tier || "D"} />
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-2">
+            <h3 className="font-bold text-white text-sm truncate">{celebrity.name}</h3>
+          </div>
+        </div>
+        <div className="p-2">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[#FFD700] font-bold text-sm">£{celebrity.price}M</span>
+            <PriceChangeIndicator currentPrice={celebrity.price} previousPrice={celebrity.previous_week_price} />
+          </div>
+          <button
+            onClick={() => onAdd(celebrity)}
+            disabled={isInTeam || !canAfford}
+            className={`w-full py-2 text-xs font-bold rounded transition-colors ${
+              isInTeam ? 'bg-[#333] text-[#666]' : 
+              !canAfford ? 'bg-[#333] text-[#666]' : 
+              'bg-[#FF0099] text-white hover:bg-[#e6008a]'
+            }`}
+            data-testid={`add-btn-${celebrity.id}`}
+          >
+            {isInTeam ? "In Team" : !canAfford ? "Can't Afford" : "Add"}
+          </button>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div 
