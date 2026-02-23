@@ -2165,6 +2165,20 @@ def detect_category_from_bio(bio: str, name: str) -> str:
         if rtn in name_lower or rtn in bio_lower:
             return "reality_tv"
     
+    # =================================================================
+    # CHECK FIRST OCCUPATION - Look at first 100 chars of bio
+    # This determines PRIMARY occupation before checking all keywords
+    # =================================================================
+    bio_start = bio_lower[:120]  # First sentence usually has primary occupation
+    
+    # YouTubers/Influencers - CHECK FIRST (before actors!)
+    # Many YouTubers have "actor" later in bio but are primarily content creators
+    if any(x in bio_start for x in ["youtuber", "youtube personality", "youtube star",
+                                     "tiktok", "tiktoker", "internet personality",
+                                     "social media personality", "influencer",
+                                     "vlogger", "streamer", "twitch", "content creator"]):
+        return "influencers"
+    
     # Reality TV keywords (check before actors)
     if any(x in bio_lower for x in ["reality television", "reality tv", "reality show", "glamour model", 
                                       "media personality", "television personality", "socialite",
@@ -2181,35 +2195,43 @@ def detect_category_from_bio(bio: str, name: str) -> str:
         return "royals"
     
     # Athletes - check BEFORE musicians (racing driver, footballer, etc. should take priority)
-    if any(x in bio_lower for x in ["footballer", "athlete", "football player", "basketball", "soccer", 
-                                     "tennis", "olympic", "premier league", "f1", "formula one",
-                                     "racing driver", "cricketer", "rugby", "boxing", "boxer",
-                                     "striker", "goalkeeper", "midfielder", "defender",
-                                     "bundesliga", "la liga", "serie a", "england national team",
-                                     "world cup", "motorsport", "grand prix"]):
+    if any(x in bio_start for x in ["footballer", "athlete", "football player", "basketball player", 
+                                     "soccer player", "tennis player", "olympic", "racing driver",
+                                     "cricketer", "rugby", "boxer", "golfer", "swimmer"]):
         return "athletes"
     
-    # Musicians/Singers - removed "record" as it's too generic
-    if any(x in bio_lower for x in ["singer", "songwriter", "musician", "rapper", "vocalist", 
-                                     "band", "album", "grammy", "brit award", "concert", 
-                                     "tour", "music artist", "pop star", "rock star", "hip hop",
-                                     "r&b", "mezzo-soprano", "soprano", "tenor", "musical artist",
-                                     "recording artist"]):
+    # Also check full bio for athletes
+    if any(x in bio_lower for x in ["premier league", "f1", "formula one", "striker", "goalkeeper", 
+                                     "midfielder", "defender", "bundesliga", "la liga", "serie a",
+                                     "england national team", "world cup", "grand prix"]):
+        return "athletes"
+    
+    # Musicians/Singers - check first part of bio for primary occupation
+    if any(x in bio_start for x in ["singer", "songwriter", "musician", "rapper", "vocalist", 
+                                     "recording artist", "pop star", "rock star"]):
         return "musicians"
     
-    # Public Figures - politicians, business magnates, activists, influencers
-    if any(x in bio_lower for x in ["politician", "president", "prime minister", "senator", "congressman",
-                                     "member of parliament", "activist", "political commentator",
-                                     "business magnate", "billionaire", "ceo", "chief executive",
-                                     "podcaster", "influencer", "social media personality"]):
+    # Also check full bio for musicians
+    if any(x in bio_lower for x in ["album", "grammy", "brit award", "concert tour", "music artist",
+                                     "hip hop artist", "r&b", "mezzo-soprano", "soprano", "tenor"]):
+        return "musicians"
+    
+    # Public Figures - politicians, business magnates, activists
+    if any(x in bio_start for x in ["politician", "president", "prime minister", "senator", 
+                                     "businessman", "businesswoman", "entrepreneur", "activist"]):
+        return "public_figure"
+    
+    if any(x in bio_lower for x in ["congressman", "member of parliament", "political commentator",
+                                     "business magnate", "billionaire", "ceo", "chief executive"]):
         return "public_figure"
     
     # TV Presenters / Talk Show Hosts - check BEFORE generic "actor" check
-    # These people may have "actor" in bio but are primarily known as presenters
-    if any(x in bio_lower for x in ["chat show", "talk show", "television presenter", "tv presenter",
-                                     "broadcaster", "television host", "radio presenter", 
-                                     "game show host", "news anchor", "news presenter"]):
-        return "other"
+    if any(x in bio_start for x in ["television presenter", "tv presenter", "broadcaster",
+                                     "television host", "radio presenter", "talk show host"]):
+        return "tv_personalities"
+    
+    if any(x in bio_lower for x in ["chat show", "game show host", "news anchor", "news presenter"]):
+        return "tv_personalities"
     
     # TV actors - actual actors in TV series
     if any(x in bio_lower for x in ["television actor", "tv actor", "television series", "tv series", 
