@@ -2992,7 +2992,8 @@ async def autocomplete_search(q: str):
     priority_suggestions = []
     if exact_match:
         tier = exact_match.get("tier", "D")
-        price = get_dynamic_price(tier, 50, exact_match["name"])
+        # Use stored database price for consistency
+        price = exact_match.get("price", get_base_price_for_tier(tier, exact_match["name"]))
         priority_suggestions.append({
             "name": exact_match["name"],
             "bio": exact_match.get("bio", "")[:100] + "..." if exact_match.get("bio") else "",
@@ -3013,7 +3014,8 @@ async def autocomplete_search(q: str):
         for match in partial_matches:
             if not any(s.get("name") == match["name"] for s in priority_suggestions):
                 tier = match.get("tier", "D")
-                price = get_dynamic_price(tier, 50, match["name"])
+                # Use stored database price for consistency
+                price = match.get("price", get_base_price_for_tier(tier, match["name"]))
                 priority_suggestions.append({
                     "name": match["name"],
                     "bio": match.get("bio", "")[:100] + "..." if match.get("bio") else "",
