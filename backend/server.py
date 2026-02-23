@@ -2379,7 +2379,21 @@ def determine_tier_from_bio(bio: str, name: str = "") -> str:
     # =================================================================
     # ANTI-D-LIST CHECKS
     # Actors with longevity or multiple successful roles should NOT be D-list
+    # TV personalities with major awards should NOT be D-list
     # =================================================================
+    
+    # Check for major award wins - anyone with these should be at least C-list
+    major_awards = [
+        "emmy", "grammy", "bafta", "golden globe", "oscar", "academy award",
+        "brit award", "nta", "national television award", "tv choice award",
+        "people's choice", "mtv award", "billboard", "american music award",
+        "screen actors guild", "critics choice", "tony award", "olivier award"
+    ]
+    awards_found = sum(1 for award in major_awards if award in bio_lower)
+    if awards_found >= 2:
+        return "B"  # Multiple major awards = B-list minimum
+    if awards_found >= 1:
+        return "C"  # Single major award = C-list minimum
     
     # Check for multi-year TV show runs (patterns like "2016-2025", "2010–2019", etc.)
     import re
