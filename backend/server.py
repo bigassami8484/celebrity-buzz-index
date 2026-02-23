@@ -2266,7 +2266,47 @@ def detect_category_from_bio(bio: str, name: str) -> str:
     if any(x in bio_lower for x in ["chat show", "game show host", "news anchor", "news presenter"]):
         return "tv_personalities"
     
-    # TV actors - full bio check
+    # =================================================================
+    # SMART FILM VS TV DETECTION
+    # Count mentions of film/movie keywords vs TV keywords
+    # If more TV mentions → tv_actors, if more film mentions → movie_stars
+    # =================================================================
+    
+    # Keywords that indicate FILM work
+    film_keywords = [
+        "film", "films", "movie", "movies", "cinema", "box office", "blockbuster",
+        "oscar", "academy award", "screen actors guild", "hollywood",
+        "feature film", "motion picture", "theatrical release"
+    ]
+    
+    # Keywords that indicate TV work  
+    tv_keywords = [
+        "television series", "tv series", "television show", "tv show",
+        "sitcom", "soap opera", "miniseries", "tv movie", "television movie",
+        "primetime emmy", "emmy award", "bafta tv", "golden globe for television",
+        "streaming series", "netflix series", "hbo series", "bbc series",
+        "comedy series", "drama series", "television drama", "tv drama"
+    ]
+    
+    # Count occurrences
+    film_score = sum(bio_lower.count(kw) for kw in film_keywords)
+    tv_score = sum(bio_lower.count(kw) for kw in tv_keywords)
+    
+    # If they're an actor/actress and we have clear TV vs film signals
+    is_actor = any(x in bio_lower for x in ["actor", "actress"])
+    
+    if is_actor:
+        if tv_score > film_score:
+            return "tv_actors"
+        elif film_score > tv_score:
+            return "movie_stars"
+        # If tied or no clear signal, check for specific indicators
+        elif tv_score > 0:
+            return "tv_actors"
+        elif film_score > 0:
+            return "movie_stars"
+    
+    # Fallback: TV actors check (legacy)
     if any(x in bio_lower for x in ["television series", "tv series", "sitcom", "soap opera"]):
         return "tv_actors"
     
