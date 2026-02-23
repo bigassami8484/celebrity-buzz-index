@@ -1936,10 +1936,38 @@ async def fetch_wikipedia_info(name: str) -> dict:
                 except Exception as e:
                     logger.error(f"Failed to get birth year for {name}: {e}")
                 
-                # Get image - use fallback if not available
-                wiki_image = data.get("thumbnail", {}).get("source", "")
+                # Get image - PREFER Wikidata P18 (more reliable, avoids rate limits)
+                # Also check P570 (date of death) to detect deceased status
+                wiki_image = ""
+                is_deceased_from_wikidata = False
+                
+                # First, try Wikidata P18 - most reliable image source
+                try:
+                    wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={name.replace(' ', '_')}&props=claims&format=json"
+                    wd_response = await client.get(wikidata_url, timeout=5.0, headers=headers)
+                    if wd_response.status_code == 200:
+                        wd_data = wd_response.json()
+                        entities = wd_data.get("entities", {})
+                        for entity in entities.values():
+                            claims = entity.get("claims", {})
+                            if "P18" in claims:  # P18 is the image property
+                                img_file = claims["P18"][0]["mainsnak"]["datavalue"]["value"]
+                                # URL encode the filename properly for Commons
+                                from urllib.parse import quote
+                                img_file_encoded = quote(img_file.replace(" ", "_"), safe='')
+                                wiki_image = f"https://commons.wikimedia.org/wiki/Special:FilePath/{img_file_encoded}?width=400"
+                            # Check for death date (P570)
+                            if "P570" in claims:
+                                is_deceased_from_wikidata = True
+                except Exception as e:
+                    logger.debug(f"Wikidata fetch failed for {name}: {e}")
+                
+                # Fallback to Wikipedia thumbnail if Wikidata didn't have an image
                 if not wiki_image:
-                    # Try pageimages API as backup
+                    wiki_image = data.get("thumbnail", {}).get("source", "")
+                
+                # If still no image, try pageimages API as backup
+                if not wiki_image:
                     try:
                         pageimages_url = f"https://en.wikipedia.org/w/api.php?action=query&titles={name.replace(' ', '_')}&prop=pageimages&format=json&pithumbsize=400"
                         img_response = await client.get(pageimages_url, timeout=5.0, headers=headers)
@@ -1949,43 +1977,6 @@ async def fetch_wikipedia_info(name: str) -> dict:
                             if pages:
                                 page = list(pages.values())[0]
                                 wiki_image = page.get("thumbnail", {}).get("source", "")
-                    except:
-                        pass
-                
-                # Try Wikidata P18 (image) property as another backup
-                # Also check P570 (date of death) to detect deceased status
-                is_deceased_from_wikidata = False
-                if not wiki_image:
-                    try:
-                        wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={name.replace(' ', '_')}&props=claims&format=json"
-                        wd_response = await client.get(wikidata_url, timeout=5.0, headers=headers)
-                        if wd_response.status_code == 200:
-                            wd_data = wd_response.json()
-                            entities = wd_data.get("entities", {})
-                            for entity in entities.values():
-                                claims = entity.get("claims", {})
-                                if "P18" in claims:  # P18 is the image property
-                                    img_file = claims["P18"][0]["mainsnak"]["datavalue"]["value"]
-                                    # URL encode the filename for Commons
-                                    img_file_encoded = img_file.replace(" ", "_")
-                                    wiki_image = f"https://commons.wikimedia.org/wiki/Special:FilePath/{img_file_encoded}?width=400"
-                                # Check for death date (P570)
-                                if "P570" in claims:
-                                    is_deceased_from_wikidata = True
-                    except:
-                        pass
-                else:
-                    # Still check Wikidata for death date even if we have an image
-                    try:
-                        wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={name.replace(' ', '_')}&props=claims&format=json"
-                        wd_response = await client.get(wikidata_url, timeout=5.0, headers=headers)
-                        if wd_response.status_code == 200:
-                            wd_data = wd_response.json()
-                            entities = wd_data.get("entities", {})
-                            for entity in entities.values():
-                                claims = entity.get("claims", {})
-                                if "P570" in claims:  # P570 is date of death
-                                    is_deceased_from_wikidata = True
                     except:
                         pass
                 
