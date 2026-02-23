@@ -5325,6 +5325,12 @@ async def get_celebrity_update_status():
         'wikidata_checked': {'$ne': True}
     })
     
+    # Count how many need bio/category fix
+    needs_bio_fix = await db.celebrities.count_documents({
+        'bio': {'$regex': 'is a celebrity', '$options': 'i'},
+        'bio_fixed': {'$ne': True}
+    })
+    
     # Category breakdown
     pipeline = [
         {"$group": {"_id": "$category", "count": {"$sum": 1}}},
@@ -5337,7 +5343,240 @@ async def get_celebrity_update_status():
         "with_real_images": with_wiki_image,
         "with_placeholder_images": with_placeholder,
         "not_yet_checked": not_checked,
+        "needs_bio_category_fix": needs_bio_fix,
         "categories": {c['_id']: c['count'] for c in category_counts if c['_id']}
+    }
+
+
+def extract_category_from_description(description: str) -> str:
+    """
+    Extract category from the FIRST occupation mentioned in a Wikipedia description.
+    E.g., "American singer-songwriter and actress" -> musicians (singer is first)
+    """
+    desc_lower = description.lower()
+    
+    # Check for royalty first (highest priority)
+    royal_keywords = ['prince', 'princess', 'duke', 'duchess', 'king', 'queen', 'royal', 'monarch', 
+                      'earl', 'countess', 'baron', 'baroness', 'lord', 'lady']
+    for kw in royal_keywords:
+        if kw in desc_lower:
+            return 'royals'
+    
+    # Define occupation keywords and their categories - ORDER MATTERS for priority
+    occupation_map = [
+        # Musicians - check first
+        (['singer', 'rapper', 'musician', 'songwriter', 'composer', 'vocalist', 'recording artist',
+          'hip hop', 'rock', 'pop star', 'country music', 'r&b', 'jazz'], 'musicians'),
+        # Movie stars
+        (['film actor', 'film actress', 'movie actor', 'movie actress', 'film director', 
+          'screenwriter', 'filmmaker'], 'movie_stars'),
+        # TV Actors (before general actors)
+        (['television actor', 'television actress', 'tv actor', 'tv actress', 'soap opera'], 'tv_actors'),
+        # Athletes
+        (['footballer', 'soccer player', 'football player', 'basketball player', 'tennis player',
+          'boxer', 'racing driver', 'formula one', 'f1', 'athlete', 'cricketer', 'golfer',
+          'swimmer', 'gymnast', 'olympian', 'sprinter', 'baseball player'], 'athletes'),
+        # Reality TV
+        (['reality television', 'reality tv', 'love island', 'big brother', 'the only way is essex',
+          'towie', 'made in chelsea', 'geordie shore', 'keeping up with'], 'reality_tv'),
+        # TV Personalities
+        (['television presenter', 'tv presenter', 'talk show host', 'chat show', 'game show host',
+          'news anchor', 'newsreader', 'broadcaster', 'radio presenter', 'television host'], 'tv_personalities'),
+        # General actors (after film/tv specific)
+        (['actor', 'actress', 'performer'], 'movie_stars'),
+        # Public figures
+        (['politician', 'businessman', 'businesswoman', 'entrepreneur', 'activist', 'lawyer',
+          'philanthropist', 'investor'], 'public_figure'),
+        # Other
+        (['chef', 'cook', 'restaurateur', 'comedian', 'stand-up', 'comic', 'author', 'writer',
+          'model', 'supermodel', 'fashion model', 'journalist', 'youtuber', 'influencer',
+          'social media', 'internet personality'], 'other'),
+    ]
+    
+    # Find the FIRST matching occupation in the description
+    first_match_pos = len(desc_lower)
+    first_match_category = None
+    
+    for keywords, category in occupation_map:
+        for kw in keywords:
+            pos = desc_lower.find(kw)
+            if pos != -1 and pos < first_match_pos:
+                first_match_pos = pos
+                first_match_category = category
+    
+    return first_match_category
+
+
+async def fetch_wikipedia_bio(name: str, client: httpx.AsyncClient, headers: dict) -> dict:
+    """
+    Fetch the actual Wikipedia extract (bio) for a celebrity.
+    Returns dict with bio text and suggested category based on first occupation.
+    """
+    result = {"bio": None, "suggested_category": None}
+    
+    try:
+        # Search Wikipedia for the page
+        search_url = "https://en.wikipedia.org/w/api.php"
+        search_params = {
+            'action': 'query',
+            'list': 'search',
+            'srsearch': name,
+            'srlimit': 3,
+            'format': 'json'
+        }
+        
+        search_response = await client.get(search_url, params=search_params, headers=headers, timeout=10.0)
+        if search_response.status_code != 200:
+            return result
+        
+        search_data = search_response.json()
+        search_results = search_data.get('query', {}).get('search', [])
+        
+        if not search_results:
+            return result
+        
+        # Get the page title (prefer exact match)
+        page_title = None
+        name_lower = name.lower()
+        for sr in search_results:
+            if sr.get('title', '').lower() == name_lower:
+                page_title = sr['title']
+                break
+        if not page_title:
+            page_title = search_results[0]['title']
+        
+        # Now get the extract for this page
+        extract_params = {
+            'action': 'query',
+            'titles': page_title,
+            'prop': 'extracts',
+            'exintro': 'true',
+            'explaintext': 'true',
+            'format': 'json'
+        }
+        
+        extract_response = await client.get(search_url, params=extract_params, headers=headers, timeout=10.0)
+        if extract_response.status_code != 200:
+            return result
+        
+        extract_data = extract_response.json()
+        pages = extract_data.get('query', {}).get('pages', {})
+        
+        for page_id, page_info in pages.items():
+            if page_id != '-1':
+                extract = page_info.get('extract', '')
+                if extract:
+                    # Get first 2-3 sentences for bio
+                    sentences = extract.split('. ')
+                    bio = '. '.join(sentences[:3])
+                    if not bio.endswith('.'):
+                        bio += '.'
+                    result['bio'] = bio
+                    
+                    # Extract category from the first sentence (contains occupation)
+                    first_sentence = sentences[0] if sentences else ''
+                    result['suggested_category'] = extract_category_from_description(first_sentence)
+                    break
+        
+    except Exception as e:
+        logger.warning(f"Error fetching Wikipedia bio for {name}: {e}")
+    
+    return result
+
+
+@api_router.post("/admin/fix-celebrity-bios")
+async def fix_celebrity_bios_and_categories(batch_size: int = 30, delay_seconds: float = 0.4):
+    """
+    Fix celebrities with generic "is a celebrity" bios by fetching real Wikipedia extracts.
+    Also recategorizes based on the FIRST occupation mentioned (e.g., singer -> musicians).
+    """
+    headers = {
+        'User-Agent': 'CelebrityBuzzIndex/1.0 (https://celebbuzzindex.com; admin@celebbuzzindex.com)',
+        'Accept': 'application/json'
+    }
+    
+    # Find celebrities needing bio fix
+    celebs_needing_fix = await db.celebrities.find(
+        {
+            '$or': [
+                {'bio': {'$regex': 'is a celebrity', '$options': 'i'}},
+                {'bio': {'$exists': False}},
+                {'bio': ''}
+            ],
+            'bio_fixed': {'$ne': True}
+        },
+        {'_id': 0, 'id': 1, 'name': 1, 'category': 1, 'bio': 1}
+    ).limit(batch_size).to_list(batch_size)
+    
+    if not celebs_needing_fix:
+        return {
+            "success": True,
+            "message": "No celebrities need bio fixing",
+            "updated": 0,
+            "remaining": 0
+        }
+    
+    # Count remaining
+    remaining_count = await db.celebrities.count_documents({
+        '$or': [
+            {'bio': {'$regex': 'is a celebrity', '$options': 'i'}},
+            {'bio': {'$exists': False}},
+            {'bio': ''}
+        ],
+        'bio_fixed': {'$ne': True}
+    })
+    
+    updated = 0
+    recategorized = 0
+    skipped = 0
+    details = []
+    
+    async with httpx.AsyncClient() as client:
+        for celeb in celebs_needing_fix:
+            celeb_id = celeb.get('id')
+            name = celeb.get('name')
+            old_category = celeb.get('category')
+            
+            try:
+                wiki_data = await fetch_wikipedia_bio(name, client, headers)
+                
+                update_fields = {'bio_fixed': True}
+                
+                if wiki_data['bio']:
+                    update_fields['bio'] = wiki_data['bio']
+                    
+                    # Update category if we got a suggestion
+                    if wiki_data['suggested_category'] and wiki_data['suggested_category'] != old_category:
+                        update_fields['category'] = wiki_data['suggested_category']
+                        recategorized += 1
+                        details.append({
+                            "name": name,
+                            "old_category": old_category,
+                            "new_category": wiki_data['suggested_category'],
+                            "bio_preview": wiki_data['bio'][:80] + "..."
+                        })
+                    
+                    await db.celebrities.update_one({'id': celeb_id}, {'$set': update_fields})
+                    updated += 1
+                    logger.info(f"Fixed bio for {name}: {wiki_data['suggested_category']}")
+                else:
+                    # Mark as checked even if no bio found
+                    await db.celebrities.update_one({'id': celeb_id}, {'$set': update_fields})
+                    skipped += 1
+                
+                await asyncio.sleep(delay_seconds)
+                
+            except Exception as e:
+                logger.error(f"Error fixing bio for {name}: {e}")
+    
+    return {
+        "success": True,
+        "message": f"Processed {len(celebs_needing_fix)} celebrities",
+        "updated": updated,
+        "recategorized": recategorized,
+        "skipped": skipped,
+        "remaining": remaining_count - len(celebs_needing_fix),
+        "details": details[:20]  # Show first 20 changes
     }
 
 
