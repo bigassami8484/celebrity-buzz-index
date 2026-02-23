@@ -1472,20 +1472,34 @@ async def record_price_history(celebrity_id: str, celebrity_name: str, price: fl
     except Exception as e:
         logger.error(f"Error recording price history: {e}")
 
-def get_base_price_for_tier(tier: str) -> float:
-    """Get BASE price range for celebrity tier (in millions)"""
-    # New pricing structure:
-    # A-List: £9m-£12m (high scoring but expensive)
-    # B-List: £5m-£8m (balanced steady picks)
-    # C-List: £2m-£4m (risk/reward)
-    # D-List: £0.5m-£1.5m (cheap wildcards)
-    base_prices = {
-        "A": 9.0,   # Base £9M, can go up to £12M
-        "B": 5.0,   # Base £5M, can go up to £8M
-        "C": 2.0,   # Base £2M, can go up to £4M
-        "D": 0.5    # Base £0.5M, can go up to £1.5M
+def get_base_price_for_tier(tier: str, name: str = "") -> float:
+    """Get BASE price range for celebrity tier (in millions) with variation"""
+    import random
+    import hashlib
+    
+    # Price ranges for each tier
+    price_ranges = {
+        "A": (9.0, 12.0),   # £9m-£12m
+        "B": (5.0, 8.0),    # £5m-£8m
+        "C": (2.0, 4.0),    # £2m-£4m
+        "D": (0.5, 1.5)     # £0.5m-£1.5m
     }
-    return base_prices.get(tier, 0.5)
+    
+    min_price, max_price = price_ranges.get(tier, (0.5, 1.5))
+    
+    # Use name hash for consistent but varied pricing (same celeb = same price)
+    if name:
+        # Create a deterministic "random" factor based on the name
+        name_hash = int(hashlib.md5(name.lower().encode()).hexdigest()[:8], 16)
+        variation = (name_hash % 100) / 100.0  # 0.0 to 0.99
+    else:
+        variation = random.random()
+    
+    # Calculate price within range
+    price_range = max_price - min_price
+    price = min_price + (price_range * variation)
+    
+    return round(price, 1)
 
 def get_dynamic_price(tier: str, buzz_score: float, name: str = "") -> float:
     """Calculate dynamic price based on tier and buzz score
