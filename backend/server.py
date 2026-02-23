@@ -3667,14 +3667,10 @@ async def get_celebrities_by_category(category: str, response: Response):
 @api_router.get("/stats")
 async def get_stats():
     """Get site statistics including player count and transfer window"""
-    # Count teams that have been saved (have at least one celebrity)
-    saved_teams_count = await db.teams.count_documents({
-        "celebrities": {"$exists": True, "$ne": []}
-    })
     transfer_window = is_transfer_window_open()
     
-    # Player count is based on saved teams only
-    player_count = max(1, saved_teams_count)
+    # Player count set to 0 for now (fresh start)
+    player_count = 0
     
     return {
         "player_count": player_count,
