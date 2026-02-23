@@ -1397,7 +1397,9 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     "description": extract or f"{actual_title} is a notable person.",
                     "image": image or f"https://ui-avatars.com/api/?name={actual_title}&size=150&background=FF0099&color=fff",
                     "wiki_url": wiki_url,
+                    "tier": tier,
                     "estimated_tier": tier,
+                    "price": price,
                     "estimated_price": price,
                     "news_premium": hot_celeb_match is not None
                 })
