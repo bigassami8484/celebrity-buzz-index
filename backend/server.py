@@ -5274,16 +5274,18 @@ async def update_celebrity_data_from_wikidata(batch_size: int = 20, delay_second
                 if wiki_data['suggested_category'] and wiki_data['suggested_category'] != old_category:
                     update_fields['category'] = wiki_data['suggested_category']
                 
-                if update_fields:
-                    await db.celebrities.update_one(
-                        {'id': celeb_id},
-                        {'$set': update_fields}
-                    )
+                # Always update (to mark as checked even if no image found)
+                await db.celebrities.update_one(
+                    {'id': celeb_id},
+                    {'$set': update_fields}
+                )
+                
+                if wiki_data['image_url']:
                     updated += 1
-                    logger.info(f"Updated {name}: image={bool(wiki_data['image_url'])}, category={wiki_data['suggested_category']}")
+                    logger.info(f"Updated {name}: image=True, category={wiki_data['suggested_category']}")
                 else:
                     skipped += 1
-                    logger.info(f"Skipped {name}: no new data found")
+                    logger.info(f"Marked {name} as checked: no image found on Wikidata")
                 
                 # Rate limiting delay
                 await asyncio.sleep(delay_seconds)
@@ -5298,7 +5300,7 @@ async def update_celebrity_data_from_wikidata(batch_size: int = 20, delay_second
         "updated": updated,
         "skipped": skipped,
         "errors": errors,
-        "remaining": remaining_count - updated
+        "remaining": remaining_count - len(celebs_needing_update)
     }
 
 
