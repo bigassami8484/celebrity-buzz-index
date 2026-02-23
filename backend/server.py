@@ -2183,7 +2183,7 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
                             "source": source_name,
                             "url": article_url,
                             "date": pub_date_str or datetime.now(timezone.utc).strftime("%b %d, %Y"),
-                            "sentiment": sentiment,
+                            "is_scandal": sentiment == "negative",  # Keep for scoring but don't show label
                             "is_real": True
                         })
                         
