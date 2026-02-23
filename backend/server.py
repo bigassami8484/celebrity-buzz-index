@@ -2990,6 +2990,17 @@ async def autocomplete_search(q: str):
     
     query_lower = q.lower().strip()
     
+    # Get hot celebs to check for news premium pricing
+    hot_celebs_cache = await db.news_cache.find_one({"type": "hot_celebs"})
+    hot_celebs_list = hot_celebs_cache.get("data", []) if hot_celebs_cache else []
+    
+    def get_hot_celeb_price(name):
+        """Check if celeb is in hot list and return their premium price"""
+        for hc in hot_celebs_list:
+            if hc.get("name", "").lower() == name.lower():
+                return hc.get("price"), hc.get("tier")
+        return None, None
+    
     # PRIORITY 1: Check database for exact match first (most likely what user wants)
     exact_match = await db.celebrities.find_one(
         {"name": {"$regex": f"^{q}$", "$options": "i"}},
@@ -3001,6 +3012,13 @@ async def autocomplete_search(q: str):
         tier = exact_match.get("tier", "D")
         # Use stored database price for consistency
         price = exact_match.get("price", get_base_price_for_tier(tier, exact_match["name"]))
+        
+        # Check if in hot celebs - use premium price
+        hot_price, hot_tier = get_hot_celeb_price(exact_match["name"])
+        if hot_price:
+            price = hot_price
+            tier = hot_tier or tier
+        
         priority_suggestions.append({
             "name": exact_match["name"],
             "bio": exact_match.get("bio", "")[:100] + "..." if exact_match.get("bio") else "",
@@ -3008,7 +3026,8 @@ async def autocomplete_search(q: str):
             "tier": tier,
             "price": price,
             "estimated_price": price,
-            "is_exact_match": True
+            "is_exact_match": True,
+            "is_hot": hot_price is not None
         })
     
     # PRIORITY 2: Check database for partial matches (starts with query)
