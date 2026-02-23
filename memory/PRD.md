@@ -16,6 +16,7 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - ✅ **Join via Code**: 6-character invite codes for easy sharing
 - ✅ **Weekly Leaderboard**: Track weekly standings within your league
 - ✅ **Monthly Leaderboard**: Accumulated monthly standings
+- ✅ **League Chat**: Real-time chat with friends in your league (with profanity filter)
 - ✅ **Badge System**: Awards for weekly/monthly winners
   - 🏆 Weekly Champion - Won a weekly league competition
   - 🌟 Monthly Master - Won a monthly league competition  
@@ -23,7 +24,22 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
   - 💪 Undefeated - Won 4 weeks in a row
   - 🎯 League Founder - Created a league with 5+ members
 - ✅ **Share to Social**: WhatsApp, X (Twitter), Facebook sharing
-- ✅ **League Stats**: Track weeks played, total celebs, most decorated team
+- ✅ **League Stats**: Weeks played, total celebs, most decorated team
+
+### Automated Schedulers
+- ✅ **Daily Points Update**: 23:00 UTC - Updates team points daily
+- ✅ **Weekly League Scoring**: Sunday 23:59 UTC - Records weekly winners, awards badges
+- ✅ **Monthly League Winner**: 1st of month 00:30 UTC - Crowns monthly champion
+- ✅ **Weekly Price Reset**: Monday 00:00 UTC - Updates celebrity prices
+
+### Celebrity Tier Fixes
+- ✅ Adam Sandler: A-list £10M (was C-list)
+- ✅ Debbie Harry: B-list £6M (newly added)
+- ✅ Simone Biles: A-list £10M (was D-list)
+- ✅ Andrew Garfield: A-list £10M
+- ✅ Harry Styles: A-list £12M
+- ✅ Michael B. Jordan: Added to hot celebs pool (A-list)
+- ✅ Andrew Mountbatten-Windsor: Kept (removed "Prince Andrew" duplicate)
 
 ### UI/UX Improvements
 - ✅ Celebrity card bio overlay redesigned - smaller and positioned at bottom
