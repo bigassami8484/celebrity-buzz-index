@@ -11,24 +11,34 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 
 ## Latest Updates (Feb 23, 2026)
 
+### Friends League Feature (NEW!)
+- ✅ **Create Leagues**: Users can create private leagues with up to 10 friends
+- ✅ **Join via Code**: 6-character invite codes for easy sharing
+- ✅ **Weekly Leaderboard**: Track weekly standings within your league
+- ✅ **Monthly Leaderboard**: Accumulated monthly standings
+- ✅ **Badge System**: Awards for weekly/monthly winners
+  - 🏆 Weekly Champion - Won a weekly league competition
+  - 🌟 Monthly Master - Won a monthly league competition  
+  - 👑 League Legend - Won 3+ weeks in your league
+  - 💪 Undefeated - Won 4 weeks in a row
+  - 🎯 League Founder - Created a league with 5+ members
+- ✅ **Share to Social**: WhatsApp, X (Twitter), Facebook sharing
+- ✅ **League Stats**: Track weeks played, total celebs, most decorated team
+
 ### UI/UX Improvements
-- ✅ Celebrity card bio overlay redesigned - now smaller and positioned at bottom
-- ✅ Bio text reduced to 2 lines with smaller font (text-xs)
-- ✅ Celebrity faces now fully visible (overlay only covers bottom portion)
-- ✅ CSS gradient adjusted for better visibility
+- ✅ Celebrity card bio overlay redesigned - smaller and positioned at bottom
+- ✅ Bio text reduced to 2 lines with smaller font
+- ✅ Celebrity faces now fully visible
+- ✅ Wikipedia links restored on all cards
 
 ### Data Updates
 - ✅ Charlie Kirk moved to `public_figure` category
-- ✅ Jake Paul, Martha Stewart, Kim Kardashian - confirmed real Wikipedia images
-- ✅ Added 8 UK Reality TV stars: Chloe Ferry, Charlotte Crosby, Vicky Pattison, Scotty T, Marnie Simpson, Jamie Laing, Sam Thompson, Zara McDermott
-- ✅ Added 9 UK TV stars: Stacey Solomon, Christine Lampard, Emma Willis, Coleen Nolan, Andrea McLean, Sherrie Hewson, Kaye Adams, Denise Welch, Matt Baker
-- **Total celebrities**: 1,600+ with real Wikipedia images
+- ✅ JoJo Siwa added as B-list (£6M) in reality_tv
+- ✅ Stacey Solomon moved to reality_tv
+- ✅ Removed 5 duplicate celebrities (Beyoncé, Drake, etc.)
+- ✅ Added 17 UK Reality TV and TV stars with images
 
-### Current Stats
-- Reality TV celebrities with images: 129
-- TV Actors with images: 91
-
-## Backend Architecture (Updated Feb 22, 2026)
+## Backend Architecture (Updated Feb 23, 2026)
 ```
 /app/backend/
 ├── server.py          # Main FastAPI app (5080 lines - reduced from 5488)
