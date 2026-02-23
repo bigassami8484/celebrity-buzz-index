@@ -9,6 +9,25 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Compete on leaderboards with friends
 - Social sharing (Twitter/X, Facebook, WhatsApp)
 
+## Latest Updates (Feb 23, 2026)
+
+### UI/UX Improvements
+- ✅ Celebrity card bio overlay redesigned - now smaller and positioned at bottom
+- ✅ Bio text reduced to 2 lines with smaller font (text-xs)
+- ✅ Celebrity faces now fully visible (overlay only covers bottom portion)
+- ✅ CSS gradient adjusted for better visibility
+
+### Data Updates
+- ✅ Charlie Kirk moved to `public_figure` category
+- ✅ Jake Paul, Martha Stewart, Kim Kardashian - confirmed real Wikipedia images
+- ✅ Added 8 UK Reality TV stars: Chloe Ferry, Charlotte Crosby, Vicky Pattison, Scotty T, Marnie Simpson, Jamie Laing, Sam Thompson, Zara McDermott
+- ✅ Added 9 UK TV stars: Stacey Solomon, Christine Lampard, Emma Willis, Coleen Nolan, Andrea McLean, Sherrie Hewson, Kaye Adams, Denise Welch, Matt Baker
+- **Total celebrities**: 1,600+ with real Wikipedia images
+
+### Current Stats
+- Reality TV celebrities with images: 129
+- TV Actors with images: 91
+
 ## Backend Architecture (Updated Feb 22, 2026)
 ```
 /app/backend/
