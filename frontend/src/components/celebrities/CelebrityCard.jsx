@@ -103,7 +103,7 @@ const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford, onShowPriceHisto
             {celebrity.name}
             {celebrity.is_deceased && <span className="ml-2" title="Deceased">💀</span>}
           </h3>
-          <p className="text-sm text-[#A1A1AA] line-clamp-2 mt-1">{celebrity.bio?.slice(0, 100)}...</p>
+          <p className="text-sm text-[#A1A1AA] line-clamp-3 mt-1">{celebrity.bio?.slice(0, 180)}...</p>
           {celebrity.wiki_url && (
             <a 
               href={celebrity.wiki_url} 
