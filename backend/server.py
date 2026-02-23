@@ -1028,50 +1028,41 @@ C_LIST_INDICATORS = ["known for", "appeared in", "featured", "contestant", "part
 
 # Mega-stars who should ALWAYS be A-list regardless of bio analysis
 GUARANTEED_A_LIST = [
+    # Global Music Superstars
     "taylor swift", "beyoncé", "beyonce", "rihanna", "drake", "kanye west", "adele",
     "ed sheeran", "ariana grande", "justin bieber", "lady gaga", "bruno mars",
-    "leonardo dicaprio", "tom cruise", "brad pitt", "angelina jolie", "tom hanks",
-    "julia roberts", "denzel washington", "will smith", "johnny depp", "robert downey jr",
-    "dwayne johnson", "the rock", "scarlett johansson", "jennifer lawrence", "margot robbie",
-    "oprah winfrey", "kim kardashian", "elon musk", "jeff bezos", "cristiano ronaldo",
-    "lionel messi", "lebron james", "serena williams", "roger federer", "michael jordan",
-    "david beckham", "barack obama", "donald trump", "joe biden", "bill gates",
-    # Victoria Beckham & One Direction
-    "victoria beckham", "harry styles", "zayn malik", "niall horan", "liam payne", "louis tomlinson",
-    # Katie Price & other major UK celebs
-    "katie price", "gemma collins", "peter andre", "cheryl", "robbie williams",
-    # British Royal Family (all variations including Wikipedia formal names)
-    "prince william", "william, prince of wales", "william prince of wales",
-    "prince harry", "harry, duke of sussex", "harry duke of sussex", "prince harry, duke of sussex", "prince harry duke of sussex",
-    "kate middleton", "catherine, princess of wales", "catherine princess of wales",
-    "queen elizabeth", "elizabeth ii", "queen elizabeth ii",
-    "king charles", "charles iii", "king charles iii",
-    "prince andrew", "andrew, duke of york", "andrew duke of york", "andrew mountbatten-windsor",
-    "meghan markle", "meghan, duchess of sussex", "meghan duchess of sussex",
-    "princess diana", "diana, princess of wales", "diana princess of wales",
-    "camilla", "queen camilla", "camilla, queen consort",
-    "princess anne", "anne, princess royal", "anne princess royal",
-    "prince edward", "edward, duke of edinburgh", "edward duke of edinburgh",
-    "princess beatrice", "princess eugenie", "zara tindall", "peter phillips",
-    # Royal Children - Prince William's children
-    "prince george", "prince george of wales", "george of wales",
-    "princess charlotte", "princess charlotte of wales", "charlotte of wales",
-    "prince louis", "prince louis of wales", "louis of wales",
-    # Royal Children - Prince Harry's children
-    "prince archie", "prince archie of sussex", "archie of sussex", "archie harrison",
-    "princess lilibet", "princess lilibet of sussex", "lilibet of sussex", "lilibet diana",
-    "prince george", "princess charlotte", "prince louis",
-    # Additional mega-stars
     "britney spears", "madonna", "michael jackson", "jennifer lopez", "shakira",
     "eminem", "jay-z", "jay z", "snoop dogg", "50 cent", "nicki minaj", "cardi b",
     "selena gomez", "miley cyrus", "katy perry", "demi lovato", "the weeknd",
-    "tom brady", "tiger woods", "usain bolt", "muhammad ali", "mike tyson",
+    "harry styles", "zayn malik", "niall horan", "liam payne", "louis tomlinson",
+    "victoria beckham", "cheryl", "robbie williams",
+    # Global Movie Stars
+    "leonardo dicaprio", "tom cruise", "brad pitt", "angelina jolie", "tom hanks",
+    "julia roberts", "denzel washington", "will smith", "johnny depp", "robert downey jr",
+    "dwayne johnson", "the rock", "scarlett johansson", "jennifer lawrence", "margot robbie",
     "meryl streep", "nicole kidman", "cate blanchett", "natalie portman", "emma watson",
     "george clooney", "matt damon", "ben affleck", "keanu reeves", "morgan freeman",
     "samuel l. jackson", "samuel l jackson", "al pacino", "robert de niro", "jack nicholson",
-    # Sports legends
-    "simone biles", "venus williams", "novak djokovic", "wayne rooney", "diego maradona",
-    "pele", "pelé", "zinedine zidane", "kobe bryant", "shaquille o'neal"
+    # Global Athletes
+    "cristiano ronaldo", "lionel messi", "lebron james", "serena williams", "roger federer", 
+    "michael jordan", "david beckham", "tom brady", "tiger woods", "usain bolt", 
+    "muhammad ali", "mike tyson", "simone biles", "venus williams", "novak djokovic", 
+    "wayne rooney", "diego maradona", "pele", "pelé", "zinedine zidane", "kobe bryant", "shaquille o'neal",
+    # Global Business/Public Figures
+    "oprah winfrey", "kim kardashian", "elon musk", "jeff bezos", "barack obama", 
+    "donald trump", "joe biden", "bill gates",
+    # British Royal Family (globally famous)
+    "prince william", "william, prince of wales", "william prince of wales",
+    "prince harry", "harry, duke of sussex", "harry duke of sussex", "prince harry, duke of sussex",
+    "kate middleton", "catherine, princess of wales", "catherine princess of wales",
+    "queen elizabeth", "elizabeth ii", "queen elizabeth ii",
+    "king charles", "charles iii", "king charles iii",
+    "meghan markle", "meghan, duchess of sussex", "meghan duchess of sussex",
+    "princess diana", "diana, princess of wales", "diana princess of wales",
+    "camilla", "queen camilla", "camilla, queen consort",
+    "princess anne", "anne, princess royal",
+    "prince george", "prince george of wales",
+    "princess charlotte", "princess charlotte of wales",
 ]
 
 # Keywords that indicate A-list royalty (for partial matching)
