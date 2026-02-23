@@ -139,10 +139,15 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - ✅ **MASS WIKIDATA UPDATE** (Feb 23, 2026):
   - **1,605 celebrities now have real Wikipedia images** (82.6% coverage)
   - Automated Wikidata API integration fetches P18 (image) and P106 (occupation)
-  - Celebrities recategorized based on their Wikidata occupation data
-  - Admin endpoints for batch updates: `/api/admin/update-celebrity-data`, `/api/admin/celebrity-update-status`
   - 339 celebrities remain with placeholder images (no Wikidata images available)
-  - Categories rebalanced: movie_stars (389), athletes (308), other (253), musicians (248), public_figure (199), royals (192), tv_personalities (142), tv_actors (114), reality_tv (99)
+- ✅ **WIKIPEDIA BIO & CATEGORY FIX** (Feb 23, 2026):
+  - All celebrities now have real Wikipedia bios (replaced generic "is a celebrity" text)
+  - Categories based on **FIRST OCCUPATION** from Wikipedia description
+  - Smart parsing: "is an American singer-songwriter" → musicians
+  - Handles edge cases: "Queen of Country" doesn't trigger royals, "sex tape with singer Ray J" doesn't make Kim K a musician
+  - Only actual royal family members (Prince of Wales, Duke of Sussex, etc.) are categorized as royals
+  - Final category distribution: movie_stars (427), athletes (291), musicians (279), royals (254), reality_tv (211), public_figure (193), other (184), tv_personalities (102), tv_actors (3)
+  - Admin endpoint: `/api/admin/fix-celebrity-bios`
 - ✅ **24-HOUR NEWS CACHE** - News feed refreshes every 24 hours (was 15 min)
 - ✅ **REAL NEWS FROM RSS FEEDS** (Feb 22, 2026):
   - Individual celebrity news now fetches REAL articles from RSS feeds first
