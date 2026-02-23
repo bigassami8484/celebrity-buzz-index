@@ -3049,6 +3049,13 @@ async def autocomplete_search(q: str):
                 tier = match.get("tier", "D")
                 # Use stored database price for consistency
                 price = match.get("price", get_base_price_for_tier(tier, match["name"]))
+                
+                # Check if in hot celebs - use premium price
+                hot_price, hot_tier, is_hot = get_hot_celeb_price(match["name"])
+                if hot_price:
+                    price = hot_price
+                    tier = hot_tier or tier
+                
                 priority_suggestions.append({
                     "name": match["name"],
                     "bio": match.get("bio", "")[:100] + "..." if match.get("bio") else "",
@@ -3056,7 +3063,8 @@ async def autocomplete_search(q: str):
                     "tier": tier,
                     "price": price,
                     "estimated_price": price,
-                    "is_db_match": True
+                    "is_db_match": True,
+                    "is_hot": is_hot
                 })
     
     # PRIORITY 3: Check if query matches a known alias
