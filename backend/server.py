@@ -2990,16 +2990,23 @@ async def autocomplete_search(q: str):
     
     query_lower = q.lower().strip()
     
-    # Get hot celebs to check for news premium pricing
-    hot_celebs_cache = await db.news_cache.find_one({"type": "hot_celebs"})
-    hot_celebs_list = hot_celebs_cache.get("data", []) if hot_celebs_cache else []
+    # Get hot celebs from the CORRECT cache type (same as celebrity/search uses)
+    hot_celebs_cache = await db.news_cache.find_one(
+        {"type": "hot_celebs_from_news_v4"},
+        {"_id": 0}
+    )
+    hot_celebs_list = hot_celebs_cache.get("hot_celebs", []) if hot_celebs_cache else []
     
     def get_hot_celeb_price(name):
         """Check if celeb is in hot list and return their premium price"""
         for hc in hot_celebs_list:
-            if hc.get("name", "").lower() == name.lower():
-                return hc.get("price"), hc.get("tier")
-        return None, None
+            hc_name = hc.get("name", "").lower()
+            if hc_name == name.lower():
+                return hc.get("price"), hc.get("tier"), True
+            # Also check using are_same_celebrity for aliases
+            if are_same_celebrity(hc.get("name", ""), name):
+                return hc.get("price"), hc.get("tier"), True
+        return None, None, False
     
     # PRIORITY 1: Check database for exact match first (most likely what user wants)
     exact_match = await db.celebrities.find_one(
