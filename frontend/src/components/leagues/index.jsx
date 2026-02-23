@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Trophy, Crown, X, Copy, Check, Facebook, Calendar, CalendarDays, Users, Award, ChevronRight, Star } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Trophy, Crown, X, Copy, Check, Facebook, Calendar, CalendarDays, Users, Award, ChevronRight, Star, MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
 
 // Badge icons mapping
@@ -13,6 +13,18 @@ const BADGE_ICONS = {
   controversy_king: "🔥",
   a_lister: "⭐",
   first_pick: "⚡",
+};
+
+// Team color mapping
+const TEAM_COLORS = {
+  pink: "#FF0099",
+  cyan: "#00F0FF",
+  gold: "#FFD700",
+  green: "#10B981",
+  purple: "#8B5CF6",
+  orange: "#F97316",
+  blue: "#3B82F6",
+  red: "#EF4444",
 };
 
 // League Panel Component
