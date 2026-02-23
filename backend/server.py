@@ -1700,6 +1700,12 @@ async def calculate_tier_from_wikipedia_data(name: str, http_client: httpx.Async
             "million copies": 12, "billion": 20, "sold-out": 8, "arena tour": 10, "stadium": 12,
             "franchise": 10, "sequel": 5, "series regular": 8, "producer": 5, "director": 8,
             "founded": 10, "ceo": 8, "entrepreneur": 5,
+            
+            # Royal / Political status (high tier indicators)
+            "prince of wales": 40, "princess of wales": 40, "duke": 25, "duchess": 25,
+            "king": 35, "queen": 35, "royal family": 30, "heir": 20, "throne": 20,
+            "president": 30, "prime minister": 30, "senator": 15, "governor": 15,
+            "billionaire": 25, "philanthropist": 10,
         }
         
         career_score = 0
