@@ -114,19 +114,19 @@ export const PointsMethodology = ({ onClose }) => (
         <div className="space-y-2 mb-6">
           <div className="bg-[#FFD700] text-black p-2 flex justify-between items-center">
             <span className="font-bold">A-LIST</span>
-            <span className="text-sm">£5m-£15m • High scoring but expensive</span>
+            <span className="text-sm">£9m-£12m • High scoring but expensive</span>
           </div>
           <div className="bg-[#C0C0C0] text-black p-2 flex justify-between items-center">
             <span className="font-bold">B-LIST</span>
-            <span className="text-sm">£2m-£5m • Balanced steady picks</span>
+            <span className="text-sm">£5m-£8m • Balanced steady picks</span>
           </div>
           <div className="bg-[#CD7F32] text-white p-2 flex justify-between items-center">
             <span className="font-bold">C-LIST</span>
-            <span className="text-sm">£0.5m-£2m • Risk/reward</span>
+            <span className="text-sm">£2m-£4m • Risk/reward</span>
           </div>
           <div className="bg-[#666666] text-white p-2 flex justify-between items-center">
             <span className="font-bold">D-LIST</span>
-            <span className="text-sm">£0.1m-£0.5m • Cheap wildcards</span>
+            <span className="text-sm">£0.5m-£1.5m • Cheap wildcards</span>
           </div>
         </div>
         
