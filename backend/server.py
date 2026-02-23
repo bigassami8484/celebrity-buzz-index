@@ -2405,6 +2405,22 @@ def determine_tier_from_bio(bio: str, name: str = "") -> str:
     if awards_found >= 1:
         return "C"  # Single major award = C-list minimum
     
+    # Check for successful TV presenters - they should not be D-list
+    presenter_indicators = [
+        "television presenter", "tv presenter", "presenter", "host",
+        "love island", "the masked singer", "strictly come dancing", "dancing with the stars",
+        "x factor", "britain's got talent", "america's got talent", "the voice",
+        "big brother", "i'm a celebrity", "great british bake off", "masterchef",
+        "this morning", "good morning", "breakfast", "newsround", "blue peter",
+        "top gear", "the one show", "loose women", "the chase", "pointless",
+        "countdown", "8 out of 10 cats", "question of sport", "a league of their own"
+    ]
+    presenter_score = sum(1 for ind in presenter_indicators if ind in bio_lower)
+    if presenter_score >= 2:
+        return "B"  # Established presenter with popular show credits
+    if presenter_score >= 1:
+        return "C"  # Presenter = at least C-list
+    
     # Check for comedians - they should be at least C-list
     comedian_indicators = [
         "comedian", "stand-up comedian", "comedy", "comedic", "panel show",
