@@ -4599,23 +4599,25 @@ async def submit_team(data: TeamSubmit):
 
 @api_router.get("/transfer-window-status")
 async def get_transfer_window_status():
-    """Check if transfer window is currently open (Saturday 00:00 - Sunday 00:00 UTC)"""
+    """Check if transfer window is currently open (Sunday 12pm - 12am GMT)"""
     now = datetime.now(timezone.utc)
-    is_saturday = now.weekday() == 5  # Saturday = 5
+    is_sunday = now.weekday() == 6  # Sunday = 6
+    is_open = is_sunday and 12 <= now.hour < 24  # 12pm to midnight
     
-    # Calculate next transfer window
-    days_until_saturday = (5 - now.weekday()) % 7
-    if days_until_saturday == 0 and not is_saturday:
-        days_until_saturday = 7
+    # Calculate next transfer window (next Sunday 12pm)
+    days_until_sunday = (6 - now.weekday()) % 7
+    if days_until_sunday == 0:
+        if now.hour >= 12:
+            days_until_sunday = 7  # Next Sunday
     
-    next_window = now + timedelta(days=days_until_saturday)
-    next_window = next_window.replace(hour=0, minute=0, second=0, microsecond=0)
+    next_window = now + timedelta(days=days_until_sunday)
+    next_window = next_window.replace(hour=12, minute=0, second=0, microsecond=0)
     
     return {
-        "is_open": is_saturday,
+        "is_open": is_open,
         "next_window": next_window.isoformat(),
         "current_day": now.strftime("%A"),
-        "message": "Transfer window open!" if is_saturday else f"Transfer window opens Saturday"
+        "message": "Transfer window open!" if is_open else f"Transfer window opens Sunday 12pm GMT"
     }
 
 
