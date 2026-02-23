@@ -4265,7 +4265,7 @@ async def create_price_watch(team_id: str, watch: PriceWatchCreate):
     
     # Create the watch
     watch_doc = {
-        "id": str(uuid4()),
+        "id": str(uuid.uuid4()),
         "team_id": team_id,
         "celebrity_name": celeb["name"],  # Use canonical name
         "target_price": watch.target_price,
