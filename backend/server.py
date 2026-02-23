@@ -3970,6 +3970,10 @@ async def get_hot_celebs():
                         
                         price = round(base_price * news_multiplier, 1)
                         
+                        # Enforce £15M price cap
+                        if price > 15:
+                            price = 15.0
+                        
                         # Show the headlines that put them on the banner
                         hot_reason = data["headline"][:80] + "..." if data["headline"] else "Trending in news"
                         
