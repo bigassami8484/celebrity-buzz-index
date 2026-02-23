@@ -414,9 +414,17 @@ class League(BaseModel):
     name: str
     code: str = Field(default_factory=generate_league_code)
     owner_team_id: str  # Team that created the league
-    team_ids: List[str] = []  # Teams in this league
-    max_teams: int = 20
+    team_ids: List[str] = []  # Teams in this league (max 10)
+    max_teams: int = 10  # Maximum 10 friends per league
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    # Weekly tracking
+    current_week: str = ""  # ISO week (e.g., "2026-W08")
+    weekly_scores: dict = {}  # {team_id: weekly_points}
+    weekly_winner_history: List[dict] = []  # [{week: str, team_id: str, team_name: str, points: float}]
+    # Monthly tracking
+    current_month: str = ""  # (e.g., "2026-02")
+    monthly_scores: dict = {}  # {team_id: accumulated_monthly_points}
+    monthly_winner_history: List[dict] = []  # [{month: str, team_id: str, team_name: str, points: float}]
 
 class LeagueCreate(BaseModel):
     name: str
