@@ -2285,14 +2285,27 @@ def detect_category_from_bio(bio: str, name: str) -> str:
         "sitcom", "soap opera", "miniseries", "tv movie", "television movie",
         "primetime emmy", "emmy award", "bafta tv", "golden globe for television",
         "streaming series", "netflix series", "hbo series", "bbc series", "amc series",
-        "comedy series", "drama series", "television drama", "tv drama",
-        "breaking bad", "game of thrones", "the crown", "downton abbey",
-        "peaky blinders", "stranger things", "the office", "friends"
+        "comedy series", "drama series", "television drama", "tv drama"
+    ]
+    
+    # ICONIC TV SHOWS - if someone is known for these, they're primarily a TV actor
+    # These shows defined their careers, so we give extra weight
+    iconic_tv_shows = [
+        "stranger things", "breaking bad", "game of thrones", "the crown", "downton abbey",
+        "peaky blinders", "the office", "friends", "fleabag", "killing eve", "succession",
+        "the sopranos", "the wire", "mad men", "lost", "grey's anatomy", "how i met your mother",
+        "the big bang theory", "modern family", "schitt's creek", "ted lasso", "the mandalorian",
+        "bridgerton", "squid game", "wednesday", "the witcher", "house of the dragon"
     ]
     
     # Count occurrences
     film_score = sum(bio_lower.count(kw) for kw in film_keywords)
     tv_score = sum(bio_lower.count(kw) for kw in tv_keywords)
+    
+    # Add bonus for iconic TV shows (2 points each - they define careers)
+    for show in iconic_tv_shows:
+        if show in bio_lower:
+            tv_score += 2
     
     # If they're an actor/actress and we have clear TV vs film signals
     is_actor = any(x in bio_lower for x in ["actor", "actress"])
