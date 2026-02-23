@@ -905,6 +905,14 @@ function App() {
         />
       )}
       
+      {/* Price Watch Modal */}
+      {showPriceWatch && team && (
+        <PriceWatch 
+          teamId={team.id}
+          onClose={() => setShowPriceWatch(false)}
+        />
+      )}
+      
       {/* Share Modal */}
       {showShareModal && team && (
         <ShareModal team={team} onClose={() => setShowShareModal(false)} />
