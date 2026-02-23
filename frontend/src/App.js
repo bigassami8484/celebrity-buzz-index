@@ -862,9 +862,9 @@ function App() {
         <div className="mt-6 md:mt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             {/* On mobile, show condensed versions */}
-            <BrownBreadWatch watchList={isMobile ? brownBreadWatch.slice(0, 3) : brownBreadWatch} onSelect={searchCelebrity} />
+            <BrownBreadWatch watchList={brownBreadWatch} onSelect={searchCelebrity} />
             <TopPickedCelebs celebs={isMobile ? topPicked.slice(0, 3) : topPicked} onSelect={searchCelebrity} />
-            <Leaderboard entries={isMobile ? leaderboard.slice(0, 5) : leaderboard} />
+            <Leaderboard entries={leaderboard} />
           </div>
         </div>
         
