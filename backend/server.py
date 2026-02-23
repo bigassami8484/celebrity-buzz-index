@@ -5477,34 +5477,8 @@ def extract_category_from_description(description: str) -> str:
     # Default for "personality" with no clear occupation
     if 'personality' in desc_lower or 'socialite' in desc_lower:
         return 'reality_tv'
-        if 'model' in desc_lower:
-            return 'other'
-        # Default personality to reality_tv if nothing else matches
-        return 'reality_tv'
     
-    # Fallback: scan for keywords by position
-    occupation_keywords = [
-        (['singer', 'rapper', 'musician', 'songwriter'], 'musicians'),
-        (['boxer', 'footballer', 'cricketer', 'golfer', 'swimmer', 'athlete', 'racing driver'], 'athletes'),
-        (['actor', 'actress', 'film director'], 'movie_stars'),
-        (['television actor', 'television actress'], 'tv_actors'),
-        (['presenter', 'host', 'broadcaster'], 'tv_personalities'),
-        (['reality television', 'reality tv', 'love island'], 'reality_tv'),
-        (['chef', 'comedian', 'model', 'author'], 'other'),
-        (['politician', 'businessman', 'entrepreneur'], 'public_figure'),
-    ]
-    
-    first_match_pos = len(desc_lower)
-    first_match_category = None
-    
-    for keywords, category in occupation_keywords:
-        for kw in keywords:
-            pos = desc_lower.find(kw)
-            if pos != -1 and pos < first_match_pos:
-                first_match_pos = pos
-                first_match_category = category
-    
-    return first_match_category
+    return None
 
 
 async def fetch_wikipedia_bio(name: str, client: httpx.AsyncClient, headers: dict) -> dict:
