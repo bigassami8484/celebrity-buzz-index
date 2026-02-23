@@ -2376,6 +2376,36 @@ def determine_tier_from_bio(bio: str, name: str = "") -> str:
     if b_list_score >= 1 or c_list_score >= 1:
         return "C"
     
+    # =================================================================
+    # ANTI-D-LIST CHECKS
+    # Actors with longevity or multiple successful roles should NOT be D-list
+    # =================================================================
+    
+    # Check for multi-year TV show runs (patterns like "2016-2025", "2010–2019", etc.)
+    import re
+    year_range_pattern = r'\b(19|20)\d{2}\s*[-–—]\s*(19|20)\d{2}\b'
+    year_ranges = re.findall(year_range_pattern, bio)
+    if year_ranges:
+        # Has at least one multi-year run on a show
+        return "C"
+    
+    # Check for multiple acting roles (count mentions of films/shows)
+    role_indicators = [
+        "starred in", "appeared in", "portrayed", "played", "cast as", "role in",
+        "starring role", "lead role", "supporting role", "recurring role"
+    ]
+    role_count = sum(bio_lower.count(ind) for ind in role_indicators)
+    if role_count >= 3:
+        # Has 3+ role mentions = established actor, not D-list
+        return "C"
+    
+    # Check for multiple project mentions (films, series, shows)
+    project_keywords = ["film", "movie", "series", "show", "drama", "comedy", "sitcom"]
+    project_mentions = sum(bio_lower.count(kw) for kw in project_keywords)
+    if project_mentions >= 5:
+        # Mentioned in 5+ projects = working actor, not D-list
+        return "C"
+    
     return "D"
 
 
