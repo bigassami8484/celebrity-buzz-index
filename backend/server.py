@@ -4044,6 +4044,10 @@ async def get_hot_celebs():
                             category = get_category_from_bio(bio, actual_name)
                             price = get_dynamic_price(tier, 50, actual_name)
                             
+                            # Enforce £15M price cap
+                            if price > 15:
+                                price = 15.0
+                            
                             # Find reason from pool
                             pool_entry = next((c for c in HOT_CELEBS_POOL if c["name"] == name), None)
                             hot_reason = pool_entry["reason"] if pool_entry else "Always making headlines"
