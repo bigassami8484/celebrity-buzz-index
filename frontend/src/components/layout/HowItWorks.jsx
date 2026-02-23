@@ -39,7 +39,7 @@ const HowItWorks = ({ onShowMethodology }) => (
         <div className="w-10 h-10 bg-[#FF5500] flex items-center justify-center mx-auto mb-2">
           <ArrowLeftRight className="w-5 h-5 text-white" />
         </div>
-        <h4 className="font-space font-bold text-sm">Sat 12pm</h4>
+        <h4 className="font-space font-bold text-sm">Sun 12pm</h4>
         <p className="text-xs text-[#A1A1AA] mt-1">Transfer window</p>
       </div>
       <div className="text-center">
