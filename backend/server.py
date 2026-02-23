@@ -5362,42 +5362,93 @@ def extract_category_from_description(description: str) -> str:
         if kw in desc_lower:
             return 'royals'
     
-    # Define occupation keywords and their categories - ORDER MATTERS for priority
-    occupation_map = [
-        # Musicians - check first
-        (['singer', 'rapper', 'musician', 'songwriter', 'composer', 'vocalist', 'recording artist',
-          'hip hop', 'rock', 'pop star', 'country music', 'r&b', 'jazz'], 'musicians'),
-        # Movie stars
-        (['film actor', 'film actress', 'movie actor', 'movie actress', 'film director', 
-          'screenwriter', 'filmmaker'], 'movie_stars'),
-        # TV Actors (before general actors)
-        (['television actor', 'television actress', 'tv actor', 'tv actress', 'soap opera'], 'tv_actors'),
+    # Look for "is a(n) [occupation]" or "is a(n) [nationality] [occupation]" pattern
+    # This extracts the FIRST occupation after "is a" or "is an"
+    import re
+    
+    # Pattern to match "is a/an [nationality] [occupation]" 
+    # E.g., "is an American singer" -> singer
+    # E.g., "is a British boxer" -> boxer
+    is_a_pattern = r'is (?:a|an) (?:\w+ )?(\w+)'
+    match = re.search(is_a_pattern, desc_lower)
+    
+    first_occupation = None
+    if match:
+        first_occupation = match.group(1)
+    
+    # Define occupation mappings - single words
+    occupation_to_category = {
+        # Musicians
+        'singer': 'musicians', 'rapper': 'musicians', 'musician': 'musicians', 
+        'songwriter': 'musicians', 'composer': 'musicians', 'vocalist': 'musicians',
+        'saxophonist': 'musicians', 'drummer': 'musicians', 'guitarist': 'musicians',
+        'pianist': 'musicians', 'dj': 'musicians',
         # Athletes
-        (['footballer', 'soccer player', 'football player', 'basketball player', 'tennis player',
-          'boxer', 'racing driver', 'formula one', 'f1', 'athlete', 'cricketer', 'golfer',
-          'swimmer', 'gymnast', 'olympian', 'sprinter', 'baseball player'], 'athletes'),
-        # Reality TV
-        (['reality television', 'reality tv', 'love island', 'big brother', 'the only way is essex',
-          'towie', 'made in chelsea', 'geordie shore', 'keeping up with'], 'reality_tv'),
-        # TV Personalities
-        (['television presenter', 'tv presenter', 'talk show host', 'chat show', 'game show host',
-          'news anchor', 'newsreader', 'broadcaster', 'radio presenter', 'television host'], 'tv_personalities'),
-        # General actors (after film/tv specific)
-        (['actor', 'actress', 'performer'], 'movie_stars'),
+        'footballer': 'athletes', 'boxer': 'athletes', 'cricketer': 'athletes',
+        'golfer': 'athletes', 'swimmer': 'athletes', 'gymnast': 'athletes',
+        'athlete': 'athletes', 'sprinter': 'athletes', 'olympian': 'athletes',
+        'tennis': 'athletes',
+        # Actors
+        'actor': 'movie_stars', 'actress': 'movie_stars', 'filmmaker': 'movie_stars',
+        'director': 'movie_stars', 'screenwriter': 'movie_stars',
+        # TV
+        'presenter': 'tv_personalities', 'host': 'tv_personalities', 
+        'broadcaster': 'tv_personalities', 'newsreader': 'tv_personalities',
+        'anchor': 'tv_personalities',
+        # Dancers/Performers
+        'dancer': 'other', 'choreographer': 'other',
         # Public figures
-        (['politician', 'businessman', 'businesswoman', 'entrepreneur', 'activist', 'lawyer',
-          'philanthropist', 'investor'], 'public_figure'),
+        'politician': 'public_figure', 'businessman': 'public_figure', 
+        'businesswoman': 'public_figure', 'entrepreneur': 'public_figure',
+        'activist': 'public_figure', 'lawyer': 'public_figure',
         # Other
-        (['chef', 'cook', 'restaurateur', 'comedian', 'stand-up', 'comic', 'author', 'writer',
-          'model', 'supermodel', 'fashion model', 'journalist', 'youtuber', 'influencer',
-          'social media', 'internet personality'], 'other'),
+        'chef': 'other', 'comedian': 'other', 'author': 'other', 'writer': 'other',
+        'model': 'other', 'journalist': 'other', 'youtuber': 'other',
+        'influencer': 'other', 'personality': None,  # personality needs context
+    }
+    
+    # Check if first occupation is directly mapped
+    if first_occupation and first_occupation in occupation_to_category:
+        category = occupation_to_category[first_occupation]
+        if category:
+            return category
+    
+    # If first occupation is "personality" or similar, look for what kind
+    if first_occupation in ['personality', 'television', 'media', 'reality']:
+        # Check for more specific occupation later in the description
+        if 'boxer' in desc_lower or 'boxing' in desc_lower:
+            return 'athletes'
+        if 'singer' in desc_lower or 'band' in desc_lower or 'musical' in desc_lower:
+            return 'musicians'
+        if 'footballer' in desc_lower or 'football player' in desc_lower:
+            return 'athletes'
+        if 'reality television' in desc_lower or 'reality tv' in desc_lower or 'love island' in desc_lower:
+            return 'reality_tv'
+        if 'television presenter' in desc_lower or 'tv presenter' in desc_lower:
+            return 'tv_personalities'
+        if 'businesswoman' in desc_lower or 'businessman' in desc_lower or 'entrepreneur' in desc_lower:
+            return 'public_figure'
+        if 'model' in desc_lower:
+            return 'other'
+        # Default personality to reality_tv if nothing else matches
+        return 'reality_tv'
+    
+    # Fallback: scan for keywords by position
+    occupation_keywords = [
+        (['singer', 'rapper', 'musician', 'songwriter'], 'musicians'),
+        (['boxer', 'footballer', 'cricketer', 'golfer', 'swimmer', 'athlete', 'racing driver'], 'athletes'),
+        (['actor', 'actress', 'film director'], 'movie_stars'),
+        (['television actor', 'television actress'], 'tv_actors'),
+        (['presenter', 'host', 'broadcaster'], 'tv_personalities'),
+        (['reality television', 'reality tv', 'love island'], 'reality_tv'),
+        (['chef', 'comedian', 'model', 'author'], 'other'),
+        (['politician', 'businessman', 'entrepreneur'], 'public_figure'),
     ]
     
-    # Find the FIRST matching occupation in the description
     first_match_pos = len(desc_lower)
     first_match_category = None
     
-    for keywords, category in occupation_map:
+    for keywords, category in occupation_keywords:
         for kw in keywords:
             pos = desc_lower.find(kw)
             if pos != -1 and pos < first_match_pos:
