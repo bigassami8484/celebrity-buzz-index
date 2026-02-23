@@ -2969,6 +2969,7 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         category = detect_category_from_bio(wiki_info.get("bio", ""), wiki_info["name"])
     
     # Calculate celebrity tier using new Wikipedia-based metrics system
+    tier_result = None
     async with httpx.AsyncClient() as http_client:
         tier_result = await calculate_tier_from_wikipedia_data(wiki_info["name"], http_client)
         tier = tier_result["tier"]
