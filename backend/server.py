@@ -5317,6 +5317,12 @@ async def get_celebrity_update_status():
         'image': {'$regex': 'ui-avatars', '$options': 'i'}
     })
     
+    # Count how many still need checking
+    not_checked = await db.celebrities.count_documents({
+        'image': {'$regex': 'ui-avatars', '$options': 'i'},
+        'wikidata_checked': {'$ne': True}
+    })
+    
     # Category breakdown
     pipeline = [
         {"$group": {"_id": "$category", "count": {"$sum": 1}}},
@@ -5328,6 +5334,7 @@ async def get_celebrity_update_status():
         "total_celebrities": total,
         "with_real_images": with_wiki_image,
         "with_placeholder_images": with_placeholder,
+        "not_yet_checked": not_checked,
         "categories": {c['_id']: c['count'] for c in category_counts if c['_id']}
     }
 
