@@ -4211,25 +4211,31 @@ async def get_price_watches(team_id: str):
         {"_id": 0}
     ).to_list(100)
     
-    # Enrich with current prices
-    for watch in watches:
-        celeb = await db.celebrities.find_one(
-            {"name": {"$regex": f"^{watch['celebrity_name']}$", "$options": "i"}},
-            {"_id": 0, "price": 1, "tier": 1, "image": 1}
-        )
-        if celeb:
-            watch["current_price"] = celeb.get("price", 0)
-            watch["tier"] = celeb.get("tier", "D")
-            watch["image"] = celeb.get("image", "")
-            
-            # Check if target reached
-            if watch["alert_type"] == "below":
-                watch["target_reached"] = celeb.get("price", 0) <= watch["target_price"]
+    # Batch fetch all celebrities in one query (fix N+1 problem)
+    if watches:
+        celeb_names = [w['celebrity_name'] for w in watches]
+        celebs = await db.celebrities.find(
+            {"name": {"$in": celeb_names}},
+            {"_id": 0, "name": 1, "price": 1, "tier": 1, "image": 1}
+        ).to_list(100)
+        celeb_map = {c['name'].lower(): c for c in celebs}
+        
+        # Enrich with current prices
+        for watch in watches:
+            celeb = celeb_map.get(watch['celebrity_name'].lower())
+            if celeb:
+                watch["current_price"] = celeb.get("price", 0)
+                watch["tier"] = celeb.get("tier", "D")
+                watch["image"] = celeb.get("image", "")
+                
+                # Check if target reached
+                if watch["alert_type"] == "below":
+                    watch["target_reached"] = celeb.get("price", 0) <= watch["target_price"]
+                else:
+                    watch["target_reached"] = celeb.get("price", 0) >= watch["target_price"]
             else:
-                watch["target_reached"] = celeb.get("price", 0) >= watch["target_price"]
-        else:
-            watch["current_price"] = 0
-            watch["target_reached"] = False
+                watch["current_price"] = 0
+                watch["target_reached"] = False
     
     return {"watches": watches, "team_id": team_id}
 
