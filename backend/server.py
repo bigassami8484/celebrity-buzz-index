@@ -2411,10 +2411,29 @@ def determine_tier_from_bio(bio: str, name: str = "") -> str:
     
     # Check for multi-year TV show runs (patterns like "2016-2025", "2010–2019", etc.)
     import re
-    year_range_pattern = r'\b(19|20)\d{2}\s*[-–—]\s*(19|20)\d{2}\b'
+    year_range_pattern = r'\b(19|20)\d{2}\s*[-–—]\s*(19|20)?\d{2,4}\b'
     year_ranges = re.findall(year_range_pattern, bio)
     if year_ranges:
         # Has at least one multi-year run on a show
+        return "C"
+    
+    # Check for long-running show indicators
+    long_running_indicators = [
+        "seasons", "series regular", "main cast", "recurring role", "regular role",
+        "episodes", "long-running", "from season", "all seasons"
+    ]
+    if any(ind in bio_lower for ind in long_running_indicators):
+        return "C"
+    
+    # Check for famous long-running TV shows
+    famous_long_shows = [
+        "coronation street", "eastenders", "emmerdale", "hollyoaks", "neighbours",
+        "grey's anatomy", "ncis", "law & order", "csi", "criminal minds",
+        "parks and recreation", "the office", "brooklyn nine-nine", "friends",
+        "how i met your mother", "the big bang theory", "modern family",
+        "breaking bad", "game of thrones", "stranger things", "the crown"
+    ]
+    if any(show in bio_lower for show in famous_long_shows):
         return "C"
     
     # Check for multiple acting roles (count mentions of films/shows)
