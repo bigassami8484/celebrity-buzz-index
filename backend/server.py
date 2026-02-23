@@ -3101,6 +3101,13 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     # Save to database
     doc = celebrity.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
+    
+    # Add tier metrics from classification
+    if tier_result:
+        doc['tier_score'] = tier_result.get('score', 0)
+        doc['tier_metrics'] = tier_result.get('metrics', {})
+        doc['tier_reasoning'] = tier_result.get('reasoning', [])
+    
     await db.celebrities.insert_one(doc)
     
     # Record initial price history
