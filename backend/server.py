@@ -1944,6 +1944,7 @@ async def fetch_wikipedia_info(name: str) -> dict:
                 # First, try Wikidata P18 - most reliable image source
                 try:
                     wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={name.replace(' ', '_')}&props=claims&format=json"
+                    logger.info(f"Fetching Wikidata image for {name}: {wikidata_url}")
                     wd_response = await client.get(wikidata_url, timeout=5.0, headers=headers)
                     if wd_response.status_code == 200:
                         wd_data = wd_response.json()
@@ -1956,11 +1957,14 @@ async def fetch_wikipedia_info(name: str) -> dict:
                                 from urllib.parse import quote
                                 img_file_encoded = quote(img_file.replace(" ", "_"), safe='')
                                 wiki_image = f"https://commons.wikimedia.org/wiki/Special:FilePath/{img_file_encoded}?width=400"
+                                logger.info(f"Got Wikidata image for {name}: {wiki_image}")
                             # Check for death date (P570)
                             if "P570" in claims:
                                 is_deceased_from_wikidata = True
+                    else:
+                        logger.warning(f"Wikidata returned status {wd_response.status_code} for {name}")
                 except Exception as e:
-                    logger.debug(f"Wikidata fetch failed for {name}: {e}")
+                    logger.warning(f"Wikidata fetch failed for {name}: {e}")
                 
                 # Fallback to Wikipedia thumbnail if Wikidata didn't have an image
                 if not wiki_image:
