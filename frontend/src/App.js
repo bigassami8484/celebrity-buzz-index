@@ -977,8 +977,7 @@ function App() {
                   <p className="text-white font-bold mb-2">Point Scoring:</p>
                   <ul className="list-disc list-inside space-y-1 ml-1">
                     <li>Each news article = base points</li>
-                    <li><span className="text-red-400 font-bold">Scandal/Controversy bonus!</span> Negative news earns significantly more (arrests, feuds, lawsuits = big points)</li>
-                    <li><span className="text-green-400">Positive news</span> = smaller bonus</li>
+                    <li><span className="text-red-400 font-bold">Scandal/Controversy bonus!</span> Negative news earns extra points (arrests, feuds, lawsuits = big points)</li>
                     <li><span className="text-yellow-400">💀 Brown Bread Bonus</span> = 100 points when a celeb passes away</li>
                   </ul>
                 </div>
@@ -994,8 +993,8 @@ function App() {
                 <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
               </summary>
               <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
-                <p>We analyse the <strong className="text-white">sentiment</strong> of each news article. Headlines containing words like arrest, scandal, lawsuit, feud, divorce, rehab, or controversy are flagged as <strong className="text-red-400">negative</strong>.</p>
-                <p>Negative news = bigger points! A celebrity embroiled in scandal will shoot up the leaderboard.</p>
+                <p>We scan news headlines for <strong className="text-white">scandal keywords</strong> like arrest, scandal, lawsuit, feud, divorce, rehab, or controversy.</p>
+                <p>Scandal news = bonus points! A celebrity embroiled in controversy will shoot up the leaderboard.</p>
               </div>
             </details>
             
