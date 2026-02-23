@@ -2409,8 +2409,28 @@ def determine_tier_from_bio(bio: str, name: str = "") -> str:
         return "C"  # Comedian = at least C-list
     
     # Check for chart/music success (for musicians)
+    # Anyone with a #1 hit should be at least B-list
+    number_one_indicators = [
+        "number one", "number-one", "#1 single", "#1 hit", "no. 1", "no.1",
+        "chart-topping", "topped the charts", "reached number one"
+    ]
+    has_number_one = any(ind in bio_lower for ind in number_one_indicators)
+    if has_number_one:
+        return "B"  # Number one hit = B-list minimum
+    
+    # Check for membership in bands with #1 hits
+    bands_with_number_ones = [
+        "spice girls", "take that", "westlife", "boyzone", "girls aloud",
+        "one direction", "little mix", "sugababes", "s club", "atomic kitten",
+        "steps", "blue", "jls", "the wanted", "busted", "mcfly", "mcbusted",
+        "oasis", "blur", "coldplay", "queen", "the beatles", "abba"
+    ]
+    in_hit_band = any(band in bio_lower for band in bands_with_number_ones)
+    if in_hit_band:
+        return "B"  # Member of hit band = B-list minimum
+    
+    # Other chart success indicators
     chart_indicators = [
-        "number one", "number-one", "#1", "no. 1", "chart-topping",
         "top 10", "top ten", "billboard hot 100", "uk singles chart",
         "multi-platinum", "platinum album", "gold record", "gold album",
         "best-selling", "million copies", "certified platinum", "certified gold"
