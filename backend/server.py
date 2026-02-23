@@ -2223,10 +2223,10 @@ def calculate_buzz_score(news: List[dict]) -> float:
     
     score = 10.0
     for article in news:
-        sentiment = article.get("sentiment", "neutral")
+        is_scandal = article.get("is_scandal", False)
         source = article.get("source", "").lower()
         
-        # Source weight
+        # Base points for any mention
         if any(x in source for x in ["tmz", "daily mail", "sun"]):
             score += 3.0
         elif any(x in source for x in ["people", "entertainment weekly", "variety"]):
@@ -2236,11 +2236,9 @@ def calculate_buzz_score(news: List[dict]) -> float:
         else:
             score += 1.0
         
-        # Sentiment modifier - CONTROVERSY BONUS is 25 points!
-        if sentiment == "positive":
-            score += 0.5
-        elif sentiment == "negative":
-            score += 25.0  # Big controversy bonus!
+        # SCANDAL/CONTROVERSY BONUS = 25 points!
+        if is_scandal:
+            score += 25.0
     
     # Ensure minimum score of 5 points
     return round(max(5.0, min(score, 150.0)), 1)
