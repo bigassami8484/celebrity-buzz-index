@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Trophy, Crown, X, Copy, Check, Facebook, Calendar, CalendarDays, Users, Award, ChevronRight, Star, MessageCircle, Send } from "lucide-react";
+import { Trophy, Crown, X, Copy, Check, Facebook, Calendar, CalendarDays, Users, Award, ChevronRight, ChevronDown, ChevronUp, Star, MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
 
 // Badge icons mapping
