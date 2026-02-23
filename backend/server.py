@@ -6075,6 +6075,295 @@ scheduler.add_job(
     replace_existing=True
 )
 
+# ==================== DAILY POINTS UPDATE ====================
+async def scheduled_daily_points_update():
+    """
+    Scheduled task to update team points daily based on celebrity news coverage.
+    Runs every day at 23:00 UTC (before midnight to capture day's news).
+    """
+    logger.info("🕐 Starting scheduled daily points update...")
+    
+    try:
+        # Get all teams with celebrities
+        teams = await db.teams.find(
+            {"celebrities": {"$exists": True, "$ne": []}},
+            {"_id": 0}
+        ).to_list(1000)
+        
+        updated_teams = 0
+        total_points_awarded = 0
+        
+        for team in teams:
+            team_id = team.get("id")
+            team_points = 0
+            
+            for celeb in team.get("celebrities", []):
+                celeb_id = celeb.get("celebrity_id")
+                
+                # Get current celebrity data
+                celeb_data = await db.celebrities.find_one(
+                    {"id": celeb_id},
+                    {"_id": 0, "buzz_score": 1, "news": 1}
+                )
+                
+                if celeb_data:
+                    # Points from buzz score
+                    buzz_points = celeb_data.get("buzz_score", 0)
+                    
+                    # Bonus for news coverage (each news article = extra points)
+                    news_count = len(celeb_data.get("news", []))
+                    news_bonus = news_count * 2  # 2 points per news article
+                    
+                    team_points += buzz_points + news_bonus
+            
+            # Update team's total points
+            if team_points > 0:
+                await db.teams.update_one(
+                    {"id": team_id},
+                    {"$inc": {"total_points": team_points}}
+                )
+                updated_teams += 1
+                total_points_awarded += team_points
+        
+        logger.info(f"✅ Daily points update: {updated_teams} teams, {total_points_awarded:.1f} points awarded")
+        
+        # Log the task
+        await db.scheduled_tasks.insert_one({
+            "task": "daily_points_update",
+            "executed_at": datetime.now(timezone.utc).isoformat(),
+            "summary": {
+                "teams_updated": updated_teams,
+                "total_points_awarded": total_points_awarded
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Daily points update failed: {e}")
+
+# Schedule daily points update at 23:00 UTC
+scheduler.add_job(
+    scheduled_daily_points_update,
+    CronTrigger(hour=23, minute=0),
+    id='daily_points_update',
+    name='Daily Team Points Update',
+    replace_existing=True
+)
+
+# ==================== WEEKLY LEAGUE SCORING ====================
+async def scheduled_weekly_league_scoring():
+    """
+    Scheduled task to record weekly league scores and award winners.
+    Runs every Sunday at 23:59 UTC (end of game week).
+    """
+    logger.info("🏆 Starting scheduled weekly league scoring...")
+    
+    try:
+        # Get all leagues
+        leagues = await db.leagues.find({}, {"_id": 0}).to_list(500)
+        
+        leagues_processed = 0
+        badges_awarded = 0
+        
+        for league in leagues:
+            league_id = league.get("id")
+            team_ids = league.get("team_ids", [])
+            
+            if not team_ids:
+                continue
+            
+            # Get all teams in league
+            teams = await db.teams.find(
+                {"id": {"$in": team_ids}},
+                {"_id": 0}
+            ).to_list(100)
+            
+            if not teams:
+                continue
+            
+            current_week = get_current_week_str()
+            current_month = get_current_month_str()
+            
+            # Record weekly scores
+            weekly_scores = {team["id"]: team.get("total_points", 0) for team in teams}
+            
+            # Find winner
+            winner = max(teams, key=lambda t: t.get("total_points", 0))
+            winner_entry = {
+                "week": current_week,
+                "team_id": winner["id"],
+                "team_name": winner.get("team_name", "Unknown"),
+                "points": winner.get("total_points", 0)
+            }
+            
+            # Update monthly scores (accumulate)
+            monthly_scores = league.get("monthly_scores", {})
+            for team_id, points in weekly_scores.items():
+                monthly_scores[team_id] = monthly_scores.get(team_id, 0) + points
+            
+            # Update league
+            await db.leagues.update_one(
+                {"id": league_id},
+                {
+                    "$set": {
+                        "current_week": current_week,
+                        "weekly_scores": weekly_scores,
+                        "current_month": current_month,
+                        "monthly_scores": monthly_scores
+                    },
+                    "$push": {"weekly_winner_history": winner_entry}
+                }
+            )
+            
+            # Award weekly winner badge
+            badge = {
+                "id": "weekly_winner",
+                "earned_at": datetime.now(timezone.utc).isoformat(),
+                "league_id": league_id,
+                "week": current_week
+            }
+            
+            await db.teams.update_one(
+                {"id": winner["id"]},
+                {
+                    "$push": {"badges": badge},
+                    "$inc": {"weekly_wins": 1}
+                }
+            )
+            badges_awarded += 1
+            
+            # Check for League Legend badge (3+ wins in this league)
+            updated_history = league.get("weekly_winner_history", []) + [winner_entry]
+            league_wins = sum(1 for w in updated_history if w.get("team_id") == winner["id"])
+            
+            if league_wins >= 3:
+                updated_team = await db.teams.find_one({"id": winner["id"]})
+                has_legend = any(
+                    b.get("id") == "league_champion" and b.get("league_id") == league_id 
+                    for b in updated_team.get("badges", [])
+                )
+                if not has_legend:
+                    legend_badge = {
+                        "id": "league_champion",
+                        "earned_at": datetime.now(timezone.utc).isoformat(),
+                        "league_id": league_id
+                    }
+                    await db.teams.update_one(
+                        {"id": winner["id"]},
+                        {"$push": {"badges": legend_badge}}
+                    )
+                    badges_awarded += 1
+            
+            leagues_processed += 1
+        
+        logger.info(f"✅ Weekly league scoring: {leagues_processed} leagues, {badges_awarded} badges awarded")
+        
+        await db.scheduled_tasks.insert_one({
+            "task": "weekly_league_scoring",
+            "executed_at": datetime.now(timezone.utc).isoformat(),
+            "summary": {
+                "leagues_processed": leagues_processed,
+                "badges_awarded": badges_awarded
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Weekly league scoring failed: {e}")
+
+# Schedule weekly league scoring for Sunday at 23:59 UTC
+scheduler.add_job(
+    scheduled_weekly_league_scoring,
+    CronTrigger(day_of_week='sun', hour=23, minute=59),
+    id='weekly_league_scoring',
+    name='Weekly League Scoring & Awards',
+    replace_existing=True
+)
+
+# ==================== MONTHLY LEAGUE WINNER ====================
+async def scheduled_monthly_league_winner():
+    """
+    Scheduled task to record monthly league winners.
+    Runs on the 1st of each month at 00:30 UTC.
+    """
+    logger.info("🌟 Starting scheduled monthly league winner recording...")
+    
+    try:
+        # Get all leagues
+        leagues = await db.leagues.find({}, {"_id": 0}).to_list(500)
+        
+        monthly_winners = 0
+        
+        for league in leagues:
+            league_id = league.get("id")
+            monthly_scores = league.get("monthly_scores", {})
+            
+            if not monthly_scores:
+                continue
+            
+            # Find monthly winner
+            winner_id = max(monthly_scores, key=monthly_scores.get)
+            winner_team = await db.teams.find_one({"id": winner_id}, {"_id": 0})
+            
+            if not winner_team:
+                continue
+            
+            # Get previous month
+            now = datetime.now(timezone.utc)
+            last_month = now.replace(day=1) - timedelta(days=1)
+            month_str = f"{last_month.year}-{last_month.month:02d}"
+            
+            winner_entry = {
+                "month": month_str,
+                "team_id": winner_id,
+                "team_name": winner_team.get("team_name", "Unknown"),
+                "points": monthly_scores[winner_id]
+            }
+            
+            # Update league - reset monthly scores
+            await db.leagues.update_one(
+                {"id": league_id},
+                {
+                    "$set": {"monthly_scores": {}},
+                    "$push": {"monthly_winner_history": winner_entry}
+                }
+            )
+            
+            # Award monthly winner badge
+            badge = {
+                "id": "monthly_winner",
+                "earned_at": datetime.now(timezone.utc).isoformat(),
+                "league_id": league_id,
+                "month": month_str
+            }
+            
+            await db.teams.update_one(
+                {"id": winner_id},
+                {"$push": {"badges": badge}}
+            )
+            
+            monthly_winners += 1
+        
+        logger.info(f"✅ Monthly league winners: {monthly_winners} winners crowned")
+        
+        await db.scheduled_tasks.insert_one({
+            "task": "monthly_league_winner",
+            "executed_at": datetime.now(timezone.utc).isoformat(),
+            "summary": {
+                "monthly_winners": monthly_winners
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Monthly league winner recording failed: {e}")
+
+# Schedule monthly winner recording for 1st of each month at 00:30 UTC
+scheduler.add_job(
+    scheduled_monthly_league_winner,
+    CronTrigger(day=1, hour=0, minute=30),
+    id='monthly_league_winner',
+    name='Monthly League Winner Awards',
+    replace_existing=True
+)
+
 @app.on_event("startup")
 async def start_scheduler():
     """Start the scheduler when the app starts"""
