@@ -2939,67 +2939,41 @@ async def get_celebrities_by_category(category: str, response: Response):
     
     # Get random sample from ALL celebrities in this category
     # MongoDB $sample provides true randomness from the entire collection
-    # FILTER: Only include celebs with valid Wikipedia data
+    # FILTER: Only include celebs with valid Wikipedia data AND images
     pipeline = [
         {"$match": {
             "category": category,
             "name": {"$ne": None, "$exists": True},
-            "bio": {"$exists": True, "$ne": "", "$ne": "Celebrity profile"},  # Must have real bio
-            "wiki_url": {"$exists": True, "$ne": ""}  # Must have Wikipedia page
+            "bio": {"$exists": True, "$ne": "", "$ne": "Celebrity profile"},
+            "wiki_url": {"$exists": True, "$ne": ""},
+            "image": {"$exists": True, "$ne": "", "$not": {"$regex": "ui-avatars"}}  # Must have real image
         }},
-        {"$sample": {"size": 50}},  # Get more than needed for variety
+        {"$sample": {"size": 8}},  # Random sample of exactly 8
         {"$project": {"_id": 0}}
     ]
     
-    all_celebs = await db.celebrities.aggregate(pipeline).to_list(50)
+    selected = await db.celebrities.aggregate(pipeline).to_list(8)
     
-    # Sort by image quality - prioritize real Wikipedia images but include others
-    with_images = [c for c in all_celebs if c.get("image") and ("wikipedia" in c.get("image", "").lower() or "wikimedia" in c.get("image", "").lower())]
-    without_images = [c for c in all_celebs if c not in with_images]
-    
-    # Try to fetch real images for up to 5 celebs with placeholders (background refresh)
-    refresh_count = 0
-    for celeb in without_images[:5]:
-        image = celeb.get("image", "")
-        if not image or "ui-avatars" in image:
-            try:
-                wiki_info = await fetch_wikipedia_info(celeb.get("name", ""))
-                if wiki_info and wiki_info.get("image"):
-                    new_image = wiki_info.get("image")
-                    if "wikipedia" in new_image.lower() or "wikimedia" in new_image.lower():
-                        celeb["image"] = new_image
-                        # Update in database too
-                        await db.celebrities.update_one(
-                            {"id": celeb.get("id")},
-                            {"$set": {"image": new_image}}
-                        )
-                        # Move to with_images list
-                        with_images.append(celeb)
-                        without_images.remove(celeb)
-                        refresh_count += 1
-            except:
-                pass
-    
-    # Shuffle both lists
-    random.shuffle(with_images)
-    random.shuffle(without_images)
-    
-    # Take up to 6 with real images, fill rest with others
-    selected = with_images[:6]
-    remaining_slots = 8 - len(selected)
-    if remaining_slots > 0:
-        selected.extend(without_images[:remaining_slots])
-    
-    # If still not enough, just use what we have
-    if len(selected) < 8 and len(with_images) > 6:
-        selected.extend(with_images[6:8-len(selected)+6])
-    
-    # Final shuffle to mix them up
-    random.shuffle(selected)
-    
-    # Use stored prices from database (don't recalculate)
-    # This ensures consistency with previous_week_price for accurate change display
-    # Prices are already set during weekly reset based on buzz scores
+    # If not enough with images, get any valid celebs
+    if len(selected) < 8:
+        fallback_pipeline = [
+            {"$match": {
+                "category": category,
+                "name": {"$ne": None, "$exists": True},
+                "bio": {"$exists": True, "$ne": "", "$ne": "Celebrity profile"},
+                "wiki_url": {"$exists": True, "$ne": ""}
+            }},
+            {"$sample": {"size": 8 - len(selected)}},
+            {"$project": {"_id": 0}}
+        ]
+        more = await db.celebrities.aggregate(fallback_pipeline).to_list(8 - len(selected))
+        # Only add celebs not already in selected
+        existing_names = {c.get("name") for c in selected}
+        for c in more:
+            if c.get("name") not in existing_names:
+                selected.append(c)
+                if len(selected) >= 8:
+                    break
     
     return {"celebrities": selected[:8]}
 
