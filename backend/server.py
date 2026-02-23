@@ -2047,61 +2047,49 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
                         # Combined text to search
                         search_text = f"{title_lower} {desc_text}"
                         
-                        # Check if celebrity is mentioned - STRICT MATCHING
+                        # Check if celebrity is mentioned - STRICT FULL NAME MATCHING ONLY
                         celeb_mentioned = False
                         
-                        # Method 1: Full name exact match (most reliable)
-                        if name_lower in search_text:
+                        import re
+                        
+                        # Common first/last names that cause false positives
+                        common_names = {
+                            'michael', 'jordan', 'james', 'john', 'david', 'peter', 'andrew',
+                            'paul', 'mark', 'steve', 'chris', 'daniel', 'robert', 'william',
+                            'george', 'thomas', 'charles', 'richard', 'jason', 'brian', 'kevin',
+                            'jennifer', 'jessica', 'sarah', 'emily', 'emma', 'anna', 'kate',
+                            'mary', 'elizabeth', 'victoria', 'charlotte', 'sophie', 'amy'
+                        }
+                        
+                        # Method 1: Full name exact match with word boundaries (REQUIRED for all)
+                        # Build regex for full name with word boundaries
+                        full_name_pattern = rf'\b{re.escape(name_lower)}\b'
+                        if re.search(full_name_pattern, search_text):
                             celeb_mentioned = True
                         
-                        # Method 2: For multi-word names, require BOTH first AND last name
-                        # This prevents "Princess Andre" from matching "Peter Andre"
-                        # and "Andrew" from matching "Prince Andrew" news for wrong person
+                        # Method 2: Check celebrity-specific aliases (only if defined)
+                        if not celeb_mentioned and name_lower in celebrity_news_aliases:
+                            for alias in celebrity_news_aliases[name_lower]:
+                                alias_pattern = rf'\b{re.escape(alias)}\b'
+                                if re.search(alias_pattern, search_text):
+                                    celeb_mentioned = True
+                                    break
+                        
+                        # Method 3: For multi-word names, ONLY match if first AND last name 
+                        # appear TOGETHER (within 15 chars) - prevents "Michael... Jordan" false positives
                         if not celeb_mentioned and len(name_parts) >= 2:
                             first_name = name_parts[0]
                             last_name = name_parts[-1]
                             
-                            # Both first and last name must appear with word boundaries
-                            def has_word_boundary_match(text, word):
-                                """Check if word appears with proper word boundaries"""
-                                if len(word) < 3:
-                                    return False
-                                idx = text.find(word)
-                                while idx >= 0:
-                                    char_before = text[idx - 1] if idx > 0 else " "
-                                    end_idx = idx + len(word)
-                                    char_after = text[end_idx] if end_idx < len(text) else " "
-                                    
-                                    # Valid boundaries
-                                    valid_before = char_before in " .,!?;:'\"()-\n\t<>"
-                                    valid_after = char_after in " .,!?;:'\"()-\n\t<>s"
-                                    
-                                    if valid_before and valid_after:
-                                        return True
-                                    # Try next occurrence
-                                    idx = text.find(word, idx + 1)
-                                return False
-                            
-                            # For celebrities, require BOTH first and last name
-                            # Exception: Use celebrity aliases if defined
-                            alias_match = False
-                            if name_lower in celebrity_news_aliases:
-                                for alias in celebrity_news_aliases[name_lower]:
-                                    if has_word_boundary_match(search_text, alias):
-                                        alias_match = True
-                                        break
-                            
-                            if alias_match:
-                                celeb_mentioned = True
+                            # Skip if either name is too common on its own
+                            if first_name in common_names or last_name in common_names:
+                                # REQUIRE both names to appear adjacent (within 15 chars)
+                                pattern = rf'\b{re.escape(first_name)}\b.{{0,15}}\b{re.escape(last_name)}\b'
+                                if re.search(pattern, search_text):
+                                    celeb_mentioned = True
                             else:
-                                # Check if first and last name appear in CORRECT ORDER and ADJACENT
-                                # This prevents "Princess Andre... dad Peter" from matching "Peter Andre"
-                                # Look for pattern: "first_name ... last_name" with max 20 chars between
-                                import re
-                                
-                                # Build regex pattern: first_name followed by last_name within ~20 chars
-                                # Allow for middle names, titles like "Mr", "Ms", etc.
-                                pattern = rf'\b{re.escape(first_name)}\b.{{0,20}}\b{re.escape(last_name)}\b'
+                                # For unusual names, still require adjacency but allow more distance
+                                pattern = rf'\b{re.escape(first_name)}\b.{{0,25}}\b{re.escape(last_name)}\b'
                                 if re.search(pattern, search_text):
                                     celeb_mentioned = True
                         
