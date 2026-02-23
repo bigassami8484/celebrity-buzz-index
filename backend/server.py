@@ -5454,7 +5454,7 @@ def extract_category_from_description(description: str) -> str:
     if 'actor' in desc_lower or 'actress' in desc_lower:
         return 'movie_stars'
     
-    # TV categories
+    # TV categories - check before public figure
     if 'television presenter' in desc_lower or 'tv presenter' in desc_lower or 'chat show' in desc_lower:
         return 'tv_personalities'
     if 'television actor' in desc_lower or 'television actress' in desc_lower:
@@ -5462,10 +5462,31 @@ def extract_category_from_description(description: str) -> str:
     if 'reality television' in desc_lower or 'reality tv' in desc_lower or 'love island' in desc_lower:
         return 'reality_tv'
     
-    # Public figures
-    if 'politician' in desc_lower or 'businessman' in desc_lower or 'businesswoman' in desc_lower:
+    # For "media personality" or "television personality" - check if they're primarily a personality
+    # before checking business roles
+    if 'media personality' in desc_lower or 'television personality' in desc_lower:
+        return 'reality_tv'
+    if 'socialite' in desc_lower:
+        return 'reality_tv'
+    
+    # Public figures - but only if NOT primarily a personality
+    if 'politician' in desc_lower:
         return 'public_figure'
-    if 'entrepreneur' in desc_lower or 'activist' in desc_lower:
+    # Only categorize as public_figure if business is the PRIMARY occupation (first in list)
+    # Check if "businessman/businesswoman/entrepreneur" appears before "personality"
+    business_pos = min(
+        desc_lower.find('businessman') if 'businessman' in desc_lower else 9999,
+        desc_lower.find('businesswoman') if 'businesswoman' in desc_lower else 9999,
+        desc_lower.find('entrepreneur') if 'entrepreneur' in desc_lower else 9999
+    )
+    personality_pos = min(
+        desc_lower.find('personality') if 'personality' in desc_lower else 9999,
+        desc_lower.find('socialite') if 'socialite' in desc_lower else 9999
+    )
+    
+    if business_pos < personality_pos and business_pos < 9999:
+        return 'public_figure'
+    if 'activist' in desc_lower:
         return 'public_figure'
     
     # Other
@@ -5475,7 +5496,7 @@ def extract_category_from_description(description: str) -> str:
         return 'tv_personalities'
     
     # Default for "personality" with no clear occupation
-    if 'personality' in desc_lower or 'socialite' in desc_lower:
+    if 'personality' in desc_lower:
         return 'reality_tv'
     
     return None
