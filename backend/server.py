@@ -1567,6 +1567,241 @@ async def calculate_celebrity_tier(bio: str, name: str) -> tuple:
     # D-list: Everyone else
     return ("D", get_base_price_for_tier("D"))
 
+
+async def calculate_tier_from_wikipedia_data(name: str, http_client: httpx.AsyncClient) -> dict:
+    """
+    Calculate celebrity tier based on objective Wikipedia metrics:
+    - Number of Wikipedia language editions (global recognition)
+    - Years active (career longevity)
+    - Awards mentioned in bio
+    - Bio length (notability indicator)
+    - Career milestones
+    
+    Tier Definitions:
+    - A-List (£9-12M): Global household name, 50+ language editions, major awards, decades active
+    - B-List (£5-8M): Well-known, 20-50 languages, some awards, established career
+    - C-List (£2-4M): Minor reality TV, limited mainstream recognition, <20 languages
+    - D-List (£0.5-1.5M): Emerging influencer, very limited recognition, <10 languages
+    """
+    headers = {
+        "User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com) httpx/0.27"
+    }
+    
+    result = {
+        "tier": "D",
+        "price": 1.0,
+        "score": 0,
+        "metrics": {
+            "language_count": 0,
+            "years_active": 0,
+            "award_score": 0,
+            "bio_length": 0,
+            "career_score": 0
+        },
+        "reasoning": []
+    }
+    
+    try:
+        # 1. Get language count from Wikidata (number of Wikipedia editions)
+        wikidata_search_url = f"https://www.wikidata.org/w/api.php?action=wbsearchentities&search={name}&language=en&format=json&limit=1"
+        wd_response = await http_client.get(wikidata_search_url, timeout=10.0, headers=headers)
+        
+        if wd_response.status_code == 200:
+            wd_data = wd_response.json()
+            if wd_data.get("search"):
+                entity_id = wd_data["search"][0].get("id")
+                
+                # Get sitelinks count (number of Wikipedia language editions)
+                entity_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&ids={entity_id}&props=sitelinks&format=json"
+                entity_response = await http_client.get(entity_url, timeout=10.0, headers=headers)
+                
+                if entity_response.status_code == 200:
+                    entity_data = entity_response.json()
+                    entities = entity_data.get("entities", {})
+                    if entity_id in entities:
+                        sitelinks = entities[entity_id].get("sitelinks", {})
+                        # Count only Wikipedia sitelinks (not Wikiquote, Wikidata, etc.)
+                        wiki_langs = sum(1 for k in sitelinks.keys() if k.endswith("wiki") and not k.startswith("common"))
+                        result["metrics"]["language_count"] = wiki_langs
+        
+        # 2. Get Wikipedia bio for analysis
+        wiki_url = f"https://en.wikipedia.org/w/api.php?action=query&titles={name.replace(' ', '_')}&prop=extracts&exintro=false&explaintext=true&format=json"
+        wiki_response = await http_client.get(wiki_url, timeout=10.0, headers=headers)
+        
+        bio = ""
+        if wiki_response.status_code == 200:
+            wiki_data = wiki_response.json()
+            pages = wiki_data.get("query", {}).get("pages", {})
+            for page_id, page_data in pages.items():
+                if page_id != "-1":
+                    bio = page_data.get("extract", "")
+                    result["metrics"]["bio_length"] = len(bio)
+        
+        bio_lower = bio.lower() if bio else ""
+        
+        # 3. Calculate years active
+        current_year = datetime.now().year
+        
+        # Look for career start patterns
+        career_patterns = [
+            r'career\s+(?:began|started|launched)\s+(?:in\s+)?(\d{4})',
+            r'debut(?:ed)?\s+(?:in\s+)?(\d{4})',
+            r'first\s+(?:appeared|role|film|album|single)\s+(?:in\s+)?(\d{4})',
+            r'since\s+(\d{4})',
+            r'(\d{4})\s*[-–]\s*present',
+            r'active\s+(?:since\s+)?(\d{4})',
+        ]
+        
+        career_start = None
+        for pattern in career_patterns:
+            match = re.search(pattern, bio_lower)
+            if match:
+                year = int(match.group(1))
+                if 1900 <= year <= current_year:
+                    if career_start is None or year < career_start:
+                        career_start = year
+        
+        if career_start:
+            result["metrics"]["years_active"] = current_year - career_start
+        
+        # 4. Award scoring
+        major_awards = [
+            ("oscar", 30), ("academy award", 30), ("grammy", 25), ("emmy", 25), ("tony", 20),
+            ("golden globe", 20), ("bafta", 20), ("pulitzer", 25), ("nobel", 35),
+            ("olympic gold", 30), ("olympic", 20), ("world champion", 25), ("world cup", 25),
+            ("super bowl", 20), ("mvp", 15), ("all-star", 10), ("hall of fame", 25),
+            ("knighted", 15), ("dame", 15), ("cbe", 10), ("mbe", 8), ("obe", 8),
+            ("lifetime achievement", 20), ("legend", 10), ("icon", 8),
+            ("billboard", 15), ("number one", 12), ("platinum", 10), ("multi-platinum", 15),
+            ("bestselling", 15), ("best-selling", 15), ("highest-grossing", 20),
+            ("forbes", 10), ("time 100", 15), ("influential", 8),
+        ]
+        
+        award_score = 0
+        for award, points in major_awards:
+            if award in bio_lower:
+                count = bio_lower.count(award)
+                award_score += points * min(count, 3)  # Cap at 3 mentions
+        
+        result["metrics"]["award_score"] = award_score
+        
+        # 5. Career milestone scoring
+        career_indicators = {
+            # Reality TV / Influencer (lower tier indicators)
+            "reality television": -10, "reality tv": -10, "influencer": -15, "social media personality": -15,
+            "tiktok": -10, "youtube personality": -10, "instagram": -8, "contestant": -5,
+            "appeared on": -3, "dating show": -10, "love island": -8, "big brother": -8,
+            "the only way is essex": -8, "made in chelsea": -5, "geordie shore": -8,
+            
+            # Mainstream indicators (higher tier)
+            "starring role": 10, "leading role": 10, "critically acclaimed": 15,
+            "box office": 15, "blockbuster": 15, "worldwide": 10, "international": 8,
+            "legendary": 15, "iconic": 12, "pioneering": 12, "influential": 10,
+            "million copies": 12, "billion": 20, "sold-out": 8, "arena tour": 10, "stadium": 12,
+            "franchise": 10, "sequel": 5, "series regular": 8, "producer": 5, "director": 8,
+            "founded": 10, "ceo": 8, "entrepreneur": 5,
+        }
+        
+        career_score = 0
+        for indicator, points in career_indicators.items():
+            if indicator in bio_lower:
+                career_score += points
+        
+        result["metrics"]["career_score"] = career_score
+        
+        # 6. Calculate final tier
+        lang_count = result["metrics"]["language_count"]
+        years_active = result["metrics"]["years_active"]
+        award_score = result["metrics"]["award_score"]
+        bio_length = result["metrics"]["bio_length"]
+        career_score = result["metrics"]["career_score"]
+        
+        # Scoring system
+        total_score = 0
+        
+        # Language editions (max 40 points)
+        if lang_count >= 80:
+            total_score += 40
+            result["reasoning"].append(f"Global recognition: {lang_count} Wikipedia languages")
+        elif lang_count >= 50:
+            total_score += 30
+            result["reasoning"].append(f"Strong international presence: {lang_count} languages")
+        elif lang_count >= 30:
+            total_score += 20
+            result["reasoning"].append(f"International recognition: {lang_count} languages")
+        elif lang_count >= 15:
+            total_score += 10
+            result["reasoning"].append(f"Moderate recognition: {lang_count} languages")
+        else:
+            result["reasoning"].append(f"Limited global recognition: {lang_count} languages")
+        
+        # Years active (max 25 points)
+        if years_active >= 30:
+            total_score += 25
+            result["reasoning"].append(f"Legendary career: {years_active}+ years")
+        elif years_active >= 20:
+            total_score += 20
+            result["reasoning"].append(f"Established career: {years_active} years")
+        elif years_active >= 10:
+            total_score += 12
+            result["reasoning"].append(f"Solid career: {years_active} years")
+        elif years_active >= 5:
+            total_score += 5
+            result["reasoning"].append(f"Developing career: {years_active} years")
+        else:
+            result["reasoning"].append("Emerging talent")
+        
+        # Awards (max 35 points)
+        if award_score >= 60:
+            total_score += 35
+            result["reasoning"].append("Major awards winner")
+        elif award_score >= 40:
+            total_score += 25
+            result["reasoning"].append("Award-winning")
+        elif award_score >= 20:
+            total_score += 15
+            result["reasoning"].append("Some awards/nominations")
+        elif award_score >= 10:
+            total_score += 8
+            result["reasoning"].append("Limited awards")
+        
+        # Career quality (can add or subtract)
+        total_score += career_score
+        if career_score < -10:
+            result["reasoning"].append("Reality TV / Influencer background")
+        elif career_score > 20:
+            result["reasoning"].append("Strong mainstream career")
+        
+        # Bio length bonus (notability indicator)
+        if bio_length >= 10000:
+            total_score += 10
+        elif bio_length >= 5000:
+            total_score += 5
+        
+        result["score"] = total_score
+        
+        # Determine tier based on total score
+        if total_score >= 70:
+            result["tier"] = "A"
+            result["price"] = 10.0 + min(2.0, (total_score - 70) / 15)  # £10-12
+        elif total_score >= 45:
+            result["tier"] = "B"
+            result["price"] = 5.0 + ((total_score - 45) / 25) * 3  # £5-8
+        elif total_score >= 20:
+            result["tier"] = "C"
+            result["price"] = 2.0 + ((total_score - 20) / 25) * 2  # £2-4
+        else:
+            result["tier"] = "D"
+            result["price"] = 0.5 + max(0, (total_score / 20)) * 1  # £0.5-1.5
+        
+        result["price"] = round(min(12.0, max(0.5, result["price"])), 1)
+        
+    except Exception as e:
+        logger.error(f"Error calculating tier for {name}: {e}")
+        result["reasoning"].append(f"Error: {str(e)}")
+    
+    return result
+
 async def fetch_wikipedia_info(name: str) -> dict:
     """Fetch celebrity info from Wikipedia API"""
     try:
