@@ -5355,14 +5355,29 @@ def extract_category_from_description(description: str) -> str:
     """
     desc_lower = description.lower()
     
-    # Check for royalty first (highest priority)
-    royal_keywords = ['prince', 'princess', 'duke', 'duchess', 'king', 'queen', 'royal', 'monarch', 
-                      'earl', 'countess', 'baron', 'baroness', 'lord', 'lady']
-    for kw in royal_keywords:
-        if kw in desc_lower:
+    import re
+    
+    # Check for ACTUAL royalty - must be a member of a royal family
+    # This should NOT match honorary titles like "Queen of Pop", "Queen of Country", etc.
+    # Look for patterns that indicate actual royal titles
+    royal_patterns = [
+        r'\bprince of wales\b', r'\bprincess of wales\b', 
+        r'\bduke of (?:cambridge|sussex|york|edinburgh|kent|gloucester)\b',
+        r'\bduchess of (?:cambridge|sussex|york|edinburgh|kent|cornwall)\b',
+        r'\bking of (?:england|britain|uk|united kingdom|the united kingdom)\b',
+        r'\bqueen of (?:england|britain|uk|united kingdom|the united kingdom)\b',
+        r'\broyal family\b', r'\bbritish royal\b', r'\broyal household\b',
+        r'\bheir to the throne\b', r'\bline of succession\b',
+        r'\bmember of the british royal family\b',
+        r'\bhouse of windsor\b', r'\bmountbatten-windsor\b',
+    ]
+    for pattern in royal_patterns:
+        if re.search(pattern, desc_lower):
             return 'royals'
     
-    import re
+    # Also check if it starts with a royal title (for Wikipedia pages of royals)
+    if desc_lower.startswith(('prince ', 'princess ', 'duke ', 'duchess ')):
+        return 'royals'
     
     # Extended pattern to capture the occupation word after "is a/an [nationality]"
     # First, let's extract everything after "is a/an" up to the first comma or period
