@@ -5364,20 +5364,16 @@ def extract_category_from_description(description: str) -> str:
     
     import re
     
-    # Extended pattern to capture compound occupations
-    # Matches: "is a/an [nationality] [adjective]? [occupation]" 
-    # E.g., "is an American singer-songwriter" -> singer-songwriter
-    # E.g., "is a British celebrity chef" -> celebrity chef  
-    # E.g., "is a British racing driver" -> racing driver
-    # E.g., "is an English former professional footballer" -> former professional footballer
-    is_a_pattern = r'is (?:a|an) (?:\w+ )?(?:former |professional |celebrity )?(\w+(?:[- ]\w+)?)'
+    # Extended pattern to capture the occupation word after "is a/an [nationality]"
+    # First, let's extract everything after "is a/an" up to the first comma or period
+    is_a_pattern = r'is (?:a|an) ([^,\.]+)'
     match = re.search(is_a_pattern, desc_lower)
     
-    first_occupation = None
+    occupation_phrase = None
     if match:
-        first_occupation = match.group(1).strip()
+        occupation_phrase = match.group(1).strip()
     
-    # Define occupation mappings - including compound words
+    # Define direct occupation mappings
     occupation_to_category = {
         # Musicians
         'singer': 'musicians', 'singer-songwriter': 'musicians', 'rapper': 'musicians', 
