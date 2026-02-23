@@ -426,6 +426,20 @@ class League(BaseModel):
     monthly_scores: dict = {}  # {team_id: accumulated_monthly_points}
     monthly_winner_history: List[dict] = []  # [{month: str, team_id: str, team_name: str, points: float}]
 
+class LeagueChatMessage(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    league_id: str
+    team_id: str
+    team_name: str
+    team_color: str = "pink"
+    message: str
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class LeagueChatSend(BaseModel):
+    team_id: str
+    message: str
+
 class LeagueCreate(BaseModel):
     name: str
     team_id: str  # The creating team
