@@ -136,6 +136,13 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
   - **Athletes** fixed: Jonathan Owens, Tyreek Hill (were incorrectly in other)
   - Added category override system for 40+ commonly miscategorized celebrities
   - Added bio-based detection for "chat show", "talk show", "broadcaster" keywords
+- ✅ **MASS WIKIDATA UPDATE** (Feb 23, 2026):
+  - **1,605 celebrities now have real Wikipedia images** (82.6% coverage)
+  - Automated Wikidata API integration fetches P18 (image) and P106 (occupation)
+  - Celebrities recategorized based on their Wikidata occupation data
+  - Admin endpoints for batch updates: `/api/admin/update-celebrity-data`, `/api/admin/celebrity-update-status`
+  - 339 celebrities remain with placeholder images (no Wikidata images available)
+  - Categories rebalanced: movie_stars (389), athletes (308), other (253), musicians (248), public_figure (199), royals (192), tv_personalities (142), tv_actors (114), reality_tv (99)
 - ✅ **24-HOUR NEWS CACHE** - News feed refreshes every 24 hours (was 15 min)
 - ✅ **REAL NEWS FROM RSS FEEDS** (Feb 22, 2026):
   - Individual celebrity news now fetches REAL articles from RSS feeds first
