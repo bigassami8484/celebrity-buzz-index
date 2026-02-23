@@ -17,6 +17,19 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - ✅ **Verified mobile view in preview** - Mobile rendering working correctly with proper responsive layout
 - ✅ **Search debounce already reduced** - Was set to 150ms (previously 300ms) for faster response
 
+### Image Fix - Wikidata Priority (Feb 23, 2026)
+- ✅ **Paris Hilton and Rafael Nadal images fixed** - Updated to use reliable Wikidata Commons URLs
+- ✅ **Improved image fetching logic** - Now prioritizes Wikidata P18 images over Wikipedia thumbnails (avoids 429 rate limits)
+- ✅ **Proper URL encoding** - Fixed URL encoding for Wikimedia Commons Special:FilePath URLs
+
+### Price Watch Feature (NEW - Feb 23, 2026)
+- ✅ **Backend API endpoints** - GET/POST/DELETE for price watches
+- ✅ **Team-based tracking** - Each team can watch up to 10 celebrities
+- ✅ **Alert types** - Watch for price drops OR price rises
+- ✅ **Target notifications** - Shows when target price is reached
+- ✅ **Frontend modal** - Beautiful UI with celebrity search, tier badges, current/target prices
+- ✅ **Pro tip guidance** - Helpful tips for using price watches effectively
+
 ### Data Quality Fixes (Feb 23, 2026 - Session 2)
 - ✅ **Adele image fixed** - Updated Wikipedia image URL (was returning 429 rate limit)
 - ✅ **Dua Lipa image fixed** - Updated Wikipedia image URL (was returning 429 rate limit)
