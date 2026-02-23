@@ -4419,6 +4419,297 @@ async def leave_league(league_id: str, team_id: str):
     
     return {"message": "Left league successfully"}
 
+def get_current_week_str() -> str:
+    """Get current ISO week string (e.g., '2026-W08')"""
+    now = datetime.now(timezone.utc)
+    return f"{now.year}-W{now.isocalendar()[1]:02d}"
+
+def get_current_month_str() -> str:
+    """Get current month string (e.g., '2026-02')"""
+    now = datetime.now(timezone.utc)
+    return f"{now.year}-{now.month:02d}"
+
+@api_router.get("/league/{league_id}/weekly-leaderboard")
+async def get_league_weekly_leaderboard(league_id: str):
+    """Get weekly leaderboard for a specific league"""
+    league = await db.leagues.find_one({"id": league_id}, {"_id": 0})
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    
+    current_week = get_current_week_str()
+    team_ids = league.get("team_ids", [])
+    teams = await db.teams.find({"id": {"$in": team_ids}}, {"_id": 0}).to_list(100)
+    
+    leaderboard = []
+    for team in teams:
+        # Get weekly points from league tracking or calculate from current points
+        weekly_points = league.get("weekly_scores", {}).get(team["id"], team.get("total_points", 0))
+        leaderboard.append({
+            "team_id": team["id"],
+            "team_name": team.get("team_name", "Unknown"),
+            "team_color": team.get("team_color", "pink"),
+            "team_icon": team.get("team_icon", "star"),
+            "weekly_points": weekly_points,
+            "celebrity_count": len(team.get("celebrities", [])),
+            "badges": [b.get("id") for b in team.get("badges", [])],
+            "is_owner": team["id"] == league.get("owner_team_id")
+        })
+    
+    leaderboard.sort(key=lambda x: x["weekly_points"], reverse=True)
+    
+    return {
+        "league_name": league["name"],
+        "league_code": league["code"],
+        "current_week": current_week,
+        "leaderboard": leaderboard,
+        "weekly_winner_history": league.get("weekly_winner_history", [])[-4:]  # Last 4 weeks
+    }
+
+@api_router.get("/league/{league_id}/monthly-leaderboard")
+async def get_league_monthly_leaderboard(league_id: str):
+    """Get monthly leaderboard for a specific league"""
+    league = await db.leagues.find_one({"id": league_id}, {"_id": 0})
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    
+    current_month = get_current_month_str()
+    team_ids = league.get("team_ids", [])
+    teams = await db.teams.find({"id": {"$in": team_ids}}, {"_id": 0}).to_list(100)
+    
+    leaderboard = []
+    for team in teams:
+        # Get monthly accumulated points
+        monthly_points = league.get("monthly_scores", {}).get(team["id"], 0)
+        # If no monthly tracking yet, use current points as starting point
+        if monthly_points == 0:
+            monthly_points = team.get("total_points", 0)
+        
+        leaderboard.append({
+            "team_id": team["id"],
+            "team_name": team.get("team_name", "Unknown"),
+            "team_color": team.get("team_color", "pink"),
+            "team_icon": team.get("team_icon", "star"),
+            "monthly_points": monthly_points,
+            "weekly_wins_this_month": sum(1 for w in league.get("weekly_winner_history", []) 
+                                          if w.get("team_id") == team["id"] and w.get("week", "").startswith(current_month[:4])),
+            "badges": [b.get("id") for b in team.get("badges", [])],
+            "is_owner": team["id"] == league.get("owner_team_id")
+        })
+    
+    leaderboard.sort(key=lambda x: x["monthly_points"], reverse=True)
+    
+    return {
+        "league_name": league["name"],
+        "league_code": league["code"],
+        "current_month": current_month,
+        "leaderboard": leaderboard,
+        "monthly_winner_history": league.get("monthly_winner_history", [])[-3:]  # Last 3 months
+    }
+
+@api_router.post("/league/{league_id}/record-weekly-scores")
+async def record_weekly_scores(league_id: str):
+    """Record current scores for the week and determine winner. Call this at end of week."""
+    league = await db.leagues.find_one({"id": league_id})
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    
+    current_week = get_current_week_str()
+    current_month = get_current_month_str()
+    team_ids = league.get("team_ids", [])
+    
+    if not team_ids:
+        raise HTTPException(status_code=400, detail="No teams in league")
+    
+    teams = await db.teams.find({"id": {"$in": team_ids}}, {"_id": 0}).to_list(100)
+    
+    if not teams:
+        raise HTTPException(status_code=400, detail="No teams found")
+    
+    # Record weekly scores
+    weekly_scores = {team["id"]: team.get("total_points", 0) for team in teams}
+    
+    # Find weekly winner
+    winner = max(teams, key=lambda t: t.get("total_points", 0))
+    winner_entry = {
+        "week": current_week,
+        "team_id": winner["id"],
+        "team_name": winner.get("team_name", "Unknown"),
+        "points": winner.get("total_points", 0)
+    }
+    
+    # Update monthly scores (accumulate weekly points)
+    monthly_scores = league.get("monthly_scores", {})
+    for team_id, points in weekly_scores.items():
+        monthly_scores[team_id] = monthly_scores.get(team_id, 0) + points
+    
+    # Update league
+    await db.leagues.update_one(
+        {"id": league_id},
+        {
+            "$set": {
+                "current_week": current_week,
+                "weekly_scores": weekly_scores,
+                "current_month": current_month,
+                "monthly_scores": monthly_scores
+            },
+            "$push": {"weekly_winner_history": winner_entry}
+        }
+    )
+    
+    # Award weekly winner badge
+    badge = {
+        "id": "weekly_winner",
+        "earned_at": datetime.now(timezone.utc).isoformat(),
+        "league_id": league_id,
+        "week": current_week
+    }
+    
+    await db.teams.update_one(
+        {"id": winner["id"]},
+        {
+            "$push": {"badges": badge},
+            "$inc": {"weekly_wins": 1}
+        }
+    )
+    
+    # Check for streak badges
+    winner_history = league.get("weekly_winner_history", []) + [winner_entry]
+    recent_winners = [w.get("team_id") for w in winner_history[-4:]]
+    
+    # Check for 4-week undefeated streak
+    if len(recent_winners) >= 4 and all(w == winner["id"] for w in recent_winners[-4:]):
+        existing_badges = await db.teams.find_one({"id": winner["id"]}, {"badges": 1})
+        has_undefeated = any(b.get("id") == "undefeated" for b in existing_badges.get("badges", []))
+        if not has_undefeated:
+            undefeated_badge = {
+                "id": "undefeated",
+                "earned_at": datetime.now(timezone.utc).isoformat(),
+                "league_id": league_id
+            }
+            await db.teams.update_one(
+                {"id": winner["id"]},
+                {"$push": {"badges": undefeated_badge}}
+            )
+    
+    # Check for League Legend (3+ wins total in this league)
+    updated_team = await db.teams.find_one({"id": winner["id"]})
+    league_wins = sum(1 for w in winner_history if w.get("team_id") == winner["id"])
+    if league_wins >= 3:
+        has_legend = any(b.get("id") == "league_champion" and b.get("league_id") == league_id 
+                        for b in updated_team.get("badges", []))
+        if not has_legend:
+            legend_badge = {
+                "id": "league_champion",
+                "earned_at": datetime.now(timezone.utc).isoformat(),
+                "league_id": league_id
+            }
+            await db.teams.update_one(
+                {"id": winner["id"]},
+                {"$push": {"badges": legend_badge}}
+            )
+    
+    return {
+        "message": f"Weekly scores recorded! Winner: {winner.get('team_name')}",
+        "weekly_winner": winner_entry,
+        "weekly_scores": weekly_scores
+    }
+
+@api_router.post("/league/{league_id}/record-monthly-winner")
+async def record_monthly_winner(league_id: str):
+    """Record monthly winner and award badge. Call at end of month."""
+    league = await db.leagues.find_one({"id": league_id})
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    
+    current_month = get_current_month_str()
+    monthly_scores = league.get("monthly_scores", {})
+    
+    if not monthly_scores:
+        raise HTTPException(status_code=400, detail="No monthly scores recorded")
+    
+    # Find monthly winner
+    winner_id = max(monthly_scores, key=monthly_scores.get)
+    winner_team = await db.teams.find_one({"id": winner_id}, {"_id": 0})
+    
+    if not winner_team:
+        raise HTTPException(status_code=400, detail="Winner team not found")
+    
+    winner_entry = {
+        "month": current_month,
+        "team_id": winner_id,
+        "team_name": winner_team.get("team_name", "Unknown"),
+        "points": monthly_scores[winner_id]
+    }
+    
+    # Update league and reset monthly scores
+    await db.leagues.update_one(
+        {"id": league_id},
+        {
+            "$set": {"monthly_scores": {}},
+            "$push": {"monthly_winner_history": winner_entry}
+        }
+    )
+    
+    # Award monthly winner badge
+    badge = {
+        "id": "monthly_winner",
+        "earned_at": datetime.now(timezone.utc).isoformat(),
+        "league_id": league_id,
+        "month": current_month
+    }
+    
+    await db.teams.update_one(
+        {"id": winner_id},
+        {"$push": {"badges": badge}}
+    )
+    
+    return {
+        "message": f"Monthly winner recorded! {winner_team.get('team_name')} wins {current_month}!",
+        "monthly_winner": winner_entry
+    }
+
+@api_router.get("/league/{league_id}/stats")
+async def get_league_stats(league_id: str):
+    """Get comprehensive league statistics"""
+    league = await db.leagues.find_one({"id": league_id}, {"_id": 0})
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    
+    team_ids = league.get("team_ids", [])
+    teams = await db.teams.find({"id": {"$in": team_ids}}, {"_id": 0}).to_list(100)
+    
+    # Calculate stats
+    total_points = sum(t.get("total_points", 0) for t in teams)
+    total_celebs = sum(len(t.get("celebrities", [])) for t in teams)
+    
+    # Most decorated team (most badges)
+    most_badges_team = max(teams, key=lambda t: len(t.get("badges", [])), default=None)
+    
+    # Weekly winner frequency
+    weekly_history = league.get("weekly_winner_history", [])
+    winner_counts = {}
+    for w in weekly_history:
+        tid = w.get("team_id")
+        winner_counts[tid] = winner_counts.get(tid, 0) + 1
+    
+    return {
+        "league_name": league["name"],
+        "league_code": league["code"],
+        "member_count": len(team_ids),
+        "max_teams": league.get("max_teams", 10),
+        "total_points_all_teams": total_points,
+        "total_celebrities_drafted": total_celebs,
+        "weeks_played": len(weekly_history),
+        "months_completed": len(league.get("monthly_winner_history", [])),
+        "most_decorated_team": {
+            "team_name": most_badges_team.get("team_name") if most_badges_team else None,
+            "badge_count": len(most_badges_team.get("badges", [])) if most_badges_team else 0
+        } if most_badges_team else None,
+        "weekly_winner_frequency": winner_counts,
+        "owner_team_id": league.get("owner_team_id"),
+        "created_at": league.get("created_at")
+    }
+
 # ==================== BADGE ENDPOINTS ====================
 
 @api_router.get("/badges")
