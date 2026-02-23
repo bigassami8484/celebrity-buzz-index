@@ -157,7 +157,7 @@ export const LeaguePanel = ({ team, leagues, onCreateLeague, onJoinLeague, onVie
   );
 };
 
-// League Detail Modal with Weekly/Monthly Tabs
+// League Detail Modal with Weekly/Monthly/Chat Tabs
 export const LeagueDetailModal = ({ league, leaderboard, onClose, teamId, apiUrl }) => {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState("weekly");
@@ -165,6 +165,10 @@ export const LeagueDetailModal = ({ league, leaderboard, onClose, teamId, apiUrl
   const [monthlyData, setMonthlyData] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const chatEndRef = useRef(null);
   
   const shareUrl = `${window.location.origin}?joinLeague=${league.code}`;
   const shareText = `Join my Celebrity Buzz league "${league.name}"! Use code: ${league.code} 🌟`;
@@ -172,6 +176,66 @@ export const LeagueDetailModal = ({ league, leaderboard, onClose, teamId, apiUrl
   useEffect(() => {
     fetchLeagueData();
   }, [league.id]);
+  
+  useEffect(() => {
+    if (activeTab === "chat") {
+      fetchChatMessages();
+      // Poll for new messages every 10 seconds when chat is open
+      const interval = setInterval(fetchChatMessages, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [activeTab, league.id]);
+  
+  useEffect(() => {
+    // Scroll to bottom when new messages arrive
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages]);
+  
+  const fetchChatMessages = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/api/league/${league.id}/chat`);
+      if (res.ok) {
+        const data = await res.json();
+        setChatMessages(data.messages || []);
+      }
+    } catch (e) {
+      console.error("Error fetching chat:", e);
+    }
+  };
+  
+  const sendMessage = async () => {
+    if (!newMessage.trim() || sendingMessage) return;
+    
+    setSendingMessage(true);
+    try {
+      const res = await fetch(`${apiUrl}/api/league/${league.id}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ team_id: teamId, message: newMessage.trim() })
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setChatMessages(prev => [...prev, data.chat_message]);
+        setNewMessage("");
+      } else {
+        const err = await res.json();
+        toast.error(err.detail || "Failed to send message");
+      }
+    } catch (e) {
+      toast.error("Failed to send message");
+    }
+    setSendingMessage(false);
+  };
+  
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
   
   const fetchLeagueData = async () => {
     setLoading(true);
