@@ -1751,8 +1751,11 @@ async def calculate_tier_from_wikipedia_data(name: str, http_client: httpx.Async
         else:
             result["reasoning"].append("Emerging talent")
         
-        # Awards (max 35 points)
-        if award_score >= 60:
+        # Awards (max 45 points) - increased weight for major awards
+        if award_score >= 100:
+            total_score += 45
+            result["reasoning"].append("Elite-level achievements")
+        elif award_score >= 60:
             total_score += 35
             result["reasoning"].append("Major awards winner")
         elif award_score >= 40:
@@ -1774,8 +1777,10 @@ async def calculate_tier_from_wikipedia_data(name: str, http_client: httpx.Async
         
         # Bio length bonus (notability indicator)
         if bio_length >= 10000:
-            total_score += 10
+            total_score += 15
         elif bio_length >= 5000:
+            total_score += 8
+        elif bio_length >= 3000:
             total_score += 5
         
         result["score"] = total_score
