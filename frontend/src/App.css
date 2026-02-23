@@ -733,6 +733,17 @@
   .remove-btn {
     padding: 8px 12px;
   }
+  
+  /* Mobile main container spacing */
+  main.container {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  
+  /* Hide long text on mobile */
+  .hide-mobile-text {
+    display: none;
+  }
 }
 
 /* League Card Styles */
