@@ -6322,6 +6322,126 @@ async def fix_celebrity_bios_and_categories(batch_size: int = 30, delay_seconds:
     }
 
 
+@api_router.post("/admin/reclassify-tiers")
+async def reclassify_celebrity_tiers(batch_size: int = 50, delay_seconds: float = 0.5):
+    """
+    Reclassify all celebrity tiers using the new Wikipedia-based metrics system.
+    
+    Metrics used:
+    - Number of Wikipedia language editions (global recognition)
+    - Years active (career longevity)
+    - Awards mentioned in bio
+    - Career indicators (reality TV vs mainstream)
+    
+    This is a background-safe operation that processes in batches.
+    """
+    # Get all celebrities that need reclassification
+    all_celebs = await db.celebrities.find(
+        {},
+        {"_id": 0, "id": 1, "name": 1, "tier": 1, "price": 1}
+    ).to_list(2000)
+    
+    if not all_celebs:
+        return {"message": "No celebrities to reclassify", "processed": 0}
+    
+    # Process in background
+    processed = 0
+    tier_changes = {"A_to_B": 0, "A_to_C": 0, "A_to_D": 0, "B_to_A": 0, "B_to_C": 0, "B_to_D": 0,
+                    "C_to_A": 0, "C_to_B": 0, "C_to_D": 0, "D_to_A": 0, "D_to_B": 0, "D_to_C": 0}
+    sample_changes = []
+    
+    headers = {
+        "User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com) httpx/0.27"
+    }
+    
+    async with httpx.AsyncClient() as http_client:
+        for celeb in all_celebs[:batch_size]:
+            celeb_id = celeb.get("id")
+            name = celeb.get("name", "")
+            old_tier = celeb.get("tier", "D")
+            old_price = celeb.get("price", 1.0)
+            
+            try:
+                # Calculate new tier using Wikipedia metrics
+                result = await calculate_tier_from_wikipedia_data(name, http_client)
+                new_tier = result["tier"]
+                new_price = result["price"]
+                
+                # Track changes
+                if old_tier != new_tier:
+                    change_key = f"{old_tier}_to_{new_tier}"
+                    if change_key in tier_changes:
+                        tier_changes[change_key] += 1
+                    
+                    if len(sample_changes) < 20:
+                        sample_changes.append({
+                            "name": name,
+                            "old_tier": old_tier,
+                            "new_tier": new_tier,
+                            "old_price": old_price,
+                            "new_price": new_price,
+                            "score": result["score"],
+                            "reasoning": result["reasoning"][:3]
+                        })
+                
+                # Update celebrity
+                await db.celebrities.update_one(
+                    {"id": celeb_id},
+                    {
+                        "$set": {
+                            "tier": new_tier,
+                            "price": new_price,
+                            "tier_score": result["score"],
+                            "tier_metrics": result["metrics"],
+                            "tier_updated_at": datetime.now(timezone.utc).isoformat()
+                        }
+                    }
+                )
+                
+                processed += 1
+                
+                # Rate limiting
+                await asyncio.sleep(delay_seconds)
+                
+            except Exception as e:
+                logger.error(f"Error reclassifying {name}: {e}")
+    
+    return {
+        "success": True,
+        "message": f"Reclassified {processed} celebrities",
+        "processed": processed,
+        "remaining": len(all_celebs) - batch_size,
+        "tier_changes": tier_changes,
+        "sample_changes": sample_changes
+    }
+
+
+@api_router.get("/admin/test-tier-calculation/{name}")
+async def test_tier_calculation(name: str):
+    """
+    Test the tier calculation for a specific celebrity.
+    Returns detailed metrics and reasoning.
+    """
+    async with httpx.AsyncClient() as http_client:
+        result = await calculate_tier_from_wikipedia_data(name, http_client)
+        
+        # Also get current DB values for comparison
+        celeb = await db.celebrities.find_one(
+            {"name": {"$regex": f"^{name}$", "$options": "i"}},
+            {"_id": 0, "tier": 1, "price": 1, "category": 1}
+        )
+        
+        return {
+            "name": name,
+            "current_db_values": celeb or "Not in database",
+            "calculated_tier": result["tier"],
+            "calculated_price": result["price"],
+            "total_score": result["score"],
+            "metrics": result["metrics"],
+            "reasoning": result["reasoning"]
+        }
+
+
 # Auth routes are now in /routes/auth.py
 
 
