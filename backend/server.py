@@ -2380,6 +2380,7 @@ def determine_tier_from_bio(bio: str, name: str = "") -> str:
     # ANTI-D-LIST CHECKS
     # Actors with longevity or multiple successful roles should NOT be D-list
     # TV personalities with major awards should NOT be D-list
+    # Musicians with chart success should NOT be D-list
     # =================================================================
     
     # Check for major award wins - anyone with these should be at least C-list
@@ -2394,6 +2395,19 @@ def determine_tier_from_bio(bio: str, name: str = "") -> str:
         return "B"  # Multiple major awards = B-list minimum
     if awards_found >= 1:
         return "C"  # Single major award = C-list minimum
+    
+    # Check for chart/music success (for musicians)
+    chart_indicators = [
+        "number one", "number-one", "#1", "no. 1", "chart-topping",
+        "top 10", "top ten", "billboard hot 100", "uk singles chart",
+        "multi-platinum", "platinum album", "gold record", "gold album",
+        "best-selling", "million copies", "certified platinum", "certified gold"
+    ]
+    chart_success = sum(1 for ind in chart_indicators if ind in bio_lower)
+    if chart_success >= 2:
+        return "B"  # Multiple chart successes = B-list minimum
+    if chart_success >= 1:
+        return "C"  # Single chart success = C-list minimum
     
     # Check for multi-year TV show runs (patterns like "2016-2025", "2010–2019", etc.)
     import re
