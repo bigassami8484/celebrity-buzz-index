@@ -92,6 +92,9 @@ function App() {
   const [showPriceHistory, setShowPriceHistory] = useState(false);
   const [priceHistoryCeleb, setPriceHistoryCeleb] = useState(null);
   
+  // Price Watch state
+  const [showPriceWatch, setShowPriceWatch] = useState(false);
+  
   // League state
   const [leagues, setLeagues] = useState([]);
   const [selectedLeague, setSelectedLeague] = useState(null);
