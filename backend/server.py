@@ -3991,9 +3991,11 @@ async def get_hot_celebs():
                             "news_premium": news_multiplier > 1.0,
                             "trending_tag": trending_tag,
                             "hot_reason": hot_reason,
-                            "news_headlines": data.get("headlines", [])[:3],
+                            "news_headlines": actual_headlines[:3],
+                            "recent_articles": actual_headlines[:5],  # Include actual articles
                             "image": image,
-                            "mention_count": mention_count
+                            "mention_count": mention_count,
+                            "article_count": len(actual_headlines)
                         })
                         
                         # Store in DB for consistency with autocomplete
