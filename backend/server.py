@@ -3885,6 +3885,11 @@ async def get_hot_celebs():
             if name.lower() == "michael jordan":
                 continue
             
+            # SKIP celebs with no actual headlines (just name matches in other contexts)
+            actual_headlines = data.get("headlines", [])
+            if len(actual_headlines) < 1:
+                continue
+            
             try:
                 wiki_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{name.replace(' ', '_')}"
                 response = await client.get(wiki_url, timeout=5.0, headers=headers)
