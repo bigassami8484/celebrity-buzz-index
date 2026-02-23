@@ -4276,7 +4276,8 @@ async def create_price_watch(team_id: str, watch: PriceWatchCreate):
     }
     
     await db.price_watches.insert_one(watch_doc)
-    del watch_doc["_id"] if "_id" in watch_doc else None
+    if "_id" in watch_doc:
+        del watch_doc["_id"]
     
     # Add current price info
     watch_doc["current_price"] = celeb.get("price", 0)
