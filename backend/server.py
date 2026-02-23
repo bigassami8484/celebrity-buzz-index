@@ -2939,41 +2939,19 @@ async def get_celebrities_by_category(category: str, response: Response):
     
     # Get random sample from ALL celebrities in this category
     # MongoDB $sample provides true randomness from the entire collection
-    # FILTER: Only include celebs with valid Wikipedia data AND images
+    # FILTER: Get random celebrities from the category
+    # Prioritize those with Wikipedia images, but include all valid celebs
     pipeline = [
         {"$match": {
             "category": category,
             "name": {"$ne": None, "$exists": True},
-            "bio": {"$exists": True, "$ne": "", "$ne": "Celebrity profile"},
-            "wiki_url": {"$exists": True, "$ne": ""},
-            "image": {"$exists": True, "$ne": "", "$not": {"$regex": "ui-avatars"}}  # Must have real image
+            "wiki_url": {"$exists": True, "$ne": ""}
         }},
         {"$sample": {"size": 8}},  # Random sample of exactly 8
         {"$project": {"_id": 0}}
     ]
     
     selected = await db.celebrities.aggregate(pipeline).to_list(8)
-    
-    # If not enough with images, get any valid celebs
-    if len(selected) < 8:
-        fallback_pipeline = [
-            {"$match": {
-                "category": category,
-                "name": {"$ne": None, "$exists": True},
-                "bio": {"$exists": True, "$ne": "", "$ne": "Celebrity profile"},
-                "wiki_url": {"$exists": True, "$ne": ""}
-            }},
-            {"$sample": {"size": 8 - len(selected)}},
-            {"$project": {"_id": 0}}
-        ]
-        more = await db.celebrities.aggregate(fallback_pipeline).to_list(8 - len(selected))
-        # Only add celebs not already in selected
-        existing_names = {c.get("name") for c in selected}
-        for c in more:
-            if c.get("name") not in existing_names:
-                selected.append(c)
-                if len(selected) >= 8:
-                    break
     
     return {"celebrities": selected[:8]}
 
