@@ -47,6 +47,7 @@ import {
   TodaysNews 
 } from "./components/celebrities";
 import { TeamPanel, TeamCustomizeModal } from "./components/team";
+import PriceWatch from "./components/team/PriceWatch";
 import { LeaguePanel, LeagueDetailModal, Leaderboard } from "./components/leagues/index.jsx";
 import { 
   ShareModal, 
