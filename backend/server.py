@@ -4725,6 +4725,93 @@ async def get_league_stats(league_id: str):
         "created_at": league.get("created_at")
     }
 
+# ==================== LEAGUE CHAT ENDPOINTS ====================
+
+@api_router.get("/league/{league_id}/chat")
+async def get_league_chat(league_id: str, limit: int = 50):
+    """Get recent chat messages for a league"""
+    league = await db.leagues.find_one({"id": league_id}, {"_id": 0, "id": 1})
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    
+    # Get recent messages
+    messages = await db.league_chat.find(
+        {"league_id": league_id},
+        {"_id": 0}
+    ).sort("timestamp", -1).limit(limit).to_list(limit)
+    
+    # Reverse to get chronological order
+    messages.reverse()
+    
+    return {"messages": messages}
+
+@api_router.post("/league/{league_id}/chat")
+async def send_league_chat(league_id: str, data: LeagueChatSend):
+    """Send a chat message to a league"""
+    league = await db.leagues.find_one({"id": league_id}, {"_id": 0, "team_ids": 1})
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    
+    # Verify team is in league
+    if data.team_id not in league.get("team_ids", []):
+        raise HTTPException(status_code=403, detail="Team not in this league")
+    
+    # Get team info
+    team = await db.teams.find_one(
+        {"id": data.team_id},
+        {"_id": 0, "team_name": 1, "team_color": 1}
+    )
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    # Basic profanity filter (reuse existing)
+    message = data.message.strip()
+    if len(message) > 500:
+        message = message[:500]
+    
+    # Filter profanity
+    filtered_message = message
+    for word in BANNED_WORDS:
+        pattern = re.compile(re.escape(word), re.IGNORECASE)
+        filtered_message = pattern.sub("*" * len(word), filtered_message)
+    
+    # Create message
+    chat_message = {
+        "id": str(uuid.uuid4()),
+        "league_id": league_id,
+        "team_id": data.team_id,
+        "team_name": team.get("team_name", "Unknown"),
+        "team_color": team.get("team_color", "pink"),
+        "message": filtered_message,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.league_chat.insert_one(chat_message)
+    
+    return {"message": "Message sent", "chat_message": chat_message}
+
+@api_router.delete("/league/{league_id}/chat/{message_id}")
+async def delete_league_chat(league_id: str, message_id: str, team_id: str):
+    """Delete a chat message (only by sender or league owner)"""
+    league = await db.leagues.find_one({"id": league_id}, {"_id": 0, "owner_team_id": 1})
+    if not league:
+        raise HTTPException(status_code=404, detail="League not found")
+    
+    message = await db.league_chat.find_one(
+        {"id": message_id, "league_id": league_id},
+        {"_id": 0, "team_id": 1}
+    )
+    if not message:
+        raise HTTPException(status_code=404, detail="Message not found")
+    
+    # Only sender or league owner can delete
+    if message.get("team_id") != team_id and league.get("owner_team_id") != team_id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this message")
+    
+    await db.league_chat.delete_one({"id": message_id})
+    
+    return {"message": "Message deleted"}
+
 # ==================== BADGE ENDPOINTS ====================
 
 @api_router.get("/badges")
