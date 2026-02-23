@@ -4189,7 +4189,169 @@ async def get_price_alerts(team_id: str):
         "next_price_update": "Sunday 12pm GMT"
     }
 
-@api_router.get("/hot-streaks/{team_id}")
+# ==========================================
+# PRICE WATCH FEATURE
+# ==========================================
+
+class PriceWatchCreate(BaseModel):
+    celebrity_name: str
+    target_price: float
+    alert_type: str = "below"  # "below" or "above"
+
+class PriceWatchUpdate(BaseModel):
+    target_price: Optional[float] = None
+    alert_type: Optional[str] = None
+    is_active: Optional[bool] = None
+
+@api_router.get("/price-watch/{team_id}")
+async def get_price_watches(team_id: str):
+    """Get all price watches for a team"""
+    watches = await db.price_watches.find(
+        {"team_id": team_id, "is_active": True},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Enrich with current prices
+    for watch in watches:
+        celeb = await db.celebrities.find_one(
+            {"name": {"$regex": f"^{watch['celebrity_name']}$", "$options": "i"}},
+            {"_id": 0, "price": 1, "tier": 1, "image": 1}
+        )
+        if celeb:
+            watch["current_price"] = celeb.get("price", 0)
+            watch["tier"] = celeb.get("tier", "D")
+            watch["image"] = celeb.get("image", "")
+            
+            # Check if target reached
+            if watch["alert_type"] == "below":
+                watch["target_reached"] = celeb.get("price", 0) <= watch["target_price"]
+            else:
+                watch["target_reached"] = celeb.get("price", 0) >= watch["target_price"]
+        else:
+            watch["current_price"] = 0
+            watch["target_reached"] = False
+    
+    return {"watches": watches, "team_id": team_id}
+
+@api_router.post("/price-watch/{team_id}")
+async def create_price_watch(team_id: str, watch: PriceWatchCreate):
+    """Create a new price watch for a celebrity"""
+    # Verify team exists
+    team = await db.teams.find_one({"id": team_id}, {"_id": 0})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    # Check if celebrity exists
+    celeb = await db.celebrities.find_one(
+        {"name": {"$regex": f"^{watch.celebrity_name}$", "$options": "i"}},
+        {"_id": 0, "name": 1, "price": 1, "tier": 1, "image": 1}
+    )
+    if not celeb:
+        raise HTTPException(status_code=404, detail="Celebrity not found in database")
+    
+    # Check if watch already exists
+    existing = await db.price_watches.find_one({
+        "team_id": team_id,
+        "celebrity_name": {"$regex": f"^{watch.celebrity_name}$", "$options": "i"},
+        "is_active": True
+    })
+    if existing:
+        raise HTTPException(status_code=400, detail="Price watch already exists for this celebrity")
+    
+    # Limit to 10 active watches per team
+    watch_count = await db.price_watches.count_documents({"team_id": team_id, "is_active": True})
+    if watch_count >= 10:
+        raise HTTPException(status_code=400, detail="Maximum 10 active price watches allowed")
+    
+    # Create the watch
+    watch_doc = {
+        "id": str(uuid4()),
+        "team_id": team_id,
+        "celebrity_name": celeb["name"],  # Use canonical name
+        "target_price": watch.target_price,
+        "alert_type": watch.alert_type,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "is_active": True,
+        "notified": False
+    }
+    
+    await db.price_watches.insert_one(watch_doc)
+    del watch_doc["_id"] if "_id" in watch_doc else None
+    
+    # Add current price info
+    watch_doc["current_price"] = celeb.get("price", 0)
+    watch_doc["tier"] = celeb.get("tier", "D")
+    watch_doc["image"] = celeb.get("image", "")
+    watch_doc["target_reached"] = (
+        celeb.get("price", 0) <= watch.target_price if watch.alert_type == "below" 
+        else celeb.get("price", 0) >= watch.target_price
+    )
+    
+    return {"watch": watch_doc, "message": f"Now watching {celeb['name']} for price {'drop' if watch.alert_type == 'below' else 'rise'} to £{watch.target_price}M"}
+
+@api_router.delete("/price-watch/{team_id}/{watch_id}")
+async def delete_price_watch(team_id: str, watch_id: str):
+    """Delete a price watch"""
+    result = await db.price_watches.delete_one({"id": watch_id, "team_id": team_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Price watch not found")
+    return {"success": True, "message": "Price watch removed"}
+
+@api_router.put("/price-watch/{team_id}/{watch_id}")
+async def update_price_watch(team_id: str, watch_id: str, update: PriceWatchUpdate):
+    """Update a price watch"""
+    update_fields = {}
+    if update.target_price is not None:
+        update_fields["target_price"] = update.target_price
+    if update.alert_type is not None:
+        update_fields["alert_type"] = update.alert_type
+    if update.is_active is not None:
+        update_fields["is_active"] = update.is_active
+    
+    if not update_fields:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    
+    update_fields["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.price_watches.update_one(
+        {"id": watch_id, "team_id": team_id},
+        {"$set": update_fields}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Price watch not found")
+    
+    return {"success": True, "message": "Price watch updated"}
+
+@api_router.get("/price-watch/{team_id}/triggered")
+async def get_triggered_watches(team_id: str):
+    """Get all price watches that have hit their target"""
+    watches = await db.price_watches.find(
+        {"team_id": team_id, "is_active": True},
+        {"_id": 0}
+    ).to_list(100)
+    
+    triggered = []
+    for watch in watches:
+        celeb = await db.celebrities.find_one(
+            {"name": {"$regex": f"^{watch['celebrity_name']}$", "$options": "i"}},
+            {"_id": 0, "price": 1, "tier": 1, "image": 1}
+        )
+        if celeb:
+            current_price = celeb.get("price", 0)
+            is_triggered = (
+                current_price <= watch["target_price"] if watch["alert_type"] == "below"
+                else current_price >= watch["target_price"]
+            )
+            if is_triggered:
+                watch["current_price"] = current_price
+                watch["tier"] = celeb.get("tier", "D")
+                watch["image"] = celeb.get("image", "")
+                watch["target_reached"] = True
+                triggered.append(watch)
+    
+    return {"triggered_watches": triggered, "count": len(triggered)}
+
+
 async def get_hot_streaks(team_id: str):
     """Get hot streak notifications for team's celebrities
     
