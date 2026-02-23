@@ -201,3 +201,28 @@ export const verifyMagicLink = async (token) => {
   const res = await axios.post(`${AUTH_API}/magic-link/verify`, { token });
   return res.data;
 };
+
+// Price Watch API
+export const getPriceWatches = async (teamId) => {
+  const res = await axios.get(`${API}/price-watch/${teamId}`);
+  return res.data.watches || [];
+};
+
+export const createPriceWatch = async (teamId, celebrityName, targetPrice, alertType = "below") => {
+  const res = await axios.post(`${API}/price-watch/${teamId}`, {
+    celebrity_name: celebrityName,
+    target_price: targetPrice,
+    alert_type: alertType
+  });
+  return res.data;
+};
+
+export const deletePriceWatch = async (teamId, watchId) => {
+  const res = await axios.delete(`${API}/price-watch/${teamId}/${watchId}`);
+  return res.data;
+};
+
+export const getTriggeredWatches = async (teamId) => {
+  const res = await axios.get(`${API}/price-watch/${teamId}/triggered`);
+  return res.data;
+};
