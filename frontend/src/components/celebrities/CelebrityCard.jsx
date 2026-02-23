@@ -220,14 +220,24 @@ const CelebrityCard = ({ celebrity, onAdd, onRemove, isInTeam, canAfford, onShow
       
       {/* Button outside of hover zone */}
       <div className="p-4 bg-[#0A0A0A]">
-        <button
-          onClick={() => onAdd(celebrity)}
-          disabled={isInTeam || !canAfford}
-          className="add-button"
-          data-testid={`add-btn-${celebrity.id}`}
-        >
-          {isInTeam ? "In Team" : !canAfford ? "Can't Afford" : "Add to Team"}
-        </button>
+        {isInTeam ? (
+          <button
+            onClick={() => onRemove && onRemove(celebrity.id)}
+            className="add-button bg-red-600 hover:bg-red-700"
+            data-testid={`remove-btn-${celebrity.id}`}
+          >
+            Remove from Team
+          </button>
+        ) : (
+          <button
+            onClick={() => onAdd(celebrity)}
+            disabled={!canAfford}
+            className="add-button"
+            data-testid={`add-btn-${celebrity.id}`}
+          >
+            {!canAfford ? "Can't Afford" : "Add to Team"}
+          </button>
+        )}
       </div>
     </div>
   );
