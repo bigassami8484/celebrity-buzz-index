@@ -7,46 +7,45 @@ The user wants to build a Celebrity Buzz Index game. This is a full-stack web ap
 -   **Gameplay**:
     -   Users draft a team of 10 celebrities with a starting budget of £50M.
     -   A tiered, dynamic pricing system for celebrities where prices fluctuate based on media buzz.
-    -   A weekly transfer window opens every Saturday for 24 hours, allowing 3 transfers.
+    -   A weekly transfer window opens every Sunday from 12:00 PM to 11:59 PM GMT, allowing 3 transfers.
     -   A daily points system based on news mentions. Scandal/controversy news should provide a bonus.
     -   A Submit Team button that locks the team until the next transfer window opens.
 -   **Authentication**: Guest mode, with a prompt to sign up/login (Google social login) to save progress.
+-   **Friends Leagues**: Users can create or join private leagues (max 10 people) to compete on weekly and monthly leaderboards, earn badges, and chat with other league members.
 -   **Features**:
-    -   Autocomplete search bar that prioritizes exact matches.
-    -   A Hot Celebs This Week banner where clicking a celebrity opens their details modal.
+    -   Autocomplete search bar that prioritizes exact matches and uses a smart classification system for new celebrities.
+    -   A Hot Celebs This Week banner showing celebs with 3+ news articles in the past 7 days.
     -   A Brown Bread Watch for elderly celebrities (80+).
     -   A Most Picked list.
     -   Team naming with a profanity filter.
-    -   Celebrity news should be from real news sources (past 7 days), and articles should be clickable links.
-    -   Categories should display a randomized set of 8 celebrities.
 -   **UI/UX**: The application must have a mobile-first design, be a PWA, and have a proper favicon.
--   **SEO**: The homepage must be crawlable with static HTML content.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack application (React/FastAPI/MongoDB) with a database of approximately 1,600 celebrities. All celebrities have been updated with real Wikipedia images (where available), full Wikipedia bios, and have been accurately re-categorized based on their primary occupation. The news system fetches real articles from over 45 UK/US sources with a 7-day lookback window. The pricing system has been updated to be more dynamic and varied within celebrity tiers. Numerous data quality fixes requested by the user have been implemented.
+A full-stack application (React/FastAPI/MongoDB) with a database of ~1,580 celebrities. A sophisticated, automated tiering and categorization system has been implemented to classify celebrities based on Wikipedia data (languages, awards, bio content). This system runs in the background to update the entire database and is also used for new celebrities found via search. A Friends League feature is now live, including private leagues, weekly/monthly leaderboards, badges, and an in-league chat function. A scheduler automates daily point updates and weekly/monthly league resets. The application has undergone extensive data quality improvements based on continuous user feedback.
 
 **Last working item**:
--   **Last item agent was working**: The user requested a new batch of data quality and UI adjustments: add images for specific celebrities (Jake Paul, Martha Stewart), re-categorize Charlie Kirk, add more UK reality and TV stars (with images only), and redesign the bio text on the celebrity card to be smaller and not obstruct the celebrity's image.
--   **Status**: NOT STARTED
--   **Agent Testing Done**: N/A
--   **Which testing method agent to use?**: Frontend testing agent for the UI change on the celebrity card, and manual verification via  for the data changes.
--   **User Testing Done**: N/A
+-   **Last item agent was working**: The user reported a new set of data quality issues:
+    1.  Adele and Dua Lipa are missing pictures.
+    2.  The category detection system is still not correctly prioritizing the *first* occupation mentioned in a celebrity's Wikipedia bio, with Keanu Reeves and Damian Lewis cited as examples.
+-   **Status**: IN PROGRESS
+-   **Agent Testing Done**: N
+-   **Which testing method agent to use?**: manual testing by curl
+-   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: Implement latest user requests (P0)**
-    -   **Description**: Address the user's latest batch of requests, which involve both data manipulation (adding/categorizing celebrities) and a frontend UI change to the celebrity card.
-    -   **Attempted fixes**: None.
+-   **Issue 1: Data Quality & Category Logic Fix (P0)**
+    -   **Description**: The user requires image fixes for Adele and Dua Lipa and a crucial refinement of the category detection logic to strictly prioritize the first occupation found in a celebrity's bio.
+    -   **Attempted fixes**: The agent has made several adjustments to the category detection logic, but it still fails in cases like actor and musician, where it needs to identify actor as primary. No fixes have been attempted for the images yet.
     -   **Next debug checklist**:
-        1.  Attempt to find and add images for Jake Paul and Martha Stewart.
-        2.  Find Charlie Kirk in the database and update his category to 'public_figure'.
-        3.  Source lists of UK reality and TV stars and add them to the database, ensuring they have available images.
-        4.  Modify : reduce the bio's font size and change its CSS to prevent it from covering the celebrity's face (e.g., using an overlay at the bottom).
-    -   **Why fix this issue and what will be achieved with the fix?**: Fulfills the user's direct requests for improved data quality and UI usability.
-    -   **Status**: NOT STARTED
-    -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: Both.
+        1.  In , investigate the  function. The current keyword-based approach is insufficient. The logic must be rewritten to parse the first sentence of the bio, identify all potential occupation keywords, and select the one that appears earliest in the string.
+        2.  Test the new logic specifically with the bios of Damian Lewis and Keanu Reeves to ensure it works as expected.
+        3.  Run a script to find Adele and Dua Lipa in the database and verify their  field. If empty or incorrect, use their Wikipedia page titles to fetch the correct data and image URL.
+    -   **Why fix this issue and what will be achieved with the fix?**: This addresses a core user requirement for data accuracy and builds trust in the application's automated systems.
+    -   **Status**: IN PROGRESS
+    -   **Is recurring issue?**: Y (The category logic has been a recurring point of feedback).
+    -   **Should Test frontend/backend/both after fix?**: Backend
     -   **Blocked on other issue**: None.
 
 -   **Issue 2: Production Mobile View is Broken (P1)**
@@ -60,90 +59,105 @@ A full-stack application (React/FastAPI/MongoDB) with a database of approximatel
 
 **In progress Task List**:
 -   **Task 1: Backend Refactoring (Phase 2 - Continued)**
-    -   **Where to resume**: Create  and  and migrate the relevant endpoints from . The  file serves as a template.
-    -   **What will be achieved with this?**: Improved code maintainability and scalability for the backend.
+    -   **Where to resume**: Create , , and . Migrate the relevant endpoints from the monolithic . The  file serves as a template.
+    -   **What will be achieved with this?**: Drastically improve code maintainability, scalability, and organization of the backend.
     -   **Status**: IN PROGRESS
     -   **Should Test frontend/backend/both after fix?**: Backend
-    -   **Blocked on something**: Blocked by the user's current P0 requests. This should be resumed after the immediate tasks are completed.
+    -   **Blocked on something**: Blocked by the user's high-priority data quality requests. This should be resumed after the immediate tasks are completed.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks**:
-    -   **P1**: Flesh out Hot Streak Notifications (implement actual browser push notifications).
-    -   **P1**: Link Guest Team on Sign-in (verify this functionality still works as expected).
+    -   **P1**: Implement browser push notifications for Hot Streaks.
+    -   **P1**: Verify the Link Guest Team on Sign-in functionality.
 -   **Future Tasks**:
-    -   **P2**: Private Friends Leagues.
-    -   **P2**: Celebrity Comparison Feature.
-    -   **P2**: Push Notifications (e.g., for transfer window opening).
-    -   **P2**: Badge system and Hall of Fame page.
+    -   **P2**: Add a Celebrity Comparison Feature.
+    -   **P2**: Implement head-to-head matchups within leagues.
+    -   **P2**: General push notifications (e.g., for transfer window opening).
+    -   **P2**: Expand the badge system and Hall of Fame page.
 
 **Completed work in this session**
--   **Mass Celebrity Data Update**: Successfully updated over 1,600 celebrities with real Wikipedia images and full biographical text, overcoming previous API rate-limiting issues by using Wikidata.
--   **Advanced Recategorization**: Implemented a sophisticated engine to parse Wikipedia bios and accurately categorize all 1,900+ celebrities based on their primary occupation.
--   **Data Cleaning & User Requests**: Performed extensive data cleanup, removing duplicates, bands, and non-celebrities, and correcting categories for dozens of individuals as requested by the user.
--   **Pricing System Overhaul**: Randomized celebrity prices within their tiers to create more dynamic and realistic valuation.
--   **News System Refinements**: Changed the news-fetching window to 7 days, added more UK/US news sources, and fixed a caching bug that showed incorrect articles for Michael Jordan.
--   **UI Updates**: Modified the celebrity card to show more of the bio and removed ~326 celebrities without images to improve visual consistency.
--   **TV Actors Category Populated**: Expanded the  category from 3 to over 80 celebrities by moving existing actors from  and other categories.
+-   **Smart Tier Classification System**: Created and deployed a complex system () to auto-classify all 1,600+ celebrities based on Wikipedia metrics (language count, awards, bio length). Includes a guaranteed A-list and special logic for royals.
+-   **Smart Category Detection System**: Built a system () to auto-categorize celebrities based on their bio. Fixed dozens of miscategorized celebs.
+-   **Friends League Feature**: Implemented a full-featured league system including creation/joining, weekly/monthly leaderboards, new badges, and an integrated real-time chat.
+-   **Automated Scheduler**: Deployed an APScheduler to handle daily point updates, weekly league scoring, and monthly awards.
+-   **Hot Celebs Banner Logic**: Updated the banner to only show celebrities with 3+ news articles from the past 7 days and removed Michael Jordan (basketball player) to prevent confusion.
+-   **Extensive Data Cleaning**:
+    -   Removed 41 disambiguation pages (e.g., Sean Delaney may refer to...).
+    -   Fixed tiers/categories for over 100 celebrities based on user feedback (Robert Downey Jr., Victoria Beckham, Sting, etc.).
+    -   Removed duplicate celebrities (Samuel L. Jackson).
+    -   Added missing celebrities (David Bowie, JoJo Siwa).
+-   **UI/UX Refinements**:
+    -   Redesigned the celebrity card bio to be a smaller, semi-transparent overlay at the bottom.
+    -   Updated the Transfer Window schedule to Sunday 12pm-12am GMT across the entire application.
+    -   Removed the redundant Found celebrity toast message.
 
 **Earlier issues found/mentioned but not fixed**
 -   None.
 
 **Known issue recurrence from previous fork**
 -   **Issue recurrence in previous fork**: Production Mobile View is Broken
--   **Recurrence count**: 4
+-   **Recurrence count**: 5+
 -   **Status**: BLOCKED
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Wikidata SPARQL**: Used as a successful workaround for Wikipedia's public API rate limits to perform a mass update of celebrity images and occupation data.
--   **Background Processing**: Long-running data update scripts were executed as background processes using  to prevent timeouts.
--   **Advanced Text Processing**: Utilized Python's  module for advanced parsing of Wikipedia bios to accurately determine a celebrity's primary occupation for categorization.
+-   **APScheduler**: Used for running scheduled background tasks (daily point updates, weekly scoring).
+-   **Advanced Text Processing**: Heavy use of Python's  module and string manipulation for advanced parsing of Wikipedia bios to determine celebrity tiers and categories.
+-   **Background Script Execution**: Running long-running tasks like the full database reclassification via  to prevent timeouts.
 
 **key DB schema**
 -   **celebrities**: 
+-   **leagues**: 
+-   **league_chats**: 
 
 **changes in tech stack**
 -   None.
 
 **All files of reference**
--   : Heavily modified. Contains new admin endpoints for Wikidata/Wikipedia updates, the advanced bio-parsing and categorization logic, and updated news-fetching logic (7-day window, more sources, stricter matching).
--   : Modified to increase the amount of bio text displayed ().
--   : Updated to reflect completed work.
+-   : The central file for all new features, including the tiering system, categorization logic, league and chat endpoints, and the scheduler setup. Urgently needs refactoring.
+-   : A new, large component that handles all UI for the Friends Leagues feature, including leaderboards and chat.
+-   : Modified to integrate the league components and other UI tweaks.
+-   : A new script created to run the full, long-running celebrity reclassification process.
 
 **Areas that need refactoring**:
--   **Critical**: . The file has become extremely large and difficult to maintain. The task to migrate endpoints into the  directory should be prioritized after the current user requests are fulfilled.
+-   **Critical**: . The file is now over 7,000 lines and contains logic for authentication, celebrity data, news, teams, leagues, chat, tiering, and scheduling. It is extremely difficult to maintain. The Backend Refactoring task to move logic into the  directory and new utility modules is of the highest priority after current user requests are resolved.
 
 **key api endpoints**
--   ****: New endpoint to fetch images and categories from Wikidata.
--   ****: New endpoint to fetch Wikipedia bios and perform advanced recategorization.
--   ****: New endpoint to monitor data update progress.
+-   : Triggers the background reclassification of all celebrities.
+-   : Checks the status of the running background jobs.
+-   : Creates a new friends league.
+-   : Joins an existing league with a code.
+-   : Fetches the weekly leaderboard for a league.
+-   : Fetches the monthly leaderboard for a league.
+-   : Fetches chat messages for a league.
+-   : Posts a message to a league's chat.
 
 **Critical Info for New Agent**
--   **UI Change Required**: The user's highest priority is a UI change. The bio text on the celebrity card needs to be smaller and repositioned so it doesn't obscure the celebrity's face. This will require CSS adjustments in .
--   **Data Accuracy**: The user is highly focused on the quality of the data. Be prepared to perform targeted data fixes for specific celebrities.
--   **Production Mobile Bug**: Reiterate to the user that this issue cannot be fixed by you and they must contact Emergent Support. Do not attempt to debug it.
--   **Backend Refactoring**: The backend  is now over 5,500 lines long. This refactoring task is overdue and should be addressed soon.
+-   **Fix Category Logic First**: The user's highest priority is fixing the category detection logic in  to correctly identify the *first* occupation in a bio. This is a recurring issue and a major point of user frustration.
+-   **Verify Missing Images**: Immediately investigate why Adele and Dua Lipa are reported as missing images and fix them.
+-   **Backend is Unwieldy**: Be aware that  is extremely monolithic. Be careful when making changes and prioritize the refactoring task as soon as the user's immediate data fixes are complete.
+-   **Production Mobile Bug is Not Your Task**: Do not attempt to debug the user-reported mobile production bug. Remind the user to contact Emergent Support.
 
 **documents and test reports created in this job**
--    (updated)
+-    (updated multiple times)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: Recategorize celebs based on first occupation and fix bios. **Status: Completed**.
-2.  **User**: Data fixes: Correct Pink, remove duplicate Lilibet, remove bands/groups, fix Kim K pic, recategorize several celebs. **Status: Completed**.
-3.  **User**: Remove TV shows, fix King Charles III, randomize C-list/D-list prices, re-add news from past 2 months. **Status: Completed**.
-4.  **User**: Fix Davide Sanclimenti's wiki link, move Usher from D-list, remove Unbox Therapy, move Ekin-Su. **Status: Completed**.
-5.  **User**: Fix  category, add images for Graham Norton, Charlie Dimmock, Richard Hammond, and other A/B/C-listers. **Status: Completed**.
-6.  **User**: Make sure news is showing. **Status: Completed**.
-7.  **User**: Remove the 326 celebs without pictures, add more celebs to . **Status: Completed**.
-8.  **User**: Add 50 more TV stars, move Anna Maxwell Martin, fix news to be 2 months and use full name matching (re: Michael Jordan). **Status: Completed**.
-9.  **User**: Change news to 7 days, add more RSS sources, disable AI news, and add more bio text to celebrity cards. **Status: Completed**.
-10. **User (Pending)**: add a pic for jake paul, martha stewart,kim kardashian, move charlie kirk into public figure, add a few more uk stars to reality tv but only if they have pics, make the text smaller for the bio and move it all around so the celebs face can be seen. add 10 more uk tv stars with pics. **Status: NOT STARTED**.
+1.  **User**: Fix Craig Ferguson's category/tier. **Status: Completed**.
+2.  **User**: Fix Adele's picture and ensure the category detection *always* takes the first occupation, citing Damian Lewis as an example. **Status: Completed**.
+3.  **User**: Reiterate that Adele and Dua Lipa need pictures and the first occupation logic must be fixed, citing Keanu Reeves. **Status: PENDING**.
+4.  **User**: Remove found toast message on celebrity click. **Status: Completed**.
+5.  **User**: Fix David Bowie's tier (he wasn't in DB). **Status: Completed**.
+6.  **User**: Update transfer window to Sunday 12pm-12am. **Status: Completed**.
+7.  **User**: Fix Robert Downey Jr.'s tier and improve the classification system. **Status: Completed**.
+8.  **User**: Fix YouTubers being classified as movie stars and prioritize the first occupation. **Status: Completed**.
+9.  **User**: Fix Dermot O'Leary's category and improve system reliability. **Status: Completed**.
+10. **User**: Remove all disambiguation pages (e.g., Sean Delaney may refer to...). **Status: Completed**.
 
 **Project Health Check:**
 -   **Broken**:
-    -   The user reports the production mobile view is broken (unverified by agent, recurring).
+    -   User reports the production mobile view is broken (unverified by agent, recurring).
 -   **Mocked**: None.
 
 **3rd Party Integrations**
@@ -157,10 +171,10 @@ A full-stack application (React/FastAPI/MongoDB) with a database of approximatel
 -   **Testing agent used after significant changes**: NO
 -   **Troubleshoot agent used after agent stuck in loop**: NO
 -   **Test files created**: None.
--   **Known regressions**: User-reported broken mobile view on production deployment (persists from previous fork).
+-   **Known regressions**: User-reported broken mobile view on production deployment.
 
 **Credentials to test flow:**
 -   None required. Authentication uses the Emergent-managed Google login flow.
 
 **What agent forgot to execute**
--   The agent has not forgotten any tasks but has not yet started the user's most recent request.</analysis>
+-   The agent did not forget any tasks but was interrupted mid-task. The work on fixing the category detection logic and adding missing images for Adele/Dua Lipa must be resumed immediately.</analysis>
