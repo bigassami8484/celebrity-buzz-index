@@ -2035,17 +2035,9 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
                         title = decode_html_entities(title)
                         title_lower = title.lower()
                         
-                        # Also check description/content for mentions
-                        desc_text = ""
-                        if "<description>" in item:
-                            desc_start = item.find("<description>") + 13
-                            desc_end = item.find("</description>")
-                            if desc_end > desc_start:
-                                desc_text = item[desc_start:desc_end].replace("<![CDATA[", "").replace("]]>", "").strip()
-                                desc_text = decode_html_entities(desc_text).lower()
-                        
-                        # Combined text to search
-                        search_text = f"{title_lower} {desc_text}"
+                        # For name matching, we ONLY check the TITLE to avoid false positives
+                        # from articles that merely mention a celebrity in passing in the description
+                        search_text = title_lower
                         
                         # Check if celebrity is mentioned - STRICT FULL NAME MATCHING ONLY
                         celeb_mentioned = False
