@@ -1991,18 +1991,112 @@ def detect_category_from_bio(bio: str, name: str) -> str:
     bio_lower = bio.lower()
     name_lower = name.lower()
     
-    # SPECIFIC CELEBRITY CATEGORY OVERRIDES - takes highest priority
+    # GUARANTEED CATEGORY OVERRIDES - takes highest priority
+    # These are celebrities whose primary occupation is well-known
+    GUARANTEED_CATEGORIES = {
+        # TV Presenters/Hosts
+        "tv_personalities": [
+            "graham norton", "james corden", "jonathan ross", "alan carr", "piers morgan",
+            "david letterman", "jimmy fallon", "jimmy kimmel", "ellen degeneres", "oprah winfrey",
+            "conan o'brien", "stephen colbert", "trevor noah", "holly willoughby", "phillip schofield",
+            "ant mcpartlin", "declan donnelly", "lorraine kelly", "rylan clark", "claudia winkleman",
+            "dermot o'leary", "amanda holden", "simon cowell", "david attenborough", "gordon ramsay",
+            "jamie oliver", "nigella lawson", "mary berry", "paul hollywood", "prue leith",
+            "ainsley harriott", "delia smith", "heston blumenthal", "marco pierre white",
+            "guy fieri", "bobby flay", "rachael ray", "ina garten", "ryan seacrest",
+            "seth meyers", "john oliver", "wendy williams", "steve harvey", "nick cannon",
+            "howie mandel", "louis walsh", "sharon osbourne", "nicole scherzinger",
+            "alesha dixon", "david walliams", "bruno tonioli", "tess daly", "zoe ball",
+            "vernon kay", "matt baker", "alex jones", "naga munchetty", "charlie stayt",
+            "susanna reid", "ben shephard", "kate garraway", "richard madeley", "judy finnigan",
+            "christine lampard", "emma willis", "regis philbin", "keke palmer", "fearne cotton",
+            "scott mills", "craig ferguson", "drew barrymore", "sherri shepherd", "mario lopez",
+            "kelly ripa", "mayim bialik", "lawrence o'donnell",
+        ],
+        
+        # Reality TV Stars
+        "reality_tv": [
+            "katie price", "kerry katona", "gemma collins", "peter andre", "joey essex",
+            "kim kardashian", "kylie jenner", "kendall jenner", "khloé kardashian",
+            "kourtney kardashian", "kris jenner", "paris hilton", "nicole richie",
+            "caitlyn jenner", "jojo siwa", "stacey solomon", "joe swash",
+            "charlotte crosby", "vicky pattison", "tommy fury", "molly-mae hague",
+            "ekin-su cülcüloğlu", "davide sanclimenti", "dani dyer", "olivia attwood",
+            "amber gill", "millie court", "tasha ghouri", "nicole snooki polizzi",
+            "bethenny frankel", "lisa vanderpump", "kyle richards", "teresa giudice",
+            "chloe ferry", "scotty t", "marnie simpson", "jamie laing", "sam thompson",
+            "zara mcdermott", "georgia toffolo", "spencer matthews", "lucy watson",
+        ],
+        
+        # Athletes
+        "athletes": [
+            "david beckham", "cristiano ronaldo", "lionel messi", "lebron james",
+            "michael jordan", "serena williams", "venus williams", "roger federer",
+            "rafael nadal", "novak djokovic", "tiger woods", "usain bolt",
+            "simone biles", "michael phelps", "tom brady", "patrick mahomes",
+            "lewis hamilton", "max verstappen", "conor mcgregor", "floyd mayweather",
+            "wayne rooney", "harry kane", "marcus rashford", "bukayo saka",
+            "neymar", "kylian mbappé", "erling haaland", "kevin de bruyne",
+            "mo salah", "jack grealish", "gareth bale", "emma raducanu",
+            "anthony joshua", "tyson fury", "ronda rousey", "amanda nunes",
+            "travis kelce", "jonathan owens", "tyreek hill",
+        ],
+        
+        # Musicians (primary occupation is music, even if they've acted)
+        "musicians": [
+            "taylor swift", "beyoncé", "beyonce", "rihanna", "drake", "ed sheeran",
+            "lady gaga", "bruno mars", "justin bieber", "ariana grande",
+            "kanye west", "jay-z", "eminem", "madonna", "cher",
+            "elton john", "paul mccartney", "mick jagger", "bono", "sting",
+            "celine dion", "mariah carey", "janet jackson", "diana ross",
+            "harry styles", "billie eilish", "dua lipa", "the weeknd",
+            "post malone", "bad bunny", "doja cat", "lizzo", "cardi b",
+            "nicki minaj", "katy perry", "miley cyrus", "selena gomez",
+            "demi lovato", "shawn mendes", "camila cabello", "halsey",
+            "adele", "sam smith", "lewis capaldi", "robbie williams",
+            "gary barlow", "olly murs", "craig david", "stormzy",
+            "victoria beckham", "mel b", "mel c", "geri halliwell",
+            "dolly parton", "barbra streisand", "tina turner", "aretha franklin",
+            "stevie wonder", "bob dylan", "bruce springsteen", "eric clapton",
+            "phil collins", "rod stewart", "billy joel", "debbie harry",
+            "50 cent", "snoop dogg", "dr. dre", "ice cube",
+            "britney spears", "christina aguilera", "whitney houston",
+            "michael jackson", "prince", "david bowie", "freddie mercury",
+        ],
+        
+        # Royals
+        "royals": [
+            "king charles iii", "king charles", "queen elizabeth", "prince william",
+            "kate middleton", "catherine", "princess of wales", "prince harry",
+            "meghan markle", "duchess of sussex", "princess diana", "camilla",
+            "prince andrew", "andrew mountbatten-windsor", "princess beatrice",
+            "princess eugenie", "prince edward", "princess anne", "zara tindall",
+        ],
+        
+        # Public Figures (politicians, business, activists)
+        "public_figure": [
+            "elon musk", "jeff bezos", "bill gates", "mark zuckerberg", "warren buffett",
+            "donald trump", "joe biden", "barack obama", "michelle obama",
+            "boris johnson", "rishi sunak", "keir starmer", "nigel farage",
+            "hillary clinton", "nancy pelosi", "alexandria ocasio-cortez",
+            "vladimir putin", "volodymyr zelenskyy", "pope francis", "dalai lama",
+            "greta thunberg", "malala yousafzai", "joe rogan", "andrew tate",
+            "jordan peterson", "charlie kirk", "ben shapiro", "tucker carlson",
+            "rachel maddow", "anderson cooper", "don lemon", "sean hannity",
+        ],
+    }
+    
+    # Check guaranteed categories first
+    for category, names in GUARANTEED_CATEGORIES.items():
+        if name_lower in names:
+            return category
+    
+    # SPECIFIC CELEBRITY CATEGORY OVERRIDES - secondary priority
     category_overrides = {
         # Musicians - people known primarily for singing
         "peter andre": "musicians",
-        "victoria beckham": "musicians",
         "kerry katona": "musicians",
         "jessica simpson": "musicians",
-        "paris hilton": "other",  # More socialite than musician
-        
-        # Royals
-        "meghan markle": "royals",
-        "meghan, duchess of sussex": "royals",
         
         # Other - notorious/infamous figures
         "ghislaine maxwell": "other",
@@ -2010,64 +2104,10 @@ def detect_category_from_bio(bio: str, name: str) -> str:
         "jeffrey epstein": "other",
         "elizabeth holmes": "other",
         
-        # Public Figures - politicians, business leaders, influencers, activists
-        "elon musk": "public_figure",
-        "donald trump": "public_figure",
-        "joe biden": "public_figure",
-        "boris johnson": "public_figure",
-        "rishi sunak": "public_figure",
-        "keir starmer": "public_figure",
-        "nigel farage": "public_figure",
-        "greta thunberg": "public_figure",
-        "alexandria ocasio-cortez": "public_figure",
-        "joe rogan": "public_figure",
-        "andrew tate": "public_figure",
-        "jordan peterson": "public_figure",
-        "mark zuckerberg": "public_figure",
-        "jeff bezos": "public_figure",
-        "bill gates": "public_figure",
-        "barack obama": "public_figure",
-        "michelle obama": "public_figure",
-        "hillary clinton": "public_figure",
-        "nancy pelosi": "public_figure",
-        "vladimir putin": "public_figure",
-        "volodymyr zelenskyy": "public_figure",
-        "pope francis": "public_figure",
-        "dalai lama": "public_figure",
-        "malala yousafzai": "public_figure",
-        
-        # TV Presenters / Talk Show Hosts - categorize as "other" (their primary job)
-        "graham norton": "other",
-        "james corden": "other",
-        "jonathan ross": "other",
-        "alan carr": "other",
-        "piers morgan": "other",
-        "david letterman": "other",
-        "jimmy fallon": "other",
-        "jimmy kimmel": "other",
-        "ellen degeneres": "other",
-        "oprah winfrey": "other",
-        "conan o'brien": "other",
-        "stephen colbert": "other",
-        "trevor noah": "other",
-        "holly willoughby": "other",
-        "phillip schofield": "other",
-        "ant and dec": "other",
-        "ant mcpartlin": "other",
-        "dec donnelly": "other",
-        "declan donnelly": "other",
-        "lorraine kelly": "other",
-        "rylan clark": "other",
-        "claudia winkleman": "other",
-        "dermot o'leary": "other",
-        "amanda holden": "other",
-        "simon cowell": "other",
-        "david attenborough": "other",
-        
         # Movie Stars - actors who may have "musician" keywords in bio due to film soundtracks
         "timothée chalamet": "movie_stars",
         "shia labeouf": "movie_stars",
-        "richard madden": "movie_stars",  # Game of Thrones, Bodyguard
+        "richard madden": "movie_stars",
         
         # TV Actors - primarily known for TV roles
         "jenna coleman": "tv_actors",
@@ -2075,9 +2115,6 @@ def detect_category_from_bio(bio: str, name: str) -> str:
         "ncuti gatwa": "tv_actors",
         "olivia colman": "tv_actors",
         "jessica alba": "tv_actors",
-        
-        # Athletes - NFL players and sports figures
-        "jonathan owens": "athletes",
         "tyreek hill": "athletes",
         "simone biles": "athletes",
         "lebron james": "athletes",
