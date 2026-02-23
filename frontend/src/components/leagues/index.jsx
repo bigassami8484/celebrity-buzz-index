@@ -556,9 +556,9 @@ export const LeagueDetailModal = ({ league, leaderboard, onClose, teamId, apiUrl
 export const Leaderboard = ({ entries }) => {
   const [expanded, setExpanded] = useState(false);
   
-  // Show 5 collapsed, 10 expanded
+  // Desktop always shows 10, mobile shows 5 collapsed / 10 expanded
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const displayCount = expanded ? 10 : 5;
+  const displayCount = isMobile ? (expanded ? 10 : 5) : 10;
   const placeholderRows = Array.from({ length: displayCount }, (_, i) => i + 1);
   
   return (
@@ -584,18 +584,20 @@ export const Leaderboard = ({ entries }) => {
         </div>
       ))}
       
-      {/* Expand/Collapse button */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full mt-3 py-2 text-xs text-[#00F0FF] flex items-center justify-center gap-1 hover:bg-[#1A1A1A] rounded transition-colors border border-[#262626]"
-        data-testid="leaderboard-expand-btn"
-      >
-        {expanded ? (
-          <>Show Top 5 <ChevronUp className="w-4 h-4" /></>
-        ) : (
-          <>View All 10 <ChevronDown className="w-4 h-4" /></>
-        )}
-      </button>
+      {/* Expand/Collapse button - MOBILE ONLY */}
+      {isMobile && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="w-full mt-3 py-2 text-xs text-[#00F0FF] flex items-center justify-center gap-1 hover:bg-[#1A1A1A] rounded transition-colors border border-[#262626]"
+          data-testid="leaderboard-expand-btn"
+        >
+          {expanded ? (
+            <>Show Top 5 <ChevronUp className="w-4 h-4" /></>
+          ) : (
+            <>View All 10 <ChevronDown className="w-4 h-4" /></>
+          )}
+        </button>
+      )}
     </div>
   );
 };
