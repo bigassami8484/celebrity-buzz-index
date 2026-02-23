@@ -1872,14 +1872,15 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
     """
     Fetch REAL news about a specific celebrity from RSS feeds.
     Searches ALL major entertainment news sources for mentions of the celebrity.
-    Returns list of real news articles from the last 2 months.
+    Returns list of real news articles from the last 7 DAYS (weekly points system).
     """
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
     
-    # COMPREHENSIVE RSS feeds - ALL major entertainment sources
+    # COMPREHENSIVE RSS feeds - ALL major UK & US entertainment sources
     rss_sources = [
         # UK TABLOIDS & SHOWBIZ
-        ("https://www.dailymail.co.uk/tvshowbiz/index.rss", "Daily Mail"),
+        ("https://www.dailymail.co.uk/tvshowbiz/index.rss", "Daily Mail UK"),
+        ("https://www.dailymail.co.uk/usshowbiz/index.rss", "Daily Mail US"),
         ("https://www.thesun.co.uk/tvandshowbiz/feed/", "The Sun"),
         ("https://www.mirror.co.uk/3am/rss.xml", "Daily Mirror"),
         ("https://metro.co.uk/entertainment/feed/", "Metro"),
@@ -1889,6 +1890,7 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
         ("https://www.independent.co.uk/topic/celebrities/rss", "The Independent"),
         ("https://www.ok.co.uk/celebrity-news/feed", "OK! Magazine"),
         ("https://www.hellomagazine.com/celebrities/rss/", "Hello!"),
+        ("https://news.sky.com/feeds/rss/entertainment.xml", "Sky News"),
         
         # US ENTERTAINMENT & GOSSIP
         ("https://www.tmz.com/rss.xml", "TMZ"),
@@ -1900,6 +1902,8 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
         ("https://www.justjared.com/feed/", "Just Jared"),
         ("https://www.buzzfeed.com/celebrity.xml", "BuzzFeed"),
         ("https://www.huffpost.com/section/entertainment/feed", "HuffPost"),
+        ("https://news.yahoo.com/rss/entertainment", "Yahoo News"),
+        ("https://www.nationalenquirer.com/feed/", "National Enquirer"),
         
         # HOLLYWOOD TRADE
         ("https://variety.com/feed/", "Variety"),
@@ -1919,9 +1923,10 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
         ("https://www.cbsnews.com/latest/rss/entertainment", "CBS News"),
         ("https://abcnews.go.com/abcnews/entertainmentheadlines", "ABC News"),
         ("https://www.reuters.com/news/archive/entertainmentNews?view=feed&type=rss", "Reuters"),
+        ("https://www.bloomberg.com/feeds/sitemap_news.xml", "Bloomberg"),
         
-        # SPORTS (for footballer celebrities)
-        ("https://www.skysports.com/rss/12040", "Sky Sports"),
+        # SPORTS (for athlete celebrities)
+        ("https://news.sky.com/feeds/rss/sports.xml", "Sky Sports"),
         ("https://www.bbc.co.uk/sport/rss.xml", "BBC Sport"),
         ("https://www.espn.com/espn/rss/news", "ESPN"),
         ("https://www.goal.com/en/feeds/news", "Goal"),
