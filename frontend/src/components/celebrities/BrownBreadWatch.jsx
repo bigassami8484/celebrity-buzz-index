@@ -1,6 +1,9 @@
-import { Skull } from "lucide-react";
+import { useState } from "react";
+import { Skull, ChevronDown, ChevronUp } from "lucide-react";
 
 const BrownBreadWatch = ({ watchList, onSelect }) => {
+  const [expanded, setExpanded] = useState(false);
+  
   if (!watchList || watchList.length === 0) return null;
   
   const getRiskEmoji = (risk) => {
@@ -13,6 +16,11 @@ const BrownBreadWatch = ({ watchList, onSelect }) => {
     }
   };
   
+  // Show 3 on mobile (collapsed), all when expanded or on desktop
+  const isMobile = window.innerWidth < 768;
+  const displayList = isMobile && !expanded ? watchList.slice(0, 3) : watchList.slice(0, 10);
+  const hasMore = isMobile && watchList.length > 3;
+  
   return (
     <div className="bg-[#0A0A0A] border border-[#262626] p-4 mb-4" data-testid="brown-bread-watch">
       <h4 className="font-anton text-lg uppercase tracking-tight text-[#888] mb-3 flex items-center gap-2">
@@ -21,7 +29,7 @@ const BrownBreadWatch = ({ watchList, onSelect }) => {
       </h4>
       <p className="text-xs text-[#666] mb-3">Strategic picks for the +100 bonus 💀</p>
       <div className="space-y-2">
-        {watchList.slice(0, 10).map((celeb, idx) => (
+        {displayList.map((celeb, idx) => (
           <div 
             key={celeb.id} 
             className={`flex items-center gap-3 p-2 hover:bg-[#1A1A1A] cursor-pointer ${celeb.is_premium ? 'border-l-2 border-[#FFD700] bg-[#FFD700]/5' : ''}`}
@@ -52,6 +60,21 @@ const BrownBreadWatch = ({ watchList, onSelect }) => {
           </div>
         ))}
       </div>
+      
+      {/* Expand/Collapse button for mobile */}
+      {hasMore && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="w-full mt-3 py-2 text-xs text-[#00F0FF] flex items-center justify-center gap-1 hover:bg-[#1A1A1A] rounded transition-colors"
+          data-testid="brown-bread-expand-btn"
+        >
+          {expanded ? (
+            <>Show Less <ChevronUp className="w-4 h-4" /></>
+          ) : (
+            <>View All {watchList.length} <ChevronDown className="w-4 h-4" /></>
+          )}
+        </button>
+      )}
     </div>
   );
 };
