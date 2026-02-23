@@ -11,6 +11,12 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 
 ## Latest Updates (Feb 23, 2026)
 
+### Search Price/Tier Mismatch Fix (Feb 23, 2026)
+- ✅ **Fixed autocomplete price inconsistency** - Autocomplete endpoint was using wrong cache type (`hot_celebs`) instead of correct one (`hot_celebs_from_news_v4`)
+- ✅ **Hot celeb premium pricing in autocomplete** - Now applies premium pricing to partial matches in autocomplete, not just exact matches
+- ✅ **Verified mobile view in preview** - Mobile rendering working correctly with proper responsive layout
+- ✅ **Search debounce already reduced** - Was set to 150ms (previously 300ms) for faster response
+
 ### Data Quality Fixes (Feb 23, 2026 - Session 2)
 - ✅ **Adele image fixed** - Updated Wikipedia image URL (was returning 429 rate limit)
 - ✅ **Dua Lipa image fixed** - Updated Wikipedia image URL (was returning 429 rate limit)
