@@ -5225,9 +5225,12 @@ async def update_celebrity_data_from_wikidata(batch_size: int = 20, delay_second
         'Accept': 'application/json'
     }
     
-    # Find celebrities needing updates (missing real image)
+    # Find celebrities needing updates (missing real image AND not already checked)
     celebs_needing_update = await db.celebrities.find(
-        {'image': {'$regex': 'ui-avatars', '$options': 'i'}},
+        {
+            'image': {'$regex': 'ui-avatars', '$options': 'i'},
+            'wikidata_checked': {'$ne': True}  # Skip already checked ones
+        },
         {'_id': 0, 'id': 1, 'name': 1, 'category': 1, 'image': 1}
     ).limit(batch_size).to_list(batch_size)
     
@@ -5239,9 +5242,12 @@ async def update_celebrity_data_from_wikidata(batch_size: int = 20, delay_second
             "remaining": 0
         }
     
-    # Count remaining
+    # Count remaining (not yet checked)
     remaining_count = await db.celebrities.count_documents(
-        {'image': {'$regex': 'ui-avatars', '$options': 'i'}}
+        {
+            'image': {'$regex': 'ui-avatars', '$options': 'i'},
+            'wikidata_checked': {'$ne': True}
+        }
     )
     
     updated = 0
@@ -5258,7 +5264,7 @@ async def update_celebrity_data_from_wikidata(batch_size: int = 20, delay_second
                 # Fetch data from Wikidata
                 wiki_data = await fetch_wikidata_info(name, client, headers)
                 
-                update_fields = {}
+                update_fields = {'wikidata_checked': True}  # Mark as checked
                 
                 # Update image if found
                 if wiki_data['image_url']:
