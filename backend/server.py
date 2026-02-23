@@ -4338,23 +4338,29 @@ async def get_triggered_watches(team_id: str):
     ).to_list(100)
     
     triggered = []
-    for watch in watches:
-        celeb = await db.celebrities.find_one(
-            {"name": {"$regex": f"^{watch['celebrity_name']}$", "$options": "i"}},
-            {"_id": 0, "price": 1, "tier": 1, "image": 1}
-        )
-        if celeb:
-            current_price = celeb.get("price", 0)
-            is_triggered = (
-                current_price <= watch["target_price"] if watch["alert_type"] == "below"
-                else current_price >= watch["target_price"]
-            )
-            if is_triggered:
-                watch["current_price"] = current_price
-                watch["tier"] = celeb.get("tier", "D")
-                watch["image"] = celeb.get("image", "")
-                watch["target_reached"] = True
-                triggered.append(watch)
+    if watches:
+        # Batch fetch all celebrities in one query (fix N+1 problem)
+        celeb_names = [w['celebrity_name'] for w in watches]
+        celebs = await db.celebrities.find(
+            {"name": {"$in": celeb_names}},
+            {"_id": 0, "name": 1, "price": 1, "tier": 1, "image": 1}
+        ).to_list(100)
+        celeb_map = {c['name'].lower(): c for c in celebs}
+        
+        for watch in watches:
+            celeb = celeb_map.get(watch['celebrity_name'].lower())
+            if celeb:
+                current_price = celeb.get("price", 0)
+                is_triggered = (
+                    current_price <= watch["target_price"] if watch["alert_type"] == "below"
+                    else current_price >= watch["target_price"]
+                )
+                if is_triggered:
+                    watch["current_price"] = current_price
+                    watch["tier"] = celeb.get("tier", "D")
+                    watch["image"] = celeb.get("image", "")
+                    watch["target_reached"] = True
+                    triggered.append(watch)
     
     return {"triggered_watches": triggered, "count": len(triggered)}
 
