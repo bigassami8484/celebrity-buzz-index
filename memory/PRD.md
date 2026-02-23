@@ -26,6 +26,22 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - ✅ **Share to Social**: WhatsApp, X (Twitter), Facebook sharing
 - ✅ **League Stats**: Weeks played, total celebs, most decorated team
 
+### Automated Tier Classification System (NEW!)
+- ✅ **Wikipedia Language Editions**: More languages = global recognition
+  - 80+ languages → A-list
+  - 50-80 languages → High recognition
+  - 30-50 languages → International
+  - <30 languages → Limited recognition
+- ✅ **Years Active**: Career longevity detection
+- ✅ **Award Scoring**: Detects Oscars, Grammys, Emmys, Olympic medals, etc.
+- ✅ **Career Quality Detection**:
+  - Reality TV/Influencer → Lower tier (-10 to -15 points)
+  - Box office/Blockbuster → Higher tier (+15-20 points)
+  - Royal/Political status → A-list automatic (+30-40 points)
+- ✅ **Admin Endpoints**:
+  - `POST /api/admin/reclassify-tiers` - Batch reclassify all celebrities
+  - `GET /api/admin/test-tier-calculation/{name}` - Test tier for specific celebrity
+
 ### Automated Schedulers
 - ✅ **Daily Points Update**: 23:00 UTC - Updates team points daily
 - ✅ **Weekly League Scoring**: Sunday 23:59 UTC - Records weekly winners, awards badges
