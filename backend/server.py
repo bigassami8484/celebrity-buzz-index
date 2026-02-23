@@ -3021,7 +3021,7 @@ async def autocomplete_search(q: str):
         price = exact_match.get("price", get_base_price_for_tier(tier, exact_match["name"]))
         
         # Check if in hot celebs - use premium price
-        hot_price, hot_tier = get_hot_celeb_price(exact_match["name"])
+        hot_price, hot_tier, is_hot = get_hot_celeb_price(exact_match["name"])
         if hot_price:
             price = hot_price
             tier = hot_tier or tier
@@ -3034,7 +3034,7 @@ async def autocomplete_search(q: str):
             "price": price,
             "estimated_price": price,
             "is_exact_match": True,
-            "is_hot": hot_price is not None
+            "is_hot": is_hot
         })
     
     # PRIORITY 2: Check database for partial matches (starts with query)
