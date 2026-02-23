@@ -1358,7 +1358,7 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 
                 # FIRST: Check if this celeb is in the Hot Celebs cache - use that price
                 hot_celebs_cache = await db.news_cache.find_one(
-                    {"type": "hot_celebs_from_news_v2"},
+                    {"type": "hot_celebs_from_news_v4"},
                     {"_id": 0, "hot_celebs": 1}
                 )
                 hot_celeb_match = None
