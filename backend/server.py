@@ -1036,6 +1036,10 @@ GUARANTEED_A_LIST = [
     "oprah winfrey", "kim kardashian", "elon musk", "jeff bezos", "cristiano ronaldo",
     "lionel messi", "lebron james", "serena williams", "roger federer", "michael jordan",
     "david beckham", "barack obama", "donald trump", "joe biden", "bill gates",
+    # Victoria Beckham & One Direction
+    "victoria beckham", "harry styles", "zayn malik", "niall horan", "liam payne", "louis tomlinson",
+    # Katie Price & other major UK celebs
+    "katie price", "gemma collins", "peter andre", "cheryl", "robbie williams",
     # British Royal Family (all variations including Wikipedia formal names)
     "prince william", "william, prince of wales", "william prince of wales",
     "prince harry", "harry, duke of sussex", "harry duke of sussex", "prince harry, duke of sussex", "prince harry duke of sussex",
