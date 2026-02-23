@@ -3902,23 +3902,33 @@ async def get_hot_celebs():
                     if image and "wikipedia" in image.lower():
                         bio = wiki_data.get("extract", "")
                         actual_name = wiki_data.get("title", name)
-                        tier = determine_tier_from_bio(bio, actual_name)
-                        category = get_category_from_bio(bio, actual_name)
-                        base_price = get_dynamic_price(tier, 50, actual_name)
                         
-                        # Apply NEWS PREMIUM based on mention count
-                        # More mentions = higher price (capped at 3x base)
+                        # First check if celeb exists in database to use their stored tier/price
+                        db_celeb = await db.celebrities.find_one(
+                            {"name": {"$regex": f"^{actual_name}$", "$options": "i"}}
+                        )
+                        
+                        if db_celeb:
+                            # Use database values for consistency
+                            tier = db_celeb.get("tier", "C")
+                            category = db_celeb.get("category", "other")
+                            base_price = db_celeb.get("price", 3.0)
+                        else:
+                            # Calculate for new celebs
+                            tier = determine_tier_from_bio(bio, actual_name)
+                            category = get_category_from_bio(bio, actual_name)
+                            base_price = get_base_price_for_tier(tier, actual_name)
+                        
+                        # Apply small NEWS PREMIUM based on mention count (max 20% boost)
                         mention_count = data["count"]
                         if mention_count >= 5:
-                            news_multiplier = 3.0  # 5+ mentions = 3x price
+                            news_multiplier = 1.15  # 5+ mentions = 15% price boost
                         elif mention_count >= 3:
-                            news_multiplier = 2.0  # 3-4 mentions = 2x price
+                            news_multiplier = 1.10  # 3-4 mentions = 10% price boost
                         else:
-                            news_multiplier = 1.5  # Should have at least 3 mentions to get here
+                            news_multiplier = 1.05  # Small boost for being in news
                         
                         price = round(base_price * news_multiplier, 1)
-                        # Cap at £15M unless Brown Bread premium
-                        price = min(price, 15.0)
                         
                         # Show the headlines that put them on the banner
                         hot_reason = data["headline"][:80] + "..." if data["headline"] else "Trending in news"
@@ -3939,7 +3949,7 @@ async def get_hot_celebs():
                             "news_premium": news_multiplier > 1.0,
                             "trending_tag": trending_tag,
                             "hot_reason": hot_reason,
-                            "news_headlines": data.get("headlines", [])[:3],  # Include actual headlines
+                            "news_headlines": data.get("headlines", [])[:3],
                             "image": image,
                             "mention_count": mention_count
                         })
