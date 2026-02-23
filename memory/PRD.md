@@ -11,6 +11,13 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 
 ## Latest Updates (Feb 23, 2026)
 
+### Data Quality Fixes (Feb 23, 2026 - Session 2)
+- ✅ **Adele image fixed** - Updated Wikipedia image URL (was returning 429 rate limit)
+- ✅ **Dua Lipa image fixed** - Updated Wikipedia image URL (was returning 429 rate limit)
+- ✅ **Damian Lewis category fixed** - Changed from `tv_actors` to `movie_stars` (bio says "actor and musician" - actor comes first)
+- ✅ **Transfer Window banner fixed** - Changed from "Sat 12pm" to "Sun 12pm" in HowItWorks.jsx
+- ✅ **Keanu Reeves verified** - Already correctly classified as `movie_stars`
+
 ### Friends League Feature (NEW!)
 - ✅ **Create Leagues**: Users can create private leagues with up to 10 friends
 - ✅ **Join via Code**: 6-character invite codes for easy sharing
