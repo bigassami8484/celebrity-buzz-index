@@ -3274,15 +3274,15 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
             existing["news_premium"] = hot_celeb_match.get("news_premium", False)
             existing["trending_tag"] = hot_celeb_match.get("trending_tag", "")
         else:
-            # Use CONSISTENT pricing - same as Hot Celebs (buzz_score = 50)
-            # Use A-tier for mega-stars
+            # Use database price - it's already correctly varied
             tier = "A" if (is_mega_star or is_royal) else existing.get("tier", "D")
             existing["tier"] = tier
-            default_buzz = 50
-            new_price = get_dynamic_price(tier, default_buzz, celeb_name)
+            
+            # Use the stored price from database (already has proper variation)
+            db_price = existing.get("price", 3.0)
             
             # Check if this celeb qualifies for Brown Bread premium pricing
-            new_price = await apply_brown_bread_premium(existing, new_price)
+            new_price = await apply_brown_bread_premium(existing, db_price)
             existing["price"] = new_price
         
         # Check if image is a placeholder - refresh in background (don't block response)
