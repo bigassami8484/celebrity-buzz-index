@@ -44,7 +44,7 @@ const PriceChangeIndicator = ({ currentPrice, previousPrice }) => {
   );
 };
 
-const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford, onShowPriceHistory, compact = false }) => {
+const CelebrityCard = ({ celebrity, onAdd, onRemove, isInTeam, canAfford, onShowPriceHistory, compact = false }) => {
   const [showNews, setShowNews] = useState(false);
   const Icon = categoryIcons[celebrity.category] || Star;
   
@@ -95,18 +95,27 @@ const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford, onShowPriceHisto
             </a>
           )}
           
-          <button
-            onClick={() => onAdd(celebrity)}
-            disabled={isInTeam || !canAfford}
-            className={`w-full py-1.5 text-xs font-bold rounded transition-colors ${
-              isInTeam ? 'bg-[#333] text-[#666]' : 
-              !canAfford ? 'bg-[#333] text-[#666]' : 
-              'bg-[#FF0099] text-white hover:bg-[#e6008a]'
-            }`}
-            data-testid={`add-btn-${celebrity.id}`}
-          >
-            {isInTeam ? "In Team" : !canAfford ? "Can't Afford" : "Add"}
-          </button>
+          {isInTeam ? (
+            <button
+              onClick={() => onRemove && onRemove(celebrity.id)}
+              className="w-full py-1.5 text-xs font-bold rounded transition-colors bg-red-600 text-white hover:bg-red-700"
+              data-testid={`remove-btn-${celebrity.id}`}
+            >
+              Remove
+            </button>
+          ) : (
+            <button
+              onClick={() => onAdd(celebrity)}
+              disabled={!canAfford}
+              className={`w-full py-1.5 text-xs font-bold rounded transition-colors ${
+                !canAfford ? 'bg-[#333] text-[#666]' : 
+                'bg-[#FF0099] text-white hover:bg-[#e6008a]'
+              }`}
+              data-testid={`add-btn-${celebrity.id}`}
+            >
+              {!canAfford ? "Can't Afford" : "Add"}
+            </button>
+          )}
         </div>
       </div>
     );
