@@ -3544,11 +3544,16 @@ async def get_hot_celebs():
                 
                 celeb_mentions[celeb_name] = {
                     "count": mention_count,
-                    "headline": headline
+                    "headline": headline,
+                    "headlines": [h["title"] for h in all_headlines if name_lower in h["title"].lower()][:5]  # Store up to 5 headlines
                 }
         
-        # Sort by mention count
-        sorted_celebs = sorted(celeb_mentions.items(), key=lambda x: x[1]["count"], reverse=True)
+        # Sort by mention count - ONLY include celebrities with 3+ mentions
+        sorted_celebs = sorted(
+            [(name, data) for name, data in celeb_mentions.items() if data["count"] >= 3],
+            key=lambda x: x[1]["count"], 
+            reverse=True
+        )
         
         # Fetch details for top celebrities - need at least 15 with real photos
         hot_list = []
@@ -3556,6 +3561,11 @@ async def get_hot_celebs():
         for name, data in sorted_celebs:
             if len(hot_list) >= 18:  # Get a few extra in case some don't have photos
                 break
+            
+            # SKIP: Michael Jordan (basketball) - too common a name, causes false matches
+            # Use Michael B. Jordan for the actor instead
+            if name.lower() == "michael jordan":
+                continue
             
             try:
                 wiki_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{name.replace(' ', '_')}"
@@ -3580,16 +3590,15 @@ async def get_hot_celebs():
                             news_multiplier = 3.0  # 5+ mentions = 3x price
                         elif mention_count >= 3:
                             news_multiplier = 2.0  # 3-4 mentions = 2x price
-                        elif mention_count >= 2:
-                            news_multiplier = 1.5  # 2 mentions = 1.5x price
                         else:
-                            news_multiplier = 1.0
+                            news_multiplier = 1.5  # Should have at least 3 mentions to get here
                         
                         price = round(base_price * news_multiplier, 1)
                         # Cap at £15M unless Brown Bread premium
                         price = min(price, 15.0)
                         
-                        hot_reason = data["headline"][:70] + "..." if data["headline"] else "Trending in news"
+                        # Show the headlines that put them on the banner
+                        hot_reason = data["headline"][:80] + "..." if data["headline"] else "Trending in news"
                         
                         # Add trending indicator if high mentions
                         trending_tag = ""
@@ -3597,8 +3606,6 @@ async def get_hot_celebs():
                             trending_tag = "🔥🔥🔥"
                         elif mention_count >= 3:
                             trending_tag = "🔥🔥"
-                        elif mention_count >= 2:
-                            trending_tag = "🔥"
                         
                         hot_list.append({
                             "name": actual_name,
@@ -3609,6 +3616,7 @@ async def get_hot_celebs():
                             "news_premium": news_multiplier > 1.0,
                             "trending_tag": trending_tag,
                             "hot_reason": hot_reason,
+                            "news_headlines": data.get("headlines", [])[:3],  # Include actual headlines
                             "image": image,
                             "mention_count": mention_count
                         })
