@@ -335,7 +335,7 @@ export const LeagueDetailModal = ({ league, leaderboard, onClose, teamId, apiUrl
             </div>
           </div>
           
-          {/* Weekly/Monthly Tabs */}
+          {/* Weekly/Monthly/Chat Tabs */}
           <div className="flex mb-4 bg-[#1A1A1A]">
             <button
               onClick={() => setActiveTab("weekly")}
@@ -359,35 +359,107 @@ export const LeagueDetailModal = ({ league, leaderboard, onClose, teamId, apiUrl
               <CalendarDays className="w-4 h-4" />
               Monthly
             </button>
+            <button
+              onClick={() => setActiveTab("chat")}
+              className={`flex-1 py-3 text-xs font-bold uppercase flex items-center justify-center gap-2 transition-colors ${
+                activeTab === "chat" 
+                  ? "bg-[#FFD700] text-black" 
+                  : "text-[#A1A1AA] hover:text-white"
+              }`}
+            >
+              <MessageCircle className="w-4 h-4" />
+              Chat
+            </button>
           </div>
           
-          {/* Leaderboard */}
-          <h4 className="font-anton text-lg uppercase text-[#00F0FF] mb-3 flex items-center gap-2">
-            <Trophy className="w-5 h-5" />
-            {activeTab === "weekly" ? "This Week's Standings" : "Monthly Standings"}
-          </h4>
-          
-          {loading ? (
-            <div className="text-center py-8 text-[#A1A1AA]">Loading...</div>
-          ) : currentLeaderboard.length > 0 ? (
-            <div className="space-y-2">
-              {currentLeaderboard.map((entry, idx) => (
-                <div
-                  key={entry.team_id}
-                  className={`flex items-center gap-3 p-3 ${
-                    entry.team_id === teamId 
-                      ? 'bg-[#FF0099]/20 border border-[#FF0099]' 
-                      : 'bg-[#1A1A1A]'
-                  }`}
+          {/* Chat Tab Content */}
+          {activeTab === "chat" ? (
+            <div className="flex flex-col h-[400px]">
+              {/* Chat Messages */}
+              <div className="flex-1 overflow-y-auto bg-[#1A1A1A] p-3 space-y-3 mb-3">
+                {chatMessages.length === 0 ? (
+                  <p className="text-center text-[#666] py-8">No messages yet. Start the banter! 🔥</p>
+                ) : (
+                  chatMessages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={`flex gap-2 ${msg.team_id === teamId ? 'flex-row-reverse' : ''}`}
+                    >
+                      <div
+                        className={`max-w-[80%] p-2 rounded ${
+                          msg.team_id === teamId 
+                            ? 'bg-[#FF0099]/30 border border-[#FF0099]' 
+                            : 'bg-[#262626]'
+                        }`}
+                      >
+                        <p className="text-xs font-bold mb-1" style={{ color: TEAM_COLORS[msg.team_color] || "#00F0FF" }}>
+                          {msg.team_name}
+                          {msg.team_id === league.owner_team_id && <Crown className="w-3 h-3 inline ml-1 text-[#FFD700]" />}
+                        </p>
+                        <p className="text-sm">{msg.message}</p>
+                        <p className="text-xs text-[#666] mt-1">
+                          {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+                <div ref={chatEndRef} />
+              </div>
+              
+              {/* Chat Input */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Talk trash..."
+                  className="flex-1 bg-[#1A1A1A] border border-[#262626] p-2 text-sm text-white"
+                  maxLength={500}
+                  disabled={!teamId}
+                />
+                <button
+                  onClick={sendMessage}
+                  disabled={!newMessage.trim() || sendingMessage || !teamId}
+                  className="bg-[#FFD700] text-black px-4 py-2 font-bold uppercase text-xs disabled:opacity-50 flex items-center gap-1"
                 >
-                  {/* Rank */}
-                  <span className={`font-anton text-xl w-8 ${
-                    idx === 0 ? 'text-[#FFD700]' 
-                    : idx === 1 ? 'text-[#C0C0C0]' 
-                    : idx === 2 ? 'text-[#CD7F32]' 
-                    : 'text-[#666]'
-                  }`}>
-                    #{idx + 1}
+                  <Send className="w-4 h-4" />
+                </button>
+              </div>
+              {!teamId && (
+                <p className="text-xs text-[#FF0099] mt-2">Create a team to join the chat!</p>
+              )}
+            </div>
+          ) : (
+            <>
+              {/* Leaderboard */}
+              <h4 className="font-anton text-lg uppercase text-[#00F0FF] mb-3 flex items-center gap-2">
+                <Trophy className="w-5 h-5" />
+                {activeTab === "weekly" ? "This Week's Standings" : "Monthly Standings"}
+              </h4>
+              
+              {loading ? (
+                <div className="text-center py-8 text-[#A1A1AA]">Loading...</div>
+              ) : currentLeaderboard.length > 0 ? (
+                <div className="space-y-2">
+                  {currentLeaderboard.map((entry, idx) => (
+                    <div
+                      key={entry.team_id}
+                      className={`flex items-center gap-3 p-3 ${
+                        entry.team_id === teamId 
+                          ? 'bg-[#FF0099]/20 border border-[#FF0099]' 
+                          : 'bg-[#1A1A1A]'
+                      }`}
+                    >
+                      {/* Rank */}
+                      <span className={`font-anton text-xl w-8 ${
+                        idx === 0 ? 'text-[#FFD700]' 
+                        : idx === 1 ? 'text-[#C0C0C0]' 
+                        : idx === 2 ? 'text-[#CD7F32]' 
+                        : 'text-[#666]'
+                      }`}>
+                        #{idx + 1}
                   </span>
                   
                   {/* Team Info */}
