@@ -2284,8 +2284,10 @@ def detect_category_from_bio(bio: str, name: str) -> str:
         "television series", "tv series", "television show", "tv show",
         "sitcom", "soap opera", "miniseries", "tv movie", "television movie",
         "primetime emmy", "emmy award", "bafta tv", "golden globe for television",
-        "streaming series", "netflix series", "hbo series", "bbc series",
-        "comedy series", "drama series", "television drama", "tv drama"
+        "streaming series", "netflix series", "hbo series", "bbc series", "amc series",
+        "comedy series", "drama series", "television drama", "tv drama",
+        "breaking bad", "game of thrones", "the crown", "downton abbey",
+        "peaky blinders", "stranger things", "the office", "friends"
     ]
     
     # Count occurrences
