@@ -5412,37 +5412,71 @@ def extract_category_from_description(description: str) -> str:
         'celebrity': None, 'former': None,
     }
     
-    # Check if first occupation is directly mapped
-    if first_occupation and first_occupation in occupation_to_category:
-        category = occupation_to_category[first_occupation]
-        if category:
-            return category
+    # Parse the occupation phrase to find actual occupation keywords
+    # E.g., "English former professional footballer" -> footballer
+    # E.g., "American singer-songwriter and actress" -> singer-songwriter
+    # E.g., "British reality television personality and boxer" -> check both
     
-    # If first occupation is ambiguous, check the full description for context
-    if first_occupation in ['personality', 'television', 'media', 'reality', 'celebrity', 'former', None]:
-        # Check for specific occupations anywhere in description
-        if 'boxer' in desc_lower or 'boxing' in desc_lower:
-            return 'athletes'
-        if 'footballer' in desc_lower or 'football player' in desc_lower:
-            return 'athletes'
-        if 'racing driver' in desc_lower or 'formula one' in desc_lower or 'f1 driver' in desc_lower:
-            return 'athletes'
-        if 'tennis player' in desc_lower or 'cricketer' in desc_lower or 'golfer' in desc_lower:
-            return 'athletes'
-        if 'singer' in desc_lower or 'band' in desc_lower or 'musical' in desc_lower:
-            return 'musicians'
-        if 'chef' in desc_lower or 'restaurateur' in desc_lower:
-            return 'other'
-        if 'comedian' in desc_lower or 'stand-up' in desc_lower:
-            return 'other'
-        if 'actor' in desc_lower or 'actress' in desc_lower:
-            return 'movie_stars'
-        if 'reality television' in desc_lower or 'reality tv' in desc_lower or 'love island' in desc_lower:
-            return 'reality_tv'
-        if 'television presenter' in desc_lower or 'tv presenter' in desc_lower:
-            return 'tv_personalities'
-        if 'businesswoman' in desc_lower or 'businessman' in desc_lower or 'entrepreneur' in desc_lower:
-            return 'public_figure'
+    if occupation_phrase:
+        # Check for direct occupation matches in the phrase
+        for occ, cat in occupation_to_category.items():
+            if cat and occ in occupation_phrase:
+                return cat
+    
+    # Check full description for specific occupations (ordered by priority)
+    # Athletes first (boxer, footballer, racing driver are strong indicators)
+    if 'boxer' in desc_lower or 'boxing' in desc_lower:
+        return 'athletes'
+    if 'footballer' in desc_lower or 'football player' in desc_lower or 'soccer player' in desc_lower:
+        return 'athletes'
+    if 'racing driver' in desc_lower or 'formula one' in desc_lower or 'f1 driver' in desc_lower:
+        return 'athletes'
+    if 'tennis player' in desc_lower or 'cricketer' in desc_lower or 'golfer' in desc_lower:
+        return 'athletes'
+    if 'basketball player' in desc_lower or 'baseball player' in desc_lower:
+        return 'athletes'
+    if 'swimmer' in desc_lower or 'gymnast' in desc_lower or 'olympian' in desc_lower:
+        return 'athletes'
+    
+    # Musicians
+    if 'singer' in desc_lower or 'songwriter' in desc_lower:
+        return 'musicians'
+    if 'rapper' in desc_lower or 'musician' in desc_lower:
+        return 'musicians'
+    
+    # Chefs and comedians
+    if 'chef' in desc_lower or 'restaurateur' in desc_lower:
+        return 'other'
+    if 'comedian' in desc_lower or 'stand-up' in desc_lower or 'comic' in desc_lower:
+        return 'other'
+    
+    # Actors
+    if 'actor' in desc_lower or 'actress' in desc_lower:
+        return 'movie_stars'
+    
+    # TV categories
+    if 'television presenter' in desc_lower or 'tv presenter' in desc_lower or 'chat show' in desc_lower:
+        return 'tv_personalities'
+    if 'television actor' in desc_lower or 'television actress' in desc_lower:
+        return 'tv_actors'
+    if 'reality television' in desc_lower or 'reality tv' in desc_lower or 'love island' in desc_lower:
+        return 'reality_tv'
+    
+    # Public figures
+    if 'politician' in desc_lower or 'businessman' in desc_lower or 'businesswoman' in desc_lower:
+        return 'public_figure'
+    if 'entrepreneur' in desc_lower or 'activist' in desc_lower:
+        return 'public_figure'
+    
+    # Other
+    if 'model' in desc_lower or 'author' in desc_lower or 'writer' in desc_lower:
+        return 'other'
+    if 'journalist' in desc_lower or 'presenter' in desc_lower:
+        return 'tv_personalities'
+    
+    # Default for "personality" with no clear occupation
+    if 'personality' in desc_lower or 'socialite' in desc_lower:
+        return 'reality_tv'
         if 'model' in desc_lower:
             return 'other'
         # Default personality to reality_tv if nothing else matches
