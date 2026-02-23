@@ -818,6 +818,7 @@ function App() {
                   key={celeb.id}
                   celebrity={celeb}
                   onAdd={addToTeam}
+                  onRemove={removeFromTeam}
                   isInTeam={isInTeam(celeb.id)}
                   canAfford={canAfford(celeb.price)}
                   onShowPriceHistory={handleShowPriceHistory}
