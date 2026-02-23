@@ -2968,8 +2968,11 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     else:
         category = detect_category_from_bio(wiki_info.get("bio", ""), wiki_info["name"])
     
-    # Calculate celebrity tier based on bio
-    tier, base_price = await calculate_celebrity_tier(wiki_info.get("bio", ""), wiki_info["name"])
+    # Calculate celebrity tier using new Wikipedia-based metrics system
+    async with httpx.AsyncClient() as http_client:
+        tier_result = await calculate_tier_from_wikipedia_data(wiki_info["name"], http_client)
+        tier = tier_result["tier"]
+        base_price = tier_result["price"]
     
     # Generate news - pass real news context if available from hot celebs
     real_news_context = hot_celeb_match.get("hot_reason") if hot_celeb_match else None
@@ -2980,7 +2983,7 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     buzz_score = 0
     
     # Final price using tier-based pricing
-    price = get_dynamic_price(tier, 50, wiki_info["name"])  # Price based on tier, not buzz
+    price = base_price  # Use the calculated price from tier system
     
     # If this celeb is in Hot Celebs, use that price (includes news premium)
     if hot_celeb_match:
