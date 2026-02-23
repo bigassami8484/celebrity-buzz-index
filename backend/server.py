@@ -5504,23 +5504,6 @@ def extract_category_from_description(description: str) -> str:
         return 'reality_tv'
     
     return None
-    
-    if business_pos < personality_pos and business_pos < 9999:
-        return 'public_figure'
-    if 'activist' in desc_lower:
-        return 'public_figure'
-    
-    # Other
-    if 'model' in desc_lower or 'author' in desc_lower or 'writer' in desc_lower:
-        return 'other'
-    if 'journalist' in desc_lower or 'presenter' in desc_lower:
-        return 'tv_personalities'
-    
-    # Default for "personality" with no clear occupation
-    if 'personality' in desc_lower:
-        return 'reality_tv'
-    
-    return None
 
 
 async def fetch_wikipedia_bio(name: str, client: httpx.AsyncClient, headers: dict) -> dict:
