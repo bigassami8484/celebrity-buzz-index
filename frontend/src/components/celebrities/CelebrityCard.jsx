@@ -85,8 +85,9 @@ const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford, onShowPriceHisto
         >
           <LineChart className="w-4 h-4 text-[#00F0FF]" />
         </button>
+        {/* Bottom overlay - name, category, price */}
         <div className="celebrity-card-overlay">
-          <div className="flex items-center gap-2 mb-2 flex-wrap">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="category-badge flex items-center gap-1">
               <Icon className="w-3 h-3" />
               {celebrity.category?.replace("_", " ")}
@@ -99,22 +100,12 @@ const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford, onShowPriceHisto
               />
             </span>
           </div>
-          <h3 className="font-anton text-2xl uppercase tracking-tight">
+          <h3 className="font-anton text-xl uppercase tracking-tight leading-tight">
             {celebrity.name}
             {celebrity.is_deceased && <span className="ml-2" title="Deceased">💀</span>}
           </h3>
-          <p className="text-sm text-[#A1A1AA] line-clamp-3 mt-1">{celebrity.bio?.slice(0, 180)}...</p>
-          {celebrity.wiki_url && (
-            <a 
-              href={celebrity.wiki_url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-xs text-[#00F0FF] hover:underline mt-2 inline-block"
-              onClick={(e) => e.stopPropagation()}
-            >
-              View on Wikipedia →
-            </a>
-          )}
+          {/* Bio - smaller text, limited to 2 lines */}
+          <p className="text-xs text-[#A1A1AA]/80 line-clamp-2 mt-1 leading-snug">{celebrity.bio?.slice(0, 100)}</p>
         </div>
         
         {/* News Panel on Hover */}
