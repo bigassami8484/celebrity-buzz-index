@@ -4000,6 +4000,8 @@ async def get_hot_celebs():
                         
                         # Store in DB for consistency with autocomplete
                         actual_name = wiki_data.get("title", name)
+                        # Cap price at £15M before storing
+                        stored_price = min(price, 15.0)
                         # Always update celebrity with current price for consistency
                         await db.celebrities.update_one(
                             {"name": {"$regex": f"^{actual_name}$", "$options": "i"}},
@@ -4009,7 +4011,7 @@ async def get_hot_celebs():
                                 "category": category,
                                 "image": image,
                                 "bio": bio[:500],
-                                "price": price,  # Update price to match hot celebs
+                                "price": stored_price,  # Update price to match hot celebs (capped)
                                 "wiki_url": f"https://en.wikipedia.org/wiki/{actual_name.replace(' ', '_')}",
                                 "updated_at": datetime.now(timezone.utc).isoformat()
                             }},
