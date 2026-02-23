@@ -4333,7 +4333,7 @@ async def join_league(data: LeagueJoin):
         raise HTTPException(status_code=400, detail="Already in this league!")
     
     # Check max teams
-    if len(league.get("team_ids", [])) >= league.get("max_teams", 20):
+    if len(league.get("team_ids", [])) >= league.get("max_teams", 10):
         raise HTTPException(status_code=400, detail="League is full!")
     
     # Add team to league
