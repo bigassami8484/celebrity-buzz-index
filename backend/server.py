@@ -2113,7 +2113,7 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
                             except:
                                 pub_date_str = datetime.now(timezone.utc).strftime("%b %d, %Y")
                         
-                        # Skip if older than 2 months
+                        # Skip if older than 7 days (weekly points system)
                         if pub_date and pub_date < cutoff_date:
                             continue
                         
