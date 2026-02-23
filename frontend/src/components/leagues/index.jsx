@@ -554,7 +554,12 @@ export const LeagueDetailModal = ({ league, leaderboard, onClose, teamId, apiUrl
 
 // Leaderboard Component (Global)
 export const Leaderboard = ({ entries }) => {
-  const placeholderRows = Array.from({ length: 10 }, (_, i) => i + 1);
+  const [expanded, setExpanded] = useState(false);
+  
+  // Show 5 collapsed, 10 expanded
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const displayCount = expanded ? 10 : 5;
+  const placeholderRows = Array.from({ length: displayCount }, (_, i) => i + 1);
   
   return (
     <div className="leaderboard" data-testid="leaderboard">
@@ -578,6 +583,19 @@ export const Leaderboard = ({ entries }) => {
           </div>
         </div>
       ))}
+      
+      {/* Expand/Collapse button */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full mt-3 py-2 text-xs text-[#00F0FF] flex items-center justify-center gap-1 hover:bg-[#1A1A1A] rounded transition-colors border border-[#262626]"
+        data-testid="leaderboard-expand-btn"
+      >
+        {expanded ? (
+          <>Show Top 5 <ChevronUp className="w-4 h-4" /></>
+        ) : (
+          <>View All 10 <ChevronDown className="w-4 h-4" /></>
+        )}
+      </button>
     </div>
   );
 };
