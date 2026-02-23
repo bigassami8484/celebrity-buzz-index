@@ -4376,42 +4376,50 @@ async def get_hot_streaks(team_id: str):
         raise HTTPException(status_code=404, detail="Team not found")
     
     hot_streaks = []
-    for celeb_data in team.get("celebrities", []):
-        celeb = await db.celebrities.find_one(
-            {"id": celeb_data.get("celebrity_id")},
+    team_celebs = team.get("celebrities", [])
+    
+    if team_celebs:
+        # Batch fetch all celebrities in one query (fix N+1 problem)
+        celeb_ids = [c.get("celebrity_id") for c in team_celebs if c.get("celebrity_id")]
+        celebs = await db.celebrities.find(
+            {"id": {"$in": celeb_ids}},
             {"_id": 0}
-        )
-        if celeb:
-            buzz_score = celeb.get("buzz_score", 5)
-            tier = celeb.get("tier", "D")
-            
-            # Calculate streak based on buzz score
-            # High buzz (>40) = likely on a streak
-            # Very high buzz (>60) = definitely on a streak
-            streak_days = 0
-            streak_status = None
-            
-            if buzz_score >= 80:
-                streak_days = 5
-                streak_status = "🔥🔥🔥 ON FIRE!"
-            elif buzz_score >= 60:
-                streak_days = 4
-                streak_status = "🔥🔥 Hot Streak!"
-            elif buzz_score >= 40:
-                streak_days = 3
-                streak_status = "🔥 Warming Up!"
-            
-            if streak_days >= 3:
-                hot_streaks.append({
-                    "celebrity_id": celeb.get("id"),
-                    "name": celeb.get("name"),
-                    "image": celeb.get("image"),
-                    "tier": tier,
-                    "buzz_score": buzz_score,
-                    "streak_days": streak_days,
-                    "streak_status": streak_status,
-                    "tip": "Consider keeping - price likely to rise!" if buzz_score >= 60 else "Watch closely - could heat up more!"
-                })
+        ).to_list(10)
+        celeb_map = {c['id']: c for c in celebs}
+        
+        for celeb_data in team_celebs:
+            celeb = celeb_map.get(celeb_data.get("celebrity_id"))
+            if celeb:
+                buzz_score = celeb.get("buzz_score", 5)
+                tier = celeb.get("tier", "D")
+                
+                # Calculate streak based on buzz score
+                # High buzz (>40) = likely on a streak
+                # Very high buzz (>60) = definitely on a streak
+                streak_days = 0
+                streak_status = None
+                
+                if buzz_score >= 80:
+                    streak_days = 5
+                    streak_status = "🔥🔥🔥 ON FIRE!"
+                elif buzz_score >= 60:
+                    streak_days = 4
+                    streak_status = "🔥🔥 Hot Streak!"
+                elif buzz_score >= 40:
+                    streak_days = 3
+                    streak_status = "🔥 Warming Up!"
+                
+                if streak_days >= 3:
+                    hot_streaks.append({
+                        "celebrity_id": celeb.get("id"),
+                        "name": celeb.get("name"),
+                        "image": celeb.get("image"),
+                        "tier": tier,
+                        "buzz_score": buzz_score,
+                        "streak_days": streak_days,
+                        "streak_status": streak_status,
+                        "tip": "Consider keeping - price likely to rise!" if buzz_score >= 60 else "Watch closely - could heat up more!"
+                    })
     
     # Sort by streak days
     hot_streaks.sort(key=lambda x: x["streak_days"], reverse=True)
