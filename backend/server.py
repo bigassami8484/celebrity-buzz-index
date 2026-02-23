@@ -574,43 +574,49 @@ def get_monday_reset_week() -> str:
     return f"{monday.year}-W{monday.isocalendar()[1]:02d}"
 
 def is_transfer_window_open() -> dict:
-    """Check if transfer window is open (Saturday 12pm GMT for 24 hours)"""
+    """Check if transfer window is open (Sunday 12pm to 12am GMT - 12 hours before new week)"""
     now = datetime.now(timezone.utc)
     
-    # Transfer window opens Saturday 12:00 GMT
-    # Find this Saturday's window
-    days_since_saturday = (now.weekday() - 5) % 7  # Saturday is 5
+    # Transfer window opens Sunday 12:00 GMT (noon) and closes Sunday 23:59 GMT (midnight)
+    # This gives players 12 hours to make transfers before the new week starts Monday
     
     # Calculate when the current/next window starts
-    if now.weekday() == 5:  # It's Saturday
+    if now.weekday() == 6:  # It's Sunday
         window_start = now.replace(hour=12, minute=0, second=0, microsecond=0)
+        window_end = now.replace(hour=23, minute=59, second=59, microsecond=0)
+        
         if now < window_start:
-            # Before 12pm Saturday, use last Saturday
-            window_start = window_start - timedelta(days=7)
-    elif now.weekday() == 6:  # Sunday
-        # Window started yesterday at 12pm
-        window_start = (now - timedelta(days=1)).replace(hour=12, minute=0, second=0, microsecond=0)
+            # Before 12pm Sunday - window hasn't opened yet today
+            is_open = False
+        elif now <= window_end:
+            # Between 12pm and midnight Sunday - window is open
+            is_open = True
+        else:
+            # After midnight (shouldn't happen as weekday would be 0)
+            is_open = False
     else:
-        # Window was last Saturday at 12pm
-        window_start = (now - timedelta(days=days_since_saturday)).replace(hour=12, minute=0, second=0, microsecond=0)
+        # Not Sunday - window is closed
+        is_open = False
+        window_start = None
+        window_end = None
     
-    window_end = window_start + timedelta(hours=24)
-    
-    is_open = window_start <= now < window_end
-    
-    # Calculate next window
+    # Calculate next window (next Sunday 12pm)
     if is_open:
-        next_window = window_start + timedelta(days=7)
+        next_window = (now + timedelta(days=7)).replace(hour=12, minute=0, second=0, microsecond=0)
         time_remaining = window_end - now
         hours_remaining = int(time_remaining.total_seconds() // 3600)
         mins_remaining = int((time_remaining.total_seconds() % 3600) // 60)
         status_text = f"OPEN - {hours_remaining}h {mins_remaining}m left"
     else:
-        # Calculate time until next Saturday 12pm
-        days_until_saturday = (5 - now.weekday()) % 7
-        if days_until_saturday == 0 and now.hour >= 12:
-            days_until_saturday = 7
-        next_window = (now + timedelta(days=days_until_saturday)).replace(hour=12, minute=0, second=0, microsecond=0)
+        # Calculate time until next Sunday 12pm
+        days_until_sunday = (6 - now.weekday()) % 7
+        if days_until_sunday == 0:
+            # It's Sunday but window closed (before noon or after midnight edge case)
+            if now.hour < 12:
+                days_until_sunday = 0  # Today at noon
+            else:
+                days_until_sunday = 7  # Next Sunday
+        next_window = (now + timedelta(days=days_until_sunday)).replace(hour=12, minute=0, second=0, microsecond=0)
         time_until = next_window - now
         days_until = time_until.days
         hours_until = int((time_until.total_seconds() % 86400) // 3600)
@@ -622,8 +628,8 @@ def is_transfer_window_open() -> dict:
     return {
         "is_open": is_open,
         "status": status_text,
-        "window_start": window_start.isoformat(),
-        "window_end": window_end.isoformat(),
+        "window_start": window_start.isoformat() if window_start else None,
+        "window_end": window_end.isoformat() if window_end else None,
         "next_window": next_window.isoformat() if not is_open else None
     }
 
