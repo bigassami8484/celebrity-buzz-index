@@ -5018,6 +5018,314 @@ async def trigger_weekly_reset_manually():
     }
 
 
+# ==================== WIKIDATA CELEBRITY UPDATE ====================
+
+# Map Wikidata occupation QIDs to our categories
+OCCUPATION_TO_CATEGORY = {
+    # Movie Stars
+    "Q33999": "movie_stars",  # actor
+    "Q10800557": "movie_stars",  # film actor
+    "Q3455803": "movie_stars",  # film director
+    "Q28389": "movie_stars",  # screenwriter
+    # TV Actors
+    "Q10798782": "tv_actors",  # television actor
+    "Q5716684": "tv_actors",  # television presenter (also check TV personalities)
+    # TV Personalities
+    "Q18814623": "tv_personalities",  # television personality
+    "Q2526255": "tv_personalities",  # film director - might need disambiguation
+    "Q947873": "tv_personalities",  # presenter
+    "Q1607826": "tv_personalities",  # news presenter
+    # Musicians
+    "Q177220": "musicians",  # singer
+    "Q639669": "musicians",  # musician
+    "Q488205": "musicians",  # singer-songwriter
+    "Q36834": "musicians",  # composer
+    "Q753110": "musicians",  # songwriter
+    "Q183945": "musicians",  # record producer
+    "Q10816969": "musicians",  # rapper
+    "Q806349": "musicians",  # bandleader
+    "Q55960555": "musicians",  # recording artist
+    # Athletes
+    "Q937857": "athletes",  # association football player
+    "Q11774891": "athletes",  # sports manager
+    "Q2309784": "athletes",  # sport cyclist
+    "Q10833314": "athletes",  # tennis player
+    "Q13381753": "athletes",  # athletics competitor
+    "Q10843263": "athletes",  # baseball player
+    "Q3665646": "athletes",  # basketball player
+    "Q14089670": "athletes",  # racing driver
+    "Q11338576": "athletes",  # boxer
+    "Q15117302": "athletes",  # swimmer
+    "Q19204627": "athletes",  # American football player
+    "Q4009406": "athletes",  # gymnast
+    "Q628099": "athletes",  # golfer
+    # Reality TV
+    "Q44508716": "reality_tv",  # influencer
+    "Q27533925": "reality_tv",  # reality television participant
+    "Q19595175": "reality_tv",  # internet celebrity
+    # Royals - These are usually identified by description
+    "Q116": "royals",  # monarch
+    "Q2478141": "royals",  # aristocrat
+    "Q36180": "royals",  # writer (might need context)
+    # Public Figure
+    "Q82955": "public_figure",  # politician
+    "Q131524": "public_figure",  # entrepreneur
+    "Q372436": "public_figure",  # statesperson
+    "Q40348": "public_figure",  # lawyer
+    # Other
+    "Q3499072": "other",  # chef
+    "Q245068": "other",  # comedian
+    "Q36180": "other",  # writer
+    "Q1930187": "other",  # journalist
+    "Q49757": "other",  # poet
+    "Q214917": "other",  # playwright
+    "Q121594": "other",  # professor
+}
+
+async def fetch_wikidata_info(name: str, client: httpx.AsyncClient, headers: dict) -> dict:
+    """
+    Fetch celebrity info from Wikidata: image (P18), occupation (P106), and description.
+    Returns dict with image_url, occupations list, and suggested_category.
+    """
+    result = {"image_url": None, "occupations": [], "suggested_category": None, "description": ""}
+    
+    try:
+        # Step 1: Search for the entity
+        search_params = {
+            'action': 'wbsearchentities',
+            'search': name,
+            'language': 'en',
+            'type': 'item',
+            'limit': 5,
+            'format': 'json'
+        }
+        
+        search_response = await client.get(
+            'https://www.wikidata.org/w/api.php',
+            params=search_params,
+            headers=headers,
+            timeout=10.0
+        )
+        
+        if search_response.status_code != 200:
+            return result
+        
+        search_data = search_response.json()
+        search_results = search_data.get('search', [])
+        
+        if not search_results:
+            return result
+        
+        # Find the best match - prefer results with descriptions indicating they're entertainers/public figures
+        best_match = None
+        priority_keywords = ['singer', 'actor', 'actress', 'footballer', 'model', 'personality', 
+                           'television', 'musician', 'athlete', 'boxer', 'presenter', 'celebrity',
+                           'british', 'american', 'reality', 'royal', 'prince', 'princess', 'duke', 'duchess']
+        
+        for sr in search_results:
+            desc = sr.get('description', '').lower()
+            # Skip if description suggests wrong person (e.g., basketball player for UK reality star)
+            if 'basketball' in desc and 'british' not in desc:
+                continue
+            if 'baseball' in desc and 'british' not in desc:
+                continue
+            
+            # Prefer matches with relevant descriptions
+            if any(kw in desc for kw in priority_keywords):
+                best_match = sr
+                break
+        
+        if not best_match:
+            best_match = search_results[0]
+        
+        qid = best_match.get('id')
+        result['description'] = best_match.get('description', '')
+        
+        # Step 2: Get entity details (image + occupation)
+        entity_params = {
+            'action': 'wbgetentities',
+            'ids': qid,
+            'props': 'claims',
+            'format': 'json'
+        }
+        
+        entity_response = await client.get(
+            'https://www.wikidata.org/w/api.php',
+            params=entity_params,
+            headers=headers,
+            timeout=10.0
+        )
+        
+        if entity_response.status_code != 200:
+            return result
+        
+        entity_data = entity_response.json()
+        entity = entity_data.get('entities', {}).get(qid, {})
+        claims = entity.get('claims', {})
+        
+        # Extract image (P18)
+        if 'P18' in claims:
+            img_file = claims['P18'][0]['mainsnak']['datavalue']['value']
+            img_file_encoded = img_file.replace(' ', '_')
+            result['image_url'] = f"https://commons.wikimedia.org/wiki/Special:FilePath/{img_file_encoded}?width=400"
+        
+        # Extract occupations (P106) and map to category
+        if 'P106' in claims:
+            for occ_claim in claims['P106']:
+                try:
+                    occ_qid = occ_claim['mainsnak']['datavalue']['value']['id']
+                    result['occupations'].append(occ_qid)
+                    
+                    # Check if this occupation maps to a category
+                    if occ_qid in OCCUPATION_TO_CATEGORY and not result['suggested_category']:
+                        result['suggested_category'] = OCCUPATION_TO_CATEGORY[occ_qid]
+                except (KeyError, TypeError):
+                    pass
+        
+        # Also check description for category hints
+        desc_lower = result['description'].lower()
+        if not result['suggested_category']:
+            if any(kw in desc_lower for kw in ['prince', 'princess', 'duke', 'duchess', 'king', 'queen', 'royal']):
+                result['suggested_category'] = 'royals'
+            elif any(kw in desc_lower for kw in ['reality television', 'reality tv', 'love island', 'towie']):
+                result['suggested_category'] = 'reality_tv'
+            elif any(kw in desc_lower for kw in ['television personality', 'tv personality', 'presenter', 'host']):
+                result['suggested_category'] = 'tv_personalities'
+            elif any(kw in desc_lower for kw in ['singer', 'musician', 'rapper', 'songwriter']):
+                result['suggested_category'] = 'musicians'
+            elif any(kw in desc_lower for kw in ['film actor', 'actress', 'movie']):
+                result['suggested_category'] = 'movie_stars'
+            elif any(kw in desc_lower for kw in ['television actor', 'tv actor']):
+                result['suggested_category'] = 'tv_actors'
+            elif any(kw in desc_lower for kw in ['footballer', 'tennis', 'boxer', 'athlete', 'racing driver', 'cricketer']):
+                result['suggested_category'] = 'athletes'
+            elif any(kw in desc_lower for kw in ['politician', 'businessman', 'entrepreneur', 'activist']):
+                result['suggested_category'] = 'public_figure'
+            elif any(kw in desc_lower for kw in ['chef', 'comedian', 'author', 'writer', 'model']):
+                result['suggested_category'] = 'other'
+        
+    except Exception as e:
+        logger.warning(f"Error fetching Wikidata for {name}: {e}")
+    
+    return result
+
+
+@api_router.post("/admin/update-celebrity-data")
+async def update_celebrity_data_from_wikidata(batch_size: int = 20, delay_seconds: float = 1.0):
+    """
+    Update celebrities with missing images and recategorize based on Wikidata.
+    Uses Wikidata API with rate limiting to avoid blocks.
+    
+    Args:
+        batch_size: Number of celebrities to process per batch (default 20)
+        delay_seconds: Delay between API calls (default 1.0 second)
+    """
+    headers = {
+        'User-Agent': 'CelebrityBuzzIndex/1.0 (https://celebbuzzindex.com; admin@celebbuzzindex.com)',
+        'Accept': 'application/json'
+    }
+    
+    # Find celebrities needing updates (missing real image)
+    celebs_needing_update = await db.celebrities.find(
+        {'image': {'$regex': 'ui-avatars', '$options': 'i'}},
+        {'_id': 0, 'id': 1, 'name': 1, 'category': 1, 'image': 1}
+    ).limit(batch_size).to_list(batch_size)
+    
+    if not celebs_needing_update:
+        return {
+            "success": True,
+            "message": "No celebrities need updating",
+            "updated": 0,
+            "remaining": 0
+        }
+    
+    # Count remaining
+    remaining_count = await db.celebrities.count_documents(
+        {'image': {'$regex': 'ui-avatars', '$options': 'i'}}
+    )
+    
+    updated = 0
+    skipped = 0
+    errors = []
+    
+    async with httpx.AsyncClient() as client:
+        for celeb in celebs_needing_update:
+            celeb_id = celeb.get('id')
+            name = celeb.get('name')
+            old_category = celeb.get('category')
+            
+            try:
+                # Fetch data from Wikidata
+                wiki_data = await fetch_wikidata_info(name, client, headers)
+                
+                update_fields = {}
+                
+                # Update image if found
+                if wiki_data['image_url']:
+                    update_fields['image'] = wiki_data['image_url']
+                
+                # Update category if we got a suggestion and it differs
+                if wiki_data['suggested_category'] and wiki_data['suggested_category'] != old_category:
+                    update_fields['category'] = wiki_data['suggested_category']
+                
+                if update_fields:
+                    await db.celebrities.update_one(
+                        {'id': celeb_id},
+                        {'$set': update_fields}
+                    )
+                    updated += 1
+                    logger.info(f"Updated {name}: image={bool(wiki_data['image_url'])}, category={wiki_data['suggested_category']}")
+                else:
+                    skipped += 1
+                    logger.info(f"Skipped {name}: no new data found")
+                
+                # Rate limiting delay
+                await asyncio.sleep(delay_seconds)
+                
+            except Exception as e:
+                errors.append({"name": name, "error": str(e)})
+                logger.error(f"Error updating {name}: {e}")
+    
+    return {
+        "success": True,
+        "message": f"Processed {len(celebs_needing_update)} celebrities",
+        "updated": updated,
+        "skipped": skipped,
+        "errors": errors,
+        "remaining": remaining_count - updated
+    }
+
+
+@api_router.get("/admin/celebrity-update-status")
+async def get_celebrity_update_status():
+    """
+    Get the current status of celebrity data (how many have images, categories breakdown).
+    """
+    total = await db.celebrities.count_documents({})
+    
+    with_wiki_image = await db.celebrities.count_documents({
+        'image': {'$regex': 'wikimedia|wikipedia|commons', '$options': 'i'}
+    })
+    
+    with_placeholder = await db.celebrities.count_documents({
+        'image': {'$regex': 'ui-avatars', '$options': 'i'}
+    })
+    
+    # Category breakdown
+    pipeline = [
+        {"$group": {"_id": "$category", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}}
+    ]
+    category_counts = await db.celebrities.aggregate(pipeline).to_list(20)
+    
+    return {
+        "total_celebrities": total,
+        "with_real_images": with_wiki_image,
+        "with_placeholder_images": with_placeholder,
+        "categories": {c['_id']: c['count'] for c in category_counts if c['_id']}
+    }
+
+
 # Auth routes are now in /routes/auth.py
 
 
