@@ -1373,15 +1373,15 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     tier = hot_celeb_match.get("tier", "D")
                     price = hot_celeb_match["price"]
                 else:
-                    # Check if celebrity exists in DB
+                    # Check if celebrity exists in DB - use their stored price
                     existing = await db.celebrities.find_one(
                         {"name": {"$regex": f"^{actual_title}$", "$options": "i"}},
                         {"_id": 0, "tier": 1, "price": 1}
                     )
                     
-                    if existing:
+                    if existing and existing.get("price"):
                         tier = existing.get("tier", "D")
-                        price = get_dynamic_price(tier, 50, actual_title)
+                        price = existing.get("price")  # Use stored DB price for consistency
                     else:
                         # Check if in HOT_CELEBS_POOL for known tier
                         pool_entry = next((c for c in HOT_CELEBS_POOL if c["name"].lower() == actual_title.lower()), None)
