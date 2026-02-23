@@ -3312,20 +3312,21 @@ async def get_hot_celebs():
                         
                         # Store in DB for consistency with autocomplete
                         actual_name = wiki_data.get("title", name)
-                        existing = await db.celebrities.find_one({"name": {"$regex": f"^{actual_name}$", "$options": "i"}})
-                        if not existing:
-                            await db.celebrities.update_one(
-                                {"name": actual_name},
-                                {"$set": {
-                                    "name": actual_name,
-                                    "tier": tier,
-                                    "category": category,
-                                    "image": image,
-                                    "bio": bio[:500],
-                                    "updated_at": datetime.now(timezone.utc).isoformat()
-                                }},
-                                upsert=True
-                            )
+                        # Always update celebrity with current price for consistency
+                        await db.celebrities.update_one(
+                            {"name": {"$regex": f"^{actual_name}$", "$options": "i"}},
+                            {"$set": {
+                                "name": actual_name,
+                                "tier": tier,
+                                "category": category,
+                                "image": image,
+                                "bio": bio[:500],
+                                "price": price,  # Update price to match hot celebs
+                                "wiki_url": f"https://en.wikipedia.org/wiki/{actual_name.replace(' ', '_')}",
+                                "updated_at": datetime.now(timezone.utc).isoformat()
+                            }},
+                            upsert=True
+                        )
             except Exception as e:
                 logger.error(f"Error fetching {name}: {e}")
                 continue
