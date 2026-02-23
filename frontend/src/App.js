@@ -871,6 +871,16 @@ function App() {
           <div className="lg:col-span-4 space-y-6">
             <PriceAlerts alerts={priceAlerts} teamId={team?.id} />
             
+            {/* Price Watch Button */}
+            <button
+              onClick={() => setShowPriceWatch(true)}
+              className="w-full bg-gradient-to-r from-[#FF0099] to-[#7B2CFF] text-white font-bold py-3 px-4 flex items-center justify-center gap-2 hover:from-[#FF33AD] hover:to-[#9456FF] transition-all"
+              data-testid="price-watch-btn"
+            >
+              <span className="text-xl">👁️</span>
+              Price Watch
+            </button>
+            
             {/* Hall of Fame Button */}
             <button
               onClick={() => { fetchHallOfFameData(); setShowHallOfFame(true); }}
