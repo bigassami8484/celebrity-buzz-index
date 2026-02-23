@@ -106,6 +106,17 @@ const CelebrityCard = ({ celebrity, onAdd, isInTeam, canAfford, onShowPriceHisto
           </h3>
           {/* Bio - smaller text, limited to 2 lines */}
           <p className="text-xs text-[#A1A1AA]/80 line-clamp-2 mt-1 leading-snug">{celebrity.bio?.slice(0, 100)}</p>
+          {celebrity.wiki_url && (
+            <a 
+              href={celebrity.wiki_url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-xs text-[#00F0FF] hover:underline mt-1 inline-block"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Wikipedia →
+            </a>
+          )}
         </div>
         
         {/* News Panel on Hover */}
