@@ -2183,11 +2183,24 @@ def detect_category_from_bio(bio: str, name: str) -> str:
                      "rugby player", "boxer", "golfer", "swimmer", "olympic"], 2),
         "musicians": (["singer", "songwriter", "musician", "rapper", "vocalist",
                       "recording artist", "pop star", "rock star"], 3),
-        "tv_personalities": (["television presenter", "tv presenter", "broadcaster",
-                             "television host", "talk show host", "radio presenter"], 4),
+        # Note: "broadcaster" removed - handled separately below (TV broadcasters vs other)
+        "tv_personalities": (["television presenter", "tv presenter", "television broadcaster",
+                             "television host", "talk show host"], 4),
         "tv_actors": (["television actor", "tv actor"], 5),
         "movie_stars": (["actor", "actress", "film actor", "film actress"], 6),
     }
+    
+    # Special handling for "broadcaster" - only TV broadcasters go to tv_personalities
+    # Radio broadcasters and generic broadcasters go to "other"
+    if "broadcaster" in bio_start:
+        # Check if it's specifically a TV broadcaster
+        if any(tv_word in bio_start for tv_word in ["television", "tv "]):
+            return "tv_personalities"
+        # Radio presenter goes to other
+        if "radio" in bio_start:
+            return "other"
+        # Generic broadcaster without TV context goes to other
+        return "other"
     
     # Find which occupation appears FIRST in the bio
     first_occupation = None
