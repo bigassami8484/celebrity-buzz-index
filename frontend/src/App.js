@@ -755,15 +755,8 @@ function App() {
                               <span className="text-[#A1A1AA]">
                                 {article.source}
                               </span>
-                              <span className={`px-2 py-0.5 rounded ${
-                                article.sentiment === 'positive' ? 'bg-green-500/20 text-green-400' :
-                                article.sentiment === 'negative' ? 'bg-red-500/20 text-red-400' :
-                                'bg-gray-500/20 text-gray-400'
-                              }`}>
-                                {article.sentiment}
-                              </span>
+                              <span className="text-[#666]">{article.date}</span>
                             </div>
-                            <p className="text-[#666] text-xs mt-1">{article.date}</p>
                           </a>
                         ))}
                     </div>
