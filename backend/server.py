@@ -2001,8 +2001,8 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
     # Remove duplicates while preserving order
     search_terms = list(dict.fromkeys(search_terms))
     
-    # Cutoff date - 2 months ago
-    cutoff_date = datetime.now(timezone.utc) - timedelta(days=60)
+    # Cutoff date - 7 DAYS ago (weekly points system)
+    cutoff_date = datetime.now(timezone.utc) - timedelta(days=7)
     
     real_news = []
     seen_titles = set()  # Avoid duplicates
