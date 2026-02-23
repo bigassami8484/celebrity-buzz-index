@@ -2166,13 +2166,45 @@ def detect_category_from_bio(bio: str, name: str) -> str:
             return "reality_tv"
     
     # =================================================================
-    # CHECK FIRST OCCUPATION - Look at first 100 chars of bio
-    # This determines PRIMARY occupation before checking all keywords
+    # CHECK FIRST OCCUPATION - Find which occupation appears FIRST
+    # Wikipedia bios typically list primary occupation first
+    # e.g., "is a British actor and musician" -> actor is first
     # =================================================================
-    bio_start = bio_lower[:120]  # First sentence usually has primary occupation
+    bio_start = bio_lower[:150]  # First sentence usually has primary occupation
     
-    # YouTubers/Influencers - CHECK FIRST (before actors!)
-    # Many YouTubers have "actor" later in bio but are primarily content creators
+    # Define occupation keywords and their categories
+    occupation_map = {
+        # Category: (keywords, priority - lower = check first)
+        "influencers": (["youtuber", "youtube personality", "tiktok", "tiktoker", 
+                        "internet personality", "social media personality", "influencer",
+                        "vlogger", "streamer", "content creator"], 1),
+        "athletes": (["footballer", "athlete", "football player", "basketball player",
+                     "soccer player", "tennis player", "racing driver", "cricketer",
+                     "rugby player", "boxer", "golfer", "swimmer", "olympic"], 2),
+        "musicians": (["singer", "songwriter", "musician", "rapper", "vocalist",
+                      "recording artist", "pop star", "rock star"], 3),
+        "tv_personalities": (["television presenter", "tv presenter", "broadcaster",
+                             "television host", "talk show host", "radio presenter"], 4),
+        "tv_actors": (["television actor", "tv actor"], 5),
+        "movie_stars": (["actor", "actress", "film actor", "film actress"], 6),
+    }
+    
+    # Find which occupation appears FIRST in the bio
+    first_occupation = None
+    first_position = 999
+    
+    for category, (keywords, priority) in occupation_map.items():
+        for kw in keywords:
+            pos = bio_start.find(kw)
+            if pos != -1 and pos < first_position:
+                first_position = pos
+                first_occupation = category
+    
+    # If we found a clear first occupation, use it
+    if first_occupation and first_position < 100:
+        return first_occupation
+    
+    # YouTubers/Influencers - fallback check
     if any(x in bio_start for x in ["youtuber", "youtube personality", "youtube star",
                                      "tiktok", "tiktoker", "internet personality",
                                      "social media personality", "influencer",
@@ -2187,31 +2219,19 @@ def detect_category_from_bio(bio: str, name: str) -> str:
         return "reality_tv"
     
     # Royals - must specifically be about royal family, NOT just people with royal honors like "Sir"
-    # Only match actual members of royal families
     if any(x in bio_lower for x in ["member of the british royal family", "member of the royal family",
                                      "heir to the throne", "house of windsor", "buckingham palace", 
                                      "line of succession", "son of king", "daughter of queen",
                                      "grandson of queen", "granddaughter of queen"]):
         return "royals"
     
-    # Athletes - check BEFORE musicians (racing driver, footballer, etc. should take priority)
-    if any(x in bio_start for x in ["footballer", "athlete", "football player", "basketball player", 
-                                     "soccer player", "tennis player", "olympic", "racing driver",
-                                     "cricketer", "rugby", "boxer", "golfer", "swimmer"]):
-        return "athletes"
-    
-    # Also check full bio for athletes
+    # Athletes - full bio check
     if any(x in bio_lower for x in ["premier league", "f1", "formula one", "striker", "goalkeeper", 
                                      "midfielder", "defender", "bundesliga", "la liga", "serie a",
                                      "england national team", "world cup", "grand prix"]):
         return "athletes"
     
-    # Musicians/Singers - check first part of bio for primary occupation
-    if any(x in bio_start for x in ["singer", "songwriter", "musician", "rapper", "vocalist", 
-                                     "recording artist", "pop star", "rock star"]):
-        return "musicians"
-    
-    # Also check full bio for musicians
+    # Musicians - full bio check
     if any(x in bio_lower for x in ["album", "grammy", "brit award", "concert tour", "music artist",
                                      "hip hop artist", "r&b", "mezzo-soprano", "soprano", "tenor"]):
         return "musicians"
@@ -2225,20 +2245,15 @@ def detect_category_from_bio(bio: str, name: str) -> str:
                                      "business magnate", "billionaire", "ceo", "chief executive"]):
         return "public_figure"
     
-    # TV Presenters / Talk Show Hosts - check BEFORE generic "actor" check
-    if any(x in bio_start for x in ["television presenter", "tv presenter", "broadcaster",
-                                     "television host", "radio presenter", "talk show host"]):
-        return "tv_personalities"
-    
+    # TV Presenters - full bio check
     if any(x in bio_lower for x in ["chat show", "game show host", "news anchor", "news presenter"]):
         return "tv_personalities"
     
-    # TV actors - actual actors in TV series
-    if any(x in bio_lower for x in ["television actor", "tv actor", "television series", "tv series", 
-                                     "sitcom", "soap opera"]):
+    # TV actors - full bio check
+    if any(x in bio_lower for x in ["television series", "tv series", "sitcom", "soap opera"]):
         return "tv_actors"
     
-    # Movie stars - check for film/movie actors
+    # Movie stars - full bio check
     if any(x in bio_lower for x in ["actor", "actress", "film", "movie", "cinema", "hollywood", 
                                      "oscar", "academy award", "golden globe",
                                      "box office", "marvel", "superhero", "spider-man"]):
