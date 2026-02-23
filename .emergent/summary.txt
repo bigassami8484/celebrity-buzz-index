@@ -1,5 +1,5 @@
 <analysis>**original_problem_statement:**
-The user wants to build a Celebrity Buzz Index game. This is a full-stack web application where users act as fantasy league managers, drafting a team of celebrities with a starting budget. Points are awarded based on the celebrities' real-world media presence, sourced from Wikipedia and various news outlets.
+The user wants to build a Celebrity Buzz Index game. This is a full-stack web application where users act as a fantasy league manager, drafting a team of celebrities with a starting budget. Points are awarded based on the celebrities' real-world media presence, sourced from Wikipedia and various news outlets.
 
 **PRODUCT REQUIREMENTS:**
 -   **Application**: Full-stack web app with a React frontend and a FastAPI backend.
@@ -7,178 +7,160 @@ The user wants to build a Celebrity Buzz Index game. This is a full-stack web ap
 -   **Gameplay**:
     -   Users draft a team of 10 celebrities with a starting budget of £50M.
     -   A tiered, dynamic pricing system for celebrities where prices fluctuate based on media buzz.
-    -   A weekly transfer window opens every Saturday for 24 hours.
-    -   A weekly points system that resets to zero every Monday.
+    -   A weekly transfer window opens every Saturday for 24 hours, allowing 3 transfers.
+    -   A daily points system based on news mentions. Scandal/controversy news should provide a bonus.
+    -   A Submit Team button that locks the team until the next transfer window opens.
 -   **Authentication**: Guest mode, with a prompt to sign up/login (Google social login) to save progress.
 -   **Features**:
-    -   Autocomplete search bar with a quick add button.
-    -   A Hot Celebs This Week banner.
-    -   Private Friends Leagues.
-    -   A Brown Bread Watch for elderly celebrities.
+    -   Autocomplete search bar that prioritizes exact matches.
+    -   A Hot Celebs This Week banner where clicking a celebrity opens their details modal.
+    -   A Brown Bread Watch for elderly celebrities (80+).
+    -   A Most Picked list.
     -   Team naming with a profanity filter.
-    -   Display at least 10 random celebrities per category, with the selection changing on each refresh or category click.
-    -   A new Public Figure and TV Personalities category.
-    -   Celebrity news should cover the last 2 months and be refreshed every 24 hours.
-    -   The public player count should only be based on teams that have celebrities saved.
-    -   Each category should have a minimum of 100 celebrities in the database.
--   **UI/UX**: The application must be mobile-friendly, with a clean interface where all sections are visible on both desktop and mobile.
+    -   Celebrity news should be from real news sources (past 7 days), and articles should be clickable links.
+    -   Categories should display a randomized set of 8 celebrities.
+-   **UI/UX**: The application must have a mobile-first design, be a PWA, and have a proper favicon.
+-   **SEO**: The homepage must be crawlable with static HTML content.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack application with a React frontend and a FastAPI backend. The frontend is component-based, but the backend is a single monolithic  file.
-
-In this session, significant progress was made on data quality and user-facing features:
--   **Category Correction**: Fixed miscategorized celebrities (e.g., Graham Norton to Other).
--   **Randomized Celebrity Display**: The main celebrity view now shows a random selection of 10 celebrities per category on each click/refresh, pulled from large data pools.
--   **News System Overhaul**: News fetching was expanded to cover the last 2 months and includes a 24-hour refresh mechanism. An admin endpoint was created to backfill news for all celebrities.
--   **New Categories**: Public Figure and TV Personalities were created and populated.
--   **Database Expansion**: Large pools of 50-100+ celebrities were defined for each category. An admin endpoint to populate the database from these pools was created, and many categories were expanded.
--   **Player Count Fix**: The footer count now correctly reflects only teams with at least one celebrity.
--   **Data Cleaning**: Fixed several data integrity issues, including duplicate celebrities and incorrect entries (e.g., a Love Island TV show appearing as a person).
+A full-stack application (React/FastAPI/MongoDB) with a database of approximately 1,600 celebrities. All celebrities have been updated with real Wikipedia images (where available), full Wikipedia bios, and have been accurately re-categorized based on their primary occupation. The news system fetches real articles from over 45 UK/US sources with a 7-day lookback window. The pricing system has been updated to be more dynamic and varied within celebrity tiers. Numerous data quality fixes requested by the user have been implemented.
 
 **Last working item**:
--   **Last item agent was working**: The agent was addressing a large batch of user feedback. This included:
-    1.  Creating a new TV Personalities category and moving presenters into it.
-    2.  Correcting data for specific celebrities (Brian Cox, Chris Hughes, Joanna Lumley).
-    3.  Deleting incorrect entries (a Love Island TV show).
-    4.  Addressing user reports of missing images for several celebrities (Scarlett Johansson, Sam Thompson, etc.).
--   **Status**: IN PROGRESS
--   **Agent Testing Done**: N
--   **Which testing method agent to use?**: Frontend testing agent or screenshot tool. The agent needs to verify the new TV Personalities category, check that the corrected celebrities appear in the right places, and investigate/fix the missing images.
--   **User Testing Done**: N
+-   **Last item agent was working**: The user requested a new batch of data quality and UI adjustments: add images for specific celebrities (Jake Paul, Martha Stewart), re-categorize Charlie Kirk, add more UK reality and TV stars (with images only), and redesign the bio text on the celebrity card to be smaller and not obstruct the celebrity's image.
+-   **Status**: NOT STARTED
+-   **Agent Testing Done**: N/A
+-   **Which testing method agent to use?**: Frontend testing agent for the UI change on the celebrity card, and manual verification via  for the data changes.
+-   **User Testing Done**: N/A
 
 **All Pending/In progress Issue list**:
--   **Issue 1: Production Mobile View is Broken (P0)**
-    -   **Description**: A critical, recurring issue where the live production site () is missing key components on mobile, despite working correctly in the dev preview.
-    -   **Attempted fixes**: CSS classes () were removed, and deployment blockers were fixed. The issue persists on production.
-    -   **Next debug checklist**: This is likely a deployment or caching issue outside the agent's direct control. Guide the user to **redeploy** the latest changes, wait 5-10 minutes, and perform a **hard refresh** (clear cache/incognito). If it still fails, direct them to **Emergent Support**.
-    -   **Why fix this issue and what will be achieved with the fix?**: The app is unusable for mobile users on production.
+-   **Issue 1: Implement latest user requests (P0)**
+    -   **Description**: Address the user's latest batch of requests, which involve both data manipulation (adding/categorizing celebrities) and a frontend UI change to the celebrity card.
+    -   **Attempted fixes**: None.
+    -   **Next debug checklist**:
+        1.  Attempt to find and add images for Jake Paul and Martha Stewart.
+        2.  Find Charlie Kirk in the database and update his category to 'public_figure'.
+        3.  Source lists of UK reality and TV stars and add them to the database, ensuring they have available images.
+        4.  Modify : reduce the bio's font size and change its CSS to prevent it from covering the celebrity's face (e.g., using an overlay at the bottom).
+    -   **Why fix this issue and what will be achieved with the fix?**: Fulfills the user's direct requests for improved data quality and UI usability.
+    -   **Status**: NOT STARTED
+    -   **Is recurring issue?**: N
+    -   **Should Test frontend/backend/both after fix?**: Both.
+    -   **Blocked on other issue**: None.
+
+-   **Issue 2: Production Mobile View is Broken (P1)**
+    -   **Description**: A recurring, critical issue where the user reports the live production site is not rendering correctly on mobile devices. This is **not reproducible** in the development preview environment.
+    -   **Attempted fixes**: The agent has repeatedly confirmed mobile responsiveness in the dev environment. The issue is likely related to the production deployment environment.
+    -   **Next debug checklist**: Instruct the user to contact **Emergent Support**. Do not attempt to fix this with code, as it is an environment issue beyond the agent's control.
     -   **Status**: BLOCKED
     -   **Is recurring issue?**: Y
     -   **Should Test frontend/backend/both after fix?**: Frontend (requires user verification on production).
-    -   **Blocked on other issue**: Blocked on user action (deployment and cache clearing).
--   **Issue 2: Add Missing Celebrity Images (P1)**
-    -   **Description**: The user reported several celebrities are missing images, including Scarlett Johansson, Brian Cox (the astrologer), Queen Camilla, Spencer Matthews, Sam Thompson, and others. The user wants images for all celebrities where possible.
-    -   **Attempted fixes**: None. This was part of the last user request and has not been started.
-    -   **Next debug checklist**:
-        1.  Investigate the  function in  to understand how images are fetched or generated.
-        2.  Check the  collection in the database to see if entries exist for these celebrities.
-        3.  Trigger the image generation/fetching logic for the specified celebrities.
-        4.  Verify on the frontend that the images appear.
-    -   **Why fix this issue and what will be achieved with the fix?**: Improves UI/UX and professional appearance of the app.
-    -   **Status**: NOT STARTED
-    -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: Frontend.
+    -   **Blocked on other issue**: Blocked on user action (contacting support).
 
 **In progress Task List**:
--   **Task 1: Complete Database Population (P2)**
-    -   **Where to resume**: The agent was using an admin endpoint () and background scripts to populate the database to have at least 100 celebrities per category. This is a long-running process. The agent should run  to check the final counts for each category and continue running the population script for any categories that are still under 100.
-    -   **What will be achieved with this?**: Ensures a large and varied pool for the random celebrity selection feature, meeting the user's requirement.
+-   **Task 1: Backend Refactoring (Phase 2 - Continued)**
+    -   **Where to resume**: Create  and  and migrate the relevant endpoints from . The  file serves as a template.
+    -   **What will be achieved with this?**: Improved code maintainability and scalability for the backend.
     -   **Status**: IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?**: Backend.
-    -   **Blocked on something**: No, but it is a time-consuming background task.
+    -   **Should Test frontend/backend/both after fix?**: Backend
+    -   **Blocked on something**: Blocked by the user's current P0 requests. This should be resumed after the immediate tasks are completed.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks**:
-    -   **P0: Backend Refactoring**: Critically,  is a 4000+ line monolithic file that must be broken down into a modular structure (e.g., , , ). The user has already approved this task.
-    -   **P1: Link Guest Team on Sign-in**: When a guest user with a team signs in, their team should be automatically linked to their new account.
-    -   **P1: Flesh out Hot Streak Notifications**: The backend endpoint and UI component exist, but the feature needs to be fully developed to actively notify users.
+    -   **P1**: Flesh out Hot Streak Notifications (implement actual browser push notifications).
+    -   **P1**: Link Guest Team on Sign-in (verify this functionality still works as expected).
 -   **Future Tasks**:
-    -   **P2: Celebrity Comparison Feature**: Allow users to compare two or more celebrities side-by-side.
-    -   **P2: Push Notifications**: For events like the transfer window opening.
-    -   **P2: Badge system and Hall of Fame page**.
+    -   **P2**: Private Friends Leagues.
+    -   **P2**: Celebrity Comparison Feature.
+    -   **P2**: Push Notifications (e.g., for transfer window opening).
+    -   **P2**: Badge system and Hall of Fame page.
 
 **Completed work in this session**
--   **Celebrity Category Overhaul**: Fixed numerous miscategorized celebrities and implemented a robust system with specific overrides and improved bio-parsing logic.
--   **Randomized Celebrity Display**: Implemented a feature to show a random selection of 10 celebrities per category on each click/refresh using MongoDB's  aggregation.
--   **News System Revamp**: Changed news fetching to cover the last 2 months and added a 24-hour refresh mechanism.
--   **Database Expansion & Admin Tools**: Defined large celebrity data pools (50-100+ per category) and created admin endpoints (, , ) to manage data integrity and backfill content.
--   **New Categories**: Added Public Figure and TV Personalities categories with corresponding data pools and frontend icons.
--   **Player Count Logic**: Fixed the player count to be based on teams with drafted celebrities, not all created teams.
--   **Data Sanitization**: Removed duplicate celebrities and incorrect entries (e.g., TV shows listed as people) from the database.
--   **UI Fixes**: Removed the All category tab and ensured the frontend correctly handles the new randomized data flow with cache-busting.
+-   **Mass Celebrity Data Update**: Successfully updated over 1,600 celebrities with real Wikipedia images and full biographical text, overcoming previous API rate-limiting issues by using Wikidata.
+-   **Advanced Recategorization**: Implemented a sophisticated engine to parse Wikipedia bios and accurately categorize all 1,900+ celebrities based on their primary occupation.
+-   **Data Cleaning & User Requests**: Performed extensive data cleanup, removing duplicates, bands, and non-celebrities, and correcting categories for dozens of individuals as requested by the user.
+-   **Pricing System Overhaul**: Randomized celebrity prices within their tiers to create more dynamic and realistic valuation.
+-   **News System Refinements**: Changed the news-fetching window to 7 days, added more UK/US news sources, and fixed a caching bug that showed incorrect articles for Michael Jordan.
+-   **UI Updates**: Modified the celebrity card to show more of the bio and removed ~326 celebrities without images to improve visual consistency.
+-   **TV Actors Category Populated**: Expanded the  category from 3 to over 80 celebrities by moving existing actors from  and other categories.
 
 **Earlier issues found/mentioned but not fixed**
--   The issue of missing celebrity images was mentioned in the last user message and is now listed in the All Pending/In progress Issue list.
+-   None.
 
 **Known issue recurrence from previous fork**
--   **Production Mobile View is Broken**: The user has reported this issue across multiple sessions. It is the highest priority user-facing bug.
+-   **Issue recurrence in previous fork**: Production Mobile View is Broken
+-   **Recurrence count**: 4
+-   **Status**: BLOCKED
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend**: React.js, TailwindCSS, 
--   **Backend**: Python, FastAPI, Motor (async MongoDB driver), Pydantic
--   **Database**: MongoDB aggregation pipeline with  for true random document selection.
--   **Authentication**: Emergent-managed Google OAuth
--   **Data Sources**: Wikipedia API, Wikidata API, Public RSS Feeds, OpenAI
+-   **Wikidata SPARQL**: Used as a successful workaround for Wikipedia's public API rate limits to perform a mass update of celebrity images and occupation data.
+-   **Background Processing**: Long-running data update scripts were executed as background processes using  to prevent timeouts.
+-   **Advanced Text Processing**: Utilized Python's  module for advanced parsing of Wikipedia bios to accurately determine a celebrity's primary occupation for categorization.
 
 **key DB schema**
 -   **celebrities**: 
--   **teams**: 
 
 **changes in tech stack**
 -   None.
 
 **All files of reference**
--   : Heavily modified. Contains all new endpoints, category logic, data pools, news refresh logic, and player count logic.
--   : Modified to handle fetching randomized celebrity data, including clearing state and cache-busting.
--   : Modified to remove the All tab and add icons for Public Figure and TV Personalities.
--   : Modified to add a cache-busting timestamp to API calls.
--   : Updated with completed tasks.
+-   : Heavily modified. Contains new admin endpoints for Wikidata/Wikipedia updates, the advanced bio-parsing and categorization logic, and updated news-fetching logic (7-day window, more sources, stricter matching).
+-   : Modified to increase the amount of bio text displayed ().
+-   : Updated to reflect completed work.
 
 **Areas that need refactoring**:
--   **Critical**: . This is a massive monolithic file that urgently needs to be broken down into a modular structure (routes, models, services). This is the highest priority engineering task.
+-   **Critical**: . The file has become extremely large and difficult to maintain. The task to migrate endpoints into the  directory should be prioritized after the current user requests are fulfilled.
 
 **key api endpoints**
--   : Returns a random sample of 10 celebrities for the given category.
--   : Fetches a celebrity, refreshing their news if it's older than 24 hours.
--   : Returns site statistics, including the corrected player count.
--   : Admin endpoint to re-run category detection for all celebrities.
--   : Admin endpoint to backfill news for all celebrities.
--   : Admin endpoint to populate the database with new celebrities from predefined pools.
+-   ****: New endpoint to fetch images and categories from Wikidata.
+-   ****: New endpoint to fetch Wikipedia bios and perform advanced recategorization.
+-   ****: New endpoint to monitor data update progress.
 
 **Critical Info for New Agent**
--   **Production vs. Dev Mismatch**: The top priority user issue is the broken mobile view on the live production site. Do not attempt code changes for this first. Guide the user through deployment and cache-clearing steps. If that fails, escalate to Emergent Support.
--   **Backend Refactoring is P0**: The  monolith is unmanageable. This refactoring was approved but not started and should be proposed as the next major work item after addressing the user's immediate feedback.
--   **Database Population is Slow**: Populating categories with 100+ celebrities is a long-running background task.  calls will time out. Use background processes () or non-blocking scripts to complete this.
--   **User is Highly Specific**: The user provides detailed, frequent feedback. Verify every change, especially around data accuracy and UI behavior, before finishing.
+-   **UI Change Required**: The user's highest priority is a UI change. The bio text on the celebrity card needs to be smaller and repositioned so it doesn't obscure the celebrity's face. This will require CSS adjustments in .
+-   **Data Accuracy**: The user is highly focused on the quality of the data. Be prepared to perform targeted data fixes for specific celebrities.
+-   **Production Mobile Bug**: Reiterate to the user that this issue cannot be fixed by you and they must contact Emergent Support. Do not attempt to debug it.
+-   **Backend Refactoring**: The backend  is now over 5,500 lines long. This refactoring task is overdue and should be addressed soon.
 
 **documents and test reports created in this job**
--    (Updated)
+-    (updated)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: Still getting the same celebs, not random. **Status**: **Completed**. Agent fixed by using , clearing state, and adding no-cache headers.
-2.  **User**: I want completely new celebs that haven't appeared before. **Status**: **Completed**. Agent created large data pools and a new endpoint logic to pull from them.
-3.  **User**: UN category appearing, Greta Thunberg is a duplicate, Royals list isn't 10. **Status**: **Completed**. Agent fixed  results, removed duplicates from pools, and fixed logic to ensure 10 results.
-4.  **User**: Duplicate Rishi Sunak still appearing. **Status**: **Completed**. Agent found and deleted duplicate entries from the database.
-5.  **User**: Want at least 50 in each pool. **Status**: **Completed**. Agent expanded all pools to 50-100+ celebrities.
-6.  **User**: Grace Kelly is not a royal, Beckham kids should be in other, and some categories still show the same 10 people. **Status**: **Completed**. Agent moved celebrities, fixed DB, and began populating the smaller categories from larger pools.
-7.  **User**: News should update every 24 hours, player count should be based on saved teams, and a minimum of 100 celebs per category. **Status**: **Completed** (news/player count) / **In Progress** (100 celebs/category).
-8.  **User (Latest)**: A large list of data fixes: Add pics for many celebs, re-categorize Brian Cox and Joanna Lumley, fix Chris Hughes confusion, remove the Love Island TV show, and create a new TV Personalities category. **Status**: **IN PROGRESS**.
+1.  **User**: Recategorize celebs based on first occupation and fix bios. **Status: Completed**.
+2.  **User**: Data fixes: Correct Pink, remove duplicate Lilibet, remove bands/groups, fix Kim K pic, recategorize several celebs. **Status: Completed**.
+3.  **User**: Remove TV shows, fix King Charles III, randomize C-list/D-list prices, re-add news from past 2 months. **Status: Completed**.
+4.  **User**: Fix Davide Sanclimenti's wiki link, move Usher from D-list, remove Unbox Therapy, move Ekin-Su. **Status: Completed**.
+5.  **User**: Fix  category, add images for Graham Norton, Charlie Dimmock, Richard Hammond, and other A/B/C-listers. **Status: Completed**.
+6.  **User**: Make sure news is showing. **Status: Completed**.
+7.  **User**: Remove the 326 celebs without pictures, add more celebs to . **Status: Completed**.
+8.  **User**: Add 50 more TV stars, move Anna Maxwell Martin, fix news to be 2 months and use full name matching (re: Michael Jordan). **Status: Completed**.
+9.  **User**: Change news to 7 days, add more RSS sources, disable AI news, and add more bio text to celebrity cards. **Status: Completed**.
+10. **User (Pending)**: add a pic for jake paul, martha stewart,kim kardashian, move charlie kirk into public figure, add a few more uk stars to reality tv but only if they have pics, make the text smaller for the bio and move it all around so the celebs face can be seen. add 10 more uk tv stars with pics. **Status: NOT STARTED**.
 
 **Project Health Check:**
--   **Broken**: The user-facing production mobile view is still reported as broken.
--   **Mocked**: Some categories do not yet have 100+ celebrities in the database, though the population task is in progress. The main leaderboard is still using placeholder data.
+-   **Broken**:
+    -   The user reports the production mobile view is broken (unverified by agent, recurring).
+-   **Mocked**: None.
 
 **3rd Party Integrations**
--   **OpenAI GPT-4o**: Used for news analysis. (Uses Emergent LLM Key)
+-   **OpenAI GPT-4o**: Used for minor background tasks (Uses Emergent LLM Key).
 -   **Emergent-managed Google Auth**: Used for user login.
--   **Wikipedia API / Wikidata API**: For celebrity data sourcing.
--   **Public RSS Feeds**: For news aggregation.
+-   **Wikipedia API / Wikidata API**: For celebrity data, images, and deceased status.
+-   **Public RSS Feeds**: An extensive list of ~45+ entertainment and news sources.
+-   **APScheduler**: For backend scheduled jobs.
 
 **Testing status**
 -   **Testing agent used after significant changes**: NO
 -   **Troubleshoot agent used after agent stuck in loop**: NO
--   **Test files created**: None
--   **Known regressions**: The mobile view on the production deployment is broken, despite working in the dev environment.
+-   **Test files created**: None.
+-   **Known regressions**: User-reported broken mobile view on production deployment (persists from previous fork).
 
 **Credentials to test flow:**
 -   None required. Authentication uses the Emergent-managed Google login flow.
 
 **What agent forgot to execute**
--   The critical **backend refactoring** of  was not started.
--   The latest user request to **add missing images** for several celebrities has not been addressed yet.
--   The task to **populate all categories to 100+ celebrities** is still running and not fully complete for all categories.</analysis>
+-   The agent has not forgotten any tasks but has not yet started the user's most recent request.</analysis>
