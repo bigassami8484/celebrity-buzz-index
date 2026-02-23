@@ -11,44 +11,40 @@ const TransferWindowBanner = ({ stats }) => {
     const updateCountdown = () => {
       const now = new Date();
       
-      // Calculate if window is open (Saturday 12pm GMT to Sunday 12pm GMT)
-      const utcDay = now.getUTCDay();
+      // Calculate if window is open (Sunday 12pm GMT to Sunday 12am/midnight GMT)
+      const utcDay = now.getUTCDay(); // 0 = Sunday
       const utcHour = now.getUTCHours();
       const utcMinutes = now.getUTCMinutes();
       const utcSeconds = now.getUTCSeconds();
       
-      // Window is open: Saturday (6) from 12:00 to Sunday (0) 12:00 UTC
-      const windowOpen = (utcDay === 6 && utcHour >= 12) || (utcDay === 0 && utcHour < 12);
+      // Window is open: Sunday (0) from 12:00 to 23:59 UTC (12 hours)
+      const windowOpen = utcDay === 0 && utcHour >= 12 && utcHour < 24;
       setIsOpen(windowOpen);
       
       if (windowOpen) {
-        // Calculate time remaining until Sunday 12pm GMT
-        let hoursLeft, minsLeft, secsLeft;
-        if (utcDay === 6) {
-          // Saturday after 12pm - hours until midnight + 12 hours Sunday
-          hoursLeft = (23 - utcHour) + 12;
-          minsLeft = 59 - utcMinutes;
-          secsLeft = 59 - utcSeconds;
-        } else {
-          // Sunday before 12pm
-          hoursLeft = 11 - utcHour;
-          minsLeft = 59 - utcMinutes;
-          secsLeft = 59 - utcSeconds;
-        }
+        // Calculate time remaining until midnight GMT
+        const hoursLeft = 23 - utcHour;
+        const minsLeft = 59 - utcMinutes;
+        const secsLeft = 59 - utcSeconds;
         setCountdown(`${hoursLeft}h ${minsLeft}m ${secsLeft}s remaining`);
       } else {
-        // Calculate time until next Saturday 12pm GMT
-        let daysUntil = (6 - utcDay + 7) % 7;
-        if (daysUntil === 0 && utcHour >= 12) {
-          daysUntil = 7;
+        // Calculate time until next Sunday 12pm GMT
+        let daysUntil = (7 - utcDay) % 7; // Days until Sunday
+        if (daysUntil === 0) {
+          // It's Sunday
+          if (utcHour < 12) {
+            daysUntil = 0; // Today at noon
+          } else {
+            daysUntil = 7; // Next Sunday (window already closed)
+          }
         }
         
-        // Calculate exact time until Saturday 12:00 GMT
-        const nextSaturday = new Date(now);
-        nextSaturday.setUTCDate(now.getUTCDate() + daysUntil);
-        nextSaturday.setUTCHours(12, 0, 0, 0);
+        // Calculate exact time until Sunday 12:00 GMT
+        const nextSunday = new Date(now);
+        nextSunday.setUTCDate(now.getUTCDate() + daysUntil);
+        nextSunday.setUTCHours(12, 0, 0, 0);
         
-        const diff = nextSaturday - now;
+        const diff = nextSunday - now;
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -89,8 +85,8 @@ const TransferWindowBanner = ({ stats }) => {
       </div>
       <p className="text-[10px] sm:text-xs text-[#A1A1AA]/70 mt-1">
         {isOpen 
-          ? "Make up to 3 transfers now! Window closes Sunday 12pm GMT" 
-          : "3 transfers allowed per window • Every Saturday 12pm - Sunday 12pm GMT"
+          ? "Make up to 3 transfers now! Window closes at midnight GMT" 
+          : "3 transfers allowed per window • Every Sunday 12pm - 12am GMT"
         }
       </p>
     </div>
