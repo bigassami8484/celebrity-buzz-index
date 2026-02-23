@@ -808,12 +808,12 @@ function App() {
         {/* Celebrity Grid */}
         <div className="mb-6">
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
               {[1, 2, 3, 4].map(i => <LoadingCard key={i} />)}
             </div>
           ) : celebrities.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" data-testid="celebrity-grid">
-              {celebrities.map(celeb => (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4" data-testid="celebrity-grid">
+              {(isMobile ? celebrities.slice(0, 6) : celebrities).map(celeb => (
                 <CelebrityCard
                   key={celeb.id}
                   celebrity={celeb}
@@ -821,6 +821,7 @@ function App() {
                   isInTeam={isInTeam(celeb.id)}
                   canAfford={canAfford(celeb.price)}
                   onShowPriceHistory={handleShowPriceHistory}
+                  compact={isMobile}
                 />
               ))}
             </div>
