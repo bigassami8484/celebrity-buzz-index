@@ -2029,7 +2029,7 @@ def detect_category_from_bio(bio: str, name: str) -> str:
             # Additional TV personalities (broadcasters known primarily for TV work)
             "jeremy clarkson", "richard hammond", "james may", "alan titchmarsh", "sue perkins",
             "alexander armstrong", "sophie raworth", "andrew marr", "chris cuomo", "eamonn holmes",
-            "gary lineker",
+            "gary lineker", "matt lucas", "david mitchell", "lee mack", "mel giedroyc",
         ],
         
         # Reality TV Stars
