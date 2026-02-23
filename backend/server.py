@@ -5438,66 +5438,72 @@ def extract_category_from_description(description: str) -> str:
             if cat and occ in occupation_phrase:
                 return cat
     
-    # Check full description for specific occupations (ordered by priority)
-    # Athletes first (boxer, footballer, racing driver are strong indicators)
-    if 'boxer' in desc_lower or 'boxing' in desc_lower:
+    # IMPORTANT: For fallback checks, use only the FIRST SENTENCE to avoid
+    # false positives from mentions of other people (e.g., "sex tape with singer Ray J")
+    first_sentence = description.split('.')[0].lower() if description else desc_lower
+    
+    # Check first sentence for TV personality FIRST (before musicians/actors)
+    # This handles cases like Kim Kardashian where "singer" appears later referring to someone else
+    if 'media personality' in first_sentence or 'television personality' in first_sentence:
+        return 'reality_tv'
+    if 'socialite' in first_sentence:
+        return 'reality_tv'
+    if 'reality television' in first_sentence or 'reality tv' in first_sentence:
+        return 'reality_tv'
+    
+    # Athletes (strong indicators - boxer, footballer are rarely mentioned for others)
+    if 'boxer' in first_sentence or 'boxing' in first_sentence:
         return 'athletes'
-    if 'footballer' in desc_lower or 'football player' in desc_lower or 'soccer player' in desc_lower:
+    if 'footballer' in first_sentence or 'football player' in first_sentence:
         return 'athletes'
-    if 'racing driver' in desc_lower or 'formula one' in desc_lower or 'f1 driver' in desc_lower:
+    if 'racing driver' in first_sentence or 'formula one' in first_sentence:
         return 'athletes'
-    if 'tennis player' in desc_lower or 'cricketer' in desc_lower or 'golfer' in desc_lower:
+    if 'tennis player' in first_sentence or 'cricketer' in first_sentence or 'golfer' in first_sentence:
         return 'athletes'
-    if 'basketball player' in desc_lower or 'baseball player' in desc_lower:
+    if 'basketball player' in first_sentence or 'baseball player' in first_sentence:
         return 'athletes'
-    if 'swimmer' in desc_lower or 'gymnast' in desc_lower or 'olympian' in desc_lower:
+    if 'swimmer' in first_sentence or 'gymnast' in first_sentence or 'olympian' in first_sentence:
         return 'athletes'
     
-    # Musicians
-    if 'singer' in desc_lower or 'songwriter' in desc_lower:
+    # Musicians - check in first sentence only
+    if 'singer' in first_sentence or 'songwriter' in first_sentence:
         return 'musicians'
-    if 'rapper' in desc_lower or 'musician' in desc_lower:
+    if 'rapper' in first_sentence or 'musician' in first_sentence:
         return 'musicians'
     
     # Chefs and comedians
-    if 'chef' in desc_lower or 'restaurateur' in desc_lower:
+    if 'chef' in first_sentence or 'restaurateur' in first_sentence:
         return 'other'
-    if 'comedian' in desc_lower or 'stand-up' in desc_lower or 'comic' in desc_lower:
+    if 'comedian' in first_sentence or 'stand-up' in first_sentence or 'comic' in first_sentence:
         return 'other'
     
     # Actors
-    if 'actor' in desc_lower or 'actress' in desc_lower:
+    if 'actor' in first_sentence or 'actress' in first_sentence:
         return 'movie_stars'
     
-    # TV categories - check before public figure
-    if 'television presenter' in desc_lower or 'tv presenter' in desc_lower or 'chat show' in desc_lower:
+    # TV categories
+    if 'television presenter' in first_sentence or 'tv presenter' in first_sentence:
         return 'tv_personalities'
-    if 'television actor' in desc_lower or 'television actress' in desc_lower:
+    if 'television actor' in first_sentence or 'television actress' in first_sentence:
         return 'tv_actors'
-    if 'reality television' in desc_lower or 'reality tv' in desc_lower or 'love island' in desc_lower:
-        return 'reality_tv'
     
-    # For "media personality" or "television personality" - check if they're primarily a personality
-    # before checking business roles
-    if 'media personality' in desc_lower or 'television personality' in desc_lower:
-        return 'reality_tv'
-    if 'socialite' in desc_lower:
-        return 'reality_tv'
-    
-    # Public figures - but only if NOT primarily a personality
-    if 'politician' in desc_lower:
+    # Public figures
+    if 'politician' in first_sentence:
         return 'public_figure'
-    # Only categorize as public_figure if business is the PRIMARY occupation (first in list)
-    # Check if "businessman/businesswoman/entrepreneur" appears before "personality"
-    business_pos = min(
-        desc_lower.find('businessman') if 'businessman' in desc_lower else 9999,
-        desc_lower.find('businesswoman') if 'businesswoman' in desc_lower else 9999,
-        desc_lower.find('entrepreneur') if 'entrepreneur' in desc_lower else 9999
-    )
-    personality_pos = min(
-        desc_lower.find('personality') if 'personality' in desc_lower else 9999,
-        desc_lower.find('socialite') if 'socialite' in desc_lower else 9999
-    )
+    if 'businessman' in first_sentence or 'businesswoman' in first_sentence or 'entrepreneur' in first_sentence:
+        return 'public_figure'
+    
+    # Other
+    if 'model' in first_sentence or 'author' in first_sentence or 'writer' in first_sentence:
+        return 'other'
+    if 'journalist' in first_sentence or 'presenter' in first_sentence:
+        return 'tv_personalities'
+    
+    # Default for "personality" with no clear occupation
+    if 'personality' in first_sentence:
+        return 'reality_tv'
+    
+    return None
     
     if business_pos < personality_pos and business_pos < 9999:
         return 'public_figure'
