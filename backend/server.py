@@ -3422,9 +3422,11 @@ async def get_hot_celebs():
         # Sports
         "Cristiano Ronaldo", "Lionel Messi", "Neymar", "Kylian Mbappé", "Erling Haaland",
         "Lewis Hamilton", "Max Verstappen", "Serena Williams", "Roger Federer", "Rafael Nadal",
-        "LeBron James", "Michael Jordan", "Tom Brady", "Patrick Mahomes", "Travis Kelce",
+        "LeBron James", "Tom Brady", "Patrick Mahomes", "Travis Kelce",
         "Simone Biles", "Usain Bolt", "Tiger Woods", "Conor McGregor", "Floyd Mayweather",
         "David Beckham", "Wayne Rooney", "Harry Kane", "Marcus Rashford", "Bukayo Saka",
+        # Actors - more
+        "Michael B. Jordan", "Chadwick Boseman", "Idris Elba", "Daniel Kaluuya",
         # Tech/Business
         "Elon Musk", "Jeff Bezos", "Mark Zuckerberg", "Bill Gates", "Kim Kardashian",
         "Kylie Jenner", "Kendall Jenner", "Kourtney Kardashian", "Khloé Kardashian",
