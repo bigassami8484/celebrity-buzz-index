@@ -935,6 +935,7 @@ function App() {
           leaderboard={leagueLeaderboard}
           teamId={team?.id}
           onClose={() => setSelectedLeague(null)}
+          apiUrl={API_URL}
         />
       )}
       
