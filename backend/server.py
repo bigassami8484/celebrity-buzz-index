@@ -1595,7 +1595,7 @@ async def calculate_tier_from_wikipedia_data(name: str, http_client: httpx.Async
         # Musicians - Global Icons
         "adele", "taylor swift", "beyoncé", "beyonce", "rihanna", "drake", "ed sheeran",
         "lady gaga", "bruno mars", "justin bieber", "ariana grande", "the weeknd",
-        "kanye west", "jay-z", "eminem", "madonna", "cher", "elton john", "paul mccartney",
+        "kanye west", "jay-z", "jay z", "eminem", "madonna", "cher", "elton john", "paul mccartney",
         "mick jagger", "bono", "sting", "celine dion", "whitney houston", "michael jackson",
         "prince", "david bowie", "freddie mercury", "bob dylan", "bruce springsteen",
         "stevie wonder", "billy joel", "phil collins", "rod stewart", "eric clapton",
@@ -1603,21 +1603,26 @@ async def calculate_tier_from_wikipedia_data(name: str, http_client: httpx.Async
         "tina turner", "aretha franklin", "shakira", "jennifer lopez", "britney spears",
         "christina aguilera", "katy perry", "miley cyrus", "dua lipa", "billie eilish",
         "harry styles", "bad bunny", "post malone", "kendrick lamar", "travis scott",
+        "pink", "p!nk", "dr dre", "dr. dre", "snoop dogg", "50 cent", "nicki minaj",
+        "cardi b", "doja cat", "lizzo", "bb king", "b.b. king",
         
         # Actors - A-List Hollywood
         "tom cruise", "leonardo dicaprio", "brad pitt", "george clooney", "matt damon",
         "denzel washington", "will smith", "tom hanks", "morgan freeman", "samuel l. jackson",
-        "robert downey jr.", "johnny depp", "keanu reeves", "dwayne johnson", "the rock",
-        "chris hemsworth", "chris pratt", "chris evans", "ryan reynolds", "ryan gosling",
-        "joaquin phoenix", "christian bale", "jake gyllenhaal", "matthew mcconaughey",
+        "samuel l jackson", "robert downey jr.", "robert downey jr", "johnny depp", 
+        "keanu reeves", "dwayne johnson", "the rock", "chris hemsworth", "chris pratt", 
+        "chris evans", "ryan reynolds", "ryan gosling", "joaquin phoenix", "christian bale", 
+        "jake gyllenhaal", "matthew mcconaughey", "mark wahlberg", "ben affleck",
         "meryl streep", "julia roberts", "sandra bullock", "nicole kidman", "cate blanchett",
         "angelina jolie", "jennifer aniston", "reese witherspoon", "scarlett johansson",
         "natalie portman", "anne hathaway", "emma stone", "jennifer lawrence", "charlize theron",
         "cameron diaz", "drew barrymore", "kate winslet", "margot robbie", "gal gadot",
-        "zendaya", "florence pugh", "timothée chalamet", "adam sandler", "jim carrey",
-        "eddie murphy", "ben stiller", "steve carell", "seth rogen", "jonah hill",
+        "zendaya", "florence pugh", "timothée chalamet", "timothee chalamet", "adam sandler", 
+        "jim carrey", "eddie murphy", "ben stiller", "steve carell", "seth rogen", "jonah hill",
         "robert de niro", "al pacino", "jack nicholson", "dustin hoffman", "anthony hopkins",
         "michael caine", "ian mckellen", "patrick stewart", "harrison ford", "clint eastwood",
+        "sylvester stallone", "arnold schwarzenegger", "bruce willis", "kevin hart",
+        "vince vaughn", "owen wilson", "terry crews", "sofia vergara", "zoe saldana",
         
         # TV Stars - Major
         "oprah winfrey", "ellen degeneres", "jimmy fallon", "jimmy kimmel", "stephen colbert",
@@ -1628,19 +1633,22 @@ async def calculate_tier_from_wikipedia_data(name: str, http_client: httpx.Async
         "cristiano ronaldo", "lionel messi", "lebron james", "michael jordan", "serena williams",
         "roger federer", "rafael nadal", "novak djokovic", "usain bolt", "simone biles",
         "tiger woods", "david beckham", "tom brady", "floyd mayweather", "conor mcgregor",
-        "lewis hamilton", "michael schumacher",
+        "lewis hamilton", "michael schumacher", "kobe bryant", "michael phelps",
         
         # Royals
-        "queen elizabeth", "king charles", "prince william", "prince harry", "kate middleton",
-        "meghan markle", "princess diana",
+        "queen elizabeth", "king charles", "king charles iii", "prince william", "prince harry", 
+        "kate middleton", "meghan markle", "princess diana",
         
         # Tech/Business Icons
         "elon musk", "jeff bezos", "bill gates", "mark zuckerberg", "steve jobs",
-        "oprah winfrey", "warren buffett",
+        "warren buffett",
+        
+        # Political/Public Figures
+        "donald trump", "barack obama", "joe biden", "george w bush", "george w. bush",
+        "hillary clinton", "michelle obama",
         
         # Other Global Icons
         "victoria beckham", "kim kardashian", "kylie jenner", "paris hilton",
-        "donald trump", "barack obama", "joe biden",
     }
     
     name_lower = name.lower().strip()
