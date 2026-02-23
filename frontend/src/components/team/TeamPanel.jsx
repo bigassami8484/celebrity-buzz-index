@@ -49,7 +49,7 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize, onSubmitTeam, isTrans
       {isTeamLocked && (
         <div className="bg-red-500/10 border border-red-500/50 p-2 mb-4 flex items-center justify-center gap-2 text-xs">
           <Lock className="w-3 h-3 text-red-400" />
-          <span className="text-red-400">Team locked until transfer window (Saturday)</span>
+          <span className="text-red-400">Team locked until transfer window (Sunday 12pm)</span>
         </div>
       )}
       {isTransferWindowOpen && (
