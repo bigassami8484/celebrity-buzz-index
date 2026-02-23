@@ -867,7 +867,8 @@ function App() {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
+        {/* Friends Leagues and Sidebar - Hidden on mobile for cleaner layout */}
+        <div className={`${isMobile ? 'hidden' : 'grid'} grid-cols-1 lg:grid-cols-12 gap-8 mt-8`}>
           {/* Main Content */}
           <div className="lg:col-span-8 space-y-6">
             <LeaguePanel
@@ -904,6 +905,26 @@ function App() {
             </button>
           </div>
         </div>
+        
+        {/* Mobile-only Quick Actions */}
+        {isMobile && (
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setShowPriceWatch(true)}
+              className="bg-gradient-to-r from-[#FF0099] to-[#7B2CFF] text-white font-bold py-3 px-3 flex items-center justify-center gap-2 rounded-lg text-sm"
+              data-testid="price-watch-btn-mobile"
+            >
+              👁️ Price Watch
+            </button>
+            <button
+              onClick={() => { fetchHallOfFameData(); setShowHallOfFame(true); }}
+              className="bg-gradient-to-r from-[#FFD700] to-[#FF8C00] text-black font-bold py-3 px-3 flex items-center justify-center gap-2 rounded-lg text-sm"
+              data-testid="hall-of-fame-btn-mobile"
+            >
+              🏆 Hall of Fame
+            </button>
+          </div>
+        )}
       </div>
       
       {/* Price History Modal */}
