@@ -2237,9 +2237,9 @@ def get_dynamic_price(tier: str, buzz_score: float, name: str = "") -> float:
     # Calculate dynamic price within the tier's range
     dynamic_price = min_price + (price_range * buzz_factor)
     
-    # STRICT: Ensure price stays within tier range and NEVER exceeds £12M
+    # STRICT: Ensure price stays within tier range and NEVER exceeds £15M
     dynamic_price = max(min_price, min(max_price, dynamic_price))
-    dynamic_price = min(12.0, dynamic_price)  # Hard cap at £12M
+    dynamic_price = min(15.0, dynamic_price)  # Hard cap at £15M
     
     # Round to 1 decimal place
     return round(dynamic_price, 1)
