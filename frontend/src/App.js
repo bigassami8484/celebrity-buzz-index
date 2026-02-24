@@ -1110,6 +1110,7 @@ function App() {
                 <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
               </summary>
               <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
+                <p className="text-[#FF0099] italic">"But my favourite celeb should be A-List!" - Sorry mate, the algorithm doesn't care about your feelings. 🤷</p>
                 <p>Tiers are determined by our <strong className="text-white">Global Recognition Algorithm</strong> which considers:</p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
                   <li><strong className="text-[#00F0FF]">🌍 Wikipedia Languages:</strong> The main factor - how many language editions feature the celebrity (shown as the number next to 🌍)</li>
@@ -1123,6 +1124,7 @@ function App() {
                   <strong className="text-[#CD7F32]"> C-LIST:</strong> 10-24 | 
                   <strong className="text-[#666]"> D-LIST:</strong> &lt;10
                 </p>
+                <p className="text-xs text-[#666] mt-2 italic">The Wikipedia community has spoken. Take it up with them, not us! 😏</p>
               </div>
             </details>
             
