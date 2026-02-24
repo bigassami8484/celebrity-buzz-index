@@ -2103,6 +2103,7 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 # Wikipedia meta/disambiguation
                 "list of", "category:", "template:", "wikipedia:", "disambiguation",
                 "may refer to", "refers to", "refer to",
+                "(surname)", "(given name)", "surname)", "given name)",
                 # Sports teams/venues (FC/CF/AFC handled by regex below for proper word boundaries)
                 "united", "club", "team", "stadium", "arena",
                 # Legal/News/Events
