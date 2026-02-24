@@ -3315,20 +3315,17 @@ async def autocomplete_search(q: str):
     
     priority_suggestions = []
     if exact_match:
-        # Get recognition metrics
-        recognition_metrics = exact_match.get("recognition_metrics", {})
+        # Get bio for tier calculation
         bio = exact_match.get("bio", "")
+        recognition_metrics = exact_match.get("recognition_metrics", {})
         
-        # Check if stored data is incomplete (language count = 0)
-        stored_languages = recognition_metrics.get("languages", {}).get("count", 0)
-        needs_fresh_calculation = stored_languages == 0
-        
-        # If data looks incomplete, fetch fresh from Wikidata
-        if needs_fresh_calculation:
+        # Get language count - fetch fresh if missing
+        language_count = recognition_metrics.get("languages", {}).get("count", 0)
+        if language_count == 0:
             try:
-                headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com; api-contact@celebrity-buzz-index.com)"}
+                headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com)"}
                 async with httpx.AsyncClient() as client:
-                    await asyncio.sleep(0.3)  # Rate limit
+                    await asyncio.sleep(0.2)
                     wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={exact_match['name'].replace(' ', '_')}&props=sitelinks&format=json"
                     response = await client.get(wikidata_url, timeout=5.0, headers=headers)
                     if response.status_code == 200:
@@ -3336,25 +3333,16 @@ async def autocomplete_search(q: str):
                         for entity in data.get("entities", {}).values():
                             sitelinks = entity.get("sitelinks", {})
                             language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
-                            if language_count > 0:
-                                recognition_metrics["languages"] = {"count": language_count}
-                                logger.info(f"Refreshed {exact_match['name']}: {language_count} languages")
-            except Exception as e:
-                logger.debug(f"Failed to refresh Wikidata for {exact_match['name']}: {e}")
+            except:
+                pass
         
-        # Use 3-LAYER TIER CALCULATION
-        tier = calculate_tier_3_layer(recognition_metrics, bio)
+        # SINGLE CALCULATION for tier AND price
+        tier, price = calculate_tier_and_price(language_count, bio)
         
-        # Calculate price from tier
-        price = get_price_from_tier(tier)
-        
-        # Get recognition score for display (informational only)
-        recognition_score = recognition_metrics.get("languages", {}).get("count", 0)  # Use language count as proxy
-        
-        # Check if in hot celebs - add news premium to price
-        hot_price, hot_tier, is_hot = get_hot_celeb_price(exact_match["name"])
-        if is_hot and hot_price:
-            price = min(15.0, price * 1.15)  # 15% news premium, capped at £15M
+        # Check if in hot celebs - add news premium
+        hot_price, _, is_hot = get_hot_celeb_price(exact_match["name"])
+        if is_hot:
+            price = min(15.0, price * 1.15)
         
         priority_suggestions.append({
             "name": exact_match["name"],
@@ -3363,7 +3351,7 @@ async def autocomplete_search(q: str):
             "tier": tier,
             "price": round(price, 1),
             "estimated_price": round(price, 1),
-            "recognition_score": recognition_score,
+            "recognition_score": language_count,
             "is_exact_match": True,
             "is_hot": is_hot
         })
