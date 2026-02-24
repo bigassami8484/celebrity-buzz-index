@@ -3883,7 +3883,8 @@ async def autocomplete_search(q: str):
             suggestion["estimated_price"] = premium_price
             suggestion["is_brown_bread_premium"] = True
     
-    return {"suggestions": all_suggestions[:10]}  # Limit to 10 results
+    # Return only 1 result for cleaner UX - the best match
+    return {"suggestions": all_suggestions[:1]}
 
 @api_router.post("/seed")
 async def seed_initial_data():
