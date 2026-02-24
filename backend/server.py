@@ -735,16 +735,29 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
     - Commercial Impact (20%): Sales, box office, brand value
     - Wikipedia Page Views (15%): 12-month popularity
     
+    Tier Rules:
+    - A = 85+ (Global household name)
+    - B = 65-84 (Strong mainstream recognition)
+    - C = 45-64 (Recognisable public figure)
+    - D = Below 45 (Emerging / limited recognition)
+    
+    Safeguard Rules:
+    - 15+ years active AND 10+ wiki languages → minimum C
+    - 15+ years AND (commercial success OR lead TV/film role) → minimum B
+    - D-tier only if <10 years active AND <10 languages AND no major commercial success
+    
     Returns: {
         "recognition_score": 0-100,
         "tier": "A"/"B"/"C"/"D",
-        "metrics": {longevity, languages, awards, commercial, pageviews}
+        "metrics": {longevity, languages, awards, commercial, pageviews},
+        "safeguards_applied": []
     }
     """
     import re
     from datetime import datetime, timedelta
     
     bio_lower = bio.lower() if bio else ""
+    safeguards_applied = []
     
     # Initialize scores (0-100 for each metric)
     longevity_score = 0
@@ -754,7 +767,6 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
     pageviews_score = 0
     
     # ===== 1. LONGEVITY SCORE (20%) =====
-    # Extract years active from bio
     years_active = 0
     
     # Look for career start patterns
@@ -764,11 +776,17 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
         r"began .* career in (\d{4})",
         r"started .* in (\d{4})",
         r"debut in (\d{4})",
+        r"debuted in (\d{4})",
         r"first .* in (\d{4})",
         r"since (\d{4})",
         r"\(born .* (\d{4})\)",
+        r"born .* (\d{4})",
         r"(\d{4})[\s\-–]+present",
-        r"(\d{4})–present"
+        r"(\d{4})–present",
+        r"career began in (\d{4})",
+        r"professional career in (\d{4})",
+        r"acting career in (\d{4})",
+        r"music career in (\d{4})",
     ]
     
     current_year = datetime.now().year
@@ -783,6 +801,15 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
                     years_active = max(years_active, year_or_span)
             except:
                 pass
+    
+    # If no career pattern found, estimate from birth year (assume career starts at 18-22)
+    if years_active == 0:
+        birth_match = re.search(r"born .* (\d{4})", bio_lower)
+        if birth_match:
+            birth_year = int(birth_match.group(1))
+            # Estimate career start (18-22 years old depending on field)
+            estimated_career_start = birth_year + 20
+            years_active = max(0, current_year - estimated_career_start)
     
     # Score longevity (max 100 at 40+ years)
     if years_active >= 40:
@@ -804,7 +831,6 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
     language_count = 0
     if http_client:
         try:
-            # Fetch Wikidata to get language editions count
             wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={name.replace(' ', '_')}&props=sitelinks&format=json"
             response = await http_client.get(wikidata_url, timeout=5.0)
             if response.status_code == 200:
@@ -812,7 +838,6 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
                 entities = data.get("entities", {})
                 for entity in entities.values():
                     sitelinks = entity.get("sitelinks", {})
-                    # Count Wikipedia language editions (ends with 'wiki' but not 'wikiquote' etc)
                     language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
         except Exception as e:
             logger.debug(f"Error fetching Wikidata for {name}: {e}")
@@ -857,6 +882,17 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
     # ===== 4. COMMERCIAL IMPACT SCORE (20%) =====
     commercial_found = sum(1 for keyword in COMMERCIAL_KEYWORDS if keyword in bio_lower)
     
+    # Check for lead role indicators
+    lead_role_indicators = [
+        "starring role", "leading role", "lead role", "title role",
+        "protagonist", "main character", "stars as", "starred in",
+        "headlined", "fronted", "lead actor", "lead actress",
+        "main cast", "series regular", "franchise lead"
+    ]
+    has_lead_role = any(indicator in bio_lower for indicator in lead_role_indicators)
+    if has_lead_role:
+        commercial_found += 2  # Boost for lead roles
+    
     # Score commercial impact (max 100 at 6+ indicators)
     if commercial_found >= 6:
         commercial_score = 100
@@ -875,7 +911,6 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
     pageviews = 0
     if http_client:
         try:
-            # Fetch 12-month page views from Wikipedia
             end_date = datetime.now()
             start_date = end_date - timedelta(days=365)
             pageviews_url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/{name.replace(' ', '_')}/monthly/{start_date.strftime('%Y%m')}01/{end_date.strftime('%Y%m')}01"
@@ -913,11 +948,9 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
         (commercial_score * 0.20) +
         (pageviews_score * 0.15)
     )
-    
-    # Round to nearest integer
     recognition_score = round(recognition_score)
     
-    # ===== DETERMINE TIER =====
+    # ===== DETERMINE BASE TIER =====
     if recognition_score >= 85:
         tier = "A"
     elif recognition_score >= 65:
@@ -927,6 +960,26 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
     else:
         tier = "D"
     
+    # ===== APPLY SAFEGUARD RULES =====
+    has_commercial_success = commercial_found >= 2
+    
+    # Safeguard 1: 15+ years active AND 10+ wiki languages → minimum C
+    if years_active >= 15 and language_count >= 10 and tier == "D":
+        tier = "C"
+        safeguards_applied.append("Upgraded to C: 15+ years active with 10+ wiki languages")
+    
+    # Safeguard 2: 15+ years AND (commercial success OR lead TV/film role) → minimum B
+    if years_active >= 15 and (has_commercial_success or has_lead_role):
+        if tier in ["C", "D"]:
+            tier = "B"
+            safeguards_applied.append("Upgraded to B: 15+ years with commercial success or lead role")
+    
+    # Safeguard 3: D-tier only if <10 years active AND <10 languages AND no major commercial success
+    if tier == "D":
+        if years_active >= 10 or language_count >= 10 or has_commercial_success:
+            tier = "C"
+            safeguards_applied.append("Upgraded to C: Does not meet D-tier criteria (needs <10 years, <10 langs, no commercial success)")
+    
     return {
         "recognition_score": recognition_score,
         "tier": tier,
@@ -934,9 +987,10 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
             "longevity": {"score": longevity_score, "years_active": years_active, "weight": "20%"},
             "languages": {"score": language_score, "count": language_count, "weight": "25%"},
             "awards": {"score": awards_score, "found": awards_found, "weight": "20%"},
-            "commercial": {"score": commercial_score, "found": commercial_found, "weight": "20%"},
+            "commercial": {"score": commercial_score, "found": commercial_found, "has_lead_role": has_lead_role, "weight": "20%"},
             "pageviews": {"score": pageviews_score, "annual": pageviews, "weight": "15%"}
-        }
+        },
+        "safeguards_applied": safeguards_applied
     }
 
 def calculate_recognition_score_from_metrics(metrics: dict) -> dict:
