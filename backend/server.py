@@ -3616,15 +3616,23 @@ async def autocomplete_search(q: str):
                         "is_alias_match": True
                     })
     
-    # Get Wikipedia autocomplete suggestions
-    suggestions = await fetch_wikipedia_autocomplete(q)
+    # Track if we found an exact alias match - if so, skip Wikipedia autocomplete
+    # This prevents "diddy" from returning "Diddy TV", "Diddy Wah Diddy" etc
+    found_exact_alias = query_lower in CELEBRITY_ALIASES and len(priority_suggestions) > 0
     
-    # Filter out any duplicates from Wikipedia results that are already in priority suggestions
-    priority_names = {s["name"].lower() for s in priority_suggestions}
-    filtered_suggestions = [s for s in suggestions if s.get("name", "").lower() not in priority_names]
-    
-    # Combine: priority first, then Wikipedia results
-    all_suggestions = priority_suggestions + filtered_suggestions
+    # Get Wikipedia autocomplete suggestions (SKIP if exact alias found)
+    if not found_exact_alias:
+        suggestions = await fetch_wikipedia_autocomplete(q)
+        
+        # Filter out any duplicates from Wikipedia results that are already in priority suggestions
+        priority_names = {s["name"].lower() for s in priority_suggestions}
+        filtered_suggestions = [s for s in suggestions if s.get("name", "").lower() not in priority_names]
+        
+        # Combine: priority first, then Wikipedia results
+        all_suggestions = priority_suggestions + filtered_suggestions
+    else:
+        # Exact alias match found - return only priority suggestions
+        all_suggestions = priority_suggestions
     
     # Check for Brown Bread premium pricing on each suggestion
     for suggestion in all_suggestions:
