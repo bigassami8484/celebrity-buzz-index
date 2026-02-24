@@ -883,7 +883,7 @@ function App() {
         
         {/* Hot Streaks - Full width */}
         <div className="mt-8">
-          <HotStreaks streaks={hotStreaks} teamId={team?.id} />
+          <HotStreaks streaks={hotStreaks} onCelebClick={searchCelebrity} />
         </div>
         
         {/* Brown Bread, Most Picked, Leaderboard - Show on ALL screen sizes */}
