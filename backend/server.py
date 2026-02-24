@@ -1824,24 +1824,27 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
         return []
 
 def estimate_tier_from_description(description: str, name: str = "") -> str:
-    """Estimate celebrity tier from Wikipedia description"""
-    
-    # First check if this is a guaranteed A-lister
-    if name and name.lower() in GUARANTEED_A_LIST:
-        return "A"
+    """Estimate celebrity tier from Wikipedia description using indicator scoring"""
+    # NOTE: This is a quick estimation. Full Recognition Score calculation 
+    # should be used for database storage via calculate_recognition_score()
     
     desc_lower = description.lower()
     
+    # Score based on indicators
+    a_score = sum(1 for ind in A_LIST_INDICATORS if ind in desc_lower)
+    b_score = sum(1 for ind in B_LIST_INDICATORS if ind in desc_lower)
+    c_score = sum(1 for ind in C_LIST_INDICATORS if ind in desc_lower)
+    
     # Check for A-list indicators
-    if any(ind in desc_lower for ind in A_LIST_INDICATORS):
+    if a_score >= 2:
         return "A"
     
     # Check for B-list indicators  
-    if any(ind in desc_lower for ind in B_LIST_INDICATORS):
+    if a_score >= 1 or b_score >= 2:
         return "B"
     
     # Check for C-list indicators
-    if any(ind in desc_lower for ind in C_LIST_INDICATORS):
+    if b_score >= 1 or c_score >= 1:
         return "C"
     
     return "D"
