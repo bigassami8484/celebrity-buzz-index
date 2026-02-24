@@ -2313,8 +2313,11 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     "news_premium": hot_celeb_match is not None
                 })
                 
-                # Return only the FIRST valid result for cleaner UX
-                if len(results) >= 1:
+                # For disambiguation cases (names with parentheses like "James Morrison (singer)"),
+                # return multiple results so user can choose. Otherwise return first match.
+                is_disambiguation = "(" in actual_title
+                max_results = 5 if is_disambiguation else 1
+                if len(results) >= max_results:
                     break
             
             logger.info(f"Wikidata-verified autocomplete returning {len(results)} humans for '{query}'")
