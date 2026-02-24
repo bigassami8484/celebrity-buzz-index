@@ -915,7 +915,7 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
             end_date = datetime.now()
             start_date = end_date - timedelta(days=365)
             pageviews_url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/{name.replace(' ', '_')}/monthly/{start_date.strftime('%Y%m')}01/{end_date.strftime('%Y%m')}01"
-            response = await http_client.get(pageviews_url, timeout=5.0, headers={"User-Agent": "CelebrityBuzzIndex/1.0"})
+            response = await http_client.get(pageviews_url, timeout=5.0, headers=headers)
             if response.status_code == 200:
                 data = response.json()
                 items = data.get("items", [])
