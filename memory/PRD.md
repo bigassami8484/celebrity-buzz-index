@@ -11,34 +11,38 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 
 ## Latest Updates (Feb 24, 2026)
 
-### Recognition Score System (Completed Feb 24, 2026)
+### Tier Calculation System (Simplified Feb 24, 2026)
 
-**Core Implementation:**
-- ✅ Real-time Recognition Score calculation for ALL Wikipedia celebrities
-- ✅ Wikidata API integration for language count (with rate limiting)
-- ✅ Wikipedia Pageviews API for popularity metrics
-- ✅ Safeguard rules preventing incorrect D-tier assignments
-- ✅ Monthly scheduled recalculation job
+**SINGLE SOURCE OF TRUTH:** `calculate_tier_and_price()` function
 
-**Score Formula (0-100):**
-- Longevity (20%): Years active in industry
-- Wikipedia Languages (25%): Number of language editions
-- Awards (20%): Grammy, Oscar, Emmy mentions in bio
-- Commercial Impact (20%): Box office, Forbes, billboard mentions
-- Page Views (15%): 12-month Wikipedia views
+**LAYER 1 - Language Count (Primary):**
+- A-LIST: 60+ Wikipedia languages (global superstars)
+- B-LIST: 25-59 languages (internationally recognized)
+- C-LIST: 10-24 languages (nationally known)
+- D-LIST: <10 languages (emerging/niche)
 
-**Tier Thresholds:**
-- A-List: 85+ (or safeguard: 3M+ pageviews + 40+ languages)
-- B-List: 65-84 (or safeguard: 50+ languages)  
-- C-List: 45-64
-- D-List: Below 45 (only if <10 years, <10 languages, no commercial success)
+**LAYER 2 - Achievement Modifiers (+1 tier upgrade):**
+- Global franchise lead (Harry Potter, Marvel, etc.)
+- Major international award (Oscar, Grammy winner)
+- World champion/record holder
+
+**LAYER 3 - Reality TV Modifier (-1 tier downgrade):**
+- Reality TV without other achievements (unless 40+ languages)
+
+**Pricing:**
+- A-LIST: £12M base
+- B-LIST: £6M base
+- C-LIST: £2.5M base
+- D-LIST: £1M base
 
 **Verified Results:**
-- Taylor Swift: A-LIST (55 score, 153 languages, 12.6M pageviews)
-- Beyoncé: A-LIST (40 score, 155 languages, 4.5M pageviews)
-- Hilary Duff: B-LIST (62 score, 82 languages, 2.7M pageviews)
-- Amber Heard: B-LIST (60 score, 79 languages, 2.5M pageviews)
-- Katie Price: C-LIST (28 score - correctly identified as UK tabloid figure)
+- Daniel Radcliffe: A-LIST (101 langs, Harry Potter) £12M
+- Emma Watson: A-LIST (122 langs, Harry Potter) £12M
+- Taylor Swift: A-LIST (153 langs) £12M
+- Kelly Osbourne: B-LIST (35 langs) £6.9M
+- Sharon Osbourne: B-LIST (33 langs) £6M
+- Rochelle Humes: C-LIST (13 langs) £2.5M
+- Pink: A-LIST (78 langs) £12M
 
 ### Bug Fixes (Feb 24, 2026)
 - ✅ **apply_brown_bread_premium → get_brown_bread_premium** - Fixed NameError in celebrity search endpoint
