@@ -57,6 +57,11 @@ const SearchBar = ({ onSearch, onQuickAdd, loading, team }) => {
     setQuery(value);
     setShowSuggestions(true);
     
+    // Clear suggestions immediately when query changes to prevent stale results
+    if (value.length < 2) {
+      setSuggestions([]);
+    }
+    
     // Clear previous timeout
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
