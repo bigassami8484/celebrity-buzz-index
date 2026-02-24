@@ -1942,13 +1942,9 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 if " vs " in title_lower or " vs. " in title_lower or " versus " in title_lower:
                     continue
                 
-                # Skip "X and Y" patterns that are likely movies/shows (e.g., "Beyonce and Rihanna")
-                # But allow names like "Simon and Garfunkel" by checking if both parts look like names
+                # Skip "X and Y" patterns - usually movies/shows/duos not individuals
                 if " and " in title_lower:
-                    parts = title_lower.split(" and ")
-                    # If either part has more than 2 words, it's likely not a name pairing
-                    if any(len(part.strip().split()) > 2 for part in parts):
-                        continue
+                    continue
                 
                 candidates.append(title)
             
