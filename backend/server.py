@@ -1985,13 +1985,56 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
     """
     Search Wikipedia for celebrity suggestions - ONLY returns humans (verified via Wikidata P31=Q5).
     Uses OpenSearch API for better partial name matching, then Wikidata for human verification.
-    Preserves OpenSearch relevance order.
+    Preserves OpenSearch relevance order. Includes fuzzy matching for common spelling variations.
     """
     try:
         headers = {
             "User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com; contact@example.com) httpx/0.27"
         }
         query_lower = query.lower().strip()
+        
+        # Common spelling variations for fuzzy matching
+        SPELLING_VARIATIONS = {
+            # y/i swaps
+            "bryan": "brian", "brian": "bryan",
+            "kerry": "kerri", "kerri": "kerry", 
+            "kelly": "kelli", "kelli": "kelly",
+            "tony": "toni", "toni": "tony",
+            "ricky": "ricki", "ricki": "ricky",
+            "johnny": "jonny", "jonny": "johnny",
+            "mikey": "mickey", "mickey": "mikey",
+            "jimmy": "jimy", "jamie": "jaimie",
+            "lindsay": "lindsey", "lindsey": "lindsay",
+            "ashley": "ashlee", "ashlee": "ashley",
+            "brittany": "brittney", "brittney": "brittany",
+            "katy": "katie", "katie": "katy",
+            "steven": "stephen", "stephen": "steven",
+            "jeffrey": "geoffrey", "geoffrey": "jeffrey",
+            "cathy": "kathy", "kathy": "cathy",
+            "catherine": "katherine", "katherine": "catherine",
+            # ae/e swaps  
+            "michael": "micheal", "micheal": "michael",
+            "shawn": "sean", "sean": "shawn",
+            # double letters
+            "matthew": "mathew", "mathew": "matthew",
+            "phillip": "philip", "philip": "phillip",
+            "ann": "anne", "anne": "ann",
+            "allan": "alan", "alan": "allan",
+            # common variations
+            "geoff": "jeff", "jeff": "geoff",
+            "chris": "kris", "kris": "chris",
+            "carl": "karl", "karl": "carl",
+            "eric": "erik", "erik": "eric",
+            "marc": "mark", "mark": "marc",
+            "jon": "john", "john": "jon",
+            "sara": "sarah", "sarah": "sara",
+            "teresa": "theresa", "theresa": "teresa",
+            "lesley": "leslie", "leslie": "lesley",
+            "stuart": "stewart", "stewart": "stuart",
+            "alan": "allen", "allen": "alan",
+            "neil": "neal", "neal": "neil",
+            "grey": "gray", "gray": "grey",
+        }
         
         logger.info(f"Autocomplete search for: {query}")
         
