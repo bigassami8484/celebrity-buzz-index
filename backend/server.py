@@ -5508,10 +5508,13 @@ async def add_to_team(data: AddToTeam):
         }
     )
     
-    # Increment times_picked for the celebrity
+    # Increment times_picked for the celebrity AND update tier/price in DB
     await db.celebrities.update_one(
         {"id": data.celebrity_id},
-        {"$inc": {"times_picked": 1}}
+        {
+            "$inc": {"times_picked": 1},
+            "$set": {"tier": tier, "price": base_price, "recognition_score": lang_count}
+        }
     )
     
     updated_team = await db.teams.find_one({"id": data.team_id}, {"_id": 0})
