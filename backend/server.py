@@ -3609,7 +3609,7 @@ async def autocomplete_search(q: str):
                 pass
         
         # SINGLE CALCULATION for tier AND price
-        tier, price = calculate_tier_and_price(language_count, bio)
+        tier, price = calculate_tier_and_price(language_count, bio, exact_match["name"])
         
         # Check if in hot celebs - add news premium
         hot_price, _, is_hot = get_hot_celeb_price(exact_match["name"])
