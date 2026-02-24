@@ -966,6 +966,12 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
     # ===== APPLY SAFEGUARD RULES =====
     has_commercial_success = commercial_found >= 2
     
+    # Safeguard 0: 50+ Wikipedia languages = strong global recognition → minimum B
+    if language_count >= 50:
+        if tier in ["C", "D"]:
+            tier = "B"
+            safeguards_applied.append(f"Upgraded to B: {language_count} Wikipedia languages indicates strong global recognition")
+    
     # Safeguard 1: 15+ years active AND 10+ wiki languages → minimum C
     if years_active >= 15 and language_count >= 10 and tier == "D":
         tier = "C"
@@ -982,6 +988,12 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
         if years_active >= 10 or language_count >= 10 or has_commercial_success:
             tier = "C"
             safeguards_applied.append("Upgraded to C: Does not meet D-tier criteria (needs <10 years, <10 langs, no commercial success)")
+    
+    # Safeguard 4: Very high pageviews (5M+) + high language count (25+) = household name → minimum A
+    if pageviews >= 5000000 and language_count >= 25:
+        if tier in ["B", "C", "D"]:
+            tier = "A"
+            safeguards_applied.append(f"Upgraded to A: {pageviews:,} annual pageviews + {language_count} languages = global household name")
     
     return {
         "recognition_score": recognition_score,
