@@ -3586,59 +3586,11 @@ async def autocomplete_search(q: str):
                 return hc.get("price"), hc.get("tier"), True
         return None, None, False
     
-    # PRIORITY 1: Check database for exact match first (most likely what user wants)
-    exact_match = await db.celebrities.find_one(
-        {"name": {"$regex": f"^{q}$", "$options": "i"}},
-        {"_id": 0}
-    )
+    # PRIORITY 1: Skip database lookup - ALWAYS fetch fresh from Wikipedia
+    # This ensures tier/price is always based on current Wikipedia language count
+    exact_match = None  # Don't use cached DB data
     
     priority_suggestions = []
-    if exact_match:
-        # Get bio for tier calculation
-        bio = exact_match.get("bio", "")
-        recognition_metrics = exact_match.get("recognition_metrics", {})
-        
-        # Check if this is a known A-list celeb that should bypass DB data
-        is_guaranteed_a_list = exact_match["name"].lower() in GUARANTEED_A_LIST
-        
-        # Get language count - ALWAYS fetch fresh for guaranteed A-listers or if missing
-        language_count = recognition_metrics.get("languages", {}).get("count", 0)
-        if language_count == 0 or language_count < 30 or is_guaranteed_a_list:
-            try:
-                headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com)"}
-                async with httpx.AsyncClient() as client:
-                    await asyncio.sleep(0.2)
-                    wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={exact_match['name'].replace(' ', '_')}&props=sitelinks&format=json"
-                    response = await client.get(wikidata_url, timeout=5.0, headers=headers)
-                    if response.status_code == 200:
-                        data = response.json()
-                        for entity in data.get("entities", {}).values():
-                            sitelinks = entity.get("sitelinks", {})
-                            fresh_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
-                            if fresh_count > language_count:
-                                language_count = fresh_count
-            except:
-                pass
-        
-        # SINGLE CALCULATION for tier AND price
-        tier, price = calculate_tier_and_price(language_count, bio, exact_match["name"])
-        
-        # Check if in hot celebs - add news premium
-        hot_price, _, is_hot = get_hot_celeb_price(exact_match["name"])
-        if is_hot:
-            price = min(15.0, price * 1.15)
-        
-        priority_suggestions.append({
-            "name": exact_match["name"],
-            "bio": bio[:100] + "..." if bio else "",
-            "image": exact_match.get("image", ""),
-            "tier": tier,
-            "price": round(price, 1),
-            "estimated_price": round(price, 1),
-            "recognition_score": language_count,
-            "is_exact_match": True,
-            "is_hot": is_hot
-        })
     
     # PRIORITY 2: Check if query matches a known alias (BEFORE partial DB matches)
     # This ensures "mario" returns Mario (American singer) not Mario Lopez
