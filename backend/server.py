@@ -2266,11 +2266,21 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     except:
                         pass
                 
-                # Skip duplicates
+                # Skip duplicates - but for disambiguation cases (names with parentheses),
+                # keep all unique full names since they're different people
                 base_name = actual_title.split("(")[0].strip().lower()
-                if base_name in seen_names:
+                full_name_lower = actual_title.lower()
+                
+                # For disambiguation (has parentheses), use full name for dedup
+                # For regular names, use base name
+                if "(" in actual_title:
+                    dedup_key = full_name_lower
+                else:
+                    dedup_key = base_name
+                    
+                if dedup_key in seen_names:
                     continue
-                seen_names.add(base_name)
+                seen_names.add(dedup_key)
                 
                 # Skip disambiguation pages (extract contains "may refer to")
                 extract_lower = extract.lower() if extract else ""
