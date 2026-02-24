@@ -621,8 +621,9 @@ function App() {
     if (team?.id) {
       fetchTeamLeaguesData(team.id);
       fetchPriceAlerts(team.id);
-      fetchHotStreaks(team.id);
     }
+    // Fetch hot streaks regardless of team
+    fetchHotStreaks();
   }, [team?.id, fetchTeamLeaguesData, fetchPriceAlerts, fetchHotStreaks]);
 
   // Auto-select first category when categories load
