@@ -2049,6 +2049,31 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
             data = response.json()
             titles = data[1] if len(data) > 1 else []
             
+            # If no results, try fuzzy search with spelling variations
+            if not titles:
+                # Try alternate spellings for each word in the query
+                query_words = query_lower.split()
+                alternate_queries = set()
+                
+                for i, word in enumerate(query_words):
+                    if word in SPELLING_VARIATIONS:
+                        alt_word = SPELLING_VARIATIONS[word]
+                        new_query = query_words.copy()
+                        new_query[i] = alt_word
+                        alternate_queries.add(" ".join(new_query))
+                
+                # Try each alternate spelling
+                for alt_query in alternate_queries:
+                    logger.info(f"Trying alternate spelling: '{alt_query}' (original: '{query}')")
+                    alt_url = f"https://en.wikipedia.org/w/api.php?action=opensearch&search={alt_query}&limit=20&format=json"
+                    alt_response = await client.get(alt_url, timeout=8.0, headers=headers)
+                    if alt_response.status_code == 200:
+                        alt_data = alt_response.json()
+                        titles = alt_data[1] if len(alt_data) > 1 else []
+                        if titles:
+                            logger.info(f"Fuzzy search found results with '{alt_query}'")
+                            break
+            
             if not titles:
                 return []
             
