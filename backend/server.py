@@ -2263,7 +2263,8 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     "news_premium": hot_celeb_match is not None
                 })
                 
-                if len(results) >= 5:
+                # Return only the FIRST valid result for cleaner UX
+                if len(results) >= 1:
                     break
             
             logger.info(f"Wikidata-verified autocomplete returning {len(results)} humans for '{query}'")
