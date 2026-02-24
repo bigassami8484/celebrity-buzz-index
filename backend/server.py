@@ -2020,8 +2020,8 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 # Wikipedia meta/disambiguation
                 "list of", "category:", "template:", "wikipedia:", "disambiguation",
                 "may refer to", "refers to", "refer to",
-                # Sports teams/venues (word-boundary patterns to avoid matching names like McFadden)
-                " fc", "fc ", " cf ", " afc ", "united", "club", "team", "stadium", "arena",
+                # Sports teams/venues (FC/CF/AFC handled by regex below for proper word boundaries)
+                "united", "club", "team", "stadium", "arena",
                 # Legal/News/Events
                 "trial", "case", "lawsuit", "allegations", "misconduct", "controversy",
                 "murder", "death of", "killing", "scandal", "feud", "dispute", "rivalry",
