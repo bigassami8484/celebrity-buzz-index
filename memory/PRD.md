@@ -9,7 +9,21 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Compete on leaderboards with friends
 - Social sharing (Twitter/X, Facebook, WhatsApp)
 
-## Latest Updates (Feb 23, 2026)
+## Latest Updates (Feb 24, 2026)
+
+### Recognition Score System (NEW - Feb 24, 2026)
+- ✅ **Backend Server Fixed** - Resolved SyntaxError and IndentationError in server.py from failed refactoring
+- ✅ **Recognition Score Display** - Score now visible in autocomplete search results (0-100 scale)
+- ✅ **Score Calculation** - Uses stored `tier_score` or `tier_metrics` from database
+- ✅ **Frontend Integration** - SearchBar.jsx shows score as grey badge next to tier badge
+- ✅ **Taylor Swift Example** - Shows recognition_score: 100, A-LIST tier, £14.2M
+
+### Bug Fixes (Feb 24, 2026)
+- ✅ **apply_brown_bread_premium → get_brown_bread_premium** - Fixed NameError in celebrity search endpoint
+- ✅ **Removed duplicate fetch_wikipedia_info function** - Cleaned up leftover code from refactoring
+- ✅ **Restored get_brown_bread_premium function definition** - Missing async def was causing await errors
+
+## Previous Updates (Feb 23, 2026)
 
 ### Search Price/Tier Mismatch Fix (Feb 23, 2026)
 - ✅ **Fixed autocomplete price inconsistency** - Autocomplete endpoint was using wrong cache type (`hot_celebs`) instead of correct one (`hot_celebs_from_news_v4`)
