@@ -4072,53 +4072,9 @@ async def get_hot_celebs():
                 logger.error(f"Error fetching {name}: {e}")
                 continue
         
-        # Only use fallback if we have very few celebs from news (less than 5)
-        # This ensures we prioritize actual news mentions over static lists
-        if len(hot_list) < 5:
-            fallback_names = [c["name"] for c in HOT_CELEBS_POOL if c["name"] not in [h["name"] for h in hot_list]]
-            random.shuffle(fallback_names)
-            
-            for name in fallback_names:
-                if len(hot_list) >= 8:  # Only fill up to 8 with fallback
-                    break
-                
-                try:
-                    wiki_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{name.replace(' ', '_')}"
-                    response = await client.get(wiki_url, timeout=5.0, headers=headers)
-                    
-                    if response.status_code == 200:
-                        wiki_data = response.json()
-                        image = wiki_data.get("thumbnail", {}).get("source", "")
-                        
-                        if image and "wikipedia" in image.lower():
-                            bio = wiki_data.get("extract", "")
-                            actual_name = wiki_data.get("title", name)
-                            tier = determine_tier_from_bio(bio, actual_name)
-                            category = get_category_from_bio(bio, actual_name)
-                            price = get_dynamic_price(tier, 50, actual_name)
-                            
-                            # Enforce £15M price cap
-                            if price > 15:
-                                price = 15.0
-                            
-                            # Find reason from pool
-                            pool_entry = next((c for c in HOT_CELEBS_POOL if c["name"] == name), None)
-                            hot_reason = pool_entry["reason"] if pool_entry else "Always making headlines"
-                            
-                            hot_list.append({
-                                "name": actual_name,
-                                "tier": tier,
-                                "category": category,
-                                "price": price,
-                                "base_price": price,
-                                "news_premium": False,
-                                "trending_tag": "",
-                                "hot_reason": hot_reason,
-                                "image": image,
-                                "mention_count": 0
-                            })
-                except:
-                    continue
+        # NO FALLBACK TO STATIC LIST - Only show celebrities who are ACTUALLY in the news
+        # If we don't have enough, that's fine - better to show fewer real results than fake ones
+        # The frontend will handle showing a message if the list is empty
     
     # Cache the results with week tracking (refreshes every Monday)
     if hot_list:
