@@ -2611,6 +2611,33 @@ def detect_category_from_bio(bio: str, name: str) -> str:
         # Generic broadcaster without TV context goes to other
         return "other"
     
+    # =================================================================
+    # TV PRESENTER/HOST DETECTION - Check if primarily a presenter
+    # If "television presenter", "TV host", or "broadcaster" appears
+    # AND no major acting credits exist, classify as TV Personality
+    # =================================================================
+    presenter_keywords = ["television presenter", "tv presenter", "tv host", "television host",
+                          "talk show host", "game show host", "news presenter", "news anchor",
+                          "chat show host", "morning show host", "television broadcaster"]
+    
+    is_presenter = any(kw in bio_lower for kw in presenter_keywords)
+    
+    if is_presenter:
+        # Check for major acting credits that would make them an actor instead
+        major_acting_indicators = [
+            "starred in", "leading role", "lead role", "title role",
+            "academy award for", "oscar-winning", "emmy-winning actor",
+            "golden globe-winning actor", "bafta-winning actor",
+            "film career", "acting career", "breakthrough role",
+            "best actor", "best actress", "acting debut"
+        ]
+        
+        has_major_acting = any(ind in bio_lower for ind in major_acting_indicators)
+        
+        # If presenter without major acting credits -> tv_personalities
+        if not has_major_acting:
+            return "tv_personalities"
+    
     # Find which occupation appears FIRST in the bio
     first_occupation = None
     first_position = 999
