@@ -2348,10 +2348,10 @@ def get_dynamic_price(tier: str, buzz_score: float, name: str = "") -> float:
     """Calculate dynamic price based on tier and buzz score
     
     Pricing Tiers (STRICT - MAX £15M for any celeb):
-    - A-List: £9m-£12m (high scoring but expensive)
-    - B-List: £5m-£8m (balanced steady picks)  
-    - C-List: £2m-£4m (risk/reward)
-    - D-List: £0.5m-£1.5m (cheap wildcards)
+    - A-List: £10m-£15m (high scoring but expensive)
+    - B-List: £4m-£6.9m (balanced steady picks)  
+    - C-List: £1.5m-£2.9m (risk/reward)
+    - D-List: £0.5m-£1m (cheap wildcards)
     
     Buzz Score Impact:
     - buzz_score 0-25: Price at lower end of tier range
@@ -2361,10 +2361,10 @@ def get_dynamic_price(tier: str, buzz_score: float, name: str = "") -> float:
     """
     # Define STRICT price ranges for each tier
     price_ranges = {
-        "A": (12.0, 15.0),   # £12m-£15m
-        "B": (5.0, 8.0),    # £5m-£8m
-        "C": (2.0, 4.0),    # £2m-£4m
-        "D": (0.5, 1.5)     # £0.5m-£1.5m
+        "A": (10.0, 15.0),   # £10m-£15m
+        "B": (4.0, 6.9),     # £4m-£6.9m
+        "C": (1.5, 2.9),     # £1.5m-£2.9m
+        "D": (0.5, 1.0)      # £0.5m-£1m
     }
     
     min_price, max_price = price_ranges.get(tier, (0.5, 1.5))
