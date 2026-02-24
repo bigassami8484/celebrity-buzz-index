@@ -80,12 +80,24 @@ function App() {
   const [hotStreaks, setHotStreaks] = useState([]);
   const [isTransferWindowOpen, setIsTransferWindowOpen] = useState(false);
   
-  // Mobile detection
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  // Mobile detection - check immediately and on mount
+  const [isMobile, setIsMobile] = useState(() => {
+    // Check immediately on initial render
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 768;
+    }
+    return false;
+  });
+  const [isLayoutReady, setIsLayoutReady] = useState(false);
   
-  // Listen for resize to update mobile state
+  // Listen for resize and set layout ready immediately on mount
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    // Immediately set correct mobile state and mark layout as ready
+    const checkMobile = () => window.innerWidth < 768;
+    setIsMobile(checkMobile());
+    setIsLayoutReady(true);
+    
+    const handleResize = () => setIsMobile(checkMobile());
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
