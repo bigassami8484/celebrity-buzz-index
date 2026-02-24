@@ -3367,7 +3367,7 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
             db_price = existing.get("price", 3.0)
             
             # Check if this celeb qualifies for Brown Bread premium pricing
-            new_price = await apply_brown_bread_premium(existing, db_price)
+            new_price = await get_brown_bread_premium(existing, db_price)
             existing["price"] = new_price
         
         # Check if image is a placeholder - refresh in background (don't block response)
@@ -3537,7 +3537,7 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     # Check for Brown Bread premium pricing (for elderly celebrities) - only if not already in Hot Celebs
     if not hot_celeb_match:
         temp_celeb = {"name": wiki_info["name"], "age": age, "is_deceased": is_deceased}
-        price = await apply_brown_bread_premium(temp_celeb, price)
+        price = await get_brown_bread_premium(temp_celeb, price)
     
     # Celebrities to skip AI generation for (use initials placeholder instead)
     # Determine image - prefer Wikipedia, fallback to initials placeholder (no AI)
