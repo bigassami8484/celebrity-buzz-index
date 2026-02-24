@@ -136,7 +136,7 @@ async def check_wikidata_is_human(page_ids: List[int]) -> dict:
         async with httpx.AsyncClient() as client:
             # First get Wikidata IDs for the Wikipedia pages
             page_ids_str = "|".join(str(pid) for pid in page_ids)
-            url = f"https://en.wikipedia.org/w/api.php?action=query&pageids={page_ids_str}&prop=pageprops&ppprop=wikibase_item&format=json"
+            url = f"https://en.wikipedia.org/w/api.php?action=query&pageids={page_ids_str}&prop=pageprops|info&ppprop=wikibase_item&inprop=url&format=json"
             
             response = await client.get(url, timeout=10.0, headers=headers)
             if response.status_code != 200:
@@ -146,12 +146,31 @@ async def check_wikidata_is_human(page_ids: List[int]) -> dict:
             data = response.json()
             pages = data.get("query", {}).get("pages", {})
             
-            # Map page_id to wikidata_id
+            # Map page_id to wikidata_id, and also keep titles for fallback
             wikidata_ids = {}
+            pages_without_wikidata = {}  # page_id -> title
+            
             for page_id, page_data in pages.items():
                 wikibase_item = page_data.get("pageprops", {}).get("wikibase_item")
                 if wikibase_item:
                     wikidata_ids[int(page_id)] = wikibase_item
+                else:
+                    # No wikibase_item - save title for fallback lookup
+                    pages_without_wikidata[int(page_id)] = page_data.get("title", "")
+            
+            # Fallback: For pages without wikibase_item, try searching Wikidata by title
+            for page_id, title in pages_without_wikidata.items():
+                if title:
+                    try:
+                        search_url = f"https://www.wikidata.org/w/api.php?action=wbsearchentities&search={title.replace(' ', '%20')}&language=en&limit=1&format=json"
+                        search_response = await client.get(search_url, timeout=5.0, headers=headers)
+                        if search_response.status_code == 200:
+                            search_data = search_response.json()
+                            search_results = search_data.get("search", [])
+                            if search_results:
+                                wikidata_ids[page_id] = search_results[0].get("id")
+                    except:
+                        pass
             
             if not wikidata_ids:
                 return {pid: False for pid in page_ids}
