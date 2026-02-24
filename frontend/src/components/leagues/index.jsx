@@ -583,20 +583,18 @@ export const Leaderboard = ({ entries }) => {
         </div>
       ))}
       
-      {/* Expand/Collapse button - MOBILE ONLY */}
-      {isMobile && (
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="w-full mt-3 py-2 text-xs text-[#00F0FF] flex items-center justify-center gap-1 hover:bg-[#1A1A1A] rounded transition-colors border border-[#262626]"
-          data-testid="leaderboard-expand-btn"
-        >
-          {expanded ? (
-            <>Show Top 5 <ChevronUp className="w-4 h-4" /></>
-          ) : (
-            <>View All 10 <ChevronDown className="w-4 h-4" /></>
-          )}
-        </button>
-      )}
+      {/* Expand/Collapse button */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full mt-3 py-2 text-xs text-[#00F0FF] flex items-center justify-center gap-1 hover:bg-[#1A1A1A] rounded transition-colors border border-[#262626]"
+        data-testid="leaderboard-expand-btn"
+      >
+        {expanded ? (
+          <>Show Less <ChevronUp className="w-4 h-4" /></>
+        ) : (
+          <>View All 10 <ChevronDown className="w-4 h-4" /></>
+        )}
+      </button>
     </div>
   );
 };
