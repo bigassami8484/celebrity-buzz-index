@@ -4,13 +4,13 @@ const TopPickedCelebs = ({ celebs, onSelect }) => {
   if (!celebs || celebs.length === 0) return null;
   
   return (
-    <div className="bg-[#0A0A0A] border border-[#262626] p-4 mb-4" data-testid="top-picked">
+    <div className="bg-[#0A0A0A] border border-[#262626] p-4 h-full" data-testid="top-picked">
       <h4 className="font-anton text-lg uppercase tracking-tight text-[#00F0FF] mb-3 flex items-center gap-2">
         <TrendingUp className="w-5 h-5" />
         Most Picked
       </h4>
       <div className="space-y-2">
-        {celebs.slice(0, 10).map((celeb, idx) => (
+        {celebs.slice(0, 5).map((celeb, idx) => (
           <div 
             key={celeb.id} 
             className="flex items-center gap-3 p-2 hover:bg-[#1A1A1A] cursor-pointer"
