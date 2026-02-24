@@ -2662,92 +2662,135 @@ def detect_category_from_bio(bio: str, name: str) -> str:
 
 
 def determine_tier_from_bio(bio: str, name: str = "") -> str:
-    """Synchronous helper to determine celebrity tier from bio text"""
+    """
+    Synchronous helper to determine celebrity tier using Recognition Score model.
+    Uses bio-based metrics when async Wikipedia calls aren't available.
+    
+    Recognition Score thresholds:
+    - 85+ = A-List
+    - 65-84 = B-List
+    - 45-64 = C-List
+    - Below 45 = D-List
+    """
+    import re
+    from datetime import datetime
+    
     name_lower = name.lower() if name else ""
+    bio_lower = bio.lower() if bio else ""
     
-    # First check if this is a guaranteed A-lister (mega-star override)
-    if name_lower in GUARANTEED_A_LIST:
+    # ===== Calculate Recognition Score components =====
+    
+    # 1. LONGEVITY (20%) - Extract years active from bio
+    longevity_score = 10
+    years_active = 0
+    current_year = datetime.now().year
+    
+    career_patterns = [
+        r"career spanning (\d+)",
+        r"active since (\d{4})",
+        r"began .* career in (\d{4})",
+        r"started .* in (\d{4})",
+        r"debut in (\d{4})",
+        r"first .* in (\d{4})",
+        r"since (\d{4})",
+        r"\(born .* (\d{4})\)",
+        r"(\d{4})[\s\-–]+present",
+        r"(\d{4})–present"
+    ]
+    
+    for pattern in career_patterns:
+        match = re.search(pattern, bio_lower)
+        if match:
+            try:
+                year_or_span = int(match.group(1))
+                if year_or_span > 100:
+                    years_active = max(years_active, current_year - year_or_span)
+                else:
+                    years_active = max(years_active, year_or_span)
+            except:
+                pass
+    
+    if years_active >= 40:
+        longevity_score = 100
+    elif years_active >= 30:
+        longevity_score = 85
+    elif years_active >= 20:
+        longevity_score = 70
+    elif years_active >= 15:
+        longevity_score = 55
+    elif years_active >= 10:
+        longevity_score = 40
+    elif years_active >= 5:
+        longevity_score = 25
+    
+    # 2. AWARDS (20%) - Count award keywords
+    awards_found = sum(1 for keyword in AWARD_KEYWORDS if keyword in bio_lower)
+    
+    if awards_found >= 8:
+        awards_score = 100
+    elif awards_found >= 6:
+        awards_score = 90
+    elif awards_found >= 4:
+        awards_score = 75
+    elif awards_found >= 3:
+        awards_score = 60
+    elif awards_found >= 2:
+        awards_score = 45
+    elif awards_found >= 1:
+        awards_score = 30
+    else:
+        awards_score = 5
+    
+    # 3. COMMERCIAL (20%) - Count commercial impact keywords
+    commercial_found = sum(1 for keyword in COMMERCIAL_KEYWORDS if keyword in bio_lower)
+    
+    if commercial_found >= 6:
+        commercial_score = 100
+    elif commercial_found >= 4:
+        commercial_score = 80
+    elif commercial_found >= 3:
+        commercial_score = 60
+    elif commercial_found >= 2:
+        commercial_score = 45
+    elif commercial_found >= 1:
+        commercial_score = 25
+    else:
+        commercial_score = 5
+    
+    # 4. LANGUAGE ESTIMATE (25%) - Use bio length as proxy for global notability
+    bio_length = len(bio) if bio else 0
+    if bio_length >= 3000:
+        language_score = 80  # Long detailed bio = likely many languages
+    elif bio_length >= 2000:
+        language_score = 65
+    elif bio_length >= 1000:
+        language_score = 50
+    elif bio_length >= 500:
+        language_score = 35
+    else:
+        language_score = 15
+    
+    # 5. PAGEVIEWS ESTIMATE (15%) - Use award/commercial indicators as proxy
+    pageviews_score = max(30, min(awards_score, commercial_score))
+    
+    # ===== Calculate weighted total =====
+    recognition_score = round(
+        (longevity_score * 0.20) +
+        (language_score * 0.25) +
+        (awards_score * 0.20) +
+        (commercial_score * 0.20) +
+        (pageviews_score * 0.15)
+    )
+    
+    # ===== Determine tier from score =====
+    if recognition_score >= 85:
         return "A"
-    
-    # Check for royal family members using partial keyword matching
-    if any(keyword in name_lower for keyword in ROYAL_A_LIST_KEYWORDS):
-        return "A"
-    
-    # Check if guaranteed B-lister
-    if name_lower in GUARANTEED_B_LIST:
+    elif recognition_score >= 65:
         return "B"
-    
-    # Check if guaranteed C-lister  
-    if name_lower in GUARANTEED_C_LIST:
+    elif recognition_score >= 45:
         return "C"
-    
-    bio_lower = bio.lower()
-    
-    # A-list: Major awards, legendary status
-    a_list_score = sum(1 for ind in A_LIST_INDICATORS if ind in bio_lower)
-    if a_list_score >= 2:
-        return "A"
-    
-    # B-list: Award-winning, successful
-    b_list_score = sum(1 for ind in B_LIST_INDICATORS if ind in bio_lower)
-    if a_list_score >= 1 or b_list_score >= 2:
-        return "B"
-    
-    # C-list: Known for appearances
-    c_list_score = sum(1 for ind in C_LIST_INDICATORS if ind in bio_lower)
-    if b_list_score >= 1 or c_list_score >= 1:
-        return "C"
-    
-    # =================================================================
-    # ANTI-D-LIST CHECKS
-    # Actors with longevity or multiple successful roles should NOT be D-list
-    # TV personalities with major awards should NOT be D-list
-    # Musicians with chart success should NOT be D-list
-    # =================================================================
-    
-    # Check for major award wins - anyone with these should be at least C-list
-    major_awards = [
-        "emmy", "grammy", "bafta", "golden globe", "oscar", "academy award",
-        "brit award", "nta", "national television award", "tv choice award",
-        "people's choice", "mtv award", "billboard", "american music award",
-        "screen actors guild", "critics choice", "tony award", "olivier award"
-    ]
-    awards_found = sum(1 for award in major_awards if award in bio_lower)
-    if awards_found >= 2:
-        return "B"  # Multiple major awards = B-list minimum
-    if awards_found >= 1:
-        return "C"  # Single major award = C-list minimum
-    
-    # Check for successful TV presenters - they should not be D-list
-    presenter_indicators = [
-        "television presenter", "tv presenter", "presenter", "host",
-        "love island", "the masked singer", "strictly come dancing", "dancing with the stars",
-        "x factor", "britain's got talent", "america's got talent", "the voice",
-        "big brother", "i'm a celebrity", "great british bake off", "masterchef",
-        "this morning", "good morning", "breakfast", "newsround", "blue peter",
-        "top gear", "the one show", "loose women", "the chase", "pointless",
-        "countdown", "8 out of 10 cats", "question of sport", "a league of their own"
-    ]
-    presenter_score = sum(1 for ind in presenter_indicators if ind in bio_lower)
-    if presenter_score >= 2:
-        return "B"  # Established presenter with popular show credits
-    if presenter_score >= 1:
-        return "C"  # Presenter = at least C-list
-    
-    # Check for comedians - they should be at least C-list
-    comedian_indicators = [
-        "comedian", "stand-up comedian", "comedy", "comedic", "panel show",
-        "8 out of 10 cats", "mock the week", "qi", "taskmaster", "would i lie to you",
-        "have i got news", "live at the apollo", "comedy central", "edinburgh festival"
-    ]
-    comedian_score = sum(1 for ind in comedian_indicators if ind in bio_lower)
-    if comedian_score >= 2:
-        return "B"  # Established comedian with multiple credits
-    if comedian_score >= 1:
-        return "C"  # Comedian = at least C-list
-    
-    # Check for chart/music success (for musicians)
-    # Anyone with a #1 hit should be at least B-list
+    else:
+        return "D"
     number_one_indicators = [
         "number one", "number-one", "#1 single", "#1 hit", "no. 1", "no.1",
         "chart-topping", "topped the charts", "reached number one"
