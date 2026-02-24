@@ -209,6 +209,8 @@ async def check_wikidata_is_human(page_ids: List[int]) -> dict:
                         qid = item_uri.split("/entity/")[1]
                         human_qids.add(qid)
                 
+                logger.info(f"SPARQL found {len(human_qids)} humans out of {len(qids)} entities")
+                
                 # Map back to page_ids
                 for page_id, qid in wikidata_ids.items():
                     results[page_id] = qid in human_qids
