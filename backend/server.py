@@ -1150,14 +1150,27 @@ def calculate_tier_and_price(language_count: int, bio: str = "", name: str = "")
     
     # LAYER 2: Achievement modifiers (upgrade potential)
     
-    # Global franchise leads
-    global_franchises = [
-        "harry potter", "star wars", "marvel", "avengers", "james bond",
-        "lord of the rings", "fast and furious", "mission impossible",
-        "spider-man", "batman", "x-men", "jurassic", "hunger games",
-        "twilight", "pirates of the caribbean", "transformers", "matrix"
+    # Global franchise leads - MUST be main/lead roles, not just appearances
+    # Check for "starred in" or "known for" or "best known for" patterns with franchise names
+    global_franchise_patterns = [
+        "starred in harry potter", "played harry potter", "as harry potter", "hermione granger",
+        "starred in star wars", "played luke skywalker", "played darth vader", "princess leia",
+        "starred in the avengers", "iron man", "captain america", "thor", "black widow",
+        "played james bond", "as james bond", "007",
+        "starred in lord of the rings", "played frodo", "played gandalf", "played aragorn",
+        "starred in the fast", "fast and furious franchise lead",
+        "starred in mission impossible", "played ethan hunt",
+        "played spider-man", "as spider-man", "peter parker in",
+        "played batman", "as batman", "the dark knight trilogy",
+        "played wolverine", "as wolverine",  # X-Men lead
+        "starred in jurassic", "jurassic park series",
+        "played katniss", "hunger games series lead",
+        "starred in twilight", "played bella", "played edward",
+        "jack sparrow", "pirates of the caribbean lead",
+        "optimus prime", "transformers franchise",
+        "played neo", "as neo", "the matrix trilogy"
     ]
-    is_franchise_lead = any(f in bio_lower for f in global_franchises)
+    is_franchise_lead = any(f in bio_lower for f in global_franchise_patterns)
     
     # Major international awards - MUST be winners, not nominees
     # Use specific winner patterns to avoid matching nominations
