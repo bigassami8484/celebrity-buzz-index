@@ -1751,6 +1751,10 @@ CELEBRITY_ALIASES = {
     "snoop dog": "Snoop Dogg",
     "lady gaga": "Lady Gaga",
     "stefani germanotta": "Lady Gaga",
+    # Madonna
+    "madonna": "Madonna",
+    "madonna ciccone": "Madonna",
+    # Anthony Head - TV actor
     # Brian Cox disambiguation
     "brian cox": "Brian Cox (physicist)",
     "brian cox physicist": "Brian Cox (physicist)",
