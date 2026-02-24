@@ -86,12 +86,15 @@ Updated `/api/celebrities/category/{category}` endpoint to:
 - D-LIST: £1M base
 
 **Verified Results (All Tests Passed):**
-- Daniel Radcliffe: A-LIST (101 langs, Harry Potter) £12M ✅
+- Daniel Radcliffe: A-LIST (101 langs, Harry Potter) £15M ✅
 - Michael B. Jordan: B-LIST (55 langs, nominated but NOT won Oscar) £6.9M ✅
 - Rochelle Humes: C-LIST (13 langs) £2.5M ✅
-- Pink (singer): A-LIST (78 langs) £12M ✅
+- Pink (singer): A-LIST (78 langs) £15M ✅
 - Kelly Osbourne: B-LIST (35 langs) £6.9M ✅
 - Sharon Osbourne: B-LIST (33 langs) £6M ✅
+- Ray J: B-LIST (now searchable!) £6M ✅
+- Sean Combs (P Diddy): A-LIST (now searchable via multiple aliases) £15M ✅
+- Mario (singer): A-LIST (now searchable!) £15M ✅
 
 ### Bug Fixes (Feb 24, 2026)
 - ✅ **apply_brown_bread_premium → get_brown_bread_premium** - Fixed NameError in celebrity search endpoint
