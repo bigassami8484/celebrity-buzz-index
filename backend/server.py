@@ -2696,6 +2696,7 @@ def detect_category_from_bio(bio: str, name: str) -> str:
         "ncuti gatwa": "tv_actors",
         "olivia colman": "tv_actors",
         "jessica alba": "tv_actors",
+        "anthony head": "tv_actors",  # Known for Buffy, Merlin, Little Britain
         "tyreek hill": "athletes",
         "simone biles": "athletes",
         "lebron james": "athletes",
