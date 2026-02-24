@@ -1174,6 +1174,21 @@ function App() {
                 </ul>
               </div>
             </details>
+            
+            {/* FAQ Item 8 - Beta Notice */}
+            <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
+              <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
+                Why is [celebrity] in the wrong category or priced weirdly?
+                <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
+                <p>We're in <strong className="text-[#FFD700]">BETA</strong> mate! 🚧</p>
+                <p>Our algorithm pulls data from Wikipedia and news sources, but sometimes it gets a bit confused. If you spot a well-known celeb priced at £0.5M or in a bizarre category...</p>
+                <p className="text-[#00F0FF] font-bold">SNAP THEM UP! 💰</p>
+                <p>Seriously, it's not that deep. Take advantage of the bargains while they last. We're working on it, but in the meantime, enjoy the chaos and build your team on the cheap!</p>
+                <p className="text-xs text-[#666] mt-2 italic">*Prices and categories may update at any time. No refunds for shrewd investments. 😉</p>
+              </div>
+            </details>
           </div>
         </div>
       </section>
