@@ -1798,6 +1798,10 @@ CELEBRITY_ALIASES = {
     "sza": "SZA",
     "lizzo": "Lizzo",
     "post malone": "Post Malone",
+    "austin post": "Post Malone",
+    "the weeknd": "The Weeknd",
+    "weeknd": "The Weeknd",
+    "abel tesfaye": "The Weeknd",
     "21 savage": "21 Savage",
     "travis scott": "Travis Scott",
     # Celebrities with special characters - map common spellings
