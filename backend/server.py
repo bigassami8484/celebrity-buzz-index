@@ -1882,8 +1882,9 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 "film", "movie", "show", "documentary", "special", "tv series",
                 "racing", "kong", "parties", "money", "records", "entertainment",
                 "videography", "singles", "songs", "albums",
-                # Wikipedia meta
+                # Wikipedia meta/disambiguation
                 "list of", "category:", "template:", "wikipedia:", "disambiguation",
+                "may refer to", "refers to", "refer to",
                 # Sports teams/venues
                 "fc", "cf", "afc", "united", "club", "team", "stadium", "arena",
                 # Legal/News/Events
