@@ -2050,7 +2050,6 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 
                 # Special handling for sports abbreviations (FC, CF, AFC) - word boundary check
                 # This avoids matching names like McFadden, MacFarlane, etc.
-                import re
                 if re.search(r'\b(fc|cf|afc)\b', title_lower):
                     continue
                 
