@@ -1048,7 +1048,7 @@ function App() {
           
           <div className="space-y-4">
             {/* FAQ Item 1 */}
-            <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group" open>
+            <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
               <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
                 How do points work?
                 <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
