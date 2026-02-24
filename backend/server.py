@@ -2088,10 +2088,7 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 
                 candidates.append(title)
             
-            logger.info(f"Filtered candidates for '{query}': {candidates}")
-            
             if not candidates:
-                logger.info(f"No candidates after filtering for '{query}'")
                 return []
             
             # Step 2: Get page IDs for candidates (with redirect handling)
