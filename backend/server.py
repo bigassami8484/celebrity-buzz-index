@@ -3783,7 +3783,6 @@ async def autocomplete_search(q: str):
                     try:
                         headers = {"User-Agent": "CelebrityBuzzIndex/1.0"}
                         async with httpx.AsyncClient() as client:
-                            await asyncio.sleep(0.15)
                             wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={match['name'].replace(' ', '_')}&props=sitelinks&format=json"
                             response = await client.get(wikidata_url, timeout=5.0, headers=headers)
                             if response.status_code == 200:
