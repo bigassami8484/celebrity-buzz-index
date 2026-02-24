@@ -1106,6 +1106,29 @@ function App() {
             {/* FAQ Item 4 */}
             <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
               <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
+                How are celebrity tiers decided?
+                <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
+                <p>Tiers are determined by our <strong className="text-white">Global Recognition Algorithm</strong> which considers:</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li><strong className="text-[#00F0FF]">🌍 Wikipedia Languages:</strong> The main factor - how many language editions feature the celebrity (shown as the number next to 🌍)</li>
+                  <li><strong className="text-[#FFD700]">Major Awards:</strong> Oscar, Grammy, Emmy winners get tier upgrades</li>
+                  <li><strong className="text-[#FF0099]">Franchise Leads:</strong> Stars of Harry Potter, Marvel, Star Wars etc. get A-List status</li>
+                  <li><strong className="text-white">World Champions:</strong> Olympic gold medalists, world record holders</li>
+                </ul>
+                <p className="mt-2 text-xs">
+                  <strong className="text-[#FFD700]">A-LIST:</strong> 60+ languages | 
+                  <strong className="text-[#C0C0C0]"> B-LIST:</strong> 25-59 | 
+                  <strong className="text-[#CD7F32]"> C-LIST:</strong> 10-24 | 
+                  <strong className="text-[#666]"> D-LIST:</strong> &lt;10
+                </p>
+              </div>
+            </details>
+            
+            {/* FAQ Item 5 */}
+            <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
+              <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
                 When can I make transfers?
                 <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
               </summary>
@@ -1119,7 +1142,7 @@ function App() {
               </div>
             </details>
             
-            {/* FAQ Item 5 */}
+            {/* FAQ Item 6 */}
             <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
               <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
                 What is the Brown Bread Watch?
@@ -1128,14 +1151,13 @@ function App() {
               <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
                 <p>The <strong className="text-white">Brown Bread Watch</strong> 💀 tracks elderly celebrities (80+) who may... shuffle off this mortal coil.</p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li>Deceased celebrities are marked with a skull icon 💀</li>
                   <li>They receive a <strong className="text-white">Brown Bread Bonus</strong> - extra points!</li>
                   <li>A morbid but strategic consideration for your team...</li>
                 </ul>
               </div>
             </details>
             
-            {/* FAQ Item 6 */}
+            {/* FAQ Item 7 */}
             <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
               <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
                 How do I save my team?
