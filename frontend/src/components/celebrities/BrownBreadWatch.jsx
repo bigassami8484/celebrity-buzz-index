@@ -16,13 +16,12 @@ const BrownBreadWatch = ({ watchList, onSelect }) => {
     }
   };
   
-  // Show 3 on mobile (collapsed), all when expanded or on desktop
-  const isMobile = window.innerWidth < 768;
-  const displayList = isMobile && !expanded ? watchList.slice(0, 3) : watchList.slice(0, 10);
-  const hasMore = isMobile && watchList.length > 3;
+  // Show 5 items to match other panels
+  const displayList = expanded ? watchList.slice(0, 10) : watchList.slice(0, 5);
+  const hasMore = watchList.length > 5;
   
   return (
-    <div className="bg-[#0A0A0A] border border-[#262626] p-4 mb-4" data-testid="brown-bread-watch">
+    <div className="bg-[#0A0A0A] border border-[#262626] p-4 h-full" data-testid="brown-bread-watch">
       <h4 className="font-anton text-lg uppercase tracking-tight text-[#888] mb-3 flex items-center gap-2">
         <Skull className="w-5 h-5" />
         Brown Bread Watch
