@@ -9,7 +9,48 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Compete on leaderboards with friends
 - Social sharing (Twitter/X, Facebook, WhatsApp)
 
-## Latest Updates (Feb 24, 2026 - Session 3)
+## Latest Updates (Feb 24, 2026 - Session 4)
+
+### NEW FEATURE: Hot Streaks (Feb 24, 2026)
+**Feature**: Track celebrities with 3+ consecutive days of news mentions
+- In-app alerts for celebrities with hot streaks (5+ days)
+- New `/api/hot-streaks` endpoint
+- Visual indicator with streak days and news article count
+- Auto-dismissible alerts stored in sessionStorage
+
+### FIX: Celebrity Image Issues (Feb 24, 2026)
+**Problem**: Lady Gaga, Madonna, Post Malone, The Weeknd showing placeholder images
+**Fix**: 
+- Enhanced alias matching to prefer fresh Wikidata images over stale DB cache
+- Added aliases for Madonna, Post Malone, The Weeknd
+- PRIORITY 2 alias logic now replaces DB matches when Wikidata has fresher images
+
+### FIX: Category Corrections (Feb 24, 2026)
+- Zooey Deschanel → tv_actors (New Girl)
+- Anthony Head → tv_actors (Buffy, Merlin)
+
+### FIX: National Team Athletes Tier Boost (Feb 24, 2026)
+**Problem**: England rugby players and other national team athletes showing as D-list
+**Fix**: Added national team indicators that boost D-list athletes to minimum C-list:
+- "national team", "international caps", "six nations", "rugby union international"
+- "premier league", "la liga", "champions league", "olympics", etc.
+
+### IMPROVEMENT: Varied A-List Pricing (Feb 24, 2026)
+**Problem**: All A-list celebrities were £15M
+**Fix**: Dynamic pricing based on language count within each tier:
+- A-LIST: £10M - £15M (120+ langs = £15M, 90+ = £13M, 75+ = £11M, else £10M)
+- B-LIST: £4M - £6.9M
+- C-LIST: £1.5M - £2.9M  
+- D-LIST: £0.5M - £1M
+
+**Examples**:
+- Taylor Swift (153 langs): £15M
+- Ed Sheeran (88 langs): £11M
+- The Weeknd (74 langs): £10M
+
+---
+
+## Previous Updates (Feb 24, 2026 - Session 3)
 
 ### BUG FIX: Duplicate Search Results for Aliased Names (Feb 24, 2026)
 **Problem**: Searching for "zoe saldana" returned TWO results:
