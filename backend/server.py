@@ -3491,38 +3491,44 @@ async def autocomplete_search(q: str):
         
         for match in partial_matches:
             if not any(s.get("name") == match["name"] for s in priority_suggestions):
-                # Get recognition score and metrics
-                recognition_score = match.get("recognition_score")
+                # Get recognition metrics and bio
                 recognition_metrics = match.get("recognition_metrics", {})
+                bio = match.get("bio", "")
                 
-                # If no recognition score, calculate from metrics or estimate
-                if recognition_score is None:
-                    tier_score = match.get("tier_score", 0)
-                    if tier_score > 0:
-                        recognition_score = min(100, max(0, tier_score))
-                    else:
-                        tier_metrics = match.get("tier_metrics", {})
-                        if tier_metrics:
-                            result = calculate_recognition_score_from_metrics(tier_metrics)
-                            recognition_score = result.get("recognition_score", 50)
-                            recognition_metrics = tier_metrics
-                        else:
-                            recognition_score = 50
+                # Check if stored data is incomplete
+                stored_languages = recognition_metrics.get("languages", {}).get("count", 0)
+                if stored_languages == 0:
+                    try:
+                        headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com)"}
+                        async with httpx.AsyncClient() as client:
+                            await asyncio.sleep(0.2)
+                            wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={match['name'].replace(' ', '_')}&props=sitelinks&format=json"
+                            response = await client.get(wikidata_url, timeout=5.0, headers=headers)
+                            if response.status_code == 200:
+                                data = response.json()
+                                for entity in data.get("entities", {}).values():
+                                    sitelinks = entity.get("sitelinks", {})
+                                    language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
+                                    if language_count > 0:
+                                        recognition_metrics["languages"] = {"count": language_count}
+                    except:
+                        pass
                 
-                # ALWAYS derive tier from recognition score
-                tier = get_tier_from_recognition_score(recognition_score, recognition_metrics)
-                
-                # Calculate price from tier
+                # Use 3-LAYER TIER CALCULATION
+                tier = calculate_tier_3_layer(recognition_metrics, bio)
                 price = get_price_from_tier(tier)
                 
-                # Check if in hot celebs - add news premium
+                # Recognition score for display
+                recognition_score = recognition_metrics.get("languages", {}).get("count", 0)
+                
+                # Check if in hot celebs
                 hot_price, hot_tier, is_hot = get_hot_celeb_price(match["name"])
                 if is_hot and hot_price:
                     price = min(15.0, price * 1.15)
                 
                 priority_suggestions.append({
                     "name": match["name"],
-                    "bio": match.get("bio", "")[:100] + "..." if match.get("bio") else "",
+                    "bio": bio[:100] + "..." if bio else "",
                     "image": match.get("image", ""),
                     "tier": tier,
                     "price": round(price, 1),
