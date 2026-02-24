@@ -2522,7 +2522,8 @@ def detect_category_from_bio(bio: str, name: str) -> str:
             "susanna reid", "ben shephard", "kate garraway", "richard madeley", "judy finnigan",
             "christine lampard", "emma willis", "regis philbin", "keke palmer", "fearne cotton",
             "scott mills", "craig ferguson", "drew barrymore", "sherri shepherd", "mario lopez",
-            "kelly ripa", "mayim bialik", "lawrence o'donnell",
+            "kelly ripa", "mayim bialik", "lawrence o'donnell", "davina mccall", "ruth langsford",
+            "rochelle humes", "alison hammond", "josie gibson", "cat deeley", "ant and dec",
             # Additional TV personalities (broadcasters known primarily for TV work)
             "jeremy clarkson", "richard hammond", "james may", "alan titchmarsh", "sue perkins",
             "alexander armstrong", "sophie raworth", "andrew marr", "chris cuomo", "eamonn holmes",
