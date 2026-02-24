@@ -1028,29 +1028,54 @@ C_LIST_INDICATORS = ["known for", "appeared in", "featured", "contestant", "part
 
 # Mega-stars who should ALWAYS be A-list regardless of bio analysis
 GUARANTEED_A_LIST = [
-    # Global Music Superstars
+    # Global Music Superstars (20+ years, major awards, Hall of Fame)
     "taylor swift", "beyoncé", "beyonce", "rihanna", "drake", "kanye west", "adele",
     "ed sheeran", "ariana grande", "justin bieber", "lady gaga", "bruno mars",
     "britney spears", "madonna", "michael jackson", "jennifer lopez", "shakira",
     "eminem", "jay-z", "jay z", "snoop dogg", "50 cent", "nicki minaj", "cardi b",
     "selena gomez", "miley cyrus", "katy perry", "demi lovato", "the weeknd",
     "harry styles", "zayn malik", "niall horan", "liam payne", "louis tomlinson",
-    "victoria beckham", "cheryl", "robbie williams",
-    # Global Movie Stars
+    "victoria beckham", "cheryl", "robbie williams", "elton john", "paul mccartney",
+    "mick jagger", "keith richards", "sting", "bono", "phil collins", "rod stewart",
+    "stevie wonder", "whitney houston", "mariah carey", "celine dion", "barbra streisand",
+    "cher", "tina turner", "janet jackson", "diana ross", "dolly parton",
+    "bruce springsteen", "billy joel", "eric clapton", "bob dylan", "prince",
+    "david bowie", "freddie mercury", "ozzy osbourne", "slash", "axl rose",
+    # Global Movie Stars (franchise leads, major awards)
     "leonardo dicaprio", "tom cruise", "brad pitt", "angelina jolie", "tom hanks",
     "julia roberts", "denzel washington", "will smith", "johnny depp", "robert downey jr",
     "dwayne johnson", "the rock", "scarlett johansson", "jennifer lawrence", "margot robbie",
     "meryl streep", "nicole kidman", "cate blanchett", "natalie portman", "emma watson",
     "george clooney", "matt damon", "ben affleck", "keanu reeves", "morgan freeman",
     "samuel l. jackson", "samuel l jackson", "al pacino", "robert de niro", "jack nicholson",
-    # Global Athletes
+    "clint eastwood", "harrison ford", "sylvester stallone", "arnold schwarzenegger",
+    "sean connery", "anthony hopkins", "michael caine", "ian mckellen", "patrick stewart",
+    "judi dench", "helen mirren", "emma thompson", "kate winslet", "sandra bullock",
+    "reese witherspoon", "charlize theron", "halle berry", "viola davis", "lupita nyong'o",
+    # Global TV Stars (iconic shows, Emmy winners)
+    "jennifer aniston", "courteney cox", "lisa kudrow", "matthew perry", "david schwimmer",
+    "matt leblanc", "jerry seinfeld", "sarah jessica parker", "kim cattrall",
+    "bryan cranston", "aaron paul", "peter dinklage", "emilia clarke", "kit harington",
+    # Global Athletes (20+ years, Hall of Fame, Olympic gold)
     "cristiano ronaldo", "lionel messi", "lebron james", "serena williams", "roger federer", 
     "michael jordan", "david beckham", "tom brady", "tiger woods", "usain bolt", 
     "muhammad ali", "mike tyson", "simone biles", "venus williams", "novak djokovic", 
     "wayne rooney", "diego maradona", "pele", "pelé", "zinedine zidane", "kobe bryant", "shaquille o'neal",
-    # Global Business/Public Figures
-    "oprah winfrey", "kim kardashian", "elon musk", "jeff bezos", "barack obama", 
-    "donald trump", "joe biden", "bill gates",
+    "michael phelps", "rafael nadal", "lewis hamilton", "floyd mayweather", "floyd mayweather jr",
+    "manny pacquiao", "conor mcgregor", "neymar", "kylian mbappe", "erling haaland",
+    # Global Business Leaders (founded global brands)
+    "oprah winfrey", "elon musk", "jeff bezos", "bill gates", "mark zuckerberg",
+    "warren buffett", "richard branson", "steve jobs", "martha stewart", "kylie jenner",
+    "rihanna", "jessica alba", "gwyneth paltrow",
+    # Media Icons & Cultural Figures
+    "kim kardashian", "khloe kardashian", "kourtney kardashian", "kris jenner", "kendall jenner",
+    "paris hilton", "ellen degeneres", "james corden", "jimmy fallon", "jimmy kimmel",
+    "conan o'brien", "david letterman", "jay leno", "anderson cooper", "ryan seacrest",
+    "simon cowell", "gordon ramsay", "guy fieri", "anthony bourdain",
+    # Political & Public Figures
+    "barack obama", "michelle obama", "donald trump", "joe biden", "hillary clinton",
+    "bill clinton", "george w. bush", "george h. w. bush", "angela merkel",
+    "nelson mandela", "dalai lama", "pope francis", "malala yousafzai", "greta thunberg",
     # British Royal Family (globally famous)
     "prince william", "william, prince of wales", "william prince of wales",
     "prince harry", "harry, duke of sussex", "harry duke of sussex", "prince harry, duke of sussex",
