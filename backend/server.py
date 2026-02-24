@@ -3785,6 +3785,11 @@ async def autocomplete_search(q: str):
     # This prevents "diddy" from returning "Diddy TV", "Diddy Wah Diddy" etc
     found_exact_alias = query_lower in CELEBRITY_ALIASES and len(priority_suggestions) > 0
     
+    # Check if query looks like a full name (has 2+ words) or is a known single-word celeb
+    query_words = q.strip().split()
+    is_full_name_query = len(query_words) >= 2
+    is_known_single_name = query_lower in CELEBRITY_ALIASES or query_lower in GUARANTEED_A_LIST
+    
     # Check if we have a single exact match from priority suggestions
     # If query exactly matches a celebrity name, return ONLY that one result
     has_exact_name_match = any(
@@ -3794,10 +3799,13 @@ async def autocomplete_search(q: str):
         for s in priority_suggestions
     )
     
-    logger.info(f"Autocomplete '{q}': found_exact_alias={found_exact_alias}, has_exact_name_match={has_exact_name_match}, priority_count={len(priority_suggestions)}")
+    # Only return single result for full name queries or known celebs
+    should_return_single = (is_full_name_query or is_known_single_name) and has_exact_name_match
     
-    # If we have an exact match (either from DB, alias, or name match), return ONLY that
-    if has_exact_name_match and len(priority_suggestions) >= 1:
+    logger.info(f"Autocomplete '{q}': found_exact_alias={found_exact_alias}, has_exact_name_match={has_exact_name_match}, should_return_single={should_return_single}, priority_count={len(priority_suggestions)}")
+    
+    # If we have an exact match for a full name query, return ONLY that
+    if should_return_single and len(priority_suggestions) >= 1:
         # Return only the first (best) match
         all_suggestions = [priority_suggestions[0]]
     elif not found_exact_alias:
@@ -3810,7 +3818,7 @@ async def autocomplete_search(q: str):
         
         # CHECK FOR EXACT FULL NAME MATCH - if first result matches query exactly, return only that
         # e.g., "richard gere" should return only "Richard Gere", not other Richards
-        if filtered_suggestions:
+        if filtered_suggestions and is_full_name_query:
             first_result_name = filtered_suggestions[0].get("name", "").lower()
             # Check if query is an exact match (case-insensitive)
             if first_result_name == query_lower:
@@ -3820,7 +3828,7 @@ async def autocomplete_search(q: str):
                 # Combine: priority first, then Wikipedia results
                 all_suggestions = priority_suggestions + filtered_suggestions
         else:
-            all_suggestions = priority_suggestions
+            all_suggestions = priority_suggestions + filtered_suggestions
     else:
         # Exact alias match found - return only priority suggestions
         all_suggestions = priority_suggestions
