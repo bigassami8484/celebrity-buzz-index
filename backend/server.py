@@ -1827,15 +1827,23 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     else:
                         # CALCULATE REAL RECOGNITION SCORE for new celebs
                         # Fetch Wikidata for language count and apply safeguards
+                        recognition_score = 50  # Default
                         try:
+                            # Add small delay to respect rate limits
+                            await asyncio.sleep(0.2)
+                            
                             wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={actual_title.replace(' ', '_')}&props=sitelinks&format=json"
-                            wd_response = await client.get(wikidata_url, timeout=3.0, headers=headers)
+                            wd_response = await client.get(wikidata_url, timeout=5.0, headers=headers)
                             language_count = 0
                             if wd_response.status_code == 200:
                                 wd_data = wd_response.json()
                                 for entity in wd_data.get("entities", {}).values():
                                     sitelinks = entity.get("sitelinks", {})
                                     language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
+                            elif wd_response.status_code == 403:
+                                # Rate limited - use bio-based estimate
+                                logger.debug(f"Wikidata rate limited for {actual_title}")
+                                language_count = 20  # Assume moderate recognition
                             
                             # Quick recognition score calculation
                             # Language score (25% weight, max 100)
