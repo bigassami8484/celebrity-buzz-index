@@ -1711,6 +1711,7 @@ GUARANTEED_A_LIST = [
     "sean connery", "anthony hopkins", "michael caine", "ian mckellen", "patrick stewart",
     "judi dench", "helen mirren", "emma thompson", "kate winslet", "sandra bullock",
     "reese witherspoon", "charlize theron", "halle berry", "viola davis", "lupita nyong'o",
+    "richard gere", "dustin hoffman", "gene hackman", "michael douglas", "kevin costner",  # Classic Hollywood
     # Global TV Stars (iconic shows, Emmy winners)
     "jennifer aniston", "courteney cox", "lisa kudrow", "matthew perry", "david schwimmer",
     "matt leblanc", "jerry seinfeld", "sarah jessica parker", "kim cattrall",
