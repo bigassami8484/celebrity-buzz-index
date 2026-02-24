@@ -4913,11 +4913,6 @@ async def get_hot_streaks():
                 "trending_tag": "Hot Streak",
                 "is_hot": True
             })
-                "price": celeb.get("price", 1.0),
-                "image": celeb.get("image", ""),
-                "trending_tag": celeb.get("trending_tag", ""),
-                "is_hot": True
-            })
     
     # Sort by streak days (longest first), then by news count
     streaks.sort(key=lambda x: (x["streak_days"], x["news_count"]), reverse=True)
