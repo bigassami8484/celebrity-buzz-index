@@ -9,7 +9,22 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Compete on leaderboards with friends
 - Social sharing (Twitter/X, Facebook, WhatsApp)
 
-## Latest Updates (Feb 24, 2026 - Session 4)
+## Latest Updates (Feb 24, 2026 - Session 5)
+
+### BUG FIX: Search Failing for Names with "Mc/Mac" Prefixes (Feb 24, 2026)
+**Problem**: Searching for "bryan mcfadden" returned no results
+**Root Cause**: The keyword filter list included "fc", "cf", "afc" (meant for sports teams) but these matched inside names like "McFadden" because the check was substring-based (`kw in title_lower`).
+**Fix Applied**:
+- Replaced substring matching for sports abbreviations with regex word-boundary checking: `r'\b(fc|cf|afc)\b'`
+- This correctly filters "Barcelona FC", "Real Madrid CF", "AFC Bournemouth" while allowing "Brian McFadden", "Bryant McFadden", "MacFarlane" through
+**Verified Results**:
+- "bryan mcfadden" → Brian McFadden (B-List, £4M) ✅
+- "bryant mcfadden" → Bryant McFadden ✅
+- "barcelona fc" → 0 results (correctly filtered) ✅
+
+---
+
+## Previous Updates (Feb 24, 2026 - Session 4)
 
 ### NEW FEATURE: Hot Streaks (Feb 24, 2026)
 **Feature**: Track celebrities with 3+ consecutive days of news mentions
