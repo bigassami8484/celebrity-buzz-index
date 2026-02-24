@@ -3700,16 +3700,30 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
             existing["news_premium"] = hot_celeb_match.get("news_premium", False)
             existing["trending_tag"] = hot_celeb_match.get("trending_tag", "")
         else:
-            # Use database price - it's already correctly varied
-            tier = "A" if (is_mega_star or is_royal) else existing.get("tier", "D")
-            existing["tier"] = tier
+            # SINGLE SOURCE OF TRUTH: Recalculate tier/price using Wikidata language count
+            # This ensures consistency with autocomplete endpoint
+            bio = existing.get("bio", "")
+            tier, base_price, lang_count = await get_tier_and_price_from_wikidata(celeb_name, bio)
             
-            # Use the stored price from database (already has proper variation)
-            db_price = existing.get("price", 3.0)
+            # Apply mega-star/royal override if applicable
+            if is_mega_star or is_royal:
+                tier = "A"
+                base_price = 12.0
+            
+            existing["tier"] = tier
+            existing["recognition_score"] = lang_count
             
             # Check if this celeb qualifies for Brown Bread premium pricing
-            new_price = await get_brown_bread_premium(existing, db_price)
+            new_price = await get_brown_bread_premium(existing, base_price)
             existing["price"] = new_price
+            
+            # Update DB with correct tier/price if changed
+            old_tier = existing.get("_original_tier")
+            if old_tier != tier:
+                await db.celebrities.update_one(
+                    {"id": existing.get("id")},
+                    {"$set": {"tier": tier, "price": base_price, "recognition_score": lang_count}}
+                )
         
         # Check if image is a placeholder - refresh in background (don't block response)
         current_image = existing.get("image", "")
