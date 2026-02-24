@@ -650,6 +650,20 @@ function App() {
       <Toaster position="top-right" theme="dark" richColors />
       <div className="noise-overlay"></div>
       
+      {/* Initial Layout Loading - Show minimal skeleton until JS hydration completes */}
+      {!isLayoutReady && (
+        <div className="fixed inset-0 bg-[#050505] z-[9999] flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="font-anton text-4xl md:text-6xl text-white uppercase">
+              <span className="text-[#FF0099]">Celebrity</span>
+              <br />
+              <span className="text-[#FFD700]">Buzz</span> <span className="text-[#00F0FF]">Index</span>
+            </h1>
+            <p className="text-[#A1A1AA] text-sm mt-4">Loading...</p>
+          </div>
+        </div>
+      )}
+      
       {/* Auth Bar */}
       <div className="bg-[#0A0A0A] border-b border-[#262626] py-2 px-4">
         <div className="max-w-7xl mx-auto flex justify-end items-center">
