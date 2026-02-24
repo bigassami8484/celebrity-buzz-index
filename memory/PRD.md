@@ -9,7 +9,35 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Compete on leaderboards with friends
 - Social sharing (Twitter/X, Facebook, WhatsApp)
 
-## Latest Updates (Feb 24, 2026 - Session 2)
+## Latest Updates (Feb 24, 2026 - Session 3)
+
+### BUG FIX: Duplicate Search Results for Aliased Names (Feb 24, 2026)
+**Problem**: Searching for "zoe saldana" returned TWO results:
+- "Zoe Saldana" (D-List, 0 recognition score) - incorrect stale DB match
+- "Zoe Saldaña" (A-List, 76 languages) - correct Wikipedia data
+
+**Root Cause**: The duplicate detection logic used simple `.lower()` comparison which treated "Zoe Saldana" and "Zoe Saldaña" as different strings due to the accented character.
+
+**Fix Applied**:
+1. Added `normalize_text()` function (removes accents using unicodedata) to duplicate checks
+2. Modified PRIORITY 2 alias matching to REPLACE stale DB matches when fresh Wikipedia data has a higher recognition score
+3. Updated final duplicate removal to use normalized names for proper deduplication
+
+**Code Changes**:
+- `/app/backend/server.py`: Lines 3556-3600 (alias matching with replacement logic)
+- `/app/backend/server.py`: Lines 3708-3717 (duplicate removal with normalization)
+
+**Verified Results**:
+- "zoe saldana" → 1 result: Zoe Saldaña (A-List, 76 langs, £15M) ✅
+- "diddy" → 1 result: Sean Combs (A-List, 62 langs) ✅
+- "p diddy" → 1 result: Sean Combs (A-List, 62 langs) ✅
+- "richard gere" → Richard Gere first (A-List, 78 langs) ✅
+- "mario" → Mario (American singer) first ✅
+- "oscar nunez" → Oscar Nunez (C-List, 21 langs) ✅
+
+---
+
+## Previous Updates (Feb 24, 2026 - Session 2)
 
 ### CRITICAL FIX: Tier/Price Consistency (Feb 24, 2026)
 **Problem**: Celebrities were showing mismatched tiers and prices across different endpoints (e.g., D-List with £5.9M price, A-List celebrities showing as C-List).
