@@ -22,6 +22,8 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - ✅ **apply_brown_bread_premium → get_brown_bread_premium** - Fixed NameError in celebrity search endpoint
 - ✅ **Removed duplicate fetch_wikipedia_info function** - Cleaned up leftover code from refactoring
 - ✅ **Restored get_brown_bread_premium function definition** - Missing async def was causing await errors
+- ✅ **Hot Celebs List Fixed** - Added 20+ missing celebrities to KNOWN_CELEBRITIES list (Russell Brand, Lisa Rinna, Kelly Osbourne, Hilary Duff, Robert Carradine, Tyra Banks, Sharon Osbourne, Nadiya Hussain, Ferne McCann, Love Island stars, etc.)
+- ✅ **Hot Celebs Now Shows Real News** - Banner now displays celebrities with 3+ actual news mentions (e.g., Robert Carradine death, Russell Brand court case, Kelly Osbourne body shaming story)
 
 ## Previous Updates (Feb 23, 2026)
 
