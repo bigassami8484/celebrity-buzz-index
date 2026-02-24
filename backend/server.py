@@ -3560,25 +3560,43 @@ async def autocomplete_search(q: str):
         logger.info(f"ALIAS MATCH: '{query_lower}' -> '{canonical_name}'")
         # Use normalize_text to handle accented characters (e.g., "Zoe Saldana" vs "Zoe Saldaña")
         canonical_normalized = normalize_text(canonical_name)
-        if not any(normalize_text(s.get("name", "")) == canonical_normalized for s in priority_suggestions):
-            wiki_info = await fetch_wikipedia_info(canonical_name)
-            if wiki_info and wiki_info.get("name"):
-                logger.info(f"ALIAS: Fetched wiki for '{canonical_name}': name={wiki_info.get('name')}")
-                # Use SINGLE SOURCE OF TRUTH for tier/price calculation
-                tier, price, lang_count = await get_tier_and_price_from_wikidata(
-                    wiki_info["name"], 
-                    wiki_info.get("bio", "")
-                )
-                priority_suggestions.append({
-                    "name": wiki_info["name"],
-                    "bio": wiki_info.get("bio", "")[:100] + "...",
-                    "image": wiki_info.get("image", ""),
-                    "tier": tier,
-                    "price": round(price, 1),
-                    "estimated_price": round(price, 1),
-                    "recognition_score": lang_count,
-                    "is_alias_match": True
-                })
+        
+        # Check if we already have this celebrity from DB match (might be stale data)
+        existing_idx = None
+        for idx, s in enumerate(priority_suggestions):
+            if normalize_text(s.get("name", "")) == canonical_normalized:
+                existing_idx = idx
+                break
+        
+        # Fetch fresh data from Wikipedia
+        wiki_info = await fetch_wikipedia_info(canonical_name)
+        if wiki_info and wiki_info.get("name"):
+            logger.info(f"ALIAS: Fetched wiki for '{canonical_name}': name={wiki_info.get('name')}")
+            # Use SINGLE SOURCE OF TRUTH for tier/price calculation
+            tier, price, lang_count = await get_tier_and_price_from_wikidata(
+                wiki_info["name"], 
+                wiki_info.get("bio", "")
+            )
+            
+            new_suggestion = {
+                "name": wiki_info["name"],
+                "bio": wiki_info.get("bio", "")[:100] + "...",
+                "image": wiki_info.get("image", ""),
+                "tier": tier,
+                "price": round(price, 1),
+                "estimated_price": round(price, 1),
+                "recognition_score": lang_count,
+                "is_alias_match": True
+            }
+            
+            if existing_idx is not None:
+                # Replace existing entry if alias data is better (higher recognition score)
+                existing_score = priority_suggestions[existing_idx].get("recognition_score", 0)
+                if lang_count > existing_score:
+                    logger.info(f"ALIAS REPLACE: Replacing '{priority_suggestions[existing_idx].get('name')}' (score={existing_score}) with '{wiki_info['name']}' (score={lang_count})")
+                    priority_suggestions[existing_idx] = new_suggestion
+            else:
+                priority_suggestions.append(new_suggestion)
     
     # PRIORITY 3: Check database for partial matches (starts with query)
     # Only check DB partial matches if query is at least 3 chars to avoid too many irrelevant results
