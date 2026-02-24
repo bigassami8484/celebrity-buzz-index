@@ -148,6 +148,11 @@ const SearchBar = ({ onSearch, onQuickAdd, loading, team }) => {
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-white truncate">{suggestion.name}</span>
                       <TierBadge tier={suggestion.tier || suggestion.estimated_tier} />
+                      {suggestion.recognition_score !== undefined && (
+                        <span className="text-xs px-1.5 py-0.5 bg-[#1A1A1A] border border-[#333] rounded text-[#A1A1AA]">
+                          {suggestion.recognition_score}
+                        </span>
+                      )}
                     </div>
                     <p className="text-xs text-[#A1A1AA] truncate">{suggestion.description}</p>
                   </div>
