@@ -1021,6 +1021,7 @@ def calculate_recognition_score_from_metrics(metrics: dict) -> dict:
     language_count = metrics.get("languages", {}).get("count", 0)
     commercial_found = metrics.get("commercial", {}).get("found", 0)
     has_lead_role = metrics.get("commercial", {}).get("has_lead_role", False)
+    pageviews = metrics.get("pageviews", {}).get("annual", 0)
     
     recognition_score = round(
         (longevity_score * 0.20) +
@@ -1044,6 +1045,12 @@ def calculate_recognition_score_from_metrics(metrics: dict) -> dict:
     safeguards_applied = []
     has_commercial_success = commercial_found >= 2
     
+    # Safeguard 0: 50+ Wikipedia languages → minimum B
+    if language_count >= 50:
+        if tier in ["C", "D"]:
+            tier = "B"
+            safeguards_applied.append(f"Upgraded to B: {language_count} languages")
+    
     # Safeguard 1: 15+ years active AND 10+ wiki languages → minimum C
     if years_active >= 15 and language_count >= 10 and tier == "D":
         tier = "C"
@@ -1060,6 +1067,12 @@ def calculate_recognition_score_from_metrics(metrics: dict) -> dict:
         if years_active >= 10 or language_count >= 10 or has_commercial_success:
             tier = "C"
             safeguards_applied.append("Upgraded to C: Does not meet D-tier criteria")
+    
+    # Safeguard 4: High pageviews + high languages → A-tier
+    if pageviews >= 3000000 and language_count >= 40:
+        if tier in ["B", "C", "D"]:
+            tier = "A"
+            safeguards_applied.append(f"Upgraded to A: {pageviews:,} pageviews + {language_count} languages")
     
     return {
         "recognition_score": recognition_score, 
