@@ -1122,13 +1122,21 @@ def calculate_tier_and_price(language_count: int, bio: str = "") -> tuple:
     ]
     is_franchise_lead = any(f in bio_lower for f in global_franchises)
     
-    # Major international awards
-    major_awards = [
-        "academy award", "oscar winner", "grammy winner", "emmy winner",
-        "golden globe winner", "bafta winner", "tony award winner",
-        "palme d'or", "cannes winner", "pulitzer", "nobel"
+    # Major international awards - MUST be winners, not nominees
+    # Use specific winner patterns to avoid matching nominations
+    major_award_patterns = [
+        "won an academy award", "won the academy award", "academy award winner",
+        "academy award-winning", "academy award for best", "received an academy award",
+        "oscar winner", "oscar-winning", "won an oscar", "won the oscar",
+        "grammy winner", "grammy-winning", "won a grammy", "won the grammy",
+        "emmy winner", "emmy-winning", "won an emmy", "won the emmy", "primetime emmy award winner",
+        "golden globe winner", "golden globe-winning", "won a golden globe", "won the golden globe",
+        "bafta winner", "bafta-winning", "won a bafta", "won the bafta",
+        "tony award winner", "tony-winning", "won a tony",
+        "palme d'or winner", "won the palme", "cannes winner",
+        "pulitzer prize winner", "nobel prize winner", "nobel laureate"
     ]
-    has_major_award = any(a in bio_lower for a in major_awards)
+    has_major_award = any(a in bio_lower for a in major_award_patterns)
     
     # World champions
     world_champion = any(w in bio_lower for w in [
