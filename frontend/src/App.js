@@ -300,10 +300,9 @@ function App() {
     }
   }, []);
 
-  const fetchHotStreaks = useCallback(async (teamId) => {
-    if (!teamId) return;
+  const fetchHotStreaks = useCallback(async () => {
     try {
-      const streaks = await fetchHotStreaksAPI(teamId);
+      const streaks = await fetchHotStreaksAPI();
       setHotStreaks(streaks);
     } catch (e) {
       console.error("Error fetching hot streaks:", e);
