@@ -556,13 +556,12 @@ export const LeagueDetailModal = ({ league, leaderboard, onClose, teamId, apiUrl
 export const Leaderboard = ({ entries }) => {
   const [expanded, setExpanded] = useState(false);
   
-  // Desktop always shows 10, mobile shows 5 collapsed / 10 expanded
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const displayCount = isMobile ? (expanded ? 10 : 5) : 10;
+  // Show 5 items to match other panels
+  const displayCount = expanded ? 10 : 5;
   const placeholderRows = Array.from({ length: displayCount }, (_, i) => i + 1);
   
   return (
-    <div className="leaderboard" data-testid="leaderboard">
+    <div className="leaderboard h-full" data-testid="leaderboard">
       <h3 className="font-anton text-2xl uppercase tracking-tight mb-2">Leaderboard</h3>
       <p className="text-xs text-[#A1A1AA] mb-4 flex items-center gap-1">
         <span className="text-[#00F0FF]">⟳</span> Weekly rankings • Resets Monday
