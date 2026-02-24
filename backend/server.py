@@ -3644,11 +3644,33 @@ async def autocomplete_search(q: str):
         priority_names = {s["name"].lower() for s in priority_suggestions}
         filtered_suggestions = [s for s in suggestions if s.get("name", "").lower() not in priority_names]
         
-        # Combine: priority first, then Wikipedia results
-        all_suggestions = priority_suggestions + filtered_suggestions
+        # CHECK FOR EXACT FULL NAME MATCH - if first result matches query exactly, return only that
+        # e.g., "richard gere" should return only "Richard Gere", not other Richards
+        if filtered_suggestions:
+            first_result_name = filtered_suggestions[0].get("name", "").lower()
+            # Check if query is an exact match (case-insensitive)
+            if first_result_name == query_lower:
+                # Return only the exact match
+                all_suggestions = priority_suggestions + [filtered_suggestions[0]]
+            else:
+                # Combine: priority first, then Wikipedia results
+                all_suggestions = priority_suggestions + filtered_suggestions
+        else:
+            all_suggestions = priority_suggestions
     else:
         # Exact alias match found - return only priority suggestions
         all_suggestions = priority_suggestions
+    
+    # REMOVE DUPLICATES - check by normalized name
+    seen_names = set()
+    unique_suggestions = []
+    for suggestion in all_suggestions:
+        name_normalized = suggestion.get("name", "").lower().strip()
+        if name_normalized not in seen_names:
+            seen_names.add(name_normalized)
+            unique_suggestions.append(suggestion)
+    
+    all_suggestions = unique_suggestions
     
     # Check for Brown Bread premium pricing on each suggestion
     for suggestion in all_suggestions:
