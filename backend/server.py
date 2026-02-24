@@ -967,7 +967,7 @@ def calculate_recognition_score_from_metrics(metrics: dict) -> dict:
     return {"recognition_score": recognition_score, "tier": tier}
 
 
-
+async def get_brown_bread_premium(celeb: dict, base_price: float) -> float:
     """
     Check if celebrity qualifies for Brown Bread premium pricing.
     Top 3 oldest living celebrities (80+) get premium prices:
