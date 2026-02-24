@@ -1881,23 +1881,26 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 "soundtrack", "video game", "tour", "concert", "episode", "series", "season",
                 "film", "movie", "show", "documentary", "special", "tv series",
                 "racing", "kong", "parties", "money", "records", "entertainment",
+                "videography", "singles", "songs", "albums",
                 # Wikipedia meta
                 "list of", "category:", "template:", "wikipedia:", "disambiguation",
                 # Sports teams/venues
                 "fc", "cf", "afc", "united", "club", "team", "stadium", "arena",
-                # Legal/News
+                # Legal/News/Events
                 "trial", "case", "lawsuit", "allegations", "misconduct", "controversy",
-                "murder", "death of", "killing", "scandal",
+                "murder", "death of", "killing", "scandal", "feud", "dispute", "rivalry",
                 # Events/Places
                 "festival", "championship", "tournament", "competition", "election",
-                "battle", "war", "incident", "disaster", "crash",
+                "battle", "war", "incident", "disaster", "crash", "bowl",
                 # Products/Business/Brands
                 "company", "corporation", "brand", "product", "starmaker",
                 "records", "productions", "entertainment", "music group",
-                # Possessives that indicate non-person articles
-                "'s ", "s' ",
+                # Possessives/Related articles
+                "'s ", "s' ", "superstar", " of ",
                 # Characters/Fictional
-                "character", "fictional"
+                "character", "fictional",
+                # Non-person article patterns
+                "act i", "act ii", "eras tour", " era", "masters dispute"
             ]
             
             # Filter candidates - PRESERVE ORDER from OpenSearch
