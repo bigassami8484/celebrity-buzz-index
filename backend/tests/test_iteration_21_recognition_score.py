@@ -213,10 +213,13 @@ class TestCelebritySearch:
         assert response.status_code == 200
         data = response.json()
         
-        assert "name" in data
-        assert "tier" in data
-        assert "price" in data
-        print(f"✓ Search result: {data['name']} - {data['tier']} - £{data['price']}M")
+        # API returns {"celebrity": {...}}
+        celebrity = data.get("celebrity", data)
+        
+        assert "name" in celebrity
+        assert "tier" in celebrity
+        assert "price" in celebrity
+        print(f"✓ Search result: {celebrity['name']} - {celebrity['tier']} - £{celebrity['price']}M")
     
     def test_search_returns_tier(self):
         """Test search returns correct tier for A-list celebrity"""
@@ -230,8 +233,11 @@ class TestCelebritySearch:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["tier"] == "A", f"Taylor Swift should be A-list, got {data['tier']}"
-        print(f"✓ Taylor Swift correctly identified as {data['tier']}-LIST")
+        # API returns {"celebrity": {...}}
+        celebrity = data.get("celebrity", data)
+        
+        assert celebrity["tier"] == "A", f"Taylor Swift should be A-list, got {celebrity['tier']}"
+        print(f"✓ Taylor Swift correctly identified as {celebrity['tier']}-LIST")
 
 
 class TestTransferWindow:
