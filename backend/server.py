@@ -2242,12 +2242,12 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             )
                             
                             # SINGLE CALCULATION for tier AND price
-                            tier, price = calculate_tier_and_price(language_count, extract)
+                            tier, price = calculate_tier_and_price(language_count, extract, actual_title)
                             recognition_score = language_count
                             
                         except Exception as e:
                             logger.debug(f"Error calculating for {actual_title}: {e}")
-                            tier, price = calculate_tier_and_price(0, extract)
+                            tier, price = calculate_tier_and_price(0, extract, actual_title)
                             recognition_score = 0
                 
                 results.append({
