@@ -114,7 +114,7 @@ export const PointsMethodology = ({ onClose }) => (
         <div className="space-y-2 mb-6">
           <div className="bg-[#FFD700] text-black p-2 flex justify-between items-center">
             <span className="font-bold">A-LIST</span>
-            <span className="text-sm">£9m-£12m • High scoring but expensive</span>
+            <span className="text-sm">£12m-£15m • High scoring but expensive</span>
           </div>
           <div className="bg-[#C0C0C0] text-black p-2 flex justify-between items-center">
             <span className="font-bold">B-LIST</span>
