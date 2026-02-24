@@ -1937,31 +1937,12 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                 (pageviews_score * 0.15)
                             )
                             
-                            # Base tier
-                            if recognition_score >= 85:
-                                tier = "A"
-                            elif recognition_score >= 65:
-                                tier = "B"
-                            elif recognition_score >= 45:
-                                tier = "C"
-                            else:
-                                tier = "D"
-                            
-                            # Apply safeguards
-                            has_commercial_success = commercial_found >= 2
-                            
-                            # Safeguard: 50+ languages = minimum B
-                            if language_count >= 50 and tier in ["C", "D"]:
-                                tier = "B"
-                            
-                            # Safeguard: 25+ languages with any awards = minimum B
-                            if language_count >= 25 and awards_found >= 1 and tier in ["C", "D"]:
-                                tier = "B"
-                            
-                            # Safeguard: D-tier needs very low recognition
-                            if tier == "D":
-                                if language_count >= 10 or has_commercial_success:
-                                    tier = "C"
+                            # Use helper function for consistent tier calculation
+                            metrics_for_safeguard = {
+                                "languages": {"count": language_count},
+                                "commercial": {"found": commercial_found}
+                            }
+                            tier = get_tier_from_recognition_score(recognition_score, metrics_for_safeguard)
                             
                         except Exception as e:
                             logger.debug(f"Error calculating recognition for {actual_title}: {e}")
@@ -1969,7 +1950,7 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                             tier = estimate_tier_from_description(extract, actual_title)
                             recognition_score = {"A": 85, "B": 70, "C": 50, "D": 30}.get(tier, 50)
                         
-                        price = get_dynamic_price(tier, 50, actual_title)
+                        price = get_price_from_tier(tier)
                 
                 results.append({
                     "name": actual_title,
