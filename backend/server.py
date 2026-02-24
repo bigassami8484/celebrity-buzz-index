@@ -4903,16 +4903,41 @@ async def get_hot_streaks():
             # 3-4 articles = 3 days, 5-6 = 4 days, 7+ = 5+ days
             streak_days = min(3 + (news_count - 3) // 2, 7)
             
+            # Check if this is a known alias that needs the canonical name
+            name_lower = name.lower().strip()
+            canonical_name = CELEBRITY_ALIASES.get(name_lower, name)
+            
             # RECALCULATE tier and price using single source of truth
             bio = celeb.get("bio", "")
             recognition_metrics = celeb.get("recognition_metrics", {})
             language_count = recognition_metrics.get("languages", {}).get("count", 0)
+            image = celeb.get("image", "")
             
-            # If no language count in DB, use a reasonable default based on existing tier
-            if language_count == 0:
-                # Estimate based on old tier
-                old_tier = celeb.get("tier", "D")
-                language_count = {"A": 70, "B": 35, "C": 15, "D": 5}.get(old_tier, 5)
+            # If language count is suspiciously low (0-10) for known important people,
+            # or if this is an aliased name, fetch fresh data from Wikidata
+            should_refresh = (
+                language_count < 10 or 
+                canonical_name != name or
+                name_lower in GUARANTEED_A_LIST or
+                any(kw in name_lower for kw in ROYAL_A_LIST_KEYWORDS)
+            )
+            
+            if should_refresh:
+                try:
+                    # Fetch fresh tier/price from Wikidata
+                    fresh_tier, fresh_price, fresh_lang_count = await get_tier_and_price_from_wikidata(
+                        canonical_name, bio
+                    )
+                    if fresh_lang_count > language_count:
+                        language_count = fresh_lang_count
+                        name = canonical_name  # Use canonical name
+                        
+                        # Also try to get fresh image
+                        wiki_info = await fetch_wikipedia_info(canonical_name)
+                        if wiki_info and wiki_info.get("image"):
+                            image = wiki_info["image"]
+                except Exception as e:
+                    logger.warning(f"Could not refresh data for {name}: {e}")
             
             tier, price = calculate_tier_and_price(language_count, bio)
             
@@ -4922,7 +4947,7 @@ async def get_hot_streaks():
                 "news_count": news_count,
                 "tier": tier,
                 "price": round(price, 1),
-                "image": celeb.get("image", ""),
+                "image": image,
                 "trending_tag": "Hot Streak",
                 "is_hot": True,
                 "recognition_score": language_count
