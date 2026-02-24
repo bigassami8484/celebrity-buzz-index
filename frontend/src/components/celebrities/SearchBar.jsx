@@ -10,6 +10,7 @@ const SearchBar = ({ onSearch, onQuickAdd, loading, team }) => {
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const searchRef = useRef(null);
   const debounceRef = useRef(null);
+  const abortControllerRef = useRef(null);
   
   // Check if celebrity is already in team
   const isInTeam = (name) => {
@@ -29,13 +30,22 @@ const SearchBar = ({ onSearch, onQuickAdd, loading, team }) => {
       return;
     }
     
+    // Cancel previous request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+    
     setLoadingSuggestions(true);
     try {
       const results = await fetchAutocomplete(searchQuery);
+      // Only update if this is still the current query
       setSuggestions(results);
     } catch (e) {
-      console.error("Autocomplete error:", e);
-      setSuggestions([]);
+      if (e.name !== 'AbortError') {
+        console.error("Autocomplete error:", e);
+        setSuggestions([]);
+      }
     } finally {
       setLoadingSuggestions(false);
     }
