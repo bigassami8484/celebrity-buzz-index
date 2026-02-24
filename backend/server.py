@@ -1717,6 +1717,11 @@ CELEBRITY_ALIASES = {
     "willie colón": "Willie Colon (American football)",
     # Mark Wright - reality TV star
     "mark wright": "Mark Wright (television personality)",
+    # Musicians with disambiguation
+    "pink": "Pink (singer)",
+    "p!nk": "Pink (singer)",
+    "pink singer": "Pink (singer)",
+    "alecia moore": "Pink (singer)",
 }
 
 # Reverse mapping - canonical name to all aliases (for duplicate checking)
