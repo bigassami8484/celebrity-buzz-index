@@ -1873,12 +1873,26 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
             if not titles:
                 return []
             
-            # Quick title filters (obvious non-people)
+            # Quick title filters (obvious non-people) - AGGRESSIVE filtering
             quick_skip_keywords = [
+                # Media/Content
                 "filmography", "discography", "bibliography", "awards", "album", 
-                "list of", "category:", "template:", "wikipedia:", "soundtrack",
-                "video game", "tour", "concert", "episode", "series", "season",
-                "fc", "cf", "afc", "united", "club", "team", "stadium"
+                "soundtrack", "video game", "tour", "concert", "episode", "series", "season",
+                "film", "movie", "show", "documentary", "special", "tv series",
+                # Wikipedia meta
+                "list of", "category:", "template:", "wikipedia:", "disambiguation",
+                # Sports teams/venues
+                "fc", "cf", "afc", "united", "club", "team", "stadium", "arena",
+                # Legal/News
+                "trial", "case", "lawsuit", "allegations", "misconduct", "controversy",
+                "murder", "death of", "killing", "scandal",
+                # Events/Places
+                "festival", "championship", "tournament", "competition", "election",
+                "battle", "war", "incident", "disaster", "crash",
+                # Products/Business
+                "company", "corporation", "brand", "product", "starmaker",
+                # Possessives that indicate non-person articles
+                "'s ", "s' "
             ]
             
             # Filter candidates - PRESERVE ORDER from OpenSearch
@@ -1896,6 +1910,19 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 
                 # Skip titles starting with "The" or "List"
                 if title_lower.startswith("the ") or title_lower.startswith("list "):
+                    continue
+                
+                # Skip titles ending with common non-person suffixes
+                non_person_suffixes = [
+                    "trial", "case", "murder", "death", "allegations", "controversy",
+                    "scandal", "incident", "massacre", "battle", "war", "film", 
+                    "album", "song", "tour", "show", "series", "episode"
+                ]
+                if any(title_lower.endswith(suffix) for suffix in non_person_suffixes):
+                    continue
+                
+                # Skip if title contains "vs" or "versus" (usually events)
+                if " vs " in title_lower or " vs. " in title_lower or " versus " in title_lower:
                     continue
                 
                 candidates.append(title)
