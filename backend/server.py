@@ -3799,15 +3799,40 @@ async def autocomplete_search(q: str):
         # Exact alias match found - return only priority suggestions
         all_suggestions = priority_suggestions
     
-    # REMOVE DUPLICATES - check by normalized name (handles accented characters like ñ vs n)
-    seen_names = set()
+    # Build a mapping of canonical names for duplicate detection
+    # This helps us identify when "Kate Middleton" and "Catherine, Princess of Wales" are the same person
+    def get_canonical_for_dedup(name):
+        """Get canonical name for deduplication, checking aliases"""
+        name_lower = name.lower().strip()
+        # Check if this name is an alias
+        if name_lower in CELEBRITY_ALIASES:
+            return normalize_text(CELEBRITY_ALIASES[name_lower])
+        # Check if this name IS a canonical name that others alias to
+        for alias, canonical in CELEBRITY_ALIASES.items():
+            if normalize_text(canonical) == normalize_text(name):
+                return normalize_text(canonical)
+        return normalize_text(name)
+    
+    # REMOVE DUPLICATES - check by canonical name (handles aliases like Kate Middleton = Catherine, Princess of Wales)
+    seen_canonical = set()
     unique_suggestions = []
     for suggestion in all_suggestions:
-        # Use normalize_text to handle accented characters (e.g., "Zoe Saldana" vs "Zoe Saldaña")
-        name_normalized = normalize_text(suggestion.get("name", ""))
-        if name_normalized not in seen_names:
-            seen_names.add(name_normalized)
+        name = suggestion.get("name", "")
+        canonical = get_canonical_for_dedup(name)
+        
+        if canonical not in seen_canonical:
+            seen_canonical.add(canonical)
             unique_suggestions.append(suggestion)
+        else:
+            # This is a duplicate - keep the one with better data (higher recognition score)
+            # Find the existing entry and compare
+            for i, existing in enumerate(unique_suggestions):
+                if get_canonical_for_dedup(existing.get("name", "")) == canonical:
+                    existing_score = existing.get("recognition_score", 0)
+                    new_score = suggestion.get("recognition_score", 0)
+                    if new_score > existing_score:
+                        unique_suggestions[i] = suggestion
+                    break
     
     all_suggestions = unique_suggestions
     
