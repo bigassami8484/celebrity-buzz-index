@@ -3845,6 +3845,13 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
             existing["tier"] = tier
             existing["recognition_score"] = lang_count
             
+            # Also recalculate category to ensure TV presenters are classified correctly
+            bio = existing.get("bio", "")
+            new_category = detect_category_from_bio(bio, celeb_name)
+            if new_category != existing.get("category"):
+                logger.info(f"Category update for {celeb_name}: {existing.get('category')} -> {new_category}")
+                existing["category"] = new_category
+            
             # Check if this celeb qualifies for Brown Bread premium pricing
             new_price = await get_brown_bread_premium(existing, base_price)
             existing["price"] = new_price
