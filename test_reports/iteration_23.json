@@ -1,0 +1,103 @@
+{
+  "summary": "Iteration 23 - Tier/Price Consistency Testing PASSED. All 16 backend tests passed. All fixes verified working: Michael B. Jordan correctly B-LIST (55 langs, nominated not won Oscar), Daniel Radcliffe A-LIST (101 langs), Rochelle Humes C-LIST (13 langs), Pink (singer) A-LIST (78 langs) accessible via 'pink' alias. Category cards endpoint recalculates tier/price from Wikidata. Hot celebs endpoint returns correct tiers.",
+  
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  
+  "passed_tests": [
+    "GET /api/ - API health check",
+    "GET /api/autocomplete?q=Michael%20B.%20Jordan - Returns B-LIST, £6.9M, 55 languages (CORRECT - nominated not won Oscar)",
+    "GET /api/autocomplete?q=Daniel%20Radcliffe - Returns A-LIST, £12M, 101 languages (CORRECT)",
+    "GET /api/autocomplete?q=Rochelle%20Humes - Returns C-LIST, £2.5M, 13 languages (CORRECT)",
+    "GET /api/autocomplete?q=pink - Returns Pink (singer) with A-LIST, £12M, 78 languages (CORRECT)",
+    "POST /api/celebrity/search - Michael B. Jordan returns B-LIST (CORRECT)",
+    "POST /api/celebrity/search - Daniel Radcliffe returns A-LIST, £12M (CORRECT)",
+    "POST /api/celebrity/search - Pink (singer) returns A-LIST, £12M (CORRECT)",
+    "POST /api/celebrity/search - 'pink' alias search works",
+    "GET /api/hot-celebs - Returns 9 celebrities with correct tier/price",
+    "GET /api/hot-celebs - All celebrities have consistent tier/price",
+    "GET /api/celebrities/category/movie_stars - Returns celebrities with recalculated tier/price from Wikidata",
+    "GET /api/celebrities/category/musicians - Returns celebrities with recalculated tier/price from Wikidata",
+    "Award detection - Michael B. Jordan NOT A-LIST (nominated but not won Oscar)",
+    "Tier/price consistency - Daniel Radcliffe same tier across autocomplete and search",
+    "Tier/price consistency - Michael B. Jordan same tier across autocomplete and search"
+  ],
+  
+  "failed_tests": [],
+  
+  "test_report_links": [
+    "/app/backend/tests/test_iteration_23_tier_price_consistency.py",
+    "/app/test_reports/pytest/iteration_23_results.xml"
+  ],
+  
+  "action_items": [],
+  
+  "critical_code_review_comments": [
+    "All tier/price consistency fixes verified working",
+    "calculate_tier_and_price() function correctly uses language count as primary indicator",
+    "major_award_patterns correctly requires WINNER keywords (not just 'academy award')",
+    "get_tier_and_price_from_wikidata() used consistently across all endpoints",
+    "Category endpoint correctly recalculates tier/price for each celebrity",
+    "CELEBRITY_ALIASES correctly maps 'pink' to 'Pink (singer)'"
+  ],
+  
+  "updated_files": [
+    "/app/backend/tests/test_iteration_23_tier_price_consistency.py - Created comprehensive test suite"
+  ],
+  
+  "success_rate": {
+    "backend": "100% (16/16 tests passed)",
+    "frontend": "100%"
+  },
+  
+  "seed_data_creation": "None",
+  
+  "retest_needed": false,
+  
+  "should_main_agent_self_test": false,
+  
+  "context_for_next_testing_agent": "All tier/price consistency fixes verified working in iteration 23. Key tier ranges: A-LIST (60+ langs), B-LIST (25-59 langs), C-LIST (10-24 langs), D-LIST (<10 langs). Achievement modifiers can upgrade tier by 1 level for franchise leads, award WINNERS (not nominees), and world champions. Test file: test_iteration_23_tier_price_consistency.py",
+  
+  "verified_fixes": {
+    "michael_b_jordan": {
+      "tier": "B-LIST",
+      "price": "£6.9M",
+      "languages": 55,
+      "reason": "Correctly NOT A-LIST because nominated but NOT won Oscar - award detection now requires winner-specific patterns"
+    },
+    "daniel_radcliffe": {
+      "tier": "A-LIST",
+      "price": "£12M",
+      "languages": 101,
+      "reason": "Correctly A-LIST due to 101 Wikipedia languages (60+ threshold)"
+    },
+    "rochelle_humes": {
+      "tier": "C-LIST",
+      "price": "£2.5M",
+      "languages": 13,
+      "reason": "Correctly C-LIST due to 13 Wikipedia languages (10-24 threshold)"
+    },
+    "pink_singer": {
+      "tier": "A-LIST",
+      "price": "£12M",
+      "languages": 78,
+      "reason": "Correctly A-LIST due to 78 Wikipedia languages, accessible via 'pink' alias"
+    },
+    "category_endpoint": {
+      "status": "FIXED",
+      "reason": "Now recalculates tier/price using get_tier_and_price_from_wikidata() for each celebrity"
+    },
+    "hot_celebs_endpoint": {
+      "status": "WORKING",
+      "reason": "Returns celebrities with correct tiers matching their language counts"
+    }
+  }
+}
