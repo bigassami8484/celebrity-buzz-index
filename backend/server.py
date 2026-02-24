@@ -2150,6 +2150,11 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     continue
                 seen_names.add(base_name)
                 
+                # Skip disambiguation pages (extract contains "may refer to")
+                extract_lower = extract.lower() if extract else ""
+                if "may refer to" in extract_lower or "can refer to" in extract_lower or "commonly refers to" in extract_lower:
+                    continue
+                
                 # FIRST: Check if this celeb is in the Hot Celebs cache - use that price
                 hot_celebs_cache = await db.news_cache.find_one(
                     {"type": "hot_celebs_from_news_v7"},
