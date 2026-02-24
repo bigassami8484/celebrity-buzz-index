@@ -4249,25 +4249,26 @@ async def get_hot_celebs():
                             "article_count": len(actual_headlines)
                         })
                         
-                        # Store in DB for consistency with autocomplete
-                        actual_name = wiki_data.get("title", name)
-                        # Cap price at £15M before storing
-                        stored_price = min(price, 15.0)
-                        # Always update celebrity with current price for consistency
-                        await db.celebrities.update_one(
-                            {"name": {"$regex": f"^{actual_name}$", "$options": "i"}},
-                            {"$set": {
-                                "name": actual_name,
-                                "tier": tier,
-                                "category": category,
-                                "image": image,
-                                "bio": bio[:500],
-                                "price": stored_price,  # Update price to match hot celebs (capped)
-                                "wiki_url": f"https://en.wikipedia.org/wiki/{actual_name.replace(' ', '_')}",
-                                "updated_at": datetime.now(timezone.utc).isoformat()
-                            }},
-                            upsert=True
-                        )
+                        # Store in DB ONLY if celeb doesn't exist (don't overwrite existing recognition scores)
+                        if not db_celeb:
+                            actual_name = wiki_data.get("title", name)
+                            # Cap price at £15M before storing
+                            stored_price = min(price, 15.0)
+                            # Only insert/update NEW celebrities
+                            await db.celebrities.update_one(
+                                {"name": {"$regex": f"^{actual_name}$", "$options": "i"}},
+                                {"$set": {
+                                    "name": actual_name,
+                                    "tier": tier,
+                                    "category": category,
+                                    "image": image,
+                                    "bio": bio[:500],
+                                    "price": stored_price,  # Update price to match hot celebs (capped)
+                                    "wiki_url": f"https://en.wikipedia.org/wiki/{actual_name.replace(' ', '_')}",
+                                    "updated_at": datetime.now(timezone.utc).isoformat()
+                                }},
+                                upsert=True
+                            )
             except Exception as e:
                 logger.error(f"Error fetching {name}: {e}")
                 continue
