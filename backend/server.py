@@ -3674,6 +3674,7 @@ async def autocomplete_search(q: str):
     # Track if we found an exact alias match - if so, skip Wikipedia autocomplete
     # This prevents "diddy" from returning "Diddy TV", "Diddy Wah Diddy" etc
     found_exact_alias = query_lower in CELEBRITY_ALIASES and len(priority_suggestions) > 0
+    logger.info(f"Autocomplete '{q}': found_exact_alias={found_exact_alias}, priority_count={len(priority_suggestions)}")
     
     # Get Wikipedia autocomplete suggestions (SKIP if exact alias found)
     if not found_exact_alias:
