@@ -1964,20 +1964,18 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     price = hot_celeb_match["price"]
                     recognition_score = hot_celeb_match.get("recognition_score", 50)
                 else:
-                    # Check if celebrity exists in DB - use their stored price
+                    # Check if celebrity exists in DB
                     existing = await db.celebrities.find_one(
                         {"name": {"$regex": f"^{actual_title}$", "$options": "i"}},
-                        {"_id": 0, "tier": 1, "price": 1, "recognition_score": 1, "recognition_metrics": 1}
+                        {"_id": 0, "tier": 1, "price": 1, "recognition_score": 1, "recognition_metrics": 1, "bio": 1}
                     )
                     
-                    if existing and existing.get("price"):
-                        tier = existing.get("tier", "D")
-                        price = existing.get("price")  # Use stored DB price for consistency
-                        recognition_score = existing.get("recognition_score")
-                        if not recognition_score and existing.get("recognition_metrics"):
-                            result = calculate_recognition_score_from_metrics(existing["recognition_metrics"])
-                            recognition_score = result.get("recognition_score", 50)
-                            tier = result.get("tier", tier)  # Use safeguard-applied tier
+                    if existing:
+                        # SINGLE SOURCE OF TRUTH: Always recalculate tier/price from Wikidata
+                        # This ensures consistency across all endpoints
+                        bio = existing.get("bio", extract or "")
+                        tier, price, language_count = await get_tier_and_price_from_wikidata(actual_title, bio)
+                        recognition_score = language_count
                     else:
                         # CALCULATE REAL RECOGNITION SCORE for new celebs
                         # Fetch Wikidata for language count and apply safeguards
