@@ -1151,6 +1151,20 @@ def calculate_tier_and_price(language_count: int, bio: str = "") -> tuple:
         "world cup winner", "ballon d'or", "heavyweight champion"
     ])
     
+    # National team athletes - representing their country at international level
+    # This ensures England rugby players, national football team members, etc. aren't D-list
+    national_team_indicators = [
+        "national team", "international caps", "england national", "scotland national",
+        "wales national", "ireland national", "british national", "great britain",
+        "six nations", "rugby union international", "rugby league international",
+        "test match", "test caps", "international rugby", "lions tour",
+        "british and irish lions", "world rugby", "rfu", "premier league",
+        "la liga", "serie a", "bundesliga", "ligue 1", "champions league",
+        "uefa", "fifa", "olympics", "olympic", "commonwealth games",
+        "world athletics", "world championship"
+    ]
+    is_national_athlete = any(n in bio_lower for n in national_team_indicators)
+    
     # Upgrade tier if achievements warrant it
     if is_franchise_lead or has_major_award or world_champion:
         if tier == "B":
