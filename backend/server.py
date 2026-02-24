@@ -1933,7 +1933,7 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     "trial", "case", "murder", "death", "allegations", "controversy",
                     "scandal", "incident", "massacre", "battle", "war", "film", 
                     "album", "song", "tour", "show", "series", "episode", "racing",
-                    "game", "games", "parties", "money"
+                    "game", "games", "parties", "money", "fierce"
                 ]
                 if any(title_lower.endswith(suffix) for suffix in non_person_suffixes):
                     continue
@@ -1941,6 +1941,14 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 # Skip if title contains "vs" or "versus" (usually events)
                 if " vs " in title_lower or " vs. " in title_lower or " versus " in title_lower:
                     continue
+                
+                # Skip "X and Y" patterns that are likely movies/shows (e.g., "Beyonce and Rihanna")
+                # But allow names like "Simon and Garfunkel" by checking if both parts look like names
+                if " and " in title_lower:
+                    parts = title_lower.split(" and ")
+                    # If either part has more than 2 words, it's likely not a name pairing
+                    if any(len(part.strip().split()) > 2 for part in parts):
+                        continue
                 
                 candidates.append(title)
             
