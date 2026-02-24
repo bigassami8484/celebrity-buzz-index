@@ -2086,9 +2086,9 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
             if not candidates:
                 return []
             
-            # Step 2: Get page IDs for candidates
+            # Step 2: Get page IDs for candidates (with redirect handling)
             titles_param = "|".join(candidates[:15])
-            pageids_url = f"https://en.wikipedia.org/w/api.php?action=query&titles={titles_param}&format=json"
+            pageids_url = f"https://en.wikipedia.org/w/api.php?action=query&titles={titles_param}&redirects&format=json"
             pageids_response = await client.get(pageids_url, timeout=8.0, headers=headers)
             
             if pageids_response.status_code != 200:
