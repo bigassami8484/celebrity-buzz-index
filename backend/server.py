@@ -3033,6 +3033,23 @@ async def autocomplete_search(q: str):
             price = hot_price
             tier = hot_tier or tier
         
+        # Get recognition score from stored metrics or tier_score
+        recognition_score = exact_match.get("recognition_score")
+        if recognition_score is None:
+            # Fall back to tier_score if available
+            tier_score = exact_match.get("tier_score", 0)
+            if tier_score > 0:
+                # Map tier_score to recognition_score (0-100 scale)
+                recognition_score = min(100, max(0, tier_score))
+            else:
+                # Calculate from tier_metrics if available
+                tier_metrics = exact_match.get("tier_metrics", {})
+                if tier_metrics:
+                    result = calculate_recognition_score_from_metrics(tier_metrics)
+                    recognition_score = result.get("recognition_score", 50)
+                else:
+                    recognition_score = {"A": 85, "B": 70, "C": 50, "D": 30}.get(tier, 50)
+        
         priority_suggestions.append({
             "name": exact_match["name"],
             "bio": exact_match.get("bio", "")[:100] + "..." if exact_match.get("bio") else "",
@@ -3040,6 +3057,7 @@ async def autocomplete_search(q: str):
             "tier": tier,
             "price": price,
             "estimated_price": price,
+            "recognition_score": recognition_score,
             "is_exact_match": True,
             "is_hot": is_hot
         })
@@ -3063,6 +3081,20 @@ async def autocomplete_search(q: str):
                     price = hot_price
                     tier = hot_tier or tier
                 
+                # Get recognition score from stored metrics or tier_score
+                recognition_score = match.get("recognition_score")
+                if recognition_score is None:
+                    tier_score = match.get("tier_score", 0)
+                    if tier_score > 0:
+                        recognition_score = min(100, max(0, tier_score))
+                    else:
+                        tier_metrics = match.get("tier_metrics", {})
+                        if tier_metrics:
+                            result = calculate_recognition_score_from_metrics(tier_metrics)
+                            recognition_score = result.get("recognition_score", 50)
+                        else:
+                            recognition_score = {"A": 85, "B": 70, "C": 50, "D": 30}.get(tier, 50)
+                
                 priority_suggestions.append({
                     "name": match["name"],
                     "bio": match.get("bio", "")[:100] + "..." if match.get("bio") else "",
@@ -3070,6 +3102,7 @@ async def autocomplete_search(q: str):
                     "tier": tier,
                     "price": price,
                     "estimated_price": price,
+                    "recognition_score": recognition_score,
                     "is_db_match": True,
                     "is_hot": is_hot
                 })
