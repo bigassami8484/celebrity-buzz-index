@@ -759,6 +759,9 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
     bio_lower = bio.lower() if bio else ""
     safeguards_applied = []
     
+    # HTTP headers for Wikipedia/Wikidata APIs
+    api_headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com; contact@example.com)"}
+    
     # Initialize scores (0-100 for each metric)
     longevity_score = 0
     language_score = 0
