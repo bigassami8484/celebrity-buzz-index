@@ -3448,15 +3448,19 @@ async def autocomplete_search(q: str):
         if not any(s.get("name", "").lower() == canonical_name.lower() for s in priority_suggestions):
             wiki_info = await fetch_wikipedia_info(canonical_name)
             if wiki_info and wiki_info.get("name"):
-                tier = determine_tier_from_bio(wiki_info.get("bio", ""), wiki_info["name"])
-                price = get_dynamic_price(tier, 50, wiki_info["name"])
+                # Use SINGLE SOURCE OF TRUTH for tier/price calculation
+                tier, price, lang_count = await get_tier_and_price_from_wikidata(
+                    wiki_info["name"], 
+                    wiki_info.get("bio", "")
+                )
                 priority_suggestions.append({
                     "name": wiki_info["name"],
                     "bio": wiki_info.get("bio", "")[:100] + "...",
                     "image": wiki_info.get("image", ""),
                     "tier": tier,
-                    "price": price,
-                    "estimated_price": price,
+                    "price": round(price, 1),
+                    "estimated_price": round(price, 1),
+                    "recognition_score": lang_count,
                     "is_alias_match": True
                 })
     
