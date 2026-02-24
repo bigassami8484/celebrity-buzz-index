@@ -3505,7 +3505,30 @@ async def autocomplete_search(q: str):
             "is_hot": is_hot
         })
     
-    # PRIORITY 2: Check database for partial matches (starts with query)
+    # PRIORITY 2: Check if query matches a known alias (BEFORE partial DB matches)
+    # This ensures "mario" returns Mario (American singer) not Mario Lopez
+    if query_lower in CELEBRITY_ALIASES:
+        canonical_name = CELEBRITY_ALIASES[query_lower]
+        if not any(s.get("name", "").lower() == canonical_name.lower() for s in priority_suggestions):
+            wiki_info = await fetch_wikipedia_info(canonical_name)
+            if wiki_info and wiki_info.get("name"):
+                # Use SINGLE SOURCE OF TRUTH for tier/price calculation
+                tier, price, lang_count = await get_tier_and_price_from_wikidata(
+                    wiki_info["name"], 
+                    wiki_info.get("bio", "")
+                )
+                priority_suggestions.append({
+                    "name": wiki_info["name"],
+                    "bio": wiki_info.get("bio", "")[:100] + "...",
+                    "image": wiki_info.get("image", ""),
+                    "tier": tier,
+                    "price": round(price, 1),
+                    "estimated_price": round(price, 1),
+                    "recognition_score": lang_count,
+                    "is_alias_match": True
+                })
+    
+    # PRIORITY 3: Check database for partial matches (starts with query)
     if not exact_match:
         partial_matches = await db.celebrities.find(
             {"name": {"$regex": f"^{q}", "$options": "i"}},
