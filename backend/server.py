@@ -4290,16 +4290,15 @@ async def get_hot_celebs():
                         )
                         
                         if db_celeb:
-                            # Get recognition metrics and bio for 3-layer calculation
-                            recognition_metrics = db_celeb.get("recognition_metrics", {})
+                            # Get bio and language count for tier calculation
                             celeb_bio = db_celeb.get("bio", bio)
+                            recognition_metrics = db_celeb.get("recognition_metrics", {})
+                            language_count = recognition_metrics.get("languages", {}).get("count", 0)
                             
-                            # Check if stored data is incomplete (language count = 0)
-                            stored_languages = recognition_metrics.get("languages", {}).get("count", 0)
-                            if stored_languages == 0:
-                                # Fetch fresh language count from Wikidata
+                            # Fetch fresh language count if missing
+                            if language_count == 0:
                                 try:
-                                    await asyncio.sleep(0.3)
+                                    await asyncio.sleep(0.2)
                                     wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={actual_name.replace(' ', '_')}&props=sitelinks&format=json"
                                     wd_response = await client.get(wikidata_url, timeout=5.0, headers=headers)
                                     if wd_response.status_code == 200:
@@ -4307,20 +4306,17 @@ async def get_hot_celebs():
                                         for entity in wd_data.get("entities", {}).values():
                                             sitelinks = entity.get("sitelinks", {})
                                             language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
-                                            if language_count > 0:
-                                                recognition_metrics["languages"] = {"count": language_count}
                                 except:
                                     pass
                             
-                            # Use 3-LAYER TIER CALCULATION
-                            tier = calculate_tier_3_layer(recognition_metrics, celeb_bio)
+                            # SINGLE CALCULATION for tier AND price
+                            tier, base_price = calculate_tier_and_price(language_count, celeb_bio)
                             category = db_celeb.get("category", "other")
-                            base_price = get_price_from_tier(tier)
                         else:
-                            # Calculate for new celebs - fetch Wikidata
-                            recognition_metrics = {}
+                            # New celeb - fetch Wikidata
+                            language_count = 0
                             try:
-                                await asyncio.sleep(0.3)
+                                await asyncio.sleep(0.2)
                                 wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={actual_name.replace(' ', '_')}&props=sitelinks&format=json"
                                 wd_response = await client.get(wikidata_url, timeout=5.0, headers=headers)
                                 if wd_response.status_code == 200:
@@ -4328,14 +4324,12 @@ async def get_hot_celebs():
                                     for entity in wd_data.get("entities", {}).values():
                                         sitelinks = entity.get("sitelinks", {})
                                         language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
-                                        recognition_metrics["languages"] = {"count": language_count}
                             except:
                                 pass
                             
-                            # Use 3-LAYER TIER CALCULATION
-                            tier = calculate_tier_3_layer(recognition_metrics, bio)
+                            # SINGLE CALCULATION for tier AND price
+                            tier, base_price = calculate_tier_and_price(language_count, bio)
                             category = get_category_from_bio(bio, actual_name)
-                            base_price = get_price_from_tier(tier)
                         
                         # Apply small NEWS PREMIUM based on mention count (max 20% boost)
                         mention_count = data["count"]
