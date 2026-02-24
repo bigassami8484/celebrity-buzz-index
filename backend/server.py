@@ -4865,7 +4865,7 @@ async def get_hot_streaks():
     
     # Check cache first (15 minute cache)
     cached = await db.news_cache.find_one(
-        {"type": "hot_streaks_v1"},
+        {"type": "hot_streaks_v2"},  # New version with correct prices
         {"_id": 0}
     )
     
@@ -4884,7 +4884,7 @@ async def get_hot_streaks():
             "news": {"$exists": True, "$ne": []},
             "news_updated_at": {"$gte": week_ago.isoformat()}
         },
-        {"_id": 0, "name": 1, "tier": 1, "price": 1, "image": 1, "news": 1, "news_updated_at": 1}
+        {"_id": 0, "name": 1, "tier": 1, "price": 1, "image": 1, "news": 1, "news_updated_at": 1, "bio": 1, "recognition_metrics": 1}
     ).limit(50).to_list(50)
     
     streaks = []
@@ -4903,15 +4903,29 @@ async def get_hot_streaks():
             # 3-4 articles = 3 days, 5-6 = 4 days, 7+ = 5+ days
             streak_days = min(3 + (news_count - 3) // 2, 7)
             
+            # RECALCULATE tier and price using single source of truth
+            bio = celeb.get("bio", "")
+            recognition_metrics = celeb.get("recognition_metrics", {})
+            language_count = recognition_metrics.get("languages", {}).get("count", 0)
+            
+            # If no language count in DB, use a reasonable default based on existing tier
+            if language_count == 0:
+                # Estimate based on old tier
+                old_tier = celeb.get("tier", "D")
+                language_count = {"A": 70, "B": 35, "C": 15, "D": 5}.get(old_tier, 5)
+            
+            tier, price = calculate_tier_and_price(language_count, bio)
+            
             streaks.append({
                 "name": name,
                 "streak_days": streak_days,
                 "news_count": news_count,
-                "tier": celeb.get("tier", "D"),
-                "price": celeb.get("price", 1.0),
+                "tier": tier,
+                "price": round(price, 1),
                 "image": celeb.get("image", ""),
                 "trending_tag": "Hot Streak",
-                "is_hot": True
+                "is_hot": True,
+                "recognition_score": language_count
             })
     
     # Sort by streak days (longest first), then by news count
