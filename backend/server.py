@@ -3888,8 +3888,11 @@ async def autocomplete_search(q: str):
             suggestion["estimated_price"] = premium_price
             suggestion["is_brown_bread_premium"] = True
     
-    # Return only 1 result for cleaner UX - the best match
-    return {"suggestions": all_suggestions[:1]}
+    # Return up to 5 results for disambiguation cases, otherwise 1 for clean UX
+    # Disambiguation = names with parentheses like "James Morrison (singer)"
+    has_disambiguation = any("(" in s.get("name", "") for s in all_suggestions)
+    max_return = 5 if has_disambiguation else 1
+    return {"suggestions": all_suggestions[:max_return]}
 
 @api_router.post("/seed")
 async def seed_initial_data():
