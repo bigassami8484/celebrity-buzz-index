@@ -51,12 +51,9 @@ const HowItWorks = ({ onShowMethodology }) => (
       </div>
     </div>
     {/* Icon Legend */}
-    <div className="mt-3 pt-3 border-t border-[#262626] flex justify-center gap-6 text-xs text-[#A1A1AA]">
+    <div className="mt-3 pt-3 border-t border-[#262626] flex justify-center text-xs text-[#A1A1AA]">
       <span className="flex items-center gap-1">
-        <span className="text-cyan-400">🌍</span> = Wikipedia languages (global fame)
-      </span>
-      <span className="flex items-center gap-1">
-        <span className="text-yellow-400">💀</span> = Deceased (Brown Bread bonus)
+        <span className="text-cyan-400">🌍</span> = Wikipedia languages (the higher the number, the more globally famous)
       </span>
     </div>
   </div>
