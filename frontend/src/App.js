@@ -1095,10 +1095,10 @@ function App() {
               <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
                 <p>Celebrities are priced based on their <strong className="text-white">tier</strong> and <strong className="text-white">current buzz</strong>:</p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li><strong className="text-[#FFD700]">A-LIST:</strong> £5M - £15M (capped at £15M for all celebs)</li>
-                  <li><strong className="text-[#C0C0C0]">B-LIST:</strong> £2M - £5M</li>
-                  <li><strong className="text-[#CD7F32]">C-LIST:</strong> £500K - £2M</li>
-                  <li><strong className="text-[#666]">D-LIST:</strong> £100K - £500K</li>
+                  <li><strong className="text-[#FFD700]">A-LIST:</strong> £10M - £15M (mega stars at the top)</li>
+                  <li><strong className="text-[#C0C0C0]">B-LIST:</strong> £4M - £6.9M</li>
+                  <li><strong className="text-[#CD7F32]">C-LIST:</strong> £1.5M - £2.9M</li>
+                  <li><strong className="text-[#666]">D-LIST:</strong> £0.5M - £1M</li>
                 </ul>
                 <p className="mt-2"><strong className="text-[#00F0FF]">Price changes affect transfers!</strong> When you transfer a celebrity out, you get their <em>current</em> market value. If their price went up, you profit. If it dropped, you lose money. Buy low, transfer high!</p>
               </div>
