@@ -1248,6 +1248,22 @@ async def get_tier_and_price_from_wikidata(name: str, bio: str = "") -> tuple:
     Returns (tier, price, language_count) tuple.
     """
     language_count = await get_wikidata_language_count(name)
+    
+    # If language count is 0, the lookup failed - estimate from bio length and name recognition
+    # A celebrity with a Wikipedia page should have at least 1 language
+    if language_count == 0:
+        # Estimate based on bio - longer bios typically mean more notable people
+        if bio:
+            bio_length = len(bio)
+            if bio_length > 500:
+                language_count = 15  # Estimate C-list
+            elif bio_length > 200:
+                language_count = 8   # Estimate D-list
+            else:
+                language_count = 5   # Default D-list
+        else:
+            language_count = 5  # Default when no data available
+        logger.debug(f"Estimated language count for {name}: {language_count} (Wikidata lookup returned 0)")
     tier, price = calculate_tier_and_price(language_count, bio)
     return tier, price, language_count
 
