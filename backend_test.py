@@ -11,7 +11,7 @@ import time
 from datetime import datetime
 
 class CelebrityBuzzTester:
-    def __init__(self, base_url="https://fantasy-celebrity.preview.emergentagent.com"):
+    def __init__(self, base_url="https://media-fame-tracker.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.team_id = None

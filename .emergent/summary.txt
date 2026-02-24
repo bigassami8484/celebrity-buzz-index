@@ -19,51 +19,259 @@ The user wants to build a Celebrity Buzz Index game. This is a full-stack web ap
     -   A Most Picked list.
     -   Team naming with a profanity filter.
 -   **UI/UX**: The application must have a mobile-first design, be a PWA, and have a proper favicon.
+-   **New Requirement**: The old tiering system is being replaced by a Recognition Score model (0-100) based on weighted metrics like career longevity, Wikipedia language count, awards, commercial impact, and page views. Tiers (A, B, C, D) will be dynamically assigned based on this score.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack application (React/FastAPI/MongoDB) with a database of ~1,580 celebrities. A sophisticated, automated tiering and categorization system has been implemented to classify celebrities based on Wikipedia data (languages, awards, bio content). This system runs in the background to update the entire database and is also used for new celebrities found via search. A Friends League feature is now live, including private leagues, weekly/monthly leaderboards, badges, and an in-league chat function. A scheduler automates daily point updates and weekly/monthly league resets. The application has undergone extensive data quality improvements based on continuous user feedback.
+A full-stack application (React/FastAPI/MongoDB) with a database of ~1,580 celebrities. The application includes features like Friends Leagues, chat, and automated data updates. The last session focused heavily on UI/UX improvements for mobile, data quality fixes, and began a major architectural overhaul to replace the manual tiering system with a dynamic Recognition Score. However, this refactoring process left the backend in a broken, non-functional state due to syntax errors.
 
 **Last working item**:
--   **Last item agent was working**: The user reported a new set of data quality issues:
-    1.  Adele and Dua Lipa are missing pictures.
-    2.  The category detection system is still not correctly prioritizing the *first* occupation mentioned in a celebrity's Wikipedia bio, with Keanu Reeves and Damian Lewis cited as examples.
+-   **Last item agent was working**: The agent was implementing a major architectural change requested by the user: replacing the entire static, bio-parsing-based tiering system with a dynamic Recognition Score model. The agent created the new calculation functions but introduced syntax and indentation errors in  while trying to remove the old code, causing the backend server to fail on restart.
 -   **Status**: IN PROGRESS
 -   **Agent Testing Done**: N
--   **Which testing method agent to use?**: manual testing by curl
+-   **Which testing method agent to use?**: backend testing agent
 -   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: Data Quality & Category Logic Fix (P0)**
-    -   **Description**: The user requires image fixes for Adele and Dua Lipa and a crucial refinement of the category detection logic to strictly prioritize the first occupation found in a celebrity's bio.
-    -   **Attempted fixes**: The agent has made several adjustments to the category detection logic, but it still fails in cases like actor and musician, where it needs to identify actor as primary. No fixes have been attempted for the images yet.
+-   **Issue 1: Backend Server is Broken (P0)**
+    -   **Description**: The backend server fails to start due to  and  in . This was caused by an incomplete and incorrect refactoring of the celebrity tiering logic.
+    -   **Attempted fixes**: The agent attempted to replace the old  function with the new  logic but failed to remove all legacy code correctly, resulting in syntax errors.
     -   **Next debug checklist**:
-        1.  In , investigate the  function. The current keyword-based approach is insufficient. The logic must be rewritten to parse the first sentence of the bio, identify all potential occupation keywords, and select the one that appears earliest in the string.
-        2.  Test the new logic specifically with the bios of Damian Lewis and Keanu Reeves to ensure it works as expected.
-        3.  Run a script to find Adele and Dua Lipa in the database and verify their  field. If empty or incorrect, use their Wikipedia page titles to fetch the correct data and image URL.
-    -   **Why fix this issue and what will be achieved with the fix?**: This addresses a core user requirement for data accuracy and builds trust in the application's automated systems.
+        1.  Examine  around lines 1970-2800.
+        2.  Carefully identify and completely remove all leftover code from the old  and related functions.
+        3.  Resolve the  and  so the server can restart.
+        4.  Verify the server is running with ==> /var/log/supervisor/backend.err.log <==
+  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 936, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1074, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1004, in source_to_code
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/app/backend/server.py", line 1979
+    }
+     ^
+IndentationError: unindent does not match any outer indentation level
+WARNING:  WatchFiles detected changes in 'server.py'. Reloading...
+Process SpawnProcess-8:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/root/.venv/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/root/.venv/lib/python3.11/site-packages/uvicorn/server.py", line 61, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/root/.venv/lib/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+    config.load()
+  File "/root/.venv/lib/python3.11/site-packages/uvicorn/config.py", line 467, in load
+    self.loaded_app = import_from_string(self.app)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/.venv/lib/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 936, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1074, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1004, in source_to_code
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/app/backend/server.py", line 1980
+    "the only way is essex": -8, "made in chelsea": -5, "geordie shore": -8,
+    ^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: illegal target for annotation
+INFO:     Will watch for changes in these directories: ['/app/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+INFO:     Started reloader process [46] using WatchFiles
+Process SpawnProcess-1:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/root/.venv/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 76, in subprocess_started
+    target(sockets=sockets)
+  File "/root/.venv/lib/python3.11/site-packages/uvicorn/server.py", line 61, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/root/.venv/lib/python3.11/site-packages/uvicorn/server.py", line 68, in serve
+    config.load()
+  File "/root/.venv/lib/python3.11/site-packages/uvicorn/config.py", line 467, in load
+    self.loaded_app = import_from_string(self.app)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/.venv/lib/python3.11/site-packages/uvicorn/importer.py", line 21, in import_from_string
+    module = importlib.import_module(module_str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 936, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1074, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1004, in source_to_code
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/app/backend/server.py", line 1980
+    "the only way is essex": -8, "made in chelsea": -5, "geordie shore": -8,
+    ^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: illegal target for annotation
+
+==> /var/log/supervisor/backend.out.log <==
+INFO:     10.219.3.2:39512 - "GET /api/celebrities/category/tv_actors?_nocache=1771891846367_0.45405453185846156 HTTP/1.1" 200 OK
+INFO:     10.219.0.121:55404 - "GET /api/categories HTTP/1.1" 200 OK
+INFO:     10.219.0.121:55418 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     10.219.3.2:38418 - "GET /api/transfer-window-status HTTP/1.1" 200 OK
+INFO:     10.219.0.121:55432 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     10.219.0.121:55418 - "GET /api/todays-news HTTP/1.1" 200 OK
+INFO:     10.219.0.121:55404 - "GET /api/team/2f3594a2-b9a6-4a0d-a5ac-c4c945621802 HTTP/1.1" 200 OK
+INFO:     10.219.3.2:38424 - "GET /api/leaderboard HTTP/1.1" 200 OK
+INFO:     10.219.0.121:55426 - "GET /api/trending HTTP/1.1" 200 OK
+INFO:     10.219.3.2:38434 - "GET /api/transfer-window-status HTTP/1.1" 200 OK
+INFO:     10.219.3.2:38418 - "GET /api/top-picked HTTP/1.1" 200 OK
+INFO:     10.219.0.121:55434 - "GET /api/hot-celebs HTTP/1.1" 200 OK
+INFO:     10.219.0.121:55438 - "GET /api/brown-bread-watch HTTP/1.1" 200 OK
+INFO:     10.219.0.121:55418 - "GET /api/celebrities/category/movie_stars?_nocache=1771892511766_0.4255154679950933 HTTP/1.1" 200 OK
+INFO:     10.219.3.2:38434 - "GET /api/hot-streaks/2f3594a2-b9a6-4a0d-a5ac-c4c945621802 HTTP/1.1" 404 Not Found
+INFO:     10.219.0.121:55418 - "GET /api/team/2f3594a2-b9a6-4a0d-a5ac-c4c945621802/leagues HTTP/1.1" 200 OK
+INFO:     10.219.0.121:55418 - "GET /api/price-alerts/2f3594a2-b9a6-4a0d-a5ac-c4c945621802 HTTP/1.1" 200 OK
+INFO:     10.219.0.121:52574 - "POST /api/celebrity/search HTTP/1.1" 200 OK
+INFO:     10.219.3.2:43866 - "GET /api/trending HTTP/1.1" 200 OK
+INFO:     10.219.3.2:43854 - "GET /api/leaderboard HTTP/1.1" 200 OK
+INFO:     10.219.3.2:43854 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45678 - "GET /api/categories HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45686 - "GET /api/transfer-window-status HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45684 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     10.219.3.2:43866 - "GET /api/todays-news HTTP/1.1" 200 OK
+INFO:     10.219.3.2:43868 - "GET /api/hot-celebs HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45686 - "GET /api/team/2f3594a2-b9a6-4a0d-a5ac-c4c945621802 HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45696 - "GET /api/brown-bread-watch HTTP/1.1" 200 OK
+INFO:     10.219.3.2:43878 - "GET /api/transfer-window-status HTTP/1.1" 200 OK
+INFO:     10.219.3.2:43874 - "GET /api/top-picked HTTP/1.1" 200 OK
+INFO:     10.219.3.2:43868 - "GET /api/celebrities/category/movie_stars?_nocache=1771893686093_0.508201204504177 HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45684 - "GET /api/hot-streaks/2f3594a2-b9a6-4a0d-a5ac-c4c945621802 HTTP/1.1" 404 Not Found
+INFO:     10.219.0.121:45684 - "GET /api/team/2f3594a2-b9a6-4a0d-a5ac-c4c945621802/leagues HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45678 - "GET /api/price-alerts/2f3594a2-b9a6-4a0d-a5ac-c4c945621802 HTTP/1.1" 200 OK
+INFO:     10.219.0.121:36622 - "POST /api/celebrity/search HTTP/1.1" 200 OK
+INFO:     10.219.0.121:36622 - "POST /api/celebrity/search HTTP/1.1" 200 OK
+INFO:     10.219.3.2:55354 - "POST /api/celebrity/search HTTP/1.1" 200 OK
+INFO:     10.219.0.121:36622 - "POST /api/celebrity/search HTTP/1.1" 200 OK
+INFO:     10.219.0.121:47824 - "POST /api/celebrity/search HTTP/1.1" 200 OK
+INFO:     10.219.0.121:47824 - "POST /api/celebrity/search HTTP/1.1" 200 OK
+INFO:     10.219.0.121:47824 - "POST /api/celebrity/search HTTP/1.1" 200 OK
+INFO:     10.219.3.2:54770 - "POST /api/celebrity/search HTTP/1.1" 200 OK
+INFO:     10.219.0.121:47824 - "POST /api/celebrity/search HTTP/1.1" 200 OK
+INFO:     10.219.3.2:37070 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45988 - "GET /api/categories HTTP/1.1" 200 OK
+INFO:     10.219.3.2:37070 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45988 - "GET /api/todays-news HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45998 - "GET /api/brown-bread-watch HTTP/1.1" 200 OK
+INFO:     10.219.0.121:46028 - "GET /api/top-picked HTTP/1.1" 200 OK
+INFO:     10.219.0.121:46046 - "GET /api/transfer-window-status HTTP/1.1" 200 OK
+INFO:     10.219.3.2:37070 - "GET /api/leaderboard HTTP/1.1" 200 OK
+INFO:     10.219.0.121:46036 - "GET /api/team/ca50eda7-2c2f-44ff-9931-2a18e3f1e483 HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45980 - "GET /api/trending HTTP/1.1" 200 OK
+INFO:     10.219.3.2:37070 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45998 - "GET /api/categories HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45998 - "GET /api/todays-news HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45988 - "GET /api/team/ca50eda7-2c2f-44ff-9931-2a18e3f1e483 HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45998 - "GET /api/brown-bread-watch HTTP/1.1" 200 OK
+INFO:     10.219.3.2:37070 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45998 - "GET /api/trending HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45988 - "GET /api/top-picked HTTP/1.1" 200 OK
+INFO:     10.219.3.2:37080 - "GET /api/leaderboard HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45988 - "GET /api/transfer-window-status HTTP/1.1" 200 OK
+INFO:     10.219.3.2:37088 - "GET /api/celebrities/category/movie_stars?_nocache=1771937287718_0.5687058686830846 HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45988 - "GET /api/price-alerts/ca50eda7-2c2f-44ff-9931-2a18e3f1e483 HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45998 - "GET /api/team/ca50eda7-2c2f-44ff-9931-2a18e3f1e483/leagues HTTP/1.1" 200 OK
+INFO:     10.219.0.121:45998 - "GET /api/hot-streaks/ca50eda7-2c2f-44ff-9931-2a18e3f1e483 HTTP/1.1" 404 Not Found
+INFO:     10.219.0.121:46012 - "GET /api/hot-celebs HTTP/1.1" 200 OK
+INFO:     10.219.3.2:37088 - "GET /api/hot-celebs HTTP/1.1" 200 OK
+INFO:     10.219.3.2:39672 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     10.219.3.2:39672 - "GET /api/categories HTTP/1.1" 200 OK
+INFO:     10.219.3.2:39674 - "GET /api/trending HTTP/1.1" 200 OK
+INFO:     10.219.3.2:39674 - "GET /api/transfer-window-status HTTP/1.1" 200 OK
+INFO:     10.219.0.121:58114 - "GET /api/todays-news HTTP/1.1" 200 OK
+INFO:     10.219.0.121:58106 - "GET /api/brown-bread-watch HTTP/1.1" 200 OK
+INFO:     10.219.0.121:58128 - "GET /api/leaderboard HTTP/1.1" 200 OK
+INFO:     10.219.0.121:58108 - "GET /api/team/ca50eda7-2c2f-44ff-9931-2a18e3f1e483 HTTP/1.1" 200 OK
+INFO:     10.219.0.121:58144 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     10.219.0.121:58142 - "GET /api/hot-celebs HTTP/1.1" 200 OK
+INFO:     10.219.3.2:39680 - "GET /api/top-picked HTTP/1.1" 200 OK
+INFO:     10.219.3.2:39672 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     10.219.3.2:39672 - "GET /api/todays-news HTTP/1.1" 200 OK
+INFO:     10.219.0.121:58106 - "GET /api/trending HTTP/1.1" 200 OK
+INFO:     10.219.0.121:58106 - "GET /api/brown-bread-watch HTTP/1.1" 200 OK
+INFO:     10.219.0.121:58106 - "GET /api/team/ca50eda7-2c2f-44ff-9931-2a18e3f1e483 HTTP/1.1" 200 OK
+INFO:     10.219.0.121:58114 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     10.219.0.121:58156 - "GET /api/hot-celebs HTTP/1.1" 200 OK
+INFO:     10.219.0.121:58114 - "GET /api/leaderboard HTTP/1.1" 200 OK
+INFO:     10.219.3.2:39672 - "GET /api/categories HTTP/1.1" 200 OK
+INFO:     10.219.3.2:39680 - "GET /api/top-picked HTTP/1.1" 200 OK
+INFO:     10.219.3.2:39672 - "GET /api/transfer-window-status HTTP/1.1" 200 OK
+INFO:     10.219.3.2:39672 - "GET /api/team/ca50eda7-2c2f-44ff-9931-2a18e3f1e483/leagues HTTP/1.1" 200 OK
+INFO:     10.219.3.2:39680 - "GET /api/price-alerts/ca50eda7-2c2f-44ff-9931-2a18e3f1e483 HTTP/1.1" 200 OK
+INFO:     10.219.0.121:58114 - "GET /api/hot-streaks/ca50eda7-2c2f-44ff-9931-2a18e3f1e483 HTTP/1.1" 404 Not Found
+INFO:     10.219.0.121:58114 - "GET /api/celebrities/category/movie_stars?_nocache=1771937361128_0.4500736649973648 HTTP/1.1" 200 OK
+INFO:     10.219.3.2:42182 - "GET /api/autocomplete?q=mau HTTP/1.1" 200 OK
+INFO:     10.219.3.2:42196 - "GET /api/autocomplete?q=maur HTTP/1.1" 200 OK
+INFO:     10.219.0.121:44348 - "GET /api/autocomplete?q=ma HTTP/1.1" 200 OK
+INFO:     10.219.3.2:42198 - "GET /api/autocomplete?q=maury HTTP/1.1" 200 OK
+INFO:     10.219.3.2:42196 - "POST /api/celebrity/search HTTP/1.1" 200 OK.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is a critical blocker. The entire application is unusable until the backend server is running.
     -   **Status**: IN PROGRESS
-    -   **Is recurring issue?**: Y (The category logic has been a recurring point of feedback).
+    -   **Is recurring issue?**: N
     -   **Should Test frontend/backend/both after fix?**: Backend
     -   **Blocked on other issue**: None.
 
 -   **Issue 2: Production Mobile View is Broken (P1)**
-    -   **Description**: A recurring, critical issue where the user reports the live production site is not rendering correctly on mobile devices. This is **not reproducible** in the development preview environment.
-    -   **Attempted fixes**: The agent has repeatedly confirmed mobile responsiveness in the dev environment. The issue is likely related to the production deployment environment.
-    -   **Next debug checklist**: Instruct the user to contact **Emergent Support**. Do not attempt to fix this with code, as it is an environment issue beyond the agent's control.
+    -   **Description**: A recurring critical issue where the user reports the live production site is not rendering correctly on mobile devices. This is not reproducible in the development preview environment.
+    -   **Next debug checklist**: This is an environment issue beyond the agent's control. Instruct the user to follow up with **Emergent Support**.
     -   **Status**: BLOCKED
     -   **Is recurring issue?**: Y
     -   **Should Test frontend/backend/both after fix?**: Frontend (requires user verification on production).
     -   **Blocked on other issue**: Blocked on user action (contacting support).
 
 **In progress Task List**:
--   **Task 1: Backend Refactoring (Phase 2 - Continued)**
-    -   **Where to resume**: Create , , and . Migrate the relevant endpoints from the monolithic . The  file serves as a template.
-    -   **What will be achieved with this?**: Drastically improve code maintainability, scalability, and organization of the backend.
+-   **Task 1: Complete Recognition Score Integration (P0)**
+    -   **Where to resume**: After fixing the broken backend, the new Recognition Score system must be fully integrated. The score and its resulting tier need to be correctly calculated and returned in all relevant API endpoints, including  and . The user explicitly requested the score be visible in the search results.
+    -   **What will be achieved with this?**: This will complete the transition to a dynamic, data-driven, and more accurate celebrity evaluation system as per the user's new core requirement.
     -   **Status**: IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?**: Both
+    -   **Blocked on something**: Issue 1: Backend Server is Broken.
+
+-   **Task 2: Backend Refactoring (Phase 2) (P2)**
+    -   **Where to resume**: Create , , and . Migrate the relevant endpoints from the monolithic .
+    -   **What will be achieved with this?**: Drastically improve code maintainability, scalability, and organization of the backend.
+    -   **Status**: NOT STARTED
     -   **Should Test frontend/backend/both after fix?**: Backend
-    -   **Blocked on something**: Blocked by the user's high-priority data quality requests. This should be resumed after the immediate tasks are completed.
+    -   **Blocked on something**: Blocked by higher-priority tasks.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks**:
@@ -76,20 +284,18 @@ A full-stack application (React/FastAPI/MongoDB) with a database of ~1,580 celeb
     -   **P2**: Expand the badge system and Hall of Fame page.
 
 **Completed work in this session**
--   **Smart Tier Classification System**: Created and deployed a complex system () to auto-classify all 1,600+ celebrities based on Wikipedia metrics (language count, awards, bio length). Includes a guaranteed A-list and special logic for royals.
--   **Smart Category Detection System**: Built a system () to auto-categorize celebrities based on their bio. Fixed dozens of miscategorized celebs.
--   **Friends League Feature**: Implemented a full-featured league system including creation/joining, weekly/monthly leaderboards, new badges, and an integrated real-time chat.
--   **Automated Scheduler**: Deployed an APScheduler to handle daily point updates, weekly league scoring, and monthly awards.
--   **Hot Celebs Banner Logic**: Updated the banner to only show celebrities with 3+ news articles from the past 7 days and removed Michael Jordan (basketball player) to prevent confusion.
--   **Extensive Data Cleaning**:
-    -   Removed 41 disambiguation pages (e.g., Sean Delaney may refer to...).
-    -   Fixed tiers/categories for over 100 celebrities based on user feedback (Robert Downey Jr., Victoria Beckham, Sting, etc.).
-    -   Removed duplicate celebrities (Samuel L. Jackson).
-    -   Added missing celebrities (David Bowie, JoJo Siwa).
--   **UI/UX Refinements**:
-    -   Redesigned the celebrity card bio to be a smaller, semi-transparent overlay at the bottom.
-    -   Updated the Transfer Window schedule to Sunday 12pm-12am GMT across the entire application.
-    -   Removed the redundant Found celebrity toast message.
+-   **Bug Fixes**:
+    -   Resolved price/tier mismatches between search autocomplete and celebrity cards.
+    -   Fixed multiple data quality issues: upgraded tiers for deserving celebs (Chris Eubank Jr, Carson Daly), corrected categories (Martin Compston), removed duplicate entries (Beyoncé, Floyd Mayweather), and fixed images for many celebs (Kate Middleton, Paris Hilton, etc.).
+    -   Resolved price cap violations, ensuring no celebrity price exceeds £15M.
+    -   Fixed 3 critical N+1 query bugs in the Price Watch API.
+-   **New Features**:
+    -   Implemented a Price Watch feature, allowing users to set price alerts for any celebrity.
+    -   Added a Remove from Team button to celebrity cards once they've been added.
+-   **UI/UX Improvements**:
+    -   Overhauled the mobile view to be more user-friendly: implemented a 2-column grid, limited categories to 6 celebs by default, and made cards more compact.
+    -   Added View All / Show Less toggles for the Brown Bread Watch and Leaderboard sections on mobile.
+    -   Re-added news snippets, wiki links, and price change arrows to the compact mobile celebrity cards per user request.
 
 **Earlier issues found/mentioned but not fixed**
 -   None.
@@ -103,12 +309,13 @@ A full-stack application (React/FastAPI/MongoDB) with a database of ~1,580 celeb
 
 
 **Key Technical Concepts**
--   **APScheduler**: Used for running scheduled background tasks (daily point updates, weekly scoring).
--   **Advanced Text Processing**: Heavy use of Python's  module and string manipulation for advanced parsing of Wikipedia bios to determine celebrity tiers and categories.
--   **Background Script Execution**: Running long-running tasks like the full database reclassification via  to prevent timeouts.
+-   **Recognition Score Model**: A new, complex, multi-factor system to dynamically calculate a celebrity's notability score (0-100) based on weighted metrics (longevity, awards, wiki presence, etc.). This replaces the old, brittle bio-parsing logic.
+-   **APScheduler**: Used for running scheduled background tasks.
+-   **Dynamic Data Correction**: Extensive use of Python scripts to find, analyze, and update specific records in MongoDB.
 
 **key DB schema**
--   **celebrities**: 
+-   **celebrities**:  (Note:  is new).
+-   **price_watches**:  (New collection).
 -   **leagues**: 
 -   **league_chats**: 
 
@@ -116,48 +323,46 @@ A full-stack application (React/FastAPI/MongoDB) with a database of ~1,580 celeb
 -   None.
 
 **All files of reference**
--   : The central file for all new features, including the tiering system, categorization logic, league and chat endpoints, and the scheduler setup. Urgently needs refactoring.
--   : A new, large component that handles all UI for the Friends Leagues feature, including leaderboards and chat.
--   : Modified to integrate the league components and other UI tweaks.
--   : A new script created to run the full, long-running celebrity reclassification process.
+-   : Heavily modified and currently broken. Contains all business logic.
+-   : Modified to add Price Watch feature and mobile layout logic.
+-   : Modified for Remove button and mobile view.
+-   : Added new API calls for the Price Watch feature.
+-   : New file for the Price Watch modal.
+-   : Updated for mobile expand/collapse functionality.
+-   : Updated the Leaderboard for mobile expand/collapse functionality.
 
 **Areas that need refactoring**:
--   **Critical**: . The file is now over 7,000 lines and contains logic for authentication, celebrity data, news, teams, leagues, chat, tiering, and scheduling. It is extremely difficult to maintain. The Backend Refactoring task to move logic into the  directory and new utility modules is of the highest priority after current user requests are resolved.
+-   **Critical**: . The failed attempt to refactor the tiering system has made fixing and modularizing this monolithic file the absolute top priority.
 
 **key api endpoints**
--   : Triggers the background reclassification of all celebrities.
--   : Checks the status of the running background jobs.
--   : Creates a new friends league.
--   : Joins an existing league with a code.
--   : Fetches the weekly leaderboard for a league.
--   : Fetches the monthly leaderboard for a league.
--   : Fetches chat messages for a league.
--   : Posts a message to a league's chat.
+-   : Needs to be updated to use the new Recognition Score.
+-   : Needs to be updated to use the new Recognition Score.
+-   : (POST, GET, DELETE) New endpoints for the Price Watch feature.
 
 **Critical Info for New Agent**
--   **Fix Category Logic First**: The user's highest priority is fixing the category detection logic in  to correctly identify the *first* occupation in a bio. This is a recurring issue and a major point of user frustration.
--   **Verify Missing Images**: Immediately investigate why Adele and Dua Lipa are reported as missing images and fix them.
--   **Backend is Unwieldy**: Be aware that  is extremely monolithic. Be careful when making changes and prioritize the refactoring task as soon as the user's immediate data fixes are complete.
--   **Production Mobile Bug is Not Your Task**: Do not attempt to debug the user-reported mobile production bug. Remind the user to contact Emergent Support.
+-   **The backend is BROKEN.** Your first and only priority is to fix the  and  in  so the application can run again.
+-   The core logic of the application has fundamentally changed. The old system of determining a celebrity's tier by parsing their biography has been replaced by a new Recognition Score model. You must complete this migration.
+-   Once the server is fixed, ensure the new Recognition Score is calculated correctly and displayed in the search results and on celebrity cards, as requested by the user.
 
 **documents and test reports created in this job**
--    (updated multiple times)
+-   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: Fix Craig Ferguson's category/tier. **Status: Completed**.
-2.  **User**: Fix Adele's picture and ensure the category detection *always* takes the first occupation, citing Damian Lewis as an example. **Status: Completed**.
-3.  **User**: Reiterate that Adele and Dua Lipa need pictures and the first occupation logic must be fixed, citing Keanu Reeves. **Status: PENDING**.
-4.  **User**: Remove found toast message on celebrity click. **Status: Completed**.
-5.  **User**: Fix David Bowie's tier (he wasn't in DB). **Status: Completed**.
-6.  **User**: Update transfer window to Sunday 12pm-12am. **Status: Completed**.
-7.  **User**: Fix Robert Downey Jr.'s tier and improve the classification system. **Status: Completed**.
-8.  **User**: Fix YouTubers being classified as movie stars and prioritize the first occupation. **Status: Completed**.
-9.  **User**: Fix Dermot O'Leary's category and improve system reliability. **Status: Completed**.
-10. **User**: Remove all disambiguation pages (e.g., Sean Delaney may refer to...). **Status: Completed**.
+1.  **User**: Implement a Recognition Score model to replace the old tiering system and show the score in search results. **Status: IN PROGRESS (and BROKEN)**.
+2.  **User**: Fix images for all remaining celebrities (Sting, Slash, Serena Williams) and upgrade Martha Stewart's tier. **Status: Completed**.
+3.  **User**: Fix duplicate celebrity entries (Martin Compston, Beyoncé, etc.). **Status: Completed**.
+4.  **User**: Fix hot celebs list to require a minimum of 3 actual news articles, not just mentions. **Status: Completed**.
+5.  **User**: Fix player count to show 0, fix price mismatch between search and celeb card, and upgrade pro boxers from C-list. **Status: Completed**.
+6.  **User**: Fix issues with Floyd Mayweather's tier, his presence on the hot celebs list, and celebs showing over the £15M price cap. **Status: Completed**.
+7.  **User**: Add Dick Van Dyke and David Attenborough to Brown Bread Watch and remove the expand/collapse button from the desktop leaderboard. **Status: Completed**.
+8.  **User**: Add Click for more functionality to Brown Bread Watch and a View All button to the mobile leaderboard. **Status: Completed**.
+9.  **User**: Add a Remove from Team button to the celebrity card after a celeb is added. **Status: Completed**.
+10. **User**: Add recent news, wiki page link, and price change arrows to the compact mobile celebrity card. **Status: Completed**.
 
 **Project Health Check:**
 -   **Broken**:
-    -   User reports the production mobile view is broken (unverified by agent, recurring).
+    -   The entire backend is non-functional due to syntax errors in .
+    -   User reports the production mobile view is broken (recurring, unverified by agent).
 -   **Mocked**: None.
 
 **3rd Party Integrations**
@@ -177,4 +382,4 @@ A full-stack application (React/FastAPI/MongoDB) with a database of ~1,580 celeb
 -   None required. Authentication uses the Emergent-managed Google login flow.
 
 **What agent forgot to execute**
--   The agent did not forget any tasks but was interrupted mid-task. The work on fixing the category detection logic and adding missing images for Adele/Dua Lipa must be resumed immediately.</analysis>
+-   The agent did not forget a task, but it failed to complete the critical refactoring of the tiering system. It left the  file in a syntactically incorrect state, breaking the entire backend. The removal of all old tiering logic and the successful integration of the new Recognition Score model is the most immediate and crucial pending action.</analysis>
