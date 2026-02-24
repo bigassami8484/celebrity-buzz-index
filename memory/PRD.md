@@ -23,14 +23,31 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 1. Created new async `get_tier_and_price_from_wikidata()` function as SINGLE SOURCE OF TRUTH
 2. Replaced ALL tier/price calculations in:
    - `/api/autocomplete` endpoint (DB-cached celebs)
-   - `/api/celebrity/search` endpoint (existing celebs)
-   - `/api/celebrity/search` endpoint (new celebs)
+   - `/api/celebrity/search` endpoint (existing celebs AND new celebs)
    - `/api/trending` endpoint
+   - `/api/celebrities/category/{category}` endpoint
    - Search alias matching
+3. Fixed award detection to only trigger for WINNERS, not nominees
 
 **New Helper Functions Added**:
 - `get_wikidata_language_count(name)` - Fetches language count from Wikidata API
 - `get_tier_and_price_from_wikidata(name, bio)` - Single source of truth for tier/price
+
+### Award Detection Fix (Feb 24, 2026)
+**Problem**: Michael B. Jordan was incorrectly A-LIST because his bio mentions "nominations for an academy award" which triggered the award check.
+
+**Fix**: Changed `major_awards` list to `major_award_patterns` that requires WINNER-specific keywords:
+- "won an academy award", "academy award winner", "oscar winner", "oscar-winning"
+- "grammy winner", "grammy-winning", "won a grammy"
+- "emmy winner", "emmy-winning", "won an emmy"
+- "golden globe winner", "won a golden globe"
+- etc.
+
+### TV Presenter Classification (Feb 24, 2026)
+Added logic to properly classify TV presenters:
+- If "television presenter", "TV host", or "broadcaster" appears
+- AND no major acting credits exist
+- Classify as `tv_personalities` category
 
 ### Pink (Singer) Wiki Link Fix (Feb 24, 2026)
 Added "pink" alias mapping to `CELEBRITY_ALIASES`:
@@ -38,6 +55,11 @@ Added "pink" alias mapping to `CELEBRITY_ALIASES`:
 - "p!nk" → "Pink (singer)"
 - "pink singer" → "Pink (singer)"
 - "alecia moore" → "Pink (singer)"
+
+### Category Cards Fix (Feb 24, 2026)
+Updated `/api/celebrities/category/{category}` endpoint to:
+- Recalculate tier/price for each celebrity using `get_tier_and_price_from_wikidata()`
+- Ensures category cards show consistent tier badges with search results
 
 ### Tier Calculation System (Simplified Feb 24, 2026)
 
@@ -50,8 +72,8 @@ Added "pink" alias mapping to `CELEBRITY_ALIASES`:
 - D-LIST: <10 languages (emerging/niche)
 
 **LAYER 2 - Achievement Modifiers (+1 tier upgrade):**
-- Global franchise lead (Harry Potter, Marvel, etc.)
-- Major international award (Oscar, Grammy winner)
+- Global franchise lead (Harry Potter, Marvel, Star Wars, etc.)
+- Major international award WINNER (Oscar, Grammy, Emmy, etc.)
 - World champion/record holder
 
 **LAYER 3 - Reality TV Modifier (-1 tier downgrade):**
@@ -63,21 +85,20 @@ Added "pink" alias mapping to `CELEBRITY_ALIASES`:
 - C-LIST: £2.5M base
 - D-LIST: £1M base
 
-**Verified Results:**
-- Daniel Radcliffe: A-LIST (101 langs, Harry Potter) £12M
-- Emma Watson: A-LIST (122 langs, Harry Potter) £12M
-- Taylor Swift: A-LIST (153 langs) £12M
-- Kelly Osbourne: B-LIST (35 langs) £6.9M
-- Sharon Osbourne: B-LIST (33 langs) £6M
-- Rochelle Humes: C-LIST (13 langs) £2.5M
-- Pink: A-LIST (78 langs) £12M
+**Verified Results (All Tests Passed):**
+- Daniel Radcliffe: A-LIST (101 langs, Harry Potter) £12M ✅
+- Michael B. Jordan: B-LIST (55 langs, nominated but NOT won Oscar) £6.9M ✅
+- Rochelle Humes: C-LIST (13 langs) £2.5M ✅
+- Pink (singer): A-LIST (78 langs) £12M ✅
+- Kelly Osbourne: B-LIST (35 langs) £6.9M ✅
+- Sharon Osbourne: B-LIST (33 langs) £6M ✅
 
 ### Bug Fixes (Feb 24, 2026)
 - ✅ **apply_brown_bread_premium → get_brown_bread_premium** - Fixed NameError in celebrity search endpoint
 - ✅ **Removed duplicate fetch_wikipedia_info function** - Cleaned up leftover code from refactoring
 - ✅ **Restored get_brown_bread_premium function definition** - Missing async def was causing await errors
-- ✅ **Hot Celebs List Fixed** - Added 20+ missing celebrities to KNOWN_CELEBRITIES list (Russell Brand, Lisa Rinna, Kelly Osbourne, Hilary Duff, Robert Carradine, Tyra Banks, Sharon Osbourne, Nadiya Hussain, Ferne McCann, Love Island stars, etc.)
-- ✅ **Hot Celebs Now Shows Real News** - Banner now displays celebrities with 3+ actual news mentions (e.g., Robert Carradine death, Russell Brand court case, Kelly Osbourne body shaming story)
+- ✅ **Hot Celebs List Fixed** - Added 20+ missing celebrities to KNOWN_CELEBRITIES list
+- ✅ **Hot Celebs Now Shows Real News** - Banner now displays celebrities with 3+ actual news mentions
 
 ## Previous Updates (Feb 23, 2026)
 
