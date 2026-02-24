@@ -1909,75 +1909,69 @@ async def calculate_celebrity_tier(bio: str, name: str) -> tuple:
 
 async def calculate_tier_from_wikipedia_data(name: str, http_client: httpx.AsyncClient) -> dict:
     """
-    Calculate celebrity tier based on objective Wikipedia metrics:
-    - Number of Wikipedia language editions (global recognition)
-    - Years active (career longevity)
-    - Awards mentioned in bio
-    - Bio length (notability indicator)
-    - Career milestones
+    Calculate celebrity tier using Recognition Score model (0-100).
     
-    Tier Definitions:
-    - A-List (£9-12M): Global household name, 50+ language editions, major awards, decades active
-    - B-List (£5-8M): Well-known, 20-50 languages, some awards, established career
-    - C-List (£2-4M): Minor reality TV, limited mainstream recognition, <20 languages
-    - D-List (£0.5-1.5M): Emerging influencer, very limited recognition, <10 languages
+    Weighted metrics:
+    - Longevity (20%): Years active in industry
+    - Wikipedia Languages (25%): Global recognition via language editions
+    - Awards/Achievements (20%): Industry recognition
+    - Commercial Impact (20%): Box office, sales, brand value
+    - Wikipedia Page Views (15%): 12-month popularity
+    
+    Tier thresholds:
+    - 85+ = A-List
+    - 65-84 = B-List  
+    - 45-64 = C-List
+    - Below 45 = D-List
     """
-    # GUARANTEED A-LIST - Global mega-stars that should ALWAYS be A-list
-    # These override any Wikipedia metrics calculation
-    GUARANTEED_A_LIST_NAMES = {
-        # Musicians - Global Icons
-        "adele", "taylor swift", "beyoncé", "beyonce", "rihanna", "drake", "ed sheeran",
-        "lady gaga", "bruno mars", "justin bieber", "ariana grande", "the weeknd",
-        "kanye west", "jay-z", "jay z", "eminem", "madonna", "cher", "elton john", "paul mccartney",
-        "mick jagger", "bono", "sting", "celine dion", "whitney houston", "michael jackson",
-        "prince", "david bowie", "freddie mercury", "bob dylan", "bruce springsteen",
-        "stevie wonder", "billy joel", "phil collins", "rod stewart", "eric clapton",
-        "dolly parton", "barbra streisand", "mariah carey", "janet jackson", "diana ross",
-        "tina turner", "aretha franklin", "shakira", "jennifer lopez", "britney spears",
-        "christina aguilera", "katy perry", "miley cyrus", "dua lipa", "billie eilish",
-        "harry styles", "bad bunny", "post malone", "kendrick lamar", "travis scott",
-        "pink", "p!nk", "dr dre", "dr. dre", "snoop dogg", "50 cent", "nicki minaj",
-        "cardi b", "doja cat", "lizzo", "bb king", "b.b. king",
+    try:
+        # Fetch Wikipedia bio
+        headers = {"User-Agent": "CelebrityBuzzIndex/1.0"}
+        url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{name.replace(' ', '_')}"
+        response = await http_client.get(url, timeout=10.0, headers=headers)
         
-        # Actors - A-List Hollywood
-        "tom cruise", "leonardo dicaprio", "brad pitt", "george clooney", "matt damon",
-        "denzel washington", "will smith", "tom hanks", "morgan freeman", "samuel l. jackson",
-        "samuel l jackson", "robert downey jr.", "robert downey jr", "johnny depp", 
-        "keanu reeves", "dwayne johnson", "the rock", "chris hemsworth", "chris pratt", 
-        "chris evans", "ryan reynolds", "ryan gosling", "joaquin phoenix", "christian bale", 
-        "jake gyllenhaal", "matthew mcconaughey", "mark wahlberg", "ben affleck",
-        "meryl streep", "julia roberts", "sandra bullock", "nicole kidman", "cate blanchett",
-        "angelina jolie", "jennifer aniston", "reese witherspoon", "scarlett johansson",
-        "natalie portman", "anne hathaway", "emma stone", "jennifer lawrence", "charlize theron",
-        "cameron diaz", "drew barrymore", "kate winslet", "margot robbie", "gal gadot",
-        "zendaya", "florence pugh", "timothée chalamet", "timothee chalamet", "adam sandler", 
-        "jim carrey", "eddie murphy", "ben stiller", "steve carell", "seth rogen", "jonah hill",
-        "robert de niro", "al pacino", "jack nicholson", "dustin hoffman", "anthony hopkins",
-        "michael caine", "ian mckellen", "patrick stewart", "harrison ford", "clint eastwood",
-        "sylvester stallone", "arnold schwarzenegger", "bruce willis", "kevin hart",
-        "vince vaughn", "owen wilson", "terry crews", "sofia vergara", "zoe saldana",
-        
-        # TV Stars - Major
-        "oprah winfrey", "ellen degeneres", "jimmy fallon", "jimmy kimmel", "stephen colbert",
-        "david letterman", "jay leno", "conan o'brien", "james corden", "graham norton",
-        "simon cowell", "gordon ramsay", "ryan seacrest",
-        
-        # Athletes - Global Icons
-        "cristiano ronaldo", "lionel messi", "lebron james", "michael jordan", "serena williams",
-        "roger federer", "rafael nadal", "novak djokovic", "usain bolt", "simone biles",
-        "tiger woods", "david beckham", "tom brady", "floyd mayweather", "conor mcgregor",
-        "lewis hamilton", "michael schumacher", "kobe bryant", "michael phelps",
-        
-        # Royals
-        "queen elizabeth", "king charles", "king charles iii", "prince william", "prince harry", 
-        "kate middleton", "meghan markle", "princess diana",
-        
-        # Tech/Business Icons
-        "elon musk", "jeff bezos", "bill gates", "mark zuckerberg", "steve jobs",
-        "warren buffett",
-        
-        # Political/Public Figures
-        "donald trump", "barack obama", "joe biden", "george w bush", "george w. bush",
+        if response.status_code == 200:
+            data = response.json()
+            bio = data.get("extract", "")
+            
+            # Calculate Recognition Score
+            score_result = await calculate_recognition_score(name, bio, http_client)
+            
+            tier = score_result["tier"]
+            recognition_score = score_result["recognition_score"]
+            metrics = score_result["metrics"]
+            
+            # Calculate price based on tier
+            base_price = get_base_price_for_tier(tier, name)
+            
+            return {
+                "tier": tier,
+                "price": base_price,
+                "recognition_score": recognition_score,
+                "tier_metrics": metrics,
+                "bio": bio,
+                "image": data.get("thumbnail", {}).get("source", ""),
+                "wiki_url": data.get("content_urls", {}).get("desktop", {}).get("page", "")
+            }
+        else:
+            # Default to D-list if Wikipedia lookup fails
+            return {
+                "tier": "D",
+                "price": get_base_price_for_tier("D", name),
+                "recognition_score": 20,
+                "tier_metrics": {}
+            }
+    except Exception as e:
+        logger.error(f"Error calculating tier for {name}: {e}")
+        return {
+            "tier": "D", 
+            "price": get_base_price_for_tier("D", name),
+            "recognition_score": 20,
+            "tier_metrics": {}
+        }
+
+# Legacy function for backwards compatibility - now uses Recognition Score
+def determine_tier_from_bio_legacy(bio: str, name: str = "") -> str:
         "hillary clinton", "michelle obama",
         
         # Other Global Icons
