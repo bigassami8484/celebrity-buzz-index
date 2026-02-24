@@ -1808,24 +1808,107 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     # Use Hot Celebs price (includes news premium)
                     tier = hot_celeb_match.get("tier", "D")
                     price = hot_celeb_match["price"]
+                    recognition_score = hot_celeb_match.get("recognition_score", 50)
                 else:
                     # Check if celebrity exists in DB - use their stored price
                     existing = await db.celebrities.find_one(
                         {"name": {"$regex": f"^{actual_title}$", "$options": "i"}},
-                        {"_id": 0, "tier": 1, "price": 1}
+                        {"_id": 0, "tier": 1, "price": 1, "recognition_score": 1, "recognition_metrics": 1}
                     )
                     
                     if existing and existing.get("price"):
                         tier = existing.get("tier", "D")
                         price = existing.get("price")  # Use stored DB price for consistency
+                        recognition_score = existing.get("recognition_score")
+                        if not recognition_score and existing.get("recognition_metrics"):
+                            result = calculate_recognition_score_from_metrics(existing["recognition_metrics"])
+                            recognition_score = result.get("recognition_score", 50)
+                            tier = result.get("tier", tier)  # Use safeguard-applied tier
                     else:
-                        # Check if in HOT_CELEBS_POOL for known tier
-                        pool_entry = next((c for c in HOT_CELEBS_POOL if c["name"].lower() == actual_title.lower()), None)
-                        if pool_entry:
-                            tier = pool_entry["tier"]
-                        else:
-                            # Estimate tier from description (pass name for guaranteed A-list check)
+                        # CALCULATE REAL RECOGNITION SCORE for new celebs
+                        # Fetch Wikidata for language count and apply safeguards
+                        try:
+                            wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={actual_title.replace(' ', '_')}&props=sitelinks&format=json"
+                            wd_response = await client.get(wikidata_url, timeout=3.0, headers=headers)
+                            language_count = 0
+                            if wd_response.status_code == 200:
+                                wd_data = wd_response.json()
+                                for entity in wd_data.get("entities", {}).values():
+                                    sitelinks = entity.get("sitelinks", {})
+                                    language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
+                            
+                            # Quick recognition score calculation
+                            # Language score (25% weight, max 100)
+                            if language_count >= 80:
+                                language_score = 100
+                            elif language_count >= 60:
+                                language_score = 90
+                            elif language_count >= 40:
+                                language_score = 75
+                            elif language_count >= 25:
+                                language_score = 60
+                            elif language_count >= 15:
+                                language_score = 45
+                            elif language_count >= 10:
+                                language_score = 30
+                            elif language_count >= 5:
+                                language_score = 15
+                            else:
+                                language_score = 5
+                            
+                            # Bio-based scores (simplified)
+                            bio_lower = extract.lower() if extract else ""
+                            awards_found = sum(1 for kw in AWARD_KEYWORDS if kw in bio_lower)
+                            commercial_found = sum(1 for kw in COMMERCIAL_KEYWORDS if kw in bio_lower)
+                            
+                            awards_score = min(100, 30 + awards_found * 15)
+                            commercial_score = min(100, 25 + commercial_found * 20)
+                            
+                            # Default longevity and pageviews (will be updated on full calc)
+                            longevity_score = 40  # Assume moderate career
+                            pageviews_score = 50  # Will be updated on full calculation
+                            
+                            # Calculate weighted score
+                            recognition_score = round(
+                                (longevity_score * 0.20) +
+                                (language_score * 0.25) +
+                                (awards_score * 0.20) +
+                                (commercial_score * 0.20) +
+                                (pageviews_score * 0.15)
+                            )
+                            
+                            # Base tier
+                            if recognition_score >= 85:
+                                tier = "A"
+                            elif recognition_score >= 65:
+                                tier = "B"
+                            elif recognition_score >= 45:
+                                tier = "C"
+                            else:
+                                tier = "D"
+                            
+                            # Apply safeguards
+                            has_commercial_success = commercial_found >= 2
+                            
+                            # Safeguard: 50+ languages = minimum B
+                            if language_count >= 50 and tier in ["C", "D"]:
+                                tier = "B"
+                            
+                            # Safeguard: 25+ languages with any awards = minimum B
+                            if language_count >= 25 and awards_found >= 1 and tier in ["C", "D"]:
+                                tier = "B"
+                            
+                            # Safeguard: D-tier needs very low recognition
+                            if tier == "D":
+                                if language_count >= 10 or has_commercial_success:
+                                    tier = "C"
+                            
+                        except Exception as e:
+                            logger.debug(f"Error calculating recognition for {actual_title}: {e}")
+                            # Fallback to description-based estimate
                             tier = estimate_tier_from_description(extract, actual_title)
+                            recognition_score = {"A": 85, "B": 70, "C": 50, "D": 30}.get(tier, 50)
+                        
                         price = get_dynamic_price(tier, 50, actual_title)
                 
                 results.append({
