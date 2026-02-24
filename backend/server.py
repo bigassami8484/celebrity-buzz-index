@@ -1727,6 +1727,7 @@ CELEBRITY_ALIASES = {
     "mario": "Mario (singer)",
     "mario singer": "Mario (singer)",
     "mario r&b": "Mario (singer)",
+    "mario barrett": "Mario (singer)",
     "p diddy": "Sean Combs",
     "puff daddy": "Sean Combs",
     "diddy": "Sean Combs",
