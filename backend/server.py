@@ -4955,7 +4955,7 @@ async def get_brown_bread_watch():
         if idx < 3:
             special_price = brown_bread_premium_prices[idx]
         else:
-            # Normal pricing for others (capped at £12M)
+            # Normal pricing for others (capped at £15M)
             tier = celeb.get("tier", "D")
             buzz_score = celeb.get("buzz_score", 5)
             special_price = get_dynamic_price(tier, buzz_score, celeb.get("name", ""))
