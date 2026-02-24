@@ -720,7 +720,7 @@ COMMERCIAL_KEYWORDS = [
     "billion", "billionaire", "multi-million", "highest-paid", "highest paid",
     "best-selling", "best selling", "record-breaking", "record breaking",
     "#1", "number one", "chart-topping", "platinum", "diamond certified",
-    "box office", "grossed", "forbes", "fortune 500", "time 100",
+    "box office", "grossed", "highest-grossing", "forbes", "fortune 500", "time 100",
     "most influential", "richest", "wealthiest", "net worth",
     "founded", "founder", "ceo", "entrepreneur", "business empire",
     "brand", "franchise", "global icon", "household name"
