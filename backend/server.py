@@ -2228,6 +2228,13 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
             results = []
             seen_names = set()
             
+            # OPTIMIZATION: Fetch hot celebs cache ONCE outside the loop
+            hot_celebs_cache = await db.news_cache.find_one(
+                {"type": "hot_celebs_from_news_v7"},
+                {"_id": 0, "hot_celebs": 1}
+            )
+            hot_celebs_list = hot_celebs_cache.get("hot_celebs", []) if hot_celebs_cache else []
+            
             # Process in order of human_titles (preserves OpenSearch relevance)
             for title in human_titles:
                 page_info = page_info_by_title.get(title.lower())
