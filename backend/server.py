@@ -1087,10 +1087,13 @@ def calculate_recognition_score_from_metrics(metrics: dict) -> dict:
         "safeguards_applied": safeguards_applied
     }
 
-def calculate_tier_and_price(language_count: int, bio: str = "") -> tuple:
+def calculate_tier_and_price(language_count: int, bio: str = "", name: str = "") -> tuple:
     """
     SINGLE SOURCE OF TRUTH for tier and price calculation.
     Returns (tier, price) tuple.
+    
+    LAYER 0 - Guaranteed A-List Override:
+    - Known mega stars bypass language count checks
     
     LAYER 1 - Language Count (Primary indicator of global recognition):
     - A-LIST: 60+ languages (true global superstars)
@@ -1107,6 +1110,12 @@ def calculate_tier_and_price(language_count: int, bio: str = "") -> tuple:
     - Reality TV without other achievements
     """
     bio_lower = bio.lower() if bio else ""
+    name_lower = name.lower() if name else ""
+    
+    # LAYER 0: Guaranteed A-List override for known mega stars
+    if name_lower in GUARANTEED_A_LIST:
+        # Give them a minimum of 60 languages for pricing purposes
+        language_count = max(language_count, 60)
     
     # LAYER 1: Base tier from language count
     if language_count >= 60:
