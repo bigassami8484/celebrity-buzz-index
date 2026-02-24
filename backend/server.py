@@ -1782,6 +1782,9 @@ CELEBRITY_ALIASES = {
     "queen camilla": "Queen Camilla",
     "princess anne": "Anne, Princess Royal",
     "anne princess royal": "Anne, Princess Royal",
+    # British comedians/actors with nickname variations
+    "ade edmondson": "Adrian Edmondson",
+    "adrian edmondson": "Adrian Edmondson",
     # Other celebs with common alternate names
     "the rock": "Dwayne Johnson",
     "dwayne 'the rock' johnson": "Dwayne Johnson",
