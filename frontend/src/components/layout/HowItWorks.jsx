@@ -1,4 +1,4 @@
-import { Search, Star, Plus, ArrowLeftRight, Skull, Info } from "lucide-react";
+import { Search, Star, Plus, ArrowLeftRight, Skull, Info, Globe } from "lucide-react";
 
 const HowItWorks = ({ onShowMethodology }) => (
   <div className="bg-[#0A0A0A] border border-[#262626] p-4 mb-8" data-testid="how-it-works">
@@ -49,6 +49,15 @@ const HowItWorks = ({ onShowMethodology }) => (
         <h4 className="font-space font-bold text-sm">+100</h4>
         <p className="text-xs text-[#A1A1AA] mt-1">Brown Bread</p>
       </div>
+    </div>
+    {/* Icon Legend */}
+    <div className="mt-3 pt-3 border-t border-[#262626] flex justify-center gap-6 text-xs text-[#A1A1AA]">
+      <span className="flex items-center gap-1">
+        <span className="text-cyan-400">🌍</span> = Wikipedia languages (global fame)
+      </span>
+      <span className="flex items-center gap-1">
+        <span className="text-yellow-400">💀</span> = Deceased (Brown Bread bonus)
+      </span>
     </div>
   </div>
 );
