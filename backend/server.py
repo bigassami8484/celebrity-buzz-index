@@ -832,11 +832,10 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
     
     # ===== 2. WIKIPEDIA LANGUAGES SCORE (25%) =====
     language_count = 0
-    headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com; contact@example.com)"}
     if http_client:
         try:
             wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={name.replace(' ', '_')}&props=sitelinks&format=json"
-            response = await http_client.get(wikidata_url, timeout=5.0, headers=headers)
+            response = await http_client.get(wikidata_url, timeout=5.0, headers=api_headers)
             if response.status_code == 200:
                 data = response.json()
                 entities = data.get("entities", {})
