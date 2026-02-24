@@ -80,7 +80,7 @@ Updated `/api/celebrities/category/{category}` endpoint to:
 - Reality TV without other achievements (unless 40+ languages)
 
 **Pricing:**
-- A-LIST: £12M base
+- A-LIST: £15M base (updated from £12M)
 - B-LIST: £6M base
 - C-LIST: £2.5M base
 - D-LIST: £1M base
