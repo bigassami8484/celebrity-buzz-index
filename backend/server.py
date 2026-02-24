@@ -1920,6 +1920,7 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     "estimated_tier": tier,
                     "price": price,
                     "estimated_price": price,
+                    "recognition_score": recognition_score if 'recognition_score' in dir() else 50,
                     "news_premium": hot_celeb_match is not None
                 })
                 
