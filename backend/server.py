@@ -3598,9 +3598,12 @@ async def autocomplete_search(q: str):
         bio = exact_match.get("bio", "")
         recognition_metrics = exact_match.get("recognition_metrics", {})
         
-        # Get language count - fetch fresh if missing
+        # Check if this is a known A-list celeb that should bypass DB data
+        is_guaranteed_a_list = exact_match["name"].lower() in GUARANTEED_A_LIST
+        
+        # Get language count - ALWAYS fetch fresh for guaranteed A-listers or if missing
         language_count = recognition_metrics.get("languages", {}).get("count", 0)
-        if language_count == 0:
+        if language_count == 0 or language_count < 30 or is_guaranteed_a_list:
             try:
                 headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com)"}
                 async with httpx.AsyncClient() as client:
@@ -3611,7 +3614,9 @@ async def autocomplete_search(q: str):
                         data = response.json()
                         for entity in data.get("entities", {}).values():
                             sitelinks = entity.get("sitelinks", {})
-                            language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
+                            fresh_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
+                            if fresh_count > language_count:
+                                language_count = fresh_count
             except:
                 pass
         
