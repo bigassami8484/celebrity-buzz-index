@@ -1169,43 +1169,49 @@ def calculate_tier_3_layer(metrics: dict, bio: str = "") -> str:
     
     # ===== LAYER 1 TIER ASSIGNMENT =====
     
-    # AUTO-A CONDITIONS
-    if language_count >= 25:
+    # AUTO-A CONDITIONS (need STRONG global recognition)
+    if language_count >= 60:  # Very high - true global stars
         tier = "A"
-        reason = f"Global recognition: {language_count} Wikipedia languages"
-    elif has_major_intl_award:
+        reason = f"Global superstar: {language_count} Wikipedia languages"
+    elif language_count >= 40 and (has_major_intl_award or is_franchise_lead or is_world_champion):
         tier = "A"
-        reason = "Major international award winner"
+        reason = f"Global recognition ({language_count} langs) + major achievement"
+    elif has_major_intl_award and language_count >= 25:
+        tier = "A"
+        reason = "Major international award winner with global reach"
     elif is_franchise_lead:
         tier = "A"
         reason = "Global franchise lead"
-    elif is_world_champion:
+    elif is_world_champion and language_count >= 25:
         tier = "A"
-        reason = "World champion/record holder"
+        reason = "World champion with global recognition"
     
     # AUTO-B CONDITIONS (if not already A)
-    elif language_count >= 15:
+    elif language_count >= 25:  # Good international recognition
         tier = "B"
-        reason = f"Strong recognition: {language_count} Wikipedia languages"
-    elif years_active >= 15:
+        reason = f"Strong international recognition: {language_count} Wikipedia languages"
+    elif language_count >= 15 and (has_national_award or is_top_athlete or is_national_presenter):
         tier = "B"
-        reason = f"Established career: {years_active}+ years active"
-    elif has_national_award:
+        reason = f"National prominence ({language_count} langs) + achievements"
+    elif years_active >= 20 and language_count >= 10:
         tier = "B"
-        reason = "National award recipient"
-    elif is_top_athlete:
+        reason = f"Long-established career: {years_active}+ years with recognition"
+    elif has_national_award and language_count >= 10:
+        tier = "B"
+        reason = "National award recipient with recognition"
+    elif is_top_athlete and language_count >= 10:
         tier = "B"
         reason = "Top-tier professional athlete"
-    elif is_national_presenter:
+    elif is_national_presenter and language_count >= 10:
         tier = "B"
         reason = "National television presenter"
     
-    # AUTO-D CONDITIONS (strict requirements)
+    # AUTO-D CONDITIONS (strict requirements - truly obscure)
     elif years_active < 10 and language_count < 10 and awards_found == 0 and commercial_found == 0:
         tier = "D"
         reason = "Emerging talent: Limited recognition"
     
-    # DEFAULT TO C
+    # DEFAULT TO C (recognizable but not mainstream famous)
     else:
         tier = "C"
         reason = "Recognizable public figure"
