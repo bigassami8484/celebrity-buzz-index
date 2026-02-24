@@ -3789,9 +3789,13 @@ async def autocomplete_search(q: str):
     
     # PRIORITY 3: Check database for partial matches (starts with query)
     # Only check DB partial matches if query is at least 3 chars to avoid too many irrelevant results
+    # SKIP DB matches with recognition_score == 0 - they have stale/corrupt data
     if not exact_match and len(q) >= 3:
         partial_matches = await db.celebrities.find(
-            {"name": {"$regex": f"^{q}", "$options": "i"}},
+            {
+                "name": {"$regex": f"^{q}", "$options": "i"},
+                "recognition_score": {"$gt": 10}  # Only trust DB entries with valid recognition scores
+            },
             {"_id": 0}
         ).limit(3).to_list(3)  # Reduced from 5 to 3 to prioritize Wikipedia results
         
