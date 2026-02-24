@@ -9,7 +9,35 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Compete on leaderboards with friends
 - Social sharing (Twitter/X, Facebook, WhatsApp)
 
-## Latest Updates (Feb 24, 2026)
+## Latest Updates (Feb 24, 2026 - Session 2)
+
+### CRITICAL FIX: Tier/Price Consistency (Feb 24, 2026)
+**Problem**: Celebrities were showing mismatched tiers and prices across different endpoints (e.g., D-List with £5.9M price, A-List celebrities showing as C-List).
+
+**Root Cause**: Multiple tier calculation functions existed with different logic:
+- `calculate_tier_and_price()` - Language count based (CORRECT)
+- `determine_tier_from_bio()` - Bio length estimation (INCORRECT)
+- `calculate_tier_from_wikipedia_data()` - Recognition score model (DIFFERENT RESULTS)
+
+**Fix Applied**:
+1. Created new async `get_tier_and_price_from_wikidata()` function as SINGLE SOURCE OF TRUTH
+2. Replaced ALL tier/price calculations in:
+   - `/api/autocomplete` endpoint (DB-cached celebs)
+   - `/api/celebrity/search` endpoint (existing celebs)
+   - `/api/celebrity/search` endpoint (new celebs)
+   - `/api/trending` endpoint
+   - Search alias matching
+
+**New Helper Functions Added**:
+- `get_wikidata_language_count(name)` - Fetches language count from Wikidata API
+- `get_tier_and_price_from_wikidata(name, bio)` - Single source of truth for tier/price
+
+### Pink (Singer) Wiki Link Fix (Feb 24, 2026)
+Added "pink" alias mapping to `CELEBRITY_ALIASES`:
+- "pink" → "Pink (singer)"
+- "p!nk" → "Pink (singer)"
+- "pink singer" → "Pink (singer)"
+- "alecia moore" → "Pink (singer)"
 
 ### Tier Calculation System (Simplified Feb 24, 2026)
 
