@@ -2275,17 +2275,12 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 if "may refer to" in extract_lower or "can refer to" in extract_lower or "commonly refers to" in extract_lower:
                     continue
                 
-                # FIRST: Check if this celeb is in the Hot Celebs cache - use that price
-                hot_celebs_cache = await db.news_cache.find_one(
-                    {"type": "hot_celebs_from_news_v7"},
-                    {"_id": 0, "hot_celebs": 1}
-                )
+                # OPTIMIZED: Check if this celeb is in the Hot Celebs cache (already fetched outside loop)
                 hot_celeb_match = None
-                if hot_celebs_cache and hot_celebs_cache.get("hot_celebs"):
-                    for hc in hot_celebs_cache["hot_celebs"]:
-                        if hc.get("name", "").lower() == actual_title.lower():
-                            hot_celeb_match = hc
-                            break
+                for hc in hot_celebs_list:
+                    if hc.get("name", "").lower() == actual_title.lower():
+                        hot_celeb_match = hc
+                        break
                 
                 if hot_celeb_match:
                     # Use Hot Celebs price (includes news premium)
