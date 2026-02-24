@@ -1151,7 +1151,55 @@ function App() {
       </section>
       
       {/* Footer */}
-      <Footer playerCount={stats?.player_count} />
+      <Footer playerCount={stats?.player_count} onTermsClick={() => setShowTerms(true)} />
+      
+      {/* Terms Modal */}
+      {showTerms && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#0A0A0A] border border-[#262626] rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="font-anton text-2xl uppercase">
+                  <span className="text-[#FF0099]">Terms</span> & <span className="text-[#00F0FF]">Conditions</span>
+                </h2>
+                <button 
+                  onClick={() => setShowTerms(false)}
+                  className="text-[#A1A1AA] hover:text-white p-2"
+                  data-testid="close-terms"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              
+              <div className="space-y-6 text-[#E5E5E5]">
+                <section>
+                  <h3 className="text-lg font-bold text-white mb-2">Data Sources</h3>
+                  <p>Data displayed on this platform is derived from publicly available sources including Wikipedia and other open data repositories.</p>
+                </section>
+                
+                <section>
+                  <h3 className="text-lg font-bold text-white mb-2">Rankings</h3>
+                  <p>All celebrity rankings and tier classifications are algorithmically generated based on publicly available metrics. These rankings are for entertainment purposes only.</p>
+                </section>
+                
+                <section>
+                  <h3 className="text-lg font-bold text-white mb-2">Trademarks</h3>
+                  <p>All trademarks, service marks, trade names, and logos displayed on this platform belong to their respective owners.</p>
+                </section>
+              </div>
+              
+              <div className="mt-6 pt-4 border-t border-[#262626]">
+                <button 
+                  onClick={() => setShowTerms(false)}
+                  className="w-full bg-[#FF0099] hover:bg-[#FF0099]/80 text-white py-2 rounded transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
