@@ -11,6 +11,32 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 
 ## Latest Updates (Feb 24, 2026 - Session 5)
 
+### FEATURE: Disambiguation Search Results (Feb 24, 2026)
+**Problem**: Searching for "james morrison" only returned 1 result, but there are multiple celebrities with that name (singer, footballer, actor, etc.)
+**Fix Applied**:
+- Modified search to return up to 5 results for disambiguation cases (names with parentheses like "James Morrison (singer)")
+- Fixed duplicate detection to allow different people with same base name through
+- Now users can choose the correct celebrity from the list
+**Verified Results**:
+- "james morrison" → 5 results: jazz musician (C), singer (B), footballer (B), actor (C), golfer (D) ✅
+
+### FEATURE: Fuzzy Search for Spelling Variations (Feb 24, 2026)
+**Problem**: Common misspellings like "Bryan" vs "Brian", "Steven" vs "Stephen" would fail to find results
+**Fix Applied**:
+- Added SPELLING_VARIATIONS dictionary with 40+ common name spelling variations
+- Search automatically tries alternate spellings when no results found
+**Examples**:
+- "bryan mcfadden" → Brian McFadden ✅
+- "stephen spielberg" → Steven Spielberg ✅
+- "katy perry" (direct) → Katy Perry ✅
+
+### OPTIMIZATION: Search Speed Improvements (Feb 24, 2026)
+**Problem**: Search was slow (2+ seconds)
+**Fixes Applied**:
+- Moved hot_celebs_cache lookup outside the loop (fetch once instead of per result)
+- Removed artificial delays (asyncio.sleep) from Wikidata lookups
+- Search now typically completes in under 1 second
+
 ### BUG FIX: Search Failing for Names with "Mc/Mac" Prefixes (Feb 24, 2026)
 **Problem**: Searching for "bryan mcfadden" returned no results
 **Root Cause**: The keyword filter list included "fc", "cf", "afc" (meant for sports teams) but these matched inside names like "McFadden" because the check was substring-based (`kw in title_lower`).
