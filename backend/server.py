@@ -3816,20 +3816,25 @@ async def get_hot_celebs():
         "Katie Price", "Kerry Katona", "Gemma Collins", "Peter Andre", "Katie Hopkins",
         "Piers Morgan", "Holly Willoughby", "Phillip Schofield", "Amanda Holden", "Ant McPartlin",
         "Declan Donnelly", "Rylan Clark", "Stacey Solomon", "Joe Swash", "Coleen Rooney",
+        "Kelly Osbourne", "Sharon Osbourne", "Ozzy Osbourne", "Lisa Rinna", "Kyle Richards",
+        "Tyra Banks", "Hilary Duff", "Lindsay Lohan", "Paris Hilton", "Nicole Richie",
         # Sports
         "Cristiano Ronaldo", "Lionel Messi", "Neymar", "Kylian Mbappé", "Erling Haaland",
         "Lewis Hamilton", "Max Verstappen", "Serena Williams", "Roger Federer", "Rafael Nadal",
         "LeBron James", "Tom Brady", "Patrick Mahomes", "Travis Kelce",
         "Simone Biles", "Usain Bolt", "Tiger Woods", "Conor McGregor", "Floyd Mayweather",
         "David Beckham", "Wayne Rooney", "Harry Kane", "Marcus Rashford", "Bukayo Saka",
+        "Adam Peaty",
         # Actors - more
         "Michael B. Jordan", "Chadwick Boseman", "Idris Elba", "Daniel Kaluuya",
+        "Robert Carradine", "Martha Plimpton", "Russell Brand",
         # Tech/Business
         "Elon Musk", "Jeff Bezos", "Mark Zuckerberg", "Bill Gates", "Kim Kardashian",
         "Kylie Jenner", "Kendall Jenner", "Kourtney Kardashian", "Khloé Kardashian",
         # TV Stars
         "Oprah Winfrey", "Ellen DeGeneres", "Jimmy Fallon", "Jimmy Kimmel", "Trevor Noah",
         "James Corden", "Graham Norton", "Jonathan Ross", "Alan Carr", "David Letterman",
+        "Andy Cohen", "Nadiya Hussain", "Ferne McCann",
         # Recently in news (2024-2025)
         "Britney Spears", "Shia LaBeouf", "Mia Goth", "Barry Manilow", "Eric Dane",
         "Liza Minnelli", "Jessica Alba", "Scott Wolf", "Tyreek Hill", "Jonathan Owens",
@@ -3839,6 +3844,9 @@ async def get_hot_celebs():
         "Taylor Lautner", "Selena Gomez", "Hailey Bieber", "Gigi Hadid", "Bella Hadid",
         "Cara Delevingne", "Emily Ratajkowski", "Megan Fox", "Machine Gun Kelly", "Pete Davidson",
         "Kim Petras", "Sam Smith", "Lil Nas X", "Megan Thee Stallion", "Ice Spice",
+        # Love Island / UK Reality
+        "Molly-Mae Hague", "Tommy Fury", "Olivia Attwood", "Chris Hughes", "Kem Cetinay",
+        "Dani Dyer", "Jack Fincham", "Amber Davies", "Georgia Steel", "Megan Barton-Hanson",
     ]
     
     # RSS feeds to scan for hot celebs - expanded list
