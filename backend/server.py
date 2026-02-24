@@ -994,12 +994,18 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
     }
 
 def calculate_recognition_score_from_metrics(metrics: dict) -> dict:
-    """Calculate recognition score from pre-computed metrics (for DB-stored data)"""
+    """Calculate recognition score from pre-computed metrics (for DB-stored data) with safeguards"""
     longevity_score = metrics.get("longevity", {}).get("score", 10)
     language_score = metrics.get("languages", {}).get("score", 10)
     awards_score = metrics.get("awards", {}).get("score", 10)
     commercial_score = metrics.get("commercial", {}).get("score", 10)
     pageviews_score = metrics.get("pageviews", {}).get("score", 10)
+    
+    # Get raw values for safeguard checks
+    years_active = metrics.get("longevity", {}).get("years_active", 0)
+    language_count = metrics.get("languages", {}).get("count", 0)
+    commercial_found = metrics.get("commercial", {}).get("found", 0)
+    has_lead_role = metrics.get("commercial", {}).get("has_lead_role", False)
     
     recognition_score = round(
         (longevity_score * 0.20) +
@@ -1009,6 +1015,7 @@ def calculate_recognition_score_from_metrics(metrics: dict) -> dict:
         (pageviews_score * 0.15)
     )
     
+    # Base tier
     if recognition_score >= 85:
         tier = "A"
     elif recognition_score >= 65:
@@ -1018,7 +1025,32 @@ def calculate_recognition_score_from_metrics(metrics: dict) -> dict:
     else:
         tier = "D"
     
-    return {"recognition_score": recognition_score, "tier": tier}
+    # Apply safeguards
+    safeguards_applied = []
+    has_commercial_success = commercial_found >= 2
+    
+    # Safeguard 1: 15+ years active AND 10+ wiki languages → minimum C
+    if years_active >= 15 and language_count >= 10 and tier == "D":
+        tier = "C"
+        safeguards_applied.append("Upgraded to C: 15+ years with 10+ languages")
+    
+    # Safeguard 2: 15+ years AND (commercial success OR lead role) → minimum B
+    if years_active >= 15 and (has_commercial_success or has_lead_role):
+        if tier in ["C", "D"]:
+            tier = "B"
+            safeguards_applied.append("Upgraded to B: 15+ years with commercial success")
+    
+    # Safeguard 3: D-tier only if meets all criteria
+    if tier == "D":
+        if years_active >= 10 or language_count >= 10 or has_commercial_success:
+            tier = "C"
+            safeguards_applied.append("Upgraded to C: Does not meet D-tier criteria")
+    
+    return {
+        "recognition_score": recognition_score, 
+        "tier": tier,
+        "safeguards_applied": safeguards_applied
+    }
 
 
 async def get_brown_bread_premium(celeb: dict, base_price: float) -> float:
