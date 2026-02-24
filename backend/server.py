@@ -3788,12 +3788,13 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     else:
         category = detect_category_from_bio(wiki_info.get("bio", ""), wiki_info["name"])
     
-    # Calculate celebrity tier using new Wikipedia-based metrics system
-    tier_result = None
-    async with httpx.AsyncClient() as http_client:
-        tier_result = await calculate_tier_from_wikipedia_data(wiki_info["name"], http_client)
-        tier = tier_result["tier"]
-        base_price = tier_result["price"]
+    # SINGLE SOURCE OF TRUTH: Calculate tier and price using Wikidata language count
+    tier, base_price, lang_count = await get_tier_and_price_from_wikidata(wiki_info["name"], wiki_info.get("bio", ""))
+    tier_result = {
+        "tier": tier,
+        "price": base_price,
+        "recognition_score": lang_count
+    }
     
     # Generate news - pass real news context if available from hot celebs
     real_news_context = hot_celeb_match.get("hot_reason") if hot_celeb_match else None
