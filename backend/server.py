@@ -2199,7 +2199,7 @@ def get_base_price_for_tier(tier: str, name: str = "") -> float:
 def get_dynamic_price(tier: str, buzz_score: float, name: str = "") -> float:
     """Calculate dynamic price based on tier and buzz score
     
-    Pricing Tiers (STRICT - MAX £12M for any celeb):
+    Pricing Tiers (STRICT - MAX £15M for any celeb):
     - A-List: £9m-£12m (high scoring but expensive)
     - B-List: £5m-£8m (balanced steady picks)  
     - C-List: £2m-£4m (risk/reward)
