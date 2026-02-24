@@ -2605,7 +2605,10 @@ def detect_category_from_bio(bio: str, name: str) -> str:
     # Check guaranteed categories first
     for category, names in GUARANTEED_CATEGORIES.items():
         if name_lower in names:
+            logger.info(f"CATEGORY MATCH: {name} found in GUARANTEED_CATEGORIES[{category}]")
             return category
+    
+    logger.info(f"CATEGORY: {name} not in any GUARANTEED_CATEGORIES list")
     
     # SPECIFIC CELEBRITY CATEGORY OVERRIDES - secondary priority
     category_overrides = {
