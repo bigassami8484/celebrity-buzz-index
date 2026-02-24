@@ -4037,6 +4037,7 @@ async def get_price_history_by_name(name: str, limit: int = 30):
 async def get_celebrities_by_category(category: str, response: Response):
     """Get 8 random celebrities by category using MongoDB $sample for true randomness.
     Only includes celebrities with valid Wikipedia data (bio and wiki_url).
+    Recalculates tier/price using SINGLE SOURCE OF TRUTH.
     """
     import random
     
@@ -4060,6 +4061,15 @@ async def get_celebrities_by_category(category: str, response: Response):
     ]
     
     selected = await db.celebrities.aggregate(pipeline).to_list(8)
+    
+    # SINGLE SOURCE OF TRUTH: Recalculate tier/price for each celebrity
+    for celeb in selected:
+        name = celeb.get("name", "")
+        bio = celeb.get("bio", "")
+        tier, price, lang_count = await get_tier_and_price_from_wikidata(name, bio)
+        celeb["tier"] = tier
+        celeb["price"] = round(price, 1)
+        celeb["recognition_score"] = lang_count
     
     return {"celebrities": selected[:8]}
 
