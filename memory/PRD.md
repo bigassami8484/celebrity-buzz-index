@@ -16,7 +16,38 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - ✅ **Recognition Score Display** - Score now visible in autocomplete search results (0-100 scale)
 - ✅ **Score Calculation** - Uses stored `tier_score` or `tier_metrics` from database
 - ✅ **Frontend Integration** - SearchBar.jsx shows score as grey badge next to tier badge
-- ✅ **Taylor Swift Example** - Shows recognition_score: 100, A-LIST tier, £14.2M
+
+### Recognition Score Formula (Feb 24, 2026)
+Score = Weighted sum of 5 metrics:
+- **Longevity (20%)**: Years active in industry
+- **Wikipedia Languages (25%)**: Number of Wikipedia language editions
+- **Awards/Achievements (20%)**: Grammy, Oscar, Emmy, etc. mentions
+- **Commercial Impact (20%)**: Billboard, box office, Forbes, etc. mentions
+- **Wikipedia Page Views (15%)**: 12-month annual views
+
+### Tier Rules
+- **A-List (85+)**: Global household name
+- **B-List (65-84)**: Strong mainstream recognition
+- **C-List (45-64)**: Recognisable public figure
+- **D-List (Below 45)**: Emerging / limited recognition
+
+### Safeguard Rules
+1. 50+ Wikipedia languages → minimum B-tier
+2. 15+ years active AND 10+ wiki languages → minimum C-tier
+3. 15+ years AND (commercial success OR lead role) → minimum B-tier
+4. D-tier only if: <10 years active AND <10 languages AND no major commercial success
+5. 3M+ pageviews AND 40+ languages → A-tier (global household name)
+
+### Monthly Recalculation
+- Scheduled job runs 1st of each month at 03:00 UTC
+- Admin endpoint: POST /api/admin/recalculate-recognition-scores
+- Removes all manual tier assignments
+
+### Examples After Recalculation
+- Taylor Swift: Score 55, A-LIST (safeguard: 12.6M pageviews + 153 languages)
+- Beyoncé: Score 40, A-LIST (safeguard: 4.5M pageviews + 155 languages)
+- Kim Kardashian: Score 54, A-LIST (safeguard: 4.2M pageviews + 100 languages)
+- Katie Price: Score 28, C-LIST (correctly identified as UK tabloid figure)
 
 ### Bug Fixes (Feb 24, 2026)
 - ✅ **apply_brown_bread_premium → get_brown_bread_premium** - Fixed NameError in celebrity search endpoint
