@@ -1183,7 +1183,7 @@ def calculate_tier_and_price(language_count: int, bio: str = "") -> tuple:
             tier = "C"
     
     # Calculate price from tier
-    tier_prices = {"A": 12.0, "B": 6.0, "C": 2.5, "D": 1.0}
+    tier_prices = {"A": 15.0, "B": 6.0, "C": 2.5, "D": 1.0}
     price = tier_prices.get(tier, 2.5)
     
     return tier, price
@@ -1202,7 +1202,7 @@ def get_tier_from_recognition_score(score: int, metrics: dict = None) -> str:
 
 def get_price_from_tier(tier: str) -> float:
     """Get base price for a tier"""
-    tier_prices = {"A": 12.0, "B": 6.0, "C": 2.5, "D": 1.0}
+    tier_prices = {"A": 15.0, "B": 6.0, "C": 2.5, "D": 1.0}
     return tier_prices.get(tier, 2.5)
 
 
