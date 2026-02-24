@@ -1879,6 +1879,7 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 "filmography", "discography", "bibliography", "awards", "album", 
                 "soundtrack", "video game", "tour", "concert", "episode", "series", "season",
                 "film", "movie", "show", "documentary", "special", "tv series",
+                "racing", "kong", "parties", "money", "records", "entertainment",
                 # Wikipedia meta
                 "list of", "category:", "template:", "wikipedia:", "disambiguation",
                 # Sports teams/venues
@@ -1889,10 +1890,13 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 # Events/Places
                 "festival", "championship", "tournament", "competition", "election",
                 "battle", "war", "incident", "disaster", "crash",
-                # Products/Business
+                # Products/Business/Brands
                 "company", "corporation", "brand", "product", "starmaker",
+                "records", "productions", "entertainment", "music group",
                 # Possessives that indicate non-person articles
-                "'s ", "s' "
+                "'s ", "s' ",
+                # Characters/Fictional
+                "character", "fictional"
             ]
             
             # Filter candidates - PRESERVE ORDER from OpenSearch
@@ -1912,11 +1916,19 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 if title_lower.startswith("the ") or title_lower.startswith("list "):
                     continue
                 
+                # Skip titles with dashes/hyphens that are typically bands/groups
+                if " – " in title or " - " in title:
+                    # Exception for names with hyphenated surnames
+                    parts = title.replace(" – ", " - ").split(" - ")
+                    if len(parts) > 1 and not all(p.strip().istitle() or p.strip()[0].isupper() for p in parts):
+                        continue
+                
                 # Skip titles ending with common non-person suffixes
                 non_person_suffixes = [
                     "trial", "case", "murder", "death", "allegations", "controversy",
                     "scandal", "incident", "massacre", "battle", "war", "film", 
-                    "album", "song", "tour", "show", "series", "episode"
+                    "album", "song", "tour", "show", "series", "episode", "racing",
+                    "game", "games", "parties", "money"
                 ]
                 if any(title_lower.endswith(suffix) for suffix in non_person_suffixes):
                     continue
