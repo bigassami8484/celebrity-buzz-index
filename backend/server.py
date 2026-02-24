@@ -1754,7 +1754,9 @@ CELEBRITY_ALIASES = {
     # Madonna
     "madonna": "Madonna",
     "madonna ciccone": "Madonna",
-    # Anthony Head - TV actor
+    # Anthony Head - TV actor (Buffy, Merlin)
+    "anthony head": "Anthony Head",
+    "anthony stewart head": "Anthony Head",
     # Brian Cox disambiguation
     "brian cox": "Brian Cox (physicist)",
     "brian cox physicist": "Brian Cox (physicist)",
