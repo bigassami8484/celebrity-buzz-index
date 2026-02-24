@@ -84,8 +84,8 @@ export const fetchPriceAlerts = async (teamId) => {
   return res.data.alerts || [];
 };
 
-export const fetchHotStreaks = async (teamId) => {
-  const res = await axios.get(`${API}/hot-streaks/${teamId}`);
+export const fetchHotStreaks = async () => {
+  const res = await axios.get(`${API}/hot-streaks`);
   return res.data.hot_streaks || [];
 };
 
