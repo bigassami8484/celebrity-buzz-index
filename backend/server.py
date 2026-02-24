@@ -3326,18 +3326,11 @@ async def autocomplete_search(q: str):
         
         for match in partial_matches:
             if not any(s.get("name") == match["name"] for s in priority_suggestions):
-                tier = match.get("tier", "D")
-                # Use stored database price for consistency
-                price = match.get("price", get_base_price_for_tier(tier, match["name"]))
-                
-                # Check if in hot celebs - use premium price
-                hot_price, hot_tier, is_hot = get_hot_celeb_price(match["name"])
-                if hot_price:
-                    price = hot_price
-                    tier = hot_tier or tier
-                
-                # Get recognition score from stored metrics or tier_score
+                # Get recognition score and metrics
                 recognition_score = match.get("recognition_score")
+                recognition_metrics = match.get("recognition_metrics", {})
+                
+                # If no recognition score, calculate from metrics or estimate
                 if recognition_score is None:
                     tier_score = match.get("tier_score", 0)
                     if tier_score > 0:
@@ -3347,16 +3340,28 @@ async def autocomplete_search(q: str):
                         if tier_metrics:
                             result = calculate_recognition_score_from_metrics(tier_metrics)
                             recognition_score = result.get("recognition_score", 50)
+                            recognition_metrics = tier_metrics
                         else:
-                            recognition_score = {"A": 85, "B": 70, "C": 50, "D": 30}.get(tier, 50)
+                            recognition_score = 50
+                
+                # ALWAYS derive tier from recognition score
+                tier = get_tier_from_recognition_score(recognition_score, recognition_metrics)
+                
+                # Calculate price from tier
+                price = get_price_from_tier(tier)
+                
+                # Check if in hot celebs - add news premium
+                hot_price, hot_tier, is_hot = get_hot_celeb_price(match["name"])
+                if is_hot and hot_price:
+                    price = min(15.0, price * 1.15)
                 
                 priority_suggestions.append({
                     "name": match["name"],
                     "bio": match.get("bio", "")[:100] + "..." if match.get("bio") else "",
                     "image": match.get("image", ""),
                     "tier": tier,
-                    "price": price,
-                    "estimated_price": price,
+                    "price": round(price, 1),
+                    "estimated_price": round(price, 1),
                     "recognition_score": recognition_score,
                     "is_db_match": True,
                     "is_hot": is_hot
