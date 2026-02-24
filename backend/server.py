@@ -1959,36 +1959,27 @@ def get_price_for_tier(tier: str) -> float:
     return get_base_price_for_tier(tier)
 
 async def calculate_celebrity_tier(bio: str, name: str) -> tuple:
-    """Calculate celebrity tier based on bio content and return (tier, base_price)"""
-    name_lower = name.lower() if name else ""
+    """Calculate celebrity tier based on bio content and return (tier, base_price)
     
-    # First check guaranteed lists (mega-star overrides)
-    if name_lower in GUARANTEED_A_LIST:
-        return ("A", get_base_price_for_tier("A"))
+    NOTE: This is a quick estimation for immediate display. 
+    Full Recognition Score calculation should be used for database storage.
+    """
+    bio_lower = bio.lower() if bio else ""
     
-    # Check for royal family members using partial keyword matching
-    if any(keyword in name_lower for keyword in ROYAL_A_LIST_KEYWORDS):
-        return ("A", get_base_price_for_tier("A"))
-    
-    if name_lower in GUARANTEED_B_LIST:
-        return ("B", get_base_price_for_tier("B"))
-    if name_lower in GUARANTEED_C_LIST:
-        return ("C", get_base_price_for_tier("C"))
-    
-    bio_lower = bio.lower()
+    # Score based on indicators (simplified - no manual overrides)
+    a_list_score = sum(1 for ind in A_LIST_INDICATORS if ind in bio_lower)
+    b_list_score = sum(1 for ind in B_LIST_INDICATORS if ind in bio_lower)
+    c_list_score = sum(1 for ind in C_LIST_INDICATORS if ind in bio_lower)
     
     # A-list: Major awards, billions in earnings, legendary status
-    a_list_score = sum(1 for ind in A_LIST_INDICATORS if ind in bio_lower)
     if a_list_score >= 2:
         return ("A", get_base_price_for_tier("A"))
     
     # B-list: Award-winning, millions, chart-topping
-    b_list_score = sum(1 for ind in B_LIST_INDICATORS if ind in bio_lower)
     if a_list_score >= 1 or b_list_score >= 2:
         return ("B", get_base_price_for_tier("B"))
     
     # C-list: Known for appearances, contestants
-    c_list_score = sum(1 for ind in C_LIST_INDICATORS if ind in bio_lower)
     if b_list_score >= 1 or c_list_score >= 1:
         return ("C", get_base_price_for_tier("C"))
     
