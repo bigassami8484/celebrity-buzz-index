@@ -1174,6 +1174,11 @@ def calculate_tier_and_price(language_count: int, bio: str = "") -> tuple:
         elif tier == "D":
             tier = "C"
     
+    # National team athletes get minimum C-tier (not D-list)
+    # They represent their country at international level
+    if is_national_athlete and tier == "D":
+        tier = "C"
+    
     # LAYER 3: Reality TV/Tabloid modifier (downgrade potential)
     reality_indicators = [
         "reality television", "reality show", "reality tv", "big brother",
