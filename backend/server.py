@@ -1080,6 +1080,58 @@ def calculate_recognition_score_from_metrics(metrics: dict) -> dict:
         "safeguards_applied": safeguards_applied
     }
 
+def get_tier_from_recognition_score(score: int, metrics: dict = None) -> str:
+    """
+    Calculate tier from recognition score with safeguards.
+    This should be the SINGLE SOURCE OF TRUTH for tier calculation.
+    """
+    # Get metrics for safeguard checks
+    language_count = 0
+    pageviews = 0
+    commercial_found = 0
+    
+    if metrics:
+        language_count = metrics.get("languages", {}).get("count", 0)
+        pageviews = metrics.get("pageviews", {}).get("annual", 0)
+        commercial_found = metrics.get("commercial", {}).get("found", 0)
+    
+    # Base tier from score
+    if score >= 85:
+        tier = "A"
+    elif score >= 65:
+        tier = "B"
+    elif score >= 45:
+        tier = "C"
+    else:
+        tier = "D"
+    
+    # Apply safeguards
+    # Safeguard 0: 50+ Wikipedia languages = minimum B
+    if language_count >= 50 and tier in ["C", "D"]:
+        tier = "B"
+    
+    # Safeguard 1: High pageviews + languages = A-tier
+    if pageviews >= 3000000 and language_count >= 40 and tier in ["B", "C", "D"]:
+        tier = "A"
+    
+    # Safeguard 2: 25+ languages with commercial success = minimum B
+    if language_count >= 25 and commercial_found >= 2 and tier in ["C", "D"]:
+        tier = "B"
+    
+    # Safeguard 3: D-tier only if very low recognition
+    if tier == "D":
+        if language_count >= 10 or commercial_found >= 2:
+            tier = "C"
+    
+    return tier
+
+
+def get_price_from_tier(tier: str) -> float:
+    """Get base price for a tier"""
+    tier_prices = {"A": 12.0, "B": 6.0, "C": 2.5, "D": 1.0}
+    return tier_prices.get(tier, 2.5)
+
+
 
 async def get_brown_bread_premium(celeb: dict, base_price: float) -> float:
     """
