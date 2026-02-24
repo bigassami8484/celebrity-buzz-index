@@ -3586,6 +3586,8 @@ async def autocomplete_search(q: str):
             {"_id": 0}
         ).limit(3).to_list(3)  # Reduced from 5 to 3 to prioritize Wikipedia results
         
+        logger.info(f"DB partial matches for '{q}': {[m.get('name') for m in partial_matches]}")
+        
         for match in partial_matches:
             if not any(s.get("name") == match["name"] for s in priority_suggestions):
                 bio = match.get("bio", "")
