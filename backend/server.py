@@ -1996,20 +1996,14 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                                 (pageviews_score * 0.15)
                             )
                             
-                            # Use 3-LAYER TIER CALCULATION
-                            metrics_for_tier = {
-                                "languages": {"count": language_count},
-                                "commercial": {"found": commercial_found},
-                                "awards": {"found": awards_found}
-                            }
-                            tier = calculate_tier_3_layer(metrics_for_tier, extract)
+                            # SINGLE CALCULATION for tier AND price
+                            tier, price = calculate_tier_and_price(language_count, extract)
+                            recognition_score = language_count
                             
                         except Exception as e:
-                            logger.debug(f"Error calculating recognition for {actual_title}: {e}")
-                            # Fallback to description-based estimate using 3-layer logic
-                            tier = calculate_tier_3_layer({}, extract)
-                        
-                        price = get_price_from_tier(tier)
+                            logger.debug(f"Error calculating for {actual_title}: {e}")
+                            tier, price = calculate_tier_and_price(0, extract)
+                            recognition_score = 0
                 
                 results.append({
                     "name": actual_title,
