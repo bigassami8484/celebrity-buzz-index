@@ -2100,12 +2100,15 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
             # Handle redirects - map original titles to redirected titles
             redirects = pageids_data.get("query", {}).get("redirects", [])
             redirect_map = {r["from"]: r["to"] for r in redirects}
+            logger.info(f"Redirects for '{query}': {redirect_map}")
             
             # Map titles to page IDs - preserve candidate order
             title_to_pageid = {}
             for page_id, page_info in pages.items():
                 if page_id != "-1":
                     title_to_pageid[page_info.get("title", "")] = int(page_id)
+            
+            logger.info(f"Title to pageid map for '{query}': {title_to_pageid}")
             
             # Update candidates with redirected titles
             resolved_candidates = []
@@ -2114,7 +2117,10 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 if resolved_title not in resolved_candidates:
                     resolved_candidates.append(resolved_title)
             
+            logger.info(f"Resolved candidates for '{query}': {resolved_candidates}")
+            
             page_ids = [title_to_pageid.get(t) for t in resolved_candidates if title_to_pageid.get(t)]
+            logger.info(f"Page IDs for '{query}': {page_ids}")
             
             if not page_ids:
                 return []
