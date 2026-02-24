@@ -7232,15 +7232,15 @@ OCCUPATION_TO_CATEGORY = {
     "Q44508716": "reality_tv",  # influencer
     "Q27533925": "reality_tv",  # reality television participant
     "Q19595175": "reality_tv",  # internet celebrity
-    # Royals - These are usually identified by description
+    # Royals - Only actual royals (monarchs are detected via description)
     "Q116": "royals",  # monarch
-    "Q2478141": "royals",  # aristocrat
-    "Q36180": "royals",  # writer (might need context)
+    # NOTE: Removed Q2478141 (aristocrat) and Q36180 (writer) - too broad, was causing false positives
     # Public Figure
     "Q82955": "public_figure",  # politician
     "Q131524": "public_figure",  # entrepreneur
     "Q372436": "public_figure",  # statesperson
     "Q40348": "public_figure",  # lawyer
+    "Q2478141": "public_figure",  # aristocrat (moved from royals - not all aristocrats are royals)
     # Other
     "Q3499072": "other",  # chef
     "Q245068": "other",  # comedian
