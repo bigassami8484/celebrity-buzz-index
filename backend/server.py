@@ -3568,17 +3568,15 @@ async def get_trending():
                 {"_id": 0}
             )
             if celeb:
-                # Recalculate tier from bio if needed (pass name for guaranteed A-list check)
+                # Use SINGLE SOURCE OF TRUTH for tier/price calculation
                 bio = celeb.get("bio", "")
-                recalc_tier = estimate_tier_from_description(bio, name)
-                
-                # Use recalculated tier
-                tier = recalc_tier
+                tier, base_price, lang_count = await get_tier_and_price_from_wikidata(name, bio)
                 buzz_score = celeb.get("buzz_score", 5)
                 
-                # Recalculate price with STRICT tier-based pricing
+                # Apply buzz score modifier to base price
                 celeb["tier"] = tier
                 celeb["price"] = get_dynamic_price(tier, buzz_score, name)
+                celeb["recognition_score"] = lang_count
                 trending.append(celeb)
     
     if trending:
