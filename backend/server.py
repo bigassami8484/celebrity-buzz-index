@@ -3955,9 +3955,9 @@ async def get_hot_celebs():
                     "headlines": [h["title"] for h in all_headlines if name_lower in h["title"].lower()][:5]  # Store up to 5 headlines
                 }
         
-        # Sort by mention count - ONLY include celebrities with 3+ mentions
+        # Sort by mention count - ONLY include celebrities with 2+ mentions (lowered from 3)
         sorted_celebs = sorted(
-            [(name, data) for name, data in celeb_mentions.items() if data["count"] >= 3],
+            [(name, data) for name, data in celeb_mentions.items() if data["count"] >= 2],
             key=lambda x: x[1]["count"], 
             reverse=True
         )
