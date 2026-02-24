@@ -193,6 +193,12 @@ async def check_wikidata_is_human(page_ids: List[int]) -> dict:
                 # Map back to page_ids
                 for page_id, qid in wikidata_ids.items():
                     results[page_id] = qid in human_qids
+            elif sparql_response.status_code in [503, 429, 500]:
+                # SPARQL service unavailable/rate limited - FALLBACK: assume all with wikidata IDs are human
+                # This prevents search from failing when Wikidata is overloaded
+                logger.warning(f"Wikidata SPARQL unavailable ({sparql_response.status_code}), assuming Wikipedia results are human")
+                for page_id, qid in wikidata_ids.items():
+                    results[page_id] = True  # Assume human when SPARQL fails
             else:
                 logger.error(f"Wikidata SPARQL error: {sparql_response.status_code}")
             
@@ -203,8 +209,9 @@ async def check_wikidata_is_human(page_ids: List[int]) -> dict:
                     
     except Exception as e:
         logger.error(f"Error checking Wikidata: {e}")
-        # On error, default to False (not human)
-        return {pid: False for pid in page_ids}
+        # On error, FALLBACK: assume all page_ids are human (better UX than no results)
+        logger.warning("Wikidata check failed, assuming Wikipedia results are human")
+        return {pid: True for pid in page_ids}
     
     return results
 
