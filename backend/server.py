@@ -685,7 +685,289 @@ def get_brown_bread_risk(age: int) -> str:
     return "low"
 
 
-async def apply_brown_bread_premium(celeb: dict, base_price: float) -> float:
+# ==========================================
+# RECOGNITION SCORE MODEL (0-100)
+# ==========================================
+# Weighted metrics for tier calculation:
+# - Longevity (20%): Years active in industry
+# - Wikipedia Languages (25%): Global recognition via language editions
+# - Awards/Achievements (20%): Industry recognition
+# - Commercial Impact (20%): Box office, sales, brand value
+# - Wikipedia Page Views (15%): 12-month popularity
+
+AWARD_KEYWORDS = [
+    # Film Awards
+    "oscar", "academy award", "golden globe", "bafta", "cannes", "venice film",
+    "screen actors guild", "sag award", "critics choice",
+    # Music Awards
+    "grammy", "brit award", "mtv", "billboard", "american music award", "iheartradio",
+    "rock and roll hall of fame", "songwriters hall of fame",
+    # TV Awards
+    "emmy", "primetime emmy", "daytime emmy",
+    # Other Major Awards
+    "tony award", "pulitzer", "nobel", "peabody", "webby",
+    # Honours
+    "knighthood", "knighted", "dame", "cbe", "obe", "mbe", "order of the british empire",
+    "presidential medal", "legion of honour", "national medal",
+    # Hall of Fame
+    "hall of fame", "inducted", "lifetime achievement", "icon award",
+    # Sports
+    "olympic gold", "world champion", "mvp", "ballon d'or", "grand slam",
+    "super bowl", "world cup winner", "all-star", "pro bowl"
+]
+
+COMMERCIAL_KEYWORDS = [
+    "billion", "billionaire", "multi-million", "highest-paid", "highest paid",
+    "best-selling", "best selling", "record-breaking", "record breaking",
+    "#1", "number one", "chart-topping", "platinum", "diamond certified",
+    "box office", "grossed", "forbes", "fortune 500", "time 100",
+    "most influential", "richest", "wealthiest", "net worth",
+    "founded", "founder", "ceo", "entrepreneur", "business empire",
+    "brand", "franchise", "global icon", "household name"
+]
+
+async def calculate_recognition_score(name: str, bio: str, http_client: httpx.AsyncClient = None) -> dict:
+    """
+    Calculate Recognition Score (0-100) based on weighted metrics:
+    - Longevity (20%): Years active
+    - Wikipedia Languages (25%): Global recognition
+    - Awards/Achievements (20%): Industry recognition  
+    - Commercial Impact (20%): Sales, box office, brand value
+    - Wikipedia Page Views (15%): 12-month popularity
+    
+    Returns: {
+        "recognition_score": 0-100,
+        "tier": "A"/"B"/"C"/"D",
+        "metrics": {longevity, languages, awards, commercial, pageviews}
+    }
+    """
+    import re
+    from datetime import datetime, timedelta
+    
+    bio_lower = bio.lower() if bio else ""
+    
+    # Initialize scores (0-100 for each metric)
+    longevity_score = 0
+    language_score = 0
+    awards_score = 0
+    commercial_score = 0
+    pageviews_score = 0
+    
+    # ===== 1. LONGEVITY SCORE (20%) =====
+    # Extract years active from bio
+    years_active = 0
+    
+    # Look for career start patterns
+    career_patterns = [
+        r"career spanning (\d+)",
+        r"active since (\d{4})",
+        r"began .* career in (\d{4})",
+        r"started .* in (\d{4})",
+        r"debut in (\d{4})",
+        r"first .* in (\d{4})",
+        r"since (\d{4})",
+        r"\(born .* (\d{4})\)",
+        r"(\d{4})[\s\-–]+present",
+        r"(\d{4})–present"
+    ]
+    
+    current_year = datetime.now().year
+    for pattern in career_patterns:
+        match = re.search(pattern, bio_lower)
+        if match:
+            try:
+                year_or_span = int(match.group(1))
+                if year_or_span > 100:  # It's a year
+                    years_active = max(years_active, current_year - year_or_span)
+                else:  # It's a span
+                    years_active = max(years_active, year_or_span)
+            except:
+                pass
+    
+    # Score longevity (max 100 at 40+ years)
+    if years_active >= 40:
+        longevity_score = 100
+    elif years_active >= 30:
+        longevity_score = 85
+    elif years_active >= 20:
+        longevity_score = 70
+    elif years_active >= 15:
+        longevity_score = 55
+    elif years_active >= 10:
+        longevity_score = 40
+    elif years_active >= 5:
+        longevity_score = 25
+    else:
+        longevity_score = 10
+    
+    # ===== 2. WIKIPEDIA LANGUAGES SCORE (25%) =====
+    language_count = 0
+    if http_client:
+        try:
+            # Fetch Wikidata to get language editions count
+            wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={name.replace(' ', '_')}&props=sitelinks&format=json"
+            response = await http_client.get(wikidata_url, timeout=5.0)
+            if response.status_code == 200:
+                data = response.json()
+                entities = data.get("entities", {})
+                for entity in entities.values():
+                    sitelinks = entity.get("sitelinks", {})
+                    # Count Wikipedia language editions (ends with 'wiki' but not 'wikiquote' etc)
+                    language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
+        except Exception as e:
+            logger.debug(f"Error fetching Wikidata for {name}: {e}")
+    
+    # Score languages (max 100 at 80+ languages)
+    if language_count >= 80:
+        language_score = 100
+    elif language_count >= 60:
+        language_score = 90
+    elif language_count >= 40:
+        language_score = 75
+    elif language_count >= 25:
+        language_score = 60
+    elif language_count >= 15:
+        language_score = 45
+    elif language_count >= 10:
+        language_score = 30
+    elif language_count >= 5:
+        language_score = 15
+    else:
+        language_score = 5
+    
+    # ===== 3. AWARDS/ACHIEVEMENTS SCORE (20%) =====
+    awards_found = sum(1 for keyword in AWARD_KEYWORDS if keyword in bio_lower)
+    
+    # Score awards (max 100 at 8+ major awards/honours)
+    if awards_found >= 8:
+        awards_score = 100
+    elif awards_found >= 6:
+        awards_score = 90
+    elif awards_found >= 4:
+        awards_score = 75
+    elif awards_found >= 3:
+        awards_score = 60
+    elif awards_found >= 2:
+        awards_score = 45
+    elif awards_found >= 1:
+        awards_score = 30
+    else:
+        awards_score = 5
+    
+    # ===== 4. COMMERCIAL IMPACT SCORE (20%) =====
+    commercial_found = sum(1 for keyword in COMMERCIAL_KEYWORDS if keyword in bio_lower)
+    
+    # Score commercial impact (max 100 at 6+ indicators)
+    if commercial_found >= 6:
+        commercial_score = 100
+    elif commercial_found >= 4:
+        commercial_score = 80
+    elif commercial_found >= 3:
+        commercial_score = 60
+    elif commercial_found >= 2:
+        commercial_score = 45
+    elif commercial_found >= 1:
+        commercial_score = 25
+    else:
+        commercial_score = 5
+    
+    # ===== 5. WIKIPEDIA PAGE VIEWS SCORE (15%) =====
+    pageviews = 0
+    if http_client:
+        try:
+            # Fetch 12-month page views from Wikipedia
+            end_date = datetime.now()
+            start_date = end_date - timedelta(days=365)
+            pageviews_url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/{name.replace(' ', '_')}/monthly/{start_date.strftime('%Y%m')}01/{end_date.strftime('%Y%m')}01"
+            response = await http_client.get(pageviews_url, timeout=5.0, headers={"User-Agent": "CelebrityBuzzIndex/1.0"})
+            if response.status_code == 200:
+                data = response.json()
+                items = data.get("items", [])
+                pageviews = sum(item.get("views", 0) for item in items)
+        except Exception as e:
+            logger.debug(f"Error fetching pageviews for {name}: {e}")
+    
+    # Score pageviews (max 100 at 10M+ annual views)
+    if pageviews >= 10000000:
+        pageviews_score = 100
+    elif pageviews >= 5000000:
+        pageviews_score = 90
+    elif pageviews >= 2000000:
+        pageviews_score = 75
+    elif pageviews >= 1000000:
+        pageviews_score = 60
+    elif pageviews >= 500000:
+        pageviews_score = 45
+    elif pageviews >= 200000:
+        pageviews_score = 30
+    elif pageviews >= 100000:
+        pageviews_score = 20
+    else:
+        pageviews_score = 10
+    
+    # ===== CALCULATE WEIGHTED TOTAL =====
+    recognition_score = (
+        (longevity_score * 0.20) +
+        (language_score * 0.25) +
+        (awards_score * 0.20) +
+        (commercial_score * 0.20) +
+        (pageviews_score * 0.15)
+    )
+    
+    # Round to nearest integer
+    recognition_score = round(recognition_score)
+    
+    # ===== DETERMINE TIER =====
+    if recognition_score >= 85:
+        tier = "A"
+    elif recognition_score >= 65:
+        tier = "B"
+    elif recognition_score >= 45:
+        tier = "C"
+    else:
+        tier = "D"
+    
+    return {
+        "recognition_score": recognition_score,
+        "tier": tier,
+        "metrics": {
+            "longevity": {"score": longevity_score, "years_active": years_active, "weight": "20%"},
+            "languages": {"score": language_score, "count": language_count, "weight": "25%"},
+            "awards": {"score": awards_score, "found": awards_found, "weight": "20%"},
+            "commercial": {"score": commercial_score, "found": commercial_found, "weight": "20%"},
+            "pageviews": {"score": pageviews_score, "annual": pageviews, "weight": "15%"}
+        }
+    }
+
+def calculate_recognition_score_from_metrics(metrics: dict) -> dict:
+    """Calculate recognition score from pre-computed metrics (for DB-stored data)"""
+    longevity_score = metrics.get("longevity", {}).get("score", 10)
+    language_score = metrics.get("languages", {}).get("score", 10)
+    awards_score = metrics.get("awards", {}).get("score", 10)
+    commercial_score = metrics.get("commercial", {}).get("score", 10)
+    pageviews_score = metrics.get("pageviews", {}).get("score", 10)
+    
+    recognition_score = round(
+        (longevity_score * 0.20) +
+        (language_score * 0.25) +
+        (awards_score * 0.20) +
+        (commercial_score * 0.20) +
+        (pageviews_score * 0.15)
+    )
+    
+    if recognition_score >= 85:
+        tier = "A"
+    elif recognition_score >= 65:
+        tier = "B"
+    elif recognition_score >= 45:
+        tier = "C"
+    else:
+        tier = "D"
+    
+    return {"recognition_score": recognition_score, "tier": tier}
+
+
+
     """
     Check if celebrity qualifies for Brown Bread premium pricing.
     Top 3 oldest living celebrities (80+) get premium prices:
