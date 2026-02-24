@@ -4276,15 +4276,79 @@ async def get_hot_celebs():
                         )
                         
                         if db_celeb:
-                            # Use database values for consistency
-                            tier = db_celeb.get("tier", "C")
+                            # Get recognition metrics and recalculate tier
+                            recognition_score = db_celeb.get("recognition_score", 50)
+                            recognition_metrics = db_celeb.get("recognition_metrics", {})
+                            
+                            # Check if stored data is incomplete (language count = 0)
+                            stored_languages = recognition_metrics.get("languages", {}).get("count", 0)
+                            if stored_languages == 0:
+                                # Fetch fresh language count from Wikidata
+                                try:
+                                    await asyncio.sleep(0.3)
+                                    wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={actual_name.replace(' ', '_')}&props=sitelinks&format=json"
+                                    wd_response = await client.get(wikidata_url, timeout=5.0, headers=headers)
+                                    if wd_response.status_code == 200:
+                                        wd_data = wd_response.json()
+                                        for entity in wd_data.get("entities", {}).values():
+                                            sitelinks = entity.get("sitelinks", {})
+                                            language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
+                                            if language_count > 0:
+                                                if language_count >= 80:
+                                                    language_score = 100
+                                                elif language_count >= 50:
+                                                    language_score = 75
+                                                elif language_count >= 25:
+                                                    language_score = 60
+                                                elif language_count >= 10:
+                                                    language_score = 30
+                                                else:
+                                                    language_score = 15
+                                                recognition_score = round(
+                                                    (40 * 0.20) + (language_score * 0.25) + (45 * 0.20) + (45 * 0.20) + (50 * 0.15)
+                                                )
+                                                recognition_metrics["languages"] = {"count": language_count, "score": language_score}
+                                except:
+                                    pass
+                            
+                            # Derive tier from recognition score
+                            tier = get_tier_from_recognition_score(recognition_score, recognition_metrics)
                             category = db_celeb.get("category", "other")
-                            base_price = db_celeb.get("price", 3.0)
+                            base_price = get_price_from_tier(tier)
                         else:
-                            # Calculate for new celebs
-                            tier = determine_tier_from_bio(bio, actual_name)
+                            # Calculate for new celebs - fetch Wikidata
+                            try:
+                                await asyncio.sleep(0.3)
+                                wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={actual_name.replace(' ', '_')}&props=sitelinks&format=json"
+                                wd_response = await client.get(wikidata_url, timeout=5.0, headers=headers)
+                                language_count = 0
+                                if wd_response.status_code == 200:
+                                    wd_data = wd_response.json()
+                                    for entity in wd_data.get("entities", {}).values():
+                                        sitelinks = entity.get("sitelinks", {})
+                                        language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
+                                
+                                if language_count >= 80:
+                                    language_score = 100
+                                elif language_count >= 50:
+                                    language_score = 75
+                                elif language_count >= 25:
+                                    language_score = 60
+                                elif language_count >= 10:
+                                    language_score = 30
+                                else:
+                                    language_score = 15
+                                
+                                recognition_score = round(
+                                    (40 * 0.20) + (language_score * 0.25) + (45 * 0.20) + (45 * 0.20) + (50 * 0.15)
+                                )
+                                recognition_metrics = {"languages": {"count": language_count, "score": language_score}}
+                                tier = get_tier_from_recognition_score(recognition_score, recognition_metrics)
+                            except:
+                                tier = estimate_tier_from_description(bio, actual_name)
+                            
                             category = get_category_from_bio(bio, actual_name)
-                            base_price = get_base_price_for_tier(tier, actual_name)
+                            base_price = get_price_from_tier(tier)
                         
                         # Apply small NEWS PREMIUM based on mention count (max 20% boost)
                         mention_count = data["count"]
