@@ -3429,13 +3429,13 @@ async def autocomplete_search(q: str):
     
     priority_suggestions = []
     if exact_match:
-        # Get recognition score and metrics
-        recognition_score = exact_match.get("recognition_score")
+        # Get recognition metrics
         recognition_metrics = exact_match.get("recognition_metrics", {})
+        bio = exact_match.get("bio", "")
         
-        # Check if stored metrics are incomplete (language count = 0 is suspicious)
+        # Check if stored data is incomplete (language count = 0)
         stored_languages = recognition_metrics.get("languages", {}).get("count", 0)
-        needs_fresh_calculation = stored_languages == 0 and recognition_score is not None
+        needs_fresh_calculation = stored_languages == 0
         
         # If data looks incomplete, fetch fresh from Wikidata
         if needs_fresh_calculation:
@@ -3451,54 +3451,28 @@ async def autocomplete_search(q: str):
                             sitelinks = entity.get("sitelinks", {})
                             language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
                             if language_count > 0:
-                                # Recalculate score with fresh language data
-                                if language_count >= 80:
-                                    language_score = 100
-                                elif language_count >= 50:
-                                    language_score = 75
-                                elif language_count >= 25:
-                                    language_score = 60
-                                elif language_count >= 10:
-                                    language_score = 30
-                                else:
-                                    language_score = 15
-                                
-                                # Recalculate recognition score
-                                recognition_score = round(
-                                    (40 * 0.20) +  # Default longevity
-                                    (language_score * 0.25) +
-                                    (recognition_metrics.get("awards", {}).get("score", 30) * 0.20) +
-                                    (recognition_metrics.get("commercial", {}).get("score", 25) * 0.20) +
-                                    (50 * 0.15)  # Default pageviews
-                                )
-                                recognition_metrics["languages"] = {"count": language_count, "score": language_score}
-                                logger.info(f"Refreshed {exact_match['name']}: {language_count} languages, new score {recognition_score}")
+                                recognition_metrics["languages"] = {"count": language_count}
+                                logger.info(f"Refreshed {exact_match['name']}: {language_count} languages")
             except Exception as e:
                 logger.debug(f"Failed to refresh Wikidata for {exact_match['name']}: {e}")
         
-        # If still no recognition score, estimate
-        if recognition_score is None:
-            tier_score = exact_match.get("tier_score", 0)
-            if tier_score > 0:
-                recognition_score = min(100, max(0, tier_score))
-            else:
-                recognition_score = 50
-        
-        # ALWAYS derive tier from recognition score - NEVER use stored tier
-        tier = get_tier_from_recognition_score(recognition_score, recognition_metrics)
+        # Use 3-LAYER TIER CALCULATION
+        tier = calculate_tier_3_layer(recognition_metrics, bio)
         
         # Calculate price from tier
         price = get_price_from_tier(tier)
         
+        # Get recognition score for display (informational only)
+        recognition_score = recognition_metrics.get("languages", {}).get("count", 0)  # Use language count as proxy
+        
         # Check if in hot celebs - add news premium to price
         hot_price, hot_tier, is_hot = get_hot_celeb_price(exact_match["name"])
         if is_hot and hot_price:
-            # Add news premium but keep the calculated tier
             price = min(15.0, price * 1.15)  # 15% news premium, capped at £15M
         
         priority_suggestions.append({
             "name": exact_match["name"],
-            "bio": exact_match.get("bio", "")[:100] + "..." if exact_match.get("bio") else "",
+            "bio": bio[:100] + "..." if bio else "",
             "image": exact_match.get("image", ""),
             "tier": tier,
             "price": round(price, 1),
