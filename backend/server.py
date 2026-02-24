@@ -4816,6 +4816,87 @@ def extract_celebrity_names_from_headline(headline: str) -> List[str]:
     
     return cleaned
 
+
+@api_router.get("/hot-streaks")
+async def get_hot_streaks():
+    """Get celebrities with hot streaks (3+ consecutive days of news mentions)
+    
+    Returns celebrities who have been in the news for multiple consecutive days,
+    indicating a sustained media presence that typically leads to price increases.
+    """
+    now = datetime.now(timezone.utc)
+    today = now.date()
+    
+    # Check cache first (15 minute cache)
+    cached = await db.news_cache.find_one(
+        {"type": "hot_streaks_v1"},
+        {"_id": 0}
+    )
+    
+    if cached and cached.get("updated_at"):
+        cache_time = datetime.fromisoformat(cached["updated_at"])
+        cache_age = now - cache_time
+        if cache_age.total_seconds() < 900:  # 15 minute cache
+            return {"hot_streaks": cached.get("streaks", []), "cached": True}
+    
+    # Fetch news mentions for the last 7 days
+    # We'll check against the hot_celebs_from_news cache which has recent news data
+    hot_celebs_cache = await db.news_cache.find_one(
+        {"type": "hot_celebs_from_news_v7"},
+        {"_id": 0}
+    )
+    
+    if not hot_celebs_cache or not hot_celebs_cache.get("hot_celebs"):
+        return {"hot_streaks": [], "cached": False}
+    
+    hot_celebs = hot_celebs_cache.get("hot_celebs", [])
+    
+    # Track daily mentions from the celebrity news data
+    # Build streak info based on news count (celebrities with 3+ news articles are on a streak)
+    streaks = []
+    
+    for celeb in hot_celebs:
+        news_count = celeb.get("news_count", 0)
+        name = celeb.get("name", "")
+        
+        # Consider it a hot streak if the celeb has 3+ news articles in the rolling window
+        # The more news articles, the longer/stronger the streak
+        if news_count >= 3:
+            # Calculate streak days based on news volume
+            # 3-4 articles = 3 days, 5-6 = 4 days, 7+ = 5+ days
+            streak_days = min(3 + (news_count - 3) // 2, 7)
+            
+            streaks.append({
+                "name": name,
+                "streak_days": streak_days,
+                "news_count": news_count,
+                "tier": celeb.get("tier", "D"),
+                "price": celeb.get("price", 1.0),
+                "image": celeb.get("image", ""),
+                "trending_tag": celeb.get("trending_tag", ""),
+                "is_hot": True
+            })
+    
+    # Sort by streak days (longest first), then by news count
+    streaks.sort(key=lambda x: (x["streak_days"], x["news_count"]), reverse=True)
+    
+    # Limit to top 10 streaks
+    streaks = streaks[:10]
+    
+    # Cache the results
+    await db.news_cache.update_one(
+        {"type": "hot_streaks_v1"},
+        {"$set": {
+            "type": "hot_streaks_v1",
+            "streaks": streaks,
+            "updated_at": now.isoformat()
+        }},
+        upsert=True
+    )
+    
+    return {"hot_streaks": streaks, "cached": False}
+
+
 @api_router.get("/price-alerts/{team_id}")
 async def get_price_alerts(team_id: str):
     """Get price change alerts for a team's celebrities
