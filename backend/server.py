@@ -1082,46 +1082,219 @@ def calculate_recognition_score_from_metrics(metrics: dict) -> dict:
 
 def get_tier_from_recognition_score(score: int, metrics: dict = None) -> str:
     """
-    Calculate tier from recognition score with safeguards.
-    This should be the SINGLE SOURCE OF TRUTH for tier calculation.
+    DEPRECATED - Use calculate_tier_3_layer() instead.
+    Kept for backwards compatibility only.
     """
-    # Get metrics for safeguard checks
-    language_count = 0
-    pageviews = 0
-    commercial_found = 0
+    return calculate_tier_3_layer(metrics or {})
+
+
+def calculate_tier_3_layer(metrics: dict, bio: str = "") -> str:
+    """
+    3-LAYER TIER CALCULATION SYSTEM
     
-    if metrics:
-        language_count = metrics.get("languages", {}).get("count", 0)
-        pageviews = metrics.get("pageviews", {}).get("annual", 0)
-        commercial_found = metrics.get("commercial", {}).get("found", 0)
+    LAYER 1 - Global Status Triggers (auto-assign tier):
+    - Auto-A: 25+ wiki languages OR major international award OR global franchise lead OR world champion
+    - Auto-B: 15+ languages OR 15+ years active OR national award OR top-tier league athlete OR national TV presenter  
+    - Auto-D: ONLY if <10 years AND <10 languages AND no major achievements
+    - Default: C
     
-    # Base tier from score
-    if score >= 85:
+    LAYER 2 - Profession-specific scoring (actors, athletes, musicians, presenters, comedians)
+    
+    LAYER 3 - Public interest modifier (wiki views) - can adjust ±1 tier
+    """
+    bio_lower = bio.lower() if bio else ""
+    
+    # Extract metrics
+    language_count = metrics.get("languages", {}).get("count", 0)
+    pageviews = metrics.get("pageviews", {}).get("annual", 0)
+    years_active = metrics.get("longevity", {}).get("years_active", 0)
+    awards_found = metrics.get("awards", {}).get("found", 0)
+    commercial_found = metrics.get("commercial", {}).get("found", 0)
+    
+    # ========== LAYER 1: GLOBAL STATUS TRIGGERS ==========
+    
+    # Major International Awards
+    major_international_awards = [
+        "academy award", "oscar", "grammy", "emmy", "tony award", "bafta",
+        "golden globe", "cannes", "palme d'or", "pulitzer", "nobel",
+        "brit award", "mtv award", "billboard", "american music award"
+    ]
+    has_major_intl_award = any(award in bio_lower for award in major_international_awards)
+    
+    # Global Franchise Lead indicators
+    global_franchises = [
+        "harry potter", "star wars", "marvel", "avengers", "james bond", "007",
+        "lord of the rings", "fast and furious", "mission impossible", "batman",
+        "spider-man", "spiderman", "iron man", "captain america", "thor",
+        "x-men", "jurassic", "pirates of the caribbean", "transformers",
+        "twilight", "hunger games", "fantastic beasts", "dc extended",
+        "hobbit", "matrix", "terminator", "alien", "predator", "john wick"
+    ]
+    is_franchise_lead = any(franchise in bio_lower for franchise in global_franchises)
+    
+    # World Champion indicators
+    world_champion_indicators = [
+        "world champion", "olympic gold", "olympics gold", "world record",
+        "grand slam", "wimbledon", "super bowl", "world cup winner",
+        "champions league", "ballon d'or", "fifa world", "world title",
+        "heavyweight champion", "formula 1 champion", "f1 champion"
+    ]
+    is_world_champion = any(ind in bio_lower for ind in world_champion_indicators)
+    
+    # National Awards
+    national_awards = [
+        "obe", "cbe", "mbe", "knighted", "dame", "order of",
+        "national television award", "nta", "olivier award",
+        "screen actors guild", "sag award", "peoples choice"
+    ]
+    has_national_award = any(award in bio_lower for award in national_awards)
+    
+    # Top-tier athlete indicators
+    top_athlete_indicators = [
+        "premier league", "la liga", "serie a", "bundesliga", "nba", "nfl",
+        "mlb", "nhl", "pga tour", "atp", "wta", "ufc champion", "boxing champion",
+        "formula 1", "f1 driver", "grand prix winner", "tour de france",
+        "olympian", "olympic", "world athletics", "commonwealth games gold"
+    ]
+    is_top_athlete = any(ind in bio_lower for ind in top_athlete_indicators)
+    
+    # National TV presenter indicators
+    national_presenter_indicators = [
+        "television presenter", "tv presenter", "chat show host", "talk show host",
+        "game show host", "news anchor", "newsreader", "bbc presenter",
+        "itv presenter", "channel 4 presenter", "sky presenter", "cnn anchor",
+        "fox news", "nbc anchor", "abc anchor", "cbs anchor"
+    ]
+    is_national_presenter = any(ind in bio_lower for ind in national_presenter_indicators)
+    
+    # ===== LAYER 1 TIER ASSIGNMENT =====
+    
+    # AUTO-A CONDITIONS
+    if language_count >= 25:
         tier = "A"
-    elif score >= 65:
+        reason = f"Global recognition: {language_count} Wikipedia languages"
+    elif has_major_intl_award:
+        tier = "A"
+        reason = "Major international award winner"
+    elif is_franchise_lead:
+        tier = "A"
+        reason = "Global franchise lead"
+    elif is_world_champion:
+        tier = "A"
+        reason = "World champion/record holder"
+    
+    # AUTO-B CONDITIONS (if not already A)
+    elif language_count >= 15:
         tier = "B"
-    elif score >= 45:
-        tier = "C"
-    else:
+        reason = f"Strong recognition: {language_count} Wikipedia languages"
+    elif years_active >= 15:
+        tier = "B"
+        reason = f"Established career: {years_active}+ years active"
+    elif has_national_award:
+        tier = "B"
+        reason = "National award recipient"
+    elif is_top_athlete:
+        tier = "B"
+        reason = "Top-tier professional athlete"
+    elif is_national_presenter:
+        tier = "B"
+        reason = "National television presenter"
+    
+    # AUTO-D CONDITIONS (strict requirements)
+    elif years_active < 10 and language_count < 10 and awards_found == 0 and commercial_found == 0:
         tier = "D"
+        reason = "Emerging talent: Limited recognition"
     
-    # Apply safeguards
-    # Safeguard 0: 50+ Wikipedia languages = minimum B
-    if language_count >= 50 and tier in ["C", "D"]:
-        tier = "B"
+    # DEFAULT TO C
+    else:
+        tier = "C"
+        reason = "Recognizable public figure"
     
-    # Safeguard 1: High pageviews + languages = A-tier
-    if pageviews >= 3000000 and language_count >= 40 and tier in ["B", "C", "D"]:
-        tier = "A"
+    # ========== LAYER 2: PROFESSION-SPECIFIC SCORING ==========
+    # (Can upgrade within current tier or to adjacent tier)
     
-    # Safeguard 2: 25+ languages with commercial success = minimum B
-    if language_count >= 25 and commercial_found >= 2 and tier in ["C", "D"]:
-        tier = "B"
+    profession_boost = 0
     
-    # Safeguard 3: D-tier only if very low recognition
-    if tier == "D":
-        if language_count >= 10 or commercial_found >= 2:
+    # Actor scoring
+    actor_indicators = ["actor", "actress", "starring", "starred", "film", "movie", "television series"]
+    if any(ind in bio_lower for ind in actor_indicators):
+        lead_role_indicators = ["starring role", "leading role", "lead role", "title role", "protagonist"]
+        if any(ind in bio_lower for ind in lead_role_indicators):
+            profession_boost += 1
+        critically_acclaimed = ["critically acclaimed", "award-winning", "acclaimed performance"]
+        if any(ind in bio_lower for ind in critically_acclaimed):
+            profession_boost += 1
+    
+    # Musician scoring
+    musician_indicators = ["singer", "musician", "songwriter", "rapper", "band", "artist"]
+    if any(ind in bio_lower for ind in musician_indicators):
+        chart_success = ["number one", "#1", "chart-topping", "platinum", "multi-platinum", "diamond"]
+        if any(ind in bio_lower for ind in chart_success):
+            profession_boost += 1
+        tour_success = ["world tour", "arena tour", "stadium tour", "sold-out", "headlined"]
+        if any(ind in bio_lower for ind in tour_success):
+            profession_boost += 1
+    
+    # Athlete scoring
+    athlete_indicators = ["athlete", "footballer", "player", "tennis", "boxer", "swimmer", "runner"]
+    if any(ind in bio_lower for ind in athlete_indicators):
+        major_wins = ["champion", "winner", "gold medal", "title", "trophy"]
+        if any(ind in bio_lower for ind in major_wins):
+            profession_boost += 1
+        records = ["record", "fastest", "youngest", "first", "highest"]
+        if any(ind in bio_lower for ind in records):
+            profession_boost += 1
+    
+    # TV personality scoring
+    tv_indicators = ["presenter", "host", "judge", "panelist", "correspondent"]
+    if any(ind in bio_lower for ind in tv_indicators):
+        primetime = ["primetime", "prime time", "prime-time", "peak time", "flagship"]
+        if any(ind in bio_lower for ind in primetime):
+            profession_boost += 1
+        longevity = ["years", "seasons", "episodes", "long-running"]
+        if any(ind in bio_lower for ind in longevity):
+            profession_boost += 1
+    
+    # Apply profession boost (max +1 tier upgrade)
+    if profession_boost >= 2:
+        if tier == "B":
+            tier = "A"
+            reason += " + Strong profession achievements"
+        elif tier == "C":
+            tier = "B"
+            reason += " + Profession achievements"
+        elif tier == "D":
             tier = "C"
+            reason += " + Some profession achievements"
+    
+    # ========== LAYER 3: PUBLIC INTEREST MODIFIER ==========
+    # (Wiki pageviews can adjust ±1 tier, capped)
+    
+    # Very high public interest can upgrade
+    if pageviews >= 5000000:  # 5M+ annual views = massive public interest
+        if tier == "B":
+            tier = "A"
+            reason += f" + High public interest ({pageviews:,} views)"
+        elif tier == "C":
+            tier = "B"
+            reason += f" + Strong public interest ({pageviews:,} views)"
+        elif tier == "D":
+            tier = "C"
+            reason += f" + Notable public interest ({pageviews:,} views)"
+    elif pageviews >= 2000000:  # 2M+ views = strong interest
+        if tier == "C":
+            tier = "B"
+            reason += f" + Public interest ({pageviews:,} views)"
+        elif tier == "D":
+            tier = "C"
+            reason += f" + Public interest ({pageviews:,} views)"
+    
+    # Very low public interest can downgrade (but never below C for established figures)
+    if pageviews > 0 and pageviews < 50000 and language_count < 15:
+        if tier == "B":
+            tier = "C"
+            reason += " - Limited current public interest"
+        # Don't downgrade A-listers or those with strong language count
     
     return tier
 
