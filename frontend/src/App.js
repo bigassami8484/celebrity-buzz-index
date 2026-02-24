@@ -44,7 +44,8 @@ import {
   HotCelebsBanner, 
   TopPickedCelebs, 
   BrownBreadWatch,
-  TodaysNews 
+  TodaysNews,
+  HotStreaks
 } from "./components/celebrities";
 import { TeamPanel, TeamCustomizeModal } from "./components/team";
 import PriceWatch from "./components/team/PriceWatch";
