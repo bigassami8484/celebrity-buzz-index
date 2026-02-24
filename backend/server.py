@@ -1252,9 +1252,9 @@ def get_tier_from_recognition_score(score: int, metrics: dict = None) -> str:
 
 
 def get_price_from_tier(tier: str) -> float:
-    """Get base price for a tier"""
-    tier_prices = {"A": 15.0, "B": 6.0, "C": 2.5, "D": 1.0}
-    return tier_prices.get(tier, 2.5)
+    """Get base price for a tier (midpoint of range)"""
+    tier_prices = {"A": 12.0, "B": 5.0, "C": 2.0, "D": 0.75}
+    return tier_prices.get(tier, 2.0)
 
 
 async def get_wikidata_language_count(name: str) -> int:
