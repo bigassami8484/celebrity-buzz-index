@@ -2097,13 +2097,24 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
             pageids_data = pageids_response.json()
             pages = pageids_data.get("query", {}).get("pages", {})
             
+            # Handle redirects - map original titles to redirected titles
+            redirects = pageids_data.get("query", {}).get("redirects", [])
+            redirect_map = {r["from"]: r["to"] for r in redirects}
+            
             # Map titles to page IDs - preserve candidate order
             title_to_pageid = {}
             for page_id, page_info in pages.items():
                 if page_id != "-1":
                     title_to_pageid[page_info.get("title", "")] = int(page_id)
             
-            page_ids = [title_to_pageid.get(t) for t in candidates if title_to_pageid.get(t)]
+            # Update candidates with redirected titles
+            resolved_candidates = []
+            for t in candidates:
+                resolved_title = redirect_map.get(t, t)
+                if resolved_title not in resolved_candidates:
+                    resolved_candidates.append(resolved_title)
+            
+            page_ids = [title_to_pageid.get(t) for t in resolved_candidates if title_to_pageid.get(t)]
             
             if not page_ids:
                 return []
@@ -2112,7 +2123,7 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
             human_status = await check_wikidata_is_human(page_ids)
             
             # Filter to only humans - PRESERVE ORIGINAL CANDIDATE ORDER
-            human_titles = [t for t in candidates if human_status.get(title_to_pageid.get(t), False)]
+            human_titles = [t for t in resolved_candidates if human_status.get(title_to_pageid.get(t), False)]
             
             if not human_titles:
                 logger.info(f"No humans found for query: {query}")
