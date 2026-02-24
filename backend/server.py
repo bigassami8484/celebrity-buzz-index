@@ -3974,9 +3974,9 @@ async def get_hot_celebs():
             if name.lower() == "michael jordan":
                 continue
             
-            # SKIP celebs with fewer than 3 actual headlines (requirement: minimum 3 news articles)
+            # SKIP celebs with fewer than 2 actual headlines (requirement: minimum 2 news articles)
             actual_headlines = data.get("headlines", [])
-            if len(actual_headlines) < 3:
+            if len(actual_headlines) < 2:
                 continue
             
             try:
