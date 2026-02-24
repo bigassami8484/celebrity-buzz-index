@@ -4961,9 +4961,9 @@ async def get_hot_streaks():
     
     # Cache the results
     await db.news_cache.update_one(
-        {"type": "hot_streaks_v2"},
+        {"type": "hot_streaks_v3"},
         {"$set": {
-            "type": "hot_streaks_v2",
+            "type": "hot_streaks_v3",
             "streaks": streaks,
             "updated_at": now.isoformat()
         }},
