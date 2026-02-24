@@ -1211,20 +1211,27 @@ async def get_wikidata_language_count(name: str) -> int:
     Fetch the number of Wikipedia language editions for a celebrity from Wikidata.
     This is a key metric for determining global recognition.
     """
+    from urllib.parse import quote
     try:
         headers = {
             "User-Agent": "CelebrityBuzzIndex/1.0 (contact@example.com)"
         }
         async with httpx.AsyncClient() as client:
-            wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={name.replace(' ', '_')}&props=sitelinks&format=json"
+            # Properly URL-encode the name for the API request
+            encoded_name = quote(name.replace(' ', '_'), safe='')
+            wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={encoded_name}&props=sitelinks&format=json"
             response = await client.get(wikidata_url, timeout=5.0, headers=headers)
             if response.status_code == 200:
                 data = response.json()
-                for entity in data.get("entities", {}).values():
+                for entity_id, entity in data.get("entities", {}).items():
+                    # Skip if entity not found (id = "-1")
+                    if entity_id == "-1":
+                        continue
                     sitelinks = entity.get("sitelinks", {})
                     # Count Wikipedia language editions (exclude wikiquote, wikisource, etc.)
                     language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
-                    return language_count
+                    if language_count > 0:
+                        return language_count
             elif response.status_code == 403:
                 logger.debug(f"Wikidata rate limited for {name}")
                 return 20  # Default to moderate recognition on rate limit
