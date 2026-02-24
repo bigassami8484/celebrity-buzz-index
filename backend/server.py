@@ -3610,9 +3610,20 @@ async def autocomplete_search(q: str):
             
             if existing_idx is not None:
                 # Replace existing entry if alias data is better (higher recognition score)
+                # OR if we have a fresh image from Wikipedia (DB images can become stale)
                 existing_score = priority_suggestions[existing_idx].get("recognition_score", 0)
-                if lang_count > existing_score:
-                    logger.info(f"ALIAS REPLACE: Replacing '{priority_suggestions[existing_idx].get('name')}' (score={existing_score}) with '{wiki_info['name']}' (score={lang_count})")
+                existing_image = priority_suggestions[existing_idx].get("image", "")
+                new_image = wiki_info.get("image", "")
+                
+                # Always prefer fresh Wikipedia data for aliases - DB data may have stale images
+                # Replace if: better score, OR new has fresh Wikidata image
+                should_replace = (
+                    lang_count > existing_score or
+                    (new_image and "commons.wikimedia.org" in new_image)  # Fresh Wikidata image is more reliable
+                )
+                
+                if should_replace:
+                    logger.info(f"ALIAS REPLACE: Replacing '{priority_suggestions[existing_idx].get('name')}' (score={existing_score}) with '{wiki_info['name']}' (score={lang_count}, fresh_image={bool(new_image)})")
                     priority_suggestions[existing_idx] = new_suggestion
             else:
                 priority_suggestions.append(new_suggestion)
