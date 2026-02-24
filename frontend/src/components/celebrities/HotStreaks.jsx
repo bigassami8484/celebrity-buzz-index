@@ -1,18 +1,35 @@
 import { useState, useEffect } from "react";
-import { Flame, TrendingUp, Zap } from "lucide-react";
+import { Flame, TrendingUp } from "lucide-react";
 import TierBadge from "../common/TierBadge";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-const HotStreaks = ({ onCelebClick }) => {
-  const [streaks, setStreaks] = useState([]);
-  const [loading, setLoading] = useState(true);
+const HotStreaks = ({ streaks: propStreaks, onCelebClick }) => {
+  const [streaks, setStreaks] = useState(propStreaks || []);
+  const [loading, setLoading] = useState(!propStreaks);
   const [showAlert, setShowAlert] = useState(false);
   const [alertCeleb, setAlertCeleb] = useState(null);
 
   useEffect(() => {
-    fetchHotStreaks();
-  }, []);
+    // If streaks passed as props, use those
+    if (propStreaks && propStreaks.length > 0) {
+      setStreaks(propStreaks);
+      setLoading(false);
+      checkForAlerts(propStreaks);
+    } else {
+      fetchHotStreaks();
+    }
+  }, [propStreaks]);
+
+  const checkForAlerts = (streakData) => {
+    // Show alert for the top streak celebrity (if any with 5+ days)
+    const topStreak = streakData?.find(s => s.streak_days >= 5);
+    if (topStreak && !sessionStorage.getItem(`streak_alert_${topStreak.name}`)) {
+      setAlertCeleb(topStreak);
+      setShowAlert(true);
+      sessionStorage.setItem(`streak_alert_${topStreak.name}`, 'shown');
+    }
+  };
 
   const fetchHotStreaks = async () => {
     try {
@@ -20,14 +37,7 @@ const HotStreaks = ({ onCelebClick }) => {
       if (response.ok) {
         const data = await response.json();
         setStreaks(data.hot_streaks || []);
-        
-        // Show alert for the top streak celebrity (if any with 5+ days)
-        const topStreak = data.hot_streaks?.find(s => s.streak_days >= 5);
-        if (topStreak && !sessionStorage.getItem(`streak_alert_${topStreak.name}`)) {
-          setAlertCeleb(topStreak);
-          setShowAlert(true);
-          sessionStorage.setItem(`streak_alert_${topStreak.name}`, 'shown');
-        }
+        checkForAlerts(data.hot_streaks);
       }
     } catch (error) {
       console.error("Error fetching hot streaks:", error);
