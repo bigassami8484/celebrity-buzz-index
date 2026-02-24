@@ -4931,7 +4931,7 @@ async def get_brown_bread_watch():
     - #1 oldest: £15M
     - #2 oldest: £13M  
     - #3 oldest: £11M
-    - Rest: normal tier pricing (max £12M)
+    - Rest: normal tier pricing (max £15M)
     """
     # Find living celebrities with known age >= 80 - get 10 for display
     elderly_celebs = await db.celebrities.find(
