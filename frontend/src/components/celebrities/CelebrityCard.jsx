@@ -175,8 +175,16 @@ const CelebrityCard = ({ celebrity, onAdd, onRemove, isInTeam, canAfford, onShow
           </div>
           <h3 className="font-anton text-xl uppercase tracking-tight leading-tight">
             {celebrity.name}
-            {celebrity.is_deceased && <span className="ml-2" title="Deceased">💀</span>}
           </h3>
+          {/* Global Recognition Score */}
+          {celebrity.recognition_score !== undefined && (
+            <span 
+              className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 bg-[#1A1A1A] border border-[#333] rounded text-[#A1A1AA] mt-1 cursor-help"
+              title={`Global Recognition: ${celebrity.recognition_score} Wikipedia languages - Higher = more internationally famous`}
+            >
+              🌍 {celebrity.recognition_score}
+            </span>
+          )}
           {/* Bio - smaller text, limited to 2 lines */}
           <p className="text-xs text-[#A1A1AA]/80 line-clamp-2 mt-1 leading-snug">{celebrity.bio?.slice(0, 100)}</p>
           {celebrity.wiki_url && (
