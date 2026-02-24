@@ -71,6 +71,7 @@ function App() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showMethodology, setShowMethodology] = useState(false);
   const [showMobileTeam, setShowMobileTeam] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
   const [stats, setStats] = useState(null);
   const [todaysNews, setTodaysNews] = useState([]);
   const [topPicked, setTopPicked] = useState([]);
