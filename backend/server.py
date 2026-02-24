@@ -4862,7 +4862,6 @@ async def get_hot_streaks():
     indicating a sustained media presence that typically leads to price increases.
     """
     now = datetime.now(timezone.utc)
-    today = now.date()
     
     # Check cache first (15 minute cache)
     cached = await db.news_cache.find_one(
@@ -4876,28 +4875,29 @@ async def get_hot_streaks():
         if cache_age.total_seconds() < 900:  # 15 minute cache
             return {"hot_streaks": cached.get("streaks", []), "cached": True}
     
-    # Fetch news mentions for the last 7 days
-    # We'll check against the hot_celebs_from_news cache which has recent news data
-    hot_celebs_cache = await db.news_cache.find_one(
-        {"type": "hot_celebs_from_news_v7"},
-        {"_id": 0}
-    )
+    # Query celebrities with recent news from DB
+    # Get celebrities that have news_updated_at in the last 7 days
+    week_ago = now - timedelta(days=7)
     
-    if not hot_celebs_cache or not hot_celebs_cache.get("hot_celebs"):
-        return {"hot_streaks": [], "cached": False}
+    celebrities_with_news = await db.celebrities.find(
+        {
+            "news": {"$exists": True, "$ne": []},
+            "news_updated_at": {"$gte": week_ago.isoformat()}
+        },
+        {"_id": 0, "name": 1, "tier": 1, "price": 1, "image": 1, "news": 1, "news_updated_at": 1}
+    ).limit(50).to_list(50)
     
-    hot_celebs = hot_celebs_cache.get("hot_celebs", [])
-    
-    # Track daily mentions from the celebrity news data
-    # Build streak info based on news count (celebrities with 3+ news articles are on a streak)
     streaks = []
     
-    for celeb in hot_celebs:
-        news_count = celeb.get("news_count", 0)
+    for celeb in celebrities_with_news:
+        news = celeb.get("news", [])
         name = celeb.get("name", "")
         
-        # Consider it a hot streak if the celeb has 3+ news articles in the rolling window
-        # The more news articles, the longer/stronger the streak
+        # Count real news articles (filter out fake/generated ones)
+        real_news = [n for n in news if n.get("is_real", True)]
+        news_count = len(real_news)
+        
+        # Consider it a hot streak if the celeb has 3+ real news articles
         if news_count >= 3:
             # Calculate streak days based on news volume
             # 3-4 articles = 3 days, 5-6 = 4 days, 7+ = 5+ days
@@ -4908,6 +4908,11 @@ async def get_hot_streaks():
                 "streak_days": streak_days,
                 "news_count": news_count,
                 "tier": celeb.get("tier", "D"),
+                "price": celeb.get("price", 1.0),
+                "image": celeb.get("image", ""),
+                "trending_tag": "Hot Streak",
+                "is_hot": True
+            })
                 "price": celeb.get("price", 1.0),
                 "image": celeb.get("image", ""),
                 "trending_tag": celeb.get("trending_tag", ""),
