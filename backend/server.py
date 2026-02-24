@@ -3558,7 +3558,9 @@ async def autocomplete_search(q: str):
     if query_lower in CELEBRITY_ALIASES:
         canonical_name = CELEBRITY_ALIASES[query_lower]
         logger.info(f"ALIAS MATCH: '{query_lower}' -> '{canonical_name}'")
-        if not any(s.get("name", "").lower() == canonical_name.lower() for s in priority_suggestions):
+        # Use normalize_text to handle accented characters (e.g., "Zoe Saldana" vs "Zoe Saldaña")
+        canonical_normalized = normalize_text(canonical_name)
+        if not any(normalize_text(s.get("name", "")) == canonical_normalized for s in priority_suggestions):
             wiki_info = await fetch_wikipedia_info(canonical_name)
             if wiki_info and wiki_info.get("name"):
                 logger.info(f"ALIAS: Fetched wiki for '{canonical_name}': name={wiki_info.get('name')}")
@@ -3705,11 +3707,12 @@ async def autocomplete_search(q: str):
         # Exact alias match found - return only priority suggestions
         all_suggestions = priority_suggestions
     
-    # REMOVE DUPLICATES - check by normalized name
+    # REMOVE DUPLICATES - check by normalized name (handles accented characters like ñ vs n)
     seen_names = set()
     unique_suggestions = []
     for suggestion in all_suggestions:
-        name_normalized = suggestion.get("name", "").lower().strip()
+        # Use normalize_text to handle accented characters (e.g., "Zoe Saldana" vs "Zoe Saldaña")
+        name_normalized = normalize_text(suggestion.get("name", ""))
         if name_normalized not in seen_names:
             seen_names.add(name_normalized)
             unique_suggestions.append(suggestion)
