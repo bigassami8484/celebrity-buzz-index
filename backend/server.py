@@ -1948,7 +1948,7 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 
                 # FIRST: Check if this celeb is in the Hot Celebs cache - use that price
                 hot_celebs_cache = await db.news_cache.find_one(
-                    {"type": "hot_celebs_from_news_v4"},
+                    {"type": "hot_celebs_from_news_v5"},
                     {"_id": 0, "hot_celebs": 1}
                 )
                 hot_celeb_match = None
@@ -3353,7 +3353,7 @@ async def autocomplete_search(q: str):
     
     # Get hot celebs from the CORRECT cache type (same as celebrity/search uses)
     hot_celebs_cache = await db.news_cache.find_one(
-        {"type": "hot_celebs_from_news_v4"},
+        {"type": "hot_celebs_from_news_v5"},
         {"_id": 0}
     )
     hot_celebs_list = hot_celebs_cache.get("hot_celebs", []) if hot_celebs_cache else []
@@ -3686,7 +3686,7 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     
     # FIRST: Check if this celeb is in the Hot Celebs cache - use that price for consistency
     hot_celebs_cache = await db.news_cache.find_one(
-        {"type": "hot_celebs_from_news_v4"},
+        {"type": "hot_celebs_from_news_v5"},
         {"_id": 0}
     )
     hot_celeb_match = None
@@ -4162,7 +4162,7 @@ async def get_hot_celebs():
     
     # Check cache first (1 hour cache) but invalidate on Monday (new week)
     cached = await db.news_cache.find_one(
-        {"type": "hot_celebs_from_news_v4"},  # New version with 7-day rolling window
+        {"type": "hot_celebs_from_news_v5"},  # New version with 7-day rolling window
         {"_id": 0}
     )
     
@@ -4502,7 +4502,7 @@ async def get_hot_celebs():
     # Cache the results with week tracking (refreshes every Monday)
     if hot_list:
         await db.news_cache.update_one(
-            {"type": "hot_celebs_from_news_v4"},
+            {"type": "hot_celebs_from_news_v5"},
             {"$set": {
                 "hot_celebs": hot_list,
                 "updated_at": datetime.now(timezone.utc).isoformat(),
