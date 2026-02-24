@@ -3606,7 +3606,8 @@ async def autocomplete_search(q: str):
     }
     
     for alias, canonical in alias_partial_matches.items():
-        if alias.startswith(query_lower) or query_lower in alias:
+        # Only match if alias STARTS with query (not just contains)
+        if alias.startswith(query_lower):
             # Check if already in priority suggestions
             if not any(s.get("name") == canonical for s in priority_suggestions):
                 wiki_info = await fetch_wikipedia_info(canonical)
