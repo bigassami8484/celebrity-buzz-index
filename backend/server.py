@@ -989,8 +989,8 @@ async def calculate_recognition_score(name: str, bio: str, http_client: httpx.As
             tier = "C"
             safeguards_applied.append("Upgraded to C: Does not meet D-tier criteria (needs <10 years, <10 langs, no commercial success)")
     
-    # Safeguard 4: Very high pageviews (5M+) + high language count (25+) = household name → minimum A
-    if pageviews >= 5000000 and language_count >= 25:
+    # Safeguard 4: Very high pageviews (3M+) + high language count (40+) = household name → minimum A
+    if pageviews >= 3000000 and language_count >= 40:
         if tier in ["B", "C", "D"]:
             tier = "A"
             safeguards_applied.append(f"Upgraded to A: {pageviews:,} annual pageviews + {language_count} languages = global household name")
