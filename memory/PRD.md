@@ -11,43 +11,34 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 
 ## Latest Updates (Feb 24, 2026)
 
-### Recognition Score System (NEW - Feb 24, 2026)
-- ✅ **Backend Server Fixed** - Resolved SyntaxError and IndentationError in server.py from failed refactoring
-- ✅ **Recognition Score Display** - Score now visible in autocomplete search results (0-100 scale)
-- ✅ **Score Calculation** - Uses stored `tier_score` or `tier_metrics` from database
-- ✅ **Frontend Integration** - SearchBar.jsx shows score as grey badge next to tier badge
+### Recognition Score System (Completed Feb 24, 2026)
 
-### Recognition Score Formula (Feb 24, 2026)
-Score = Weighted sum of 5 metrics:
-- **Longevity (20%)**: Years active in industry
-- **Wikipedia Languages (25%)**: Number of Wikipedia language editions
-- **Awards/Achievements (20%)**: Grammy, Oscar, Emmy, etc. mentions
-- **Commercial Impact (20%)**: Billboard, box office, Forbes, etc. mentions
-- **Wikipedia Page Views (15%)**: 12-month annual views
+**Core Implementation:**
+- ✅ Real-time Recognition Score calculation for ALL Wikipedia celebrities
+- ✅ Wikidata API integration for language count (with rate limiting)
+- ✅ Wikipedia Pageviews API for popularity metrics
+- ✅ Safeguard rules preventing incorrect D-tier assignments
+- ✅ Monthly scheduled recalculation job
 
-### Tier Rules
-- **A-List (85+)**: Global household name
-- **B-List (65-84)**: Strong mainstream recognition
-- **C-List (45-64)**: Recognisable public figure
-- **D-List (Below 45)**: Emerging / limited recognition
+**Score Formula (0-100):**
+- Longevity (20%): Years active in industry
+- Wikipedia Languages (25%): Number of language editions
+- Awards (20%): Grammy, Oscar, Emmy mentions in bio
+- Commercial Impact (20%): Box office, Forbes, billboard mentions
+- Page Views (15%): 12-month Wikipedia views
 
-### Safeguard Rules
-1. 50+ Wikipedia languages → minimum B-tier
-2. 15+ years active AND 10+ wiki languages → minimum C-tier
-3. 15+ years AND (commercial success OR lead role) → minimum B-tier
-4. D-tier only if: <10 years active AND <10 languages AND no major commercial success
-5. 3M+ pageviews AND 40+ languages → A-tier (global household name)
+**Tier Thresholds:**
+- A-List: 85+ (or safeguard: 3M+ pageviews + 40+ languages)
+- B-List: 65-84 (or safeguard: 50+ languages)  
+- C-List: 45-64
+- D-List: Below 45 (only if <10 years, <10 languages, no commercial success)
 
-### Monthly Recalculation
-- Scheduled job runs 1st of each month at 03:00 UTC
-- Admin endpoint: POST /api/admin/recalculate-recognition-scores
-- Removes all manual tier assignments
-
-### Examples After Recalculation
-- Taylor Swift: Score 55, A-LIST (safeguard: 12.6M pageviews + 153 languages)
-- Beyoncé: Score 40, A-LIST (safeguard: 4.5M pageviews + 155 languages)
-- Kim Kardashian: Score 54, A-LIST (safeguard: 4.2M pageviews + 100 languages)
-- Katie Price: Score 28, C-LIST (correctly identified as UK tabloid figure)
+**Verified Results:**
+- Taylor Swift: A-LIST (55 score, 153 languages, 12.6M pageviews)
+- Beyoncé: A-LIST (40 score, 155 languages, 4.5M pageviews)
+- Hilary Duff: B-LIST (62 score, 82 languages, 2.7M pageviews)
+- Amber Heard: B-LIST (60 score, 79 languages, 2.5M pageviews)
+- Katie Price: C-LIST (28 score - correctly identified as UK tabloid figure)
 
 ### Bug Fixes (Feb 24, 2026)
 - ✅ **apply_brown_bread_premium → get_brown_bread_premium** - Fixed NameError in celebrity search endpoint
