@@ -46,10 +46,8 @@ const BrownBreadWatch = ({ watchList, onSelect }) => {
             />
             <div className="flex-1 min-w-0">
               <span className="text-sm truncate block">
-                {celeb.name}
-                {celeb.is_deceased && <span className="ml-1" title="Deceased">💀</span>}
+                {celeb.name} <span className="text-[#666]">({celeb.age})</span>
               </span>
-              <span className="text-xs text-[#666]">Age {celeb.age}</span>
             </div>
             <div className="text-right">
               <span className={`text-sm font-bold ${celeb.is_premium ? 'text-[#FFD700]' : 'text-[#A1A1AA]'}`}>
