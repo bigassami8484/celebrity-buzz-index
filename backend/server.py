@@ -4865,7 +4865,7 @@ async def get_hot_streaks():
     
     # Check cache first (15 minute cache)
     cached = await db.news_cache.find_one(
-        {"type": "hot_streaks_v2"},  # New version with correct prices
+        {"type": "hot_streaks_v3"},  # New version with royal fixes
         {"_id": 0}
     )
     
