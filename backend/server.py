@@ -2048,6 +2048,12 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                 if any(kw in title_lower for kw in quick_skip_keywords):
                     continue
                 
+                # Special handling for sports abbreviations (FC, CF, AFC) - word boundary check
+                # This avoids matching names like McFadden, MacFarlane, etc.
+                import re
+                if re.search(r'\b(fc|cf|afc)\b', title_lower):
+                    continue
+                
                 # Skip titles with colons (usually not people)
                 if ":" in title:
                     continue
