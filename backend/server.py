@@ -3260,19 +3260,56 @@ async def autocomplete_search(q: str):
         recognition_score = exact_match.get("recognition_score")
         recognition_metrics = exact_match.get("recognition_metrics", {})
         
-        # If no recognition score, calculate from metrics or estimate
+        # Check if stored metrics are incomplete (language count = 0 is suspicious)
+        stored_languages = recognition_metrics.get("languages", {}).get("count", 0)
+        needs_fresh_calculation = stored_languages == 0 and recognition_score is not None
+        
+        # If data looks incomplete, fetch fresh from Wikidata
+        if needs_fresh_calculation:
+            try:
+                headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com; api-contact@celebrity-buzz-index.com)"}
+                async with httpx.AsyncClient() as client:
+                    await asyncio.sleep(0.3)  # Rate limit
+                    wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={exact_match['name'].replace(' ', '_')}&props=sitelinks&format=json"
+                    response = await client.get(wikidata_url, timeout=5.0, headers=headers)
+                    if response.status_code == 200:
+                        data = response.json()
+                        for entity in data.get("entities", {}).values():
+                            sitelinks = entity.get("sitelinks", {})
+                            language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
+                            if language_count > 0:
+                                # Recalculate score with fresh language data
+                                if language_count >= 80:
+                                    language_score = 100
+                                elif language_count >= 50:
+                                    language_score = 75
+                                elif language_count >= 25:
+                                    language_score = 60
+                                elif language_count >= 10:
+                                    language_score = 30
+                                else:
+                                    language_score = 15
+                                
+                                # Recalculate recognition score
+                                recognition_score = round(
+                                    (40 * 0.20) +  # Default longevity
+                                    (language_score * 0.25) +
+                                    (recognition_metrics.get("awards", {}).get("score", 30) * 0.20) +
+                                    (recognition_metrics.get("commercial", {}).get("score", 25) * 0.20) +
+                                    (50 * 0.15)  # Default pageviews
+                                )
+                                recognition_metrics["languages"] = {"count": language_count, "score": language_score}
+                                logger.info(f"Refreshed {exact_match['name']}: {language_count} languages, new score {recognition_score}")
+            except Exception as e:
+                logger.debug(f"Failed to refresh Wikidata for {exact_match['name']}: {e}")
+        
+        # If still no recognition score, estimate
         if recognition_score is None:
             tier_score = exact_match.get("tier_score", 0)
             if tier_score > 0:
                 recognition_score = min(100, max(0, tier_score))
             else:
-                tier_metrics = exact_match.get("tier_metrics", {})
-                if tier_metrics:
-                    result = calculate_recognition_score_from_metrics(tier_metrics)
-                    recognition_score = result.get("recognition_score", 50)
-                    recognition_metrics = tier_metrics
-                else:
-                    recognition_score = 50  # Default moderate score
+                recognition_score = 50
         
         # ALWAYS derive tier from recognition score - NEVER use stored tier
         tier = get_tier_from_recognition_score(recognition_score, recognition_metrics)
