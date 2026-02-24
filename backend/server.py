@@ -1019,11 +1019,26 @@ def get_random_hot_celebs(count: int = 8) -> list:
     return selected[:count]
 
 # A-list indicators (keywords that suggest high fame)
-A_LIST_INDICATORS = ["oscar", "grammy", "emmy", "golden globe", "bafta", "world cup winner", 
-                      "billion", "legendary", "iconic", "superstar", "megastar", "one of the most",
-                      "best-selling", "highest-paid", "most famous", "world record"]
+A_LIST_INDICATORS = [
+    # Major Awards
+    "oscar", "academy award", "grammy", "emmy", "golden globe", "bafta", "tony award",
+    "pulitzer", "nobel", "knighthood", "dame", "order of the british empire",
+    # Hall of Fame
+    "hall of fame", "rock and roll hall", "hollywood walk of fame", "inducted",
+    # Career Longevity & Success
+    "billion", "legendary", "iconic", "superstar", "megastar", "one of the most",
+    "best-selling", "highest-paid", "most famous", "world record", "all-time",
+    "pioneer", "trailblazer", "revolutionized", "transformed",
+    # Global Brand/Franchise
+    "founded", "entrepreneur", "business empire", "brand", "franchise",
+    "forbes", "time 100", "most influential", "global icon",
+    # Sports Excellence  
+    "world cup winner", "olympic gold", "world champion", "grand slam",
+    "mvp", "all-star", "pro bowl", "ballon d'or"
+]
 B_LIST_INDICATORS = ["award-winning", "acclaimed", "successful", "popular", "well-known", 
-                      "million", "chart-topping", "hit", "starring", "lead role"]
+                      "million", "chart-topping", "hit", "starring", "lead role",
+                      "critically acclaimed", "box office", "platinum", "gold record"]
 C_LIST_INDICATORS = ["known for", "appeared in", "featured", "contestant", "participant"]
 
 # Mega-stars who should ALWAYS be A-list regardless of bio analysis
