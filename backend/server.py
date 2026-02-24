@@ -3557,9 +3557,11 @@ async def autocomplete_search(q: str):
     # This ensures "mario" returns Mario (American singer) not Mario Lopez
     if query_lower in CELEBRITY_ALIASES:
         canonical_name = CELEBRITY_ALIASES[query_lower]
+        logger.info(f"ALIAS MATCH: '{query_lower}' -> '{canonical_name}'")
         if not any(s.get("name", "").lower() == canonical_name.lower() for s in priority_suggestions):
             wiki_info = await fetch_wikipedia_info(canonical_name)
             if wiki_info and wiki_info.get("name"):
+                logger.info(f"ALIAS: Fetched wiki for '{canonical_name}': name={wiki_info.get('name')}")
                 # Use SINGLE SOURCE OF TRUTH for tier/price calculation
                 tier, price, lang_count = await get_tier_and_price_from_wikidata(
                     wiki_info["name"], 
