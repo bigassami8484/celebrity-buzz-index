@@ -1191,6 +1191,44 @@ def get_price_from_tier(tier: str) -> float:
     return tier_prices.get(tier, 2.5)
 
 
+async def get_wikidata_language_count(name: str) -> int:
+    """
+    Fetch the number of Wikipedia language editions for a celebrity from Wikidata.
+    This is a key metric for determining global recognition.
+    """
+    try:
+        headers = {
+            "User-Agent": "CelebrityBuzzIndex/1.0 (contact@example.com)"
+        }
+        async with httpx.AsyncClient() as client:
+            wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={name.replace(' ', '_')}&props=sitelinks&format=json"
+            response = await client.get(wikidata_url, timeout=5.0, headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                for entity in data.get("entities", {}).values():
+                    sitelinks = entity.get("sitelinks", {})
+                    # Count Wikipedia language editions (exclude wikiquote, wikisource, etc.)
+                    language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
+                    return language_count
+            elif response.status_code == 403:
+                logger.debug(f"Wikidata rate limited for {name}")
+                return 20  # Default to moderate recognition on rate limit
+    except Exception as e:
+        logger.debug(f"Error fetching Wikidata language count for {name}: {e}")
+    return 0
+
+
+async def get_tier_and_price_from_wikidata(name: str, bio: str = "") -> tuple:
+    """
+    SINGLE SOURCE OF TRUTH: Get tier and price using Wikidata language count.
+    This should be the ONLY function used for tier/price calculation across all endpoints.
+    
+    Returns (tier, price, language_count) tuple.
+    """
+    language_count = await get_wikidata_language_count(name)
+    tier, price = calculate_tier_and_price(language_count, bio)
+    return tier, price, language_count
+
 
 async def get_brown_bread_premium(celeb: dict, base_price: float) -> float:
     """
