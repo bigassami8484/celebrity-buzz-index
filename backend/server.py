@@ -1201,9 +1201,41 @@ def calculate_tier_and_price(language_count: int, bio: str = "") -> tuple:
         elif tier == "B":
             tier = "C"
     
-    # Calculate price from tier
-    tier_prices = {"A": 15.0, "B": 6.0, "C": 2.5, "D": 1.0}
-    price = tier_prices.get(tier, 2.5)
+    # Calculate price from tier - with variation within tiers based on language count
+    # A-LIST: £10M - £15M based on global reach
+    # B-LIST: £4M - £6.9M
+    # C-LIST: £1.5M - £2.9M
+    # D-LIST: £0.5M - £1M
+    if tier == "A":
+        if language_count >= 120:
+            price = 15.0  # Mega stars (Taylor Swift, Beyoncé, etc.)
+        elif language_count >= 90:
+            price = 13.0  # Major A-listers
+        elif language_count >= 75:
+            price = 11.0  # Solid A-listers
+        else:
+            price = 10.0  # Entry-level A-list
+    elif tier == "B":
+        if language_count >= 50:
+            price = 6.9
+        elif language_count >= 40:
+            price = 5.5
+        else:
+            price = 4.0
+    elif tier == "C":
+        if language_count >= 18:
+            price = 2.9
+        elif language_count >= 14:
+            price = 2.0
+        else:
+            price = 1.5
+    else:  # D-tier
+        if language_count >= 7:
+            price = 1.0
+        elif language_count >= 4:
+            price = 0.7
+        else:
+            price = 0.5
     
     return tier, price
 
