@@ -1690,6 +1690,7 @@ GUARANTEED_A_LIST = [
     "cher", "tina turner", "janet jackson", "diana ross", "dolly parton",
     "bruce springsteen", "billy joel", "eric clapton", "bob dylan", "prince",
     "david bowie", "freddie mercury", "ozzy osbourne", "slash", "axl rose",
+    "bb king", "b.b. king", "asap rocky", "a$ap rocky",  # Blues/Hip-hop legends
     # Global Movie Stars (franchise leads, major awards)
     "leonardo dicaprio", "tom cruise", "brad pitt", "angelina jolie", "tom hanks",
     "julia roberts", "denzel washington", "will smith", "johnny depp", "robert downey jr",
