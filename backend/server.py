@@ -2174,7 +2174,7 @@ def get_base_price_for_tier(tier: str, name: str = "") -> float:
     
     # Price ranges for each tier
     price_ranges = {
-        "A": (9.0, 12.0),   # £9m-£12m
+        "A": (12.0, 15.0),   # £12m-£15m
         "B": (5.0, 8.0),    # £5m-£8m
         "C": (2.0, 4.0),    # £2m-£4m
         "D": (0.5, 1.5)     # £0.5m-£1.5m
@@ -2213,7 +2213,7 @@ def get_dynamic_price(tier: str, buzz_score: float, name: str = "") -> float:
     """
     # Define STRICT price ranges for each tier
     price_ranges = {
-        "A": (9.0, 12.0),   # £9m-£12m
+        "A": (12.0, 15.0),   # £12m-£15m
         "B": (5.0, 8.0),    # £5m-£8m
         "C": (2.0, 4.0),    # £2m-£4m
         "D": (0.5, 1.5)     # £0.5m-£1.5m
