@@ -55,8 +55,7 @@ import {
   PointsMethodology, 
   PriceHistoryModal, 
   HallOfFameModal,
-  PriceAlerts,
-  HotStreaks 
+  PriceAlerts
 } from "./components/modals/index.jsx";
 
 // Main App Component
