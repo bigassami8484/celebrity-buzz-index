@@ -3784,10 +3784,24 @@ async def autocomplete_search(q: str):
     # Track if we found an exact alias match - if so, skip Wikipedia autocomplete
     # This prevents "diddy" from returning "Diddy TV", "Diddy Wah Diddy" etc
     found_exact_alias = query_lower in CELEBRITY_ALIASES and len(priority_suggestions) > 0
-    logger.info(f"Autocomplete '{q}': found_exact_alias={found_exact_alias}, priority_count={len(priority_suggestions)}")
     
-    # Get Wikipedia autocomplete suggestions (SKIP if exact alias found)
-    if not found_exact_alias:
+    # Check if we have a single exact match from priority suggestions
+    # If query exactly matches a celebrity name, return ONLY that one result
+    has_exact_name_match = any(
+        normalize_text(s.get("name", "")) == normalize_text(q) or
+        s.get("is_exact_match") or
+        s.get("is_alias_match")
+        for s in priority_suggestions
+    )
+    
+    logger.info(f"Autocomplete '{q}': found_exact_alias={found_exact_alias}, has_exact_name_match={has_exact_name_match}, priority_count={len(priority_suggestions)}")
+    
+    # If we have an exact match (either from DB, alias, or name match), return ONLY that
+    if has_exact_name_match and len(priority_suggestions) >= 1:
+        # Return only the first (best) match
+        all_suggestions = [priority_suggestions[0]]
+    elif not found_exact_alias:
+        # Get Wikipedia autocomplete suggestions
         suggestions = await fetch_wikipedia_autocomplete(q)
         
         # Filter out any duplicates from Wikipedia results that are already in priority suggestions
@@ -3801,7 +3815,7 @@ async def autocomplete_search(q: str):
             # Check if query is an exact match (case-insensitive)
             if first_result_name == query_lower:
                 # Return only the exact match
-                all_suggestions = priority_suggestions + [filtered_suggestions[0]]
+                all_suggestions = [filtered_suggestions[0]]
             else:
                 # Combine: priority first, then Wikipedia results
                 all_suggestions = priority_suggestions + filtered_suggestions
