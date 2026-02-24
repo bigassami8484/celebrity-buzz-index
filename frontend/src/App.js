@@ -1063,6 +1063,12 @@ function App() {
                     <li><span className="text-red-400 font-bold">Scandal/Controversy bonus!</span> Negative news earns extra points (arrests, feuds, lawsuits = big points)</li>
                     <li><span className="text-yellow-400">💀 Brown Bread Bonus</span> = 100 points when a celeb passes away</li>
                   </ul>
+                  
+                  <p className="text-white font-bold mb-2 mt-4">Icons Explained:</p>
+                  <ul className="list-disc list-inside space-y-1 ml-1">
+                    <li><span className="text-cyan-400">🌍 Global Recognition</span> = Number of Wikipedia languages (higher = more famous worldwide)</li>
+                    <li><span className="text-yellow-400">💀 Skull Icon</span> = Deceased celebrity (eligible for Brown Bread bonus)</li>
+                  </ul>
                 </div>
                 
                 <p><strong className="text-[#00F0FF]">Auto-updates:</strong> Points recalculate automatically as new articles are published throughout the day.</p>
