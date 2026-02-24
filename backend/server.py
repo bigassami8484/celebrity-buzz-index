@@ -2320,15 +2320,15 @@ def get_base_price_for_tier(tier: str, name: str = "") -> float:
     import random
     import hashlib
     
-    # Price ranges for each tier
+    # Price ranges for each tier - more variation
     price_ranges = {
-        "A": (12.0, 15.0),   # £12m-£15m
-        "B": (5.0, 8.0),    # £5m-£8m
-        "C": (2.0, 4.0),    # £2m-£4m
-        "D": (0.5, 1.5)     # £0.5m-£1.5m
+        "A": (10.0, 15.0),   # £10m-£15m (wider range for A-list)
+        "B": (4.0, 6.9),     # £4m-£6.9m
+        "C": (1.5, 2.9),     # £1.5m-£2.9m
+        "D": (0.5, 1.0)      # £0.5m-£1m
     }
     
-    min_price, max_price = price_ranges.get(tier, (0.5, 1.5))
+    min_price, max_price = price_ranges.get(tier, (0.5, 1.0))
     
     # Use name hash for consistent but varied pricing (same celeb = same price)
     if name:
