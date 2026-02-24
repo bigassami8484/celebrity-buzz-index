@@ -2305,9 +2305,6 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                         # Fetch Wikidata for language count and apply safeguards
                         recognition_score = 50  # Default
                         try:
-                            # Add small delay to respect rate limits
-                            await asyncio.sleep(0.2)
-                            
                             wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={actual_title.replace(' ', '_')}&props=sitelinks&format=json"
                             wd_response = await client.get(wikidata_url, timeout=5.0, headers=headers)
                             language_count = 0
