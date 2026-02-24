@@ -5473,17 +5473,17 @@ async def add_to_team(data: AddToTeam):
         brown_bread_bonus = 100.0  # 100 points for dead celebs!
         celeb_points += brown_bread_bonus
     
-    # Add to team
+    # Add to team with CORRECT tier/price
     team_celeb = TeamCelebrity(
         celebrity_id=celebrity["id"],
         name=celebrity["name"],
         image=celebrity["image"],
         category=celebrity["category"],
         price=price,
-        buzz_score=celebrity["buzz_score"],
-        tier=celebrity.get("tier", "D"),
-        previous_week_price=celebrity.get("previous_week_price", 0.0),  # Include price change data
-        is_deceased=celebrity.get("is_deceased", False),  # Include deceased status for skull icon
+        buzz_score=celebrity.get("buzz_score", 50),
+        tier=tier,  # Use recalculated tier
+        previous_week_price=celebrity.get("previous_week_price", 0.0),
+        is_deceased=celebrity.get("is_deceased", False),
         added_at=datetime.now(timezone.utc).isoformat()
     )
     
