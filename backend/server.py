@@ -7193,6 +7193,87 @@ async def test_tier_calculation(name: str):
         }
 
 
+@api_router.post("/admin/recalculate-recognition-scores")
+async def admin_recalculate_recognition_scores(limit: int = None):
+    """
+    Manually trigger Recognition Score recalculation for all celebrities.
+    Optional limit parameter to process only N celebrities (for testing).
+    """
+    logger.info(f"🔄 Manual Recognition Score recalculation triggered (limit={limit})")
+    
+    try:
+        celebs = await db.celebrities.find({}).to_list(limit)
+        updated_count = 0
+        tier_changes = {"upgraded": 0, "downgraded": 0, "unchanged": 0}
+        results = []
+        
+        async with httpx.AsyncClient() as http_client:
+            for celeb in celebs:
+                try:
+                    name = celeb.get("name", "")
+                    bio = celeb.get("bio", "")
+                    old_tier = celeb.get("tier", "D")
+                    old_score = celeb.get("recognition_score", 0)
+                    
+                    result = await calculate_recognition_score(name, bio, http_client)
+                    new_score = result["recognition_score"]
+                    new_tier = result["tier"]
+                    metrics = result["metrics"]
+                    safeguards = result.get("safeguards_applied", [])
+                    
+                    # Track tier changes
+                    tier_order = {"A": 4, "B": 3, "C": 2, "D": 1}
+                    change_type = "unchanged"
+                    if tier_order.get(new_tier, 0) > tier_order.get(old_tier, 0):
+                        tier_changes["upgraded"] += 1
+                        change_type = "upgraded"
+                    elif tier_order.get(new_tier, 0) < tier_order.get(old_tier, 0):
+                        tier_changes["downgraded"] += 1
+                        change_type = "downgraded"
+                    else:
+                        tier_changes["unchanged"] += 1
+                    
+                    # Update database
+                    await db.celebrities.update_one(
+                        {"_id": celeb["_id"]},
+                        {"$set": {
+                            "recognition_score": new_score,
+                            "tier": new_tier,
+                            "recognition_metrics": metrics,
+                            "safeguards_applied": safeguards,
+                            "tier_recalculated_at": datetime.now(timezone.utc).isoformat()
+                        }}
+                    )
+                    
+                    if old_tier != new_tier:
+                        results.append({
+                            "name": name,
+                            "old_tier": old_tier,
+                            "new_tier": new_tier,
+                            "old_score": old_score,
+                            "new_score": new_score,
+                            "change": change_type,
+                            "safeguards": safeguards
+                        })
+                    
+                    updated_count += 1
+                    
+                except Exception as e:
+                    logger.error(f"Error processing {celeb.get('name', 'unknown')}: {e}")
+                    continue
+        
+        return {
+            "status": "completed",
+            "celebrities_processed": updated_count,
+            "tier_changes": tier_changes,
+            "notable_changes": results[:50]  # Limit output
+        }
+        
+    except Exception as e:
+        logger.error(f"Manual recalculation failed: {e}")
+        return {"status": "failed", "error": str(e)}
+
+
 # Auth routes are now in /routes/auth.py
 
 
