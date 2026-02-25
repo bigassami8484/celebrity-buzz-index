@@ -4892,7 +4892,6 @@ async def get_hot_celebs():
                             "category": category,
                             "price": price,
                             "base_price": base_price,
-                            "news_premium": news_multiplier > 1.0,
                             "trending_tag": trending_tag,
                             "hot_reason": hot_reason,
                             "news_headlines": actual_headlines[:3],
