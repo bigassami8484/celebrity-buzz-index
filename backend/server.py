@@ -9010,6 +9010,10 @@ scheduler.add_job(
     replace_existing=True
 )
 
+# Include routers (MUST be after all routes are defined)
+app.include_router(api_router)
+app.include_router(auth_router)
+
 @app.on_event("startup")
 async def start_scheduler():
     """Start the scheduler when the app starts"""
