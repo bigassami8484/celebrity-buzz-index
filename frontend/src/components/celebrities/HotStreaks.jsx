@@ -96,9 +96,6 @@ const HotStreaks = ({ streaks: propStreaks, onCelebClick }) => {
               <p className="text-white/90 text-sm mt-1">
                 <span className="font-bold">{alertCeleb.name}</span> has been trending for {alertCeleb.streak_days} days straight!
               </p>
-              <p className="text-white/70 text-xs mt-1">
-                {alertCeleb.news_count} news articles this week
-              </p>
             </div>
             <button 
               onClick={dismissAlert}
