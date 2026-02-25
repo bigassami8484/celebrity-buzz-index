@@ -8750,6 +8750,18 @@ async def admin_add_celebrity(name: str, category: str = "other", force_update: 
                 "message": f"Cannot add '{actual_name}' - they appear to be deceased. Only living celebrities can be added."
             }
         
+        # Check for serial killers - reject them
+        serial_killer_indicators = ["serial killer", "serial murderer", "mass murderer", "murdered", 
+                                    "killed", "victims", "convicted of murder", "death row",
+                                    "executed", "life imprisonment for murder", "multiple murders"]
+        is_serial_killer = any(indicator in bio_lower for indicator in serial_killer_indicators)
+        
+        if is_serial_killer:
+            return {
+                "success": False,
+                "message": f"Cannot add '{actual_name}' - serial killers and murderers are not allowed."
+            }
+        
         # Get tier and price from Wikidata (SINGLE SOURCE OF TRUTH)
         tier, price, lang_count = await get_tier_and_price_from_wikidata(actual_name, bio)
         
