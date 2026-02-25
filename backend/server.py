@@ -9050,6 +9050,16 @@ async def admin_add_celebrities_bulk(celebrities: list, category: str):
                 results.append({"name": actual_name, "success": False, "reason": "Deceased - cannot add"})
                 continue
             
+            # Check for serial killers - skip them
+            serial_killer_indicators = ["serial killer", "serial murderer", "mass murderer", "murdered",
+                                        "killed", "victims", "convicted of murder", "death row",
+                                        "executed", "life imprisonment for murder", "multiple murders"]
+            is_serial_killer = any(indicator in bio_lower for indicator in serial_killer_indicators)
+            
+            if is_serial_killer:
+                results.append({"name": actual_name, "success": False, "reason": "Serial killer - not allowed"})
+                continue
+            
             # Get tier and price
             tier, price, lang_count = await get_tier_and_price_from_wikidata(actual_name, bio)
             
