@@ -8816,6 +8816,7 @@ async def admin_add_royals():
                 "tier": tier,
                 "price": price,
                 "recognition_score": lang_count,
+                "wiki_url": wiki_info.get("wiki_url", f"https://en.wikipedia.org/wiki/{actual_name.replace(' ', '_')}"),
                 "buzz_score": 50,
                 "birth_year": birth_year,
                 "age": age,
