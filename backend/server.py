@@ -8670,6 +8670,357 @@ scheduler.add_job(
     replace_existing=True
 )
 
+# ==================== ADMIN: ADD SPECIFIC CELEBRITIES ====================
+
+@api_router.post("/admin/add-celebrity")
+async def admin_add_celebrity(name: str, category: str = "other", force_update: bool = False):
+    """
+    Admin endpoint to add a specific celebrity to the database with proper data.
+    Fetches Wikipedia info, calculates tier/price from Wikidata, and stores in DB.
+    
+    Args:
+        name: The celebrity name (or Wikipedia search term)
+        category: The category to assign (movie_stars, musicians, royals, etc.)
+        force_update: If True, updates even if celebrity already exists
+    """
+    try:
+        # Check if already exists
+        existing = await db.celebrities.find_one(
+            {"name": {"$regex": f"^{name}$", "$options": "i"}}
+        )
+        
+        if existing and not force_update:
+            return {
+                "success": False,
+                "message": f"Celebrity '{existing.get('name')}' already exists. Use force_update=True to update.",
+                "existing": {
+                    "name": existing.get("name"),
+                    "tier": existing.get("tier"),
+                    "price": existing.get("price"),
+                    "category": existing.get("category")
+                }
+            }
+        
+        # Fetch Wikipedia info
+        wiki_info = await fetch_wikipedia_info(name)
+        
+        if not wiki_info or not wiki_info.get("name"):
+            return {
+                "success": False,
+                "message": f"Could not find Wikipedia info for '{name}'"
+            }
+        
+        actual_name = wiki_info.get("name")
+        bio = wiki_info.get("bio", "")[:500]
+        image = wiki_info.get("image", "")
+        
+        # Get tier and price from Wikidata (SINGLE SOURCE OF TRUTH)
+        tier, price, lang_count = await get_tier_and_price_from_wikidata(actual_name, bio)
+        
+        # Extract age from bio
+        birth_year = extract_birth_year_from_bio(bio)
+        age = calculate_age(birth_year) if birth_year else 0
+        
+        # Create or update celebrity
+        celeb_id = existing.get("id") if existing else str(uuid.uuid4())
+        
+        celeb_data = {
+            "id": celeb_id,
+            "name": actual_name,
+            "bio": bio,
+            "image": image,
+            "category": category,
+            "tier": tier,
+            "price": price,
+            "recognition_score": lang_count,
+            "buzz_score": 50,
+            "birth_year": birth_year,
+            "age": age,
+            "is_deceased": False,
+            "times_picked": existing.get("times_picked", 0) if existing else 0,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        if existing:
+            await db.celebrities.update_one(
+                {"id": celeb_id},
+                {"$set": celeb_data}
+            )
+            action = "updated"
+        else:
+            celeb_data["created_at"] = datetime.now(timezone.utc).isoformat()
+            await db.celebrities.insert_one(celeb_data)
+            action = "created"
+        
+        return {
+            "success": True,
+            "action": action,
+            "celebrity": {
+                "name": actual_name,
+                "tier": tier,
+                "price": price,
+                "category": category,
+                "image": image[:80] + "..." if len(image) > 80 else image,
+                "language_count": lang_count,
+                "age": age
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error adding celebrity {name}: {e}")
+        return {
+            "success": False,
+            "message": str(e)
+        }
+
+
+@api_router.post("/admin/add-royals")
+async def admin_add_royals():
+    """
+    Admin endpoint to add Prince Harry, King Charles, and Prince William to the royals category.
+    """
+    royals_to_add = [
+        {"search": "Prince Harry, Duke of Sussex", "category": "royals"},
+        {"search": "Charles III", "category": "royals"},
+        {"search": "William, Prince of Wales", "category": "royals"},
+    ]
+    
+    results = []
+    for royal in royals_to_add:
+        try:
+            # Fetch Wikipedia info
+            wiki_info = await fetch_wikipedia_info(royal["search"])
+            
+            if not wiki_info or not wiki_info.get("name"):
+                results.append({
+                    "search": royal["search"],
+                    "success": False,
+                    "message": "Wikipedia info not found"
+                })
+                continue
+            
+            actual_name = wiki_info.get("name")
+            bio = wiki_info.get("bio", "")[:500]
+            image = wiki_info.get("image", "")
+            
+            # Get tier and price
+            tier, price, lang_count = await get_tier_and_price_from_wikidata(actual_name, bio)
+            
+            # Extract age
+            birth_year = extract_birth_year_from_bio(bio)
+            age = calculate_age(birth_year) if birth_year else 0
+            
+            # Check if already exists
+            existing = await db.celebrities.find_one(
+                {"name": {"$regex": f"^{actual_name}$", "$options": "i"}}
+            )
+            
+            celeb_id = existing.get("id") if existing else str(uuid.uuid4())
+            
+            celeb_data = {
+                "id": celeb_id,
+                "name": actual_name,
+                "bio": bio,
+                "image": image,
+                "category": "royals",  # Force royals category
+                "tier": tier,
+                "price": price,
+                "recognition_score": lang_count,
+                "buzz_score": 50,
+                "birth_year": birth_year,
+                "age": age,
+                "is_deceased": False,
+                "times_picked": existing.get("times_picked", 0) if existing else 0,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+            
+            if existing:
+                await db.celebrities.update_one(
+                    {"id": celeb_id},
+                    {"$set": celeb_data}
+                )
+                action = "updated"
+            else:
+                celeb_data["created_at"] = datetime.now(timezone.utc).isoformat()
+                await db.celebrities.insert_one(celeb_data)
+                action = "created"
+            
+            results.append({
+                "search": royal["search"],
+                "success": True,
+                "action": action,
+                "name": actual_name,
+                "tier": tier,
+                "price": price,
+                "image": "real" if image and "ui-avatars" not in image else "placeholder"
+            })
+            
+        except Exception as e:
+            results.append({
+                "search": royal["search"],
+                "success": False,
+                "message": str(e)
+            })
+    
+    return {
+        "message": "Royals addition complete",
+        "results": results
+    }
+
+
+# ==================== PERIODIC BIO UPDATES ====================
+
+async def update_celebrity_bios_batch(batch_size: int = 10, delay: float = 1.0):
+    """
+    Update celebrity bios with real Wikipedia intros.
+    Runs in batches with delays to avoid rate limiting.
+    """
+    try:
+        logger.info("🔄 Starting batch bio update...")
+        
+        # Find celebrities with short/generic bios
+        cursor = db.celebrities.find({
+            "$or": [
+                {"bio": {"$regex": "^.{0,100}$"}},  # Bio shorter than 100 chars
+                {"bio": {"$regex": "is a celebrity"}},  # Generic placeholder
+                {"bio": {"$exists": False}},
+                {"bio": None},
+                {"bio": ""}
+            ]
+        }, {"_id": 0}).limit(batch_size)
+        
+        celebs = await cursor.to_list(length=batch_size)
+        
+        if not celebs:
+            logger.info("✅ All celebrities have proper bios")
+            return {"updated": 0, "message": "All celebrities have proper bios"}
+        
+        updated_count = 0
+        errors = []
+        
+        headers = {
+            "User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz-index.com; contact@example.com)"
+        }
+        
+        async with httpx.AsyncClient() as client:
+            for celeb in celebs:
+                name = celeb.get("name", "")
+                try:
+                    # Add delay between requests to avoid rate limiting
+                    await asyncio.sleep(delay)
+                    
+                    # Fetch fresh Wikipedia summary
+                    wiki_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{name.replace(' ', '_')}"
+                    response = await client.get(wiki_url, timeout=10.0, headers=headers)
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        new_bio = data.get("extract", "")
+                        
+                        if new_bio and len(new_bio) > 50:
+                            # Truncate to first few sentences (approx 500 chars)
+                            if len(new_bio) > 500:
+                                # Find a good break point
+                                break_point = new_bio[:500].rfind('. ')
+                                if break_point > 200:
+                                    new_bio = new_bio[:break_point + 1]
+                                else:
+                                    new_bio = new_bio[:500] + "..."
+                            
+                            # Also update image if missing/placeholder
+                            new_image = data.get("thumbnail", {}).get("source", "")
+                            update_data = {"bio": new_bio}
+                            
+                            old_image = celeb.get("image", "")
+                            if new_image and (not old_image or "ui-avatars" in old_image):
+                                update_data["image"] = new_image
+                            
+                            await db.celebrities.update_one(
+                                {"id": celeb.get("id")},
+                                {"$set": update_data}
+                            )
+                            updated_count += 1
+                            logger.info(f"  ✓ Updated bio for {name}")
+                        else:
+                            errors.append({"name": name, "reason": "Wikipedia bio too short"})
+                    elif response.status_code == 429:
+                        logger.warning(f"Rate limited - stopping batch early at {updated_count} updates")
+                        break
+                    else:
+                        errors.append({"name": name, "reason": f"HTTP {response.status_code}"})
+                        
+                except Exception as e:
+                    errors.append({"name": name, "reason": str(e)[:50]})
+        
+        logger.info(f"✅ Bio update batch complete: {updated_count} updated, {len(errors)} errors")
+        
+        return {
+            "updated": updated_count,
+            "errors": errors[:10] if errors else None,
+            "remaining": await db.celebrities.count_documents({
+                "$or": [
+                    {"bio": {"$regex": "^.{0,100}$"}},
+                    {"bio": {"$regex": "is a celebrity"}},
+                    {"bio": {"$exists": False}},
+                    {"bio": None},
+                    {"bio": ""}
+                ]
+            })
+        }
+        
+    except Exception as e:
+        logger.error(f"Bio update batch failed: {e}")
+        return {"error": str(e)}
+
+
+@api_router.post("/admin/update-bios")
+async def admin_update_bios(batch_size: int = 10, delay: float = 1.0):
+    """
+    Admin endpoint to trigger batch bio updates.
+    Updates celebrities with short/generic bios with real Wikipedia intros.
+    
+    Args:
+        batch_size: Number of celebrities to update per batch (default 10)
+        delay: Delay in seconds between API calls to avoid rate limiting (default 1.0)
+    """
+    result = await update_celebrity_bios_batch(batch_size, delay)
+    return result
+
+
+# Scheduled task for periodic bio updates (runs daily at 4 AM UTC)
+async def scheduled_bio_update():
+    """Scheduled task to update celebrity bios periodically"""
+    try:
+        logger.info("🔄 Running scheduled bio update...")
+        result = await update_celebrity_bios_batch(batch_size=20, delay=1.5)
+        
+        await db.scheduled_tasks.insert_one({
+            "task": "bio_update",
+            "executed_at": datetime.now(timezone.utc).isoformat(),
+            "result": result,
+            "status": "completed"
+        })
+        
+        logger.info(f"✅ Scheduled bio update complete: {result.get('updated', 0)} updated")
+        
+    except Exception as e:
+        logger.error(f"❌ Scheduled bio update failed: {e}")
+        await db.scheduled_tasks.insert_one({
+            "task": "bio_update",
+            "executed_at": datetime.now(timezone.utc).isoformat(),
+            "error": str(e),
+            "status": "failed"
+        })
+
+# Schedule daily bio updates at 4 AM UTC
+scheduler.add_job(
+    scheduled_bio_update,
+    CronTrigger(hour=4, minute=0),
+    id='daily_bio_update',
+    name='Daily Celebrity Bio Update',
+    replace_existing=True
+)
+
 @app.on_event("startup")
 async def start_scheduler():
     """Start the scheduler when the app starts"""
