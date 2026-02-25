@@ -3981,7 +3981,7 @@ async def autocomplete_search(q: str):
                     "mr beast", "mrbeast", "markiplier", "jacksepticeye", "pokimane", "xqc",
                     "dream", "technoblade", "tommyinnit", "tubbo", "ranboo", "georgenotfound",
                     "earl of snowdon", "james ogilvy", "lady gabriella kingston", "jwoww",
-                    "lady gabriella windsor", "danny pintauro"]
+                    "lady gabriella windsor", "danny pintauro", "princess theodora of greece"]
     all_suggestions = [s for s in all_suggestions 
                        if not any(banned in s.get("name", "").lower() for banned in banned_names)]
     
