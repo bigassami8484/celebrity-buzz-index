@@ -3825,10 +3825,8 @@ async def autocomplete_search(q: str):
                 # SINGLE CALCULATION for tier AND price
                 tier, price = calculate_tier_and_price(language_count, bio, match["name"])
                 
-                # Check if in hot celebs
-                hot_price, _, is_hot = get_hot_celeb_price(match["name"])
-                if is_hot:
-                    price = min(15.0, price * 1.15)
+                # Check if in hot celebs (for display purposes only - NO price premium)
+                _, _, is_hot = get_hot_celeb_price(match["name"])
                 
                 priority_suggestions.append({
                     "name": match["name"],
