@@ -159,7 +159,7 @@ const HotStreaks = ({ streaks: propStreaks, onCelebClick }) => {
                   <TierBadge tier={streak.tier} size="xs" />
                 </div>
                 <div className="text-xs text-[#A1A1AA]">
-                  {streak.streak_days} days · {streak.news_count} articles
+                  {streak.streak_days} days trending
                 </div>
               </div>
               
