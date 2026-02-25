@@ -3974,6 +3974,13 @@ async def autocomplete_search(q: str):
     
     all_suggestions = unique_suggestions
     
+    # Filter out banned celebrities (streamers, YouTubers, etc.)
+    banned_names = ["ninja", "pewdiepie", "shroud", "callux", "ksi", "logan paul", "jake paul",
+                    "mr beast", "mrbeast", "markiplier", "jacksepticeye", "pokimane", "xqc",
+                    "dream", "technoblade", "tommyinnit", "tubbo", "ranboo", "georgenotfound"]
+    all_suggestions = [s for s in all_suggestions 
+                       if not any(banned in s.get("name", "").lower() for banned in banned_names)]
+    
     # Check for Brown Bread premium pricing on each suggestion
     for suggestion in all_suggestions:
         premium_price = await get_brown_bread_premium_by_name(suggestion.get("name", ""))
