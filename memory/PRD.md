@@ -9,7 +9,47 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Compete on leaderboards with friends
 - Social sharing (Twitter/X, Facebook, WhatsApp)
 
-## Latest Updates (Feb 24, 2026 - Session 5)
+## Latest Updates (Feb 25, 2026 - Session 6)
+
+### CRITICAL FIX: Price/Tier Consistency Across All UI Components (Feb 25, 2026)
+**Problem**: Celebrities showed different prices in Hot Celebs banner, Search results, and Category pages. For example, Taylor Swift showed £14.3M in Hot Celebs but £14.9M in Search.
+**Root Cause**: The hot celebs endpoint applied a "news premium" multiplier (1.05-1.15x) to prices, and autocomplete also applied a 1.15x premium for hot celebrities.
+**Fix Applied**:
+- Removed news premium multiplier from `/api/hot-celebs` endpoint - now uses base price directly
+- Removed 1.15x hot celeb premium from `/api/autocomplete` endpoint
+- Added `/api/admin/refresh-hot-celebs` endpoint to force cache refresh
+**Verified Results**:
+- Taylor Swift: £13.0M in Hot Celebs AND Search ✅
+- Eric Dane: £6.9M in Hot Celebs AND Search ✅
+- Prince Harry: £11.0M in Search AND Category ✅
+
+### NEW: Royals Added with Real Photos (Feb 25, 2026)
+**Added Celebrities**:
+- Prince Harry, Duke of Sussex (A-LIST, £11M, real photo)
+- Charles III (A-LIST, £15M, real photo)
+- William, Prince of Wales (A-LIST, £13M, real photo)
+**Implementation**:
+- Created `/api/admin/add-royals` endpoint
+- All royals now appear in the Royals category with correct tier/price
+- Fixed `wiki_url` field to ensure celebrities appear in category views
+
+### NEW: Periodic Bio Updates from Wikipedia (Feb 25, 2026)
+**Feature**: Automatic celebrity bio updates from Wikipedia
+- Created `/api/admin/update-bios` endpoint for manual batch updates
+- Added scheduled task running daily at 4 AM UTC
+- Throttled API calls (1 second delay) to avoid rate limiting
+- Updates celebrities with short/generic bios with real Wikipedia intros
+**Status**: 30 bios updated, 228 remaining to process
+
+### Admin Endpoints Added (Feb 25, 2026)
+- `POST /api/admin/add-celebrity` - Add any celebrity with proper tier/price/image
+- `POST /api/admin/add-royals` - Add Prince Harry, King Charles, Prince William
+- `POST /api/admin/update-bios` - Batch update celebrity bios from Wikipedia
+- `POST /api/admin/refresh-hot-celebs` - Force refresh hot celebs cache
+
+---
+
+## Previous Updates (Feb 24, 2026 - Session 5)
 
 ### FEATURE: Disambiguation Search Results (Feb 24, 2026)
 **Problem**: Searching for "james morrison" only returned 1 result, but there are multiple celebrities with that name (singer, footballer, actor, etc.)
