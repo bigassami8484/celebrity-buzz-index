@@ -3976,7 +3976,7 @@ async def autocomplete_search(q: str):
     
     all_suggestions = unique_suggestions
     
-    # Filter out banned celebrities (streamers, YouTubers, removed royals, bands, etc.)
+    # Filter out banned celebrities (streamers, YouTubers, removed royals, bands, serial killers, etc.)
     banned_names = ["ninja", "pewdiepie", "shroud", "callux", "ksi", "logan paul", "jake paul",
                     "mr beast", "mrbeast", "markiplier", "jacksepticeye", "pokimane", "xqc",
                     "dream", "technoblade", "tommyinnit", "tubbo", "ranboo", "georgenotfound",
@@ -3984,7 +3984,15 @@ async def autocomplete_search(q: str):
                     "lady gabriella windsor", "princess theodora of greece",
                     "danny pintauro", "dana plato", "tony little", "caylee anthony",
                     "right said fred", "jedward", "kevin federline", "milli vanilli",
-                    "tiffany", "puck", "john bobbitt", "lorena bobbitt", "bobbitt"]
+                    "tiffany", "puck", "john bobbitt", "lorena bobbitt", "bobbitt",
+                    # Serial killers - banned
+                    "ted bundy", "jeffrey dahmer", "john wayne gacy", "charles manson",
+                    "ed gein", "richard ramirez", "dennis rader", "btk killer", "zodiac killer",
+                    "harold shipman", "fred west", "rose west", "peter sutcliffe", "yorkshire ripper",
+                    "myra hindley", "ian brady", "dennis nilsen", "levi bellfield", "steve wright",
+                    "joanna dennehy", "aileen wuornos", "andrei chikatilo", "luis garavito",
+                    "pedro lopez", "gary ridgway", "green river killer", "samuel little",
+                    "h. h. holmes", "albert fish", "edmund kemper", "david berkowitz", "son of sam"]
     all_suggestions = [s for s in all_suggestions 
                        if not any(banned in s.get("name", "").lower() for banned in banned_names)]
     
