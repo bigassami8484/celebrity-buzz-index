@@ -47,8 +47,6 @@ class TestPriceConsistency:
         # Taylor Swift should be A-LIST (she has 100+ Wikipedia languages)
         assert taylor.get("tier") == "A", f"Expected A-LIST, got {taylor.get('tier')}"
         assert taylor.get("price") >= 10, f"Expected price >= £10M, got £{taylor.get('price')}M"
-        
-        return taylor.get("price"), taylor.get("tier")
     
     def test_hot_celebs_endpoint(self):
         """Test hot celebs endpoint returns celebrities with consistent pricing"""
@@ -56,12 +54,14 @@ class TestPriceConsistency:
         assert response.status_code == 200
         data = response.json()
         
-        assert isinstance(data, list), "Hot celebs should return a list"
-        print(f"✓ Hot celebs returned {len(data)} celebrities")
+        # Hot celebs returns {"hot_celebs": [...]}
+        hot_celebs = data.get("hot_celebs", [])
+        assert isinstance(hot_celebs, list), "Hot celebs should return a list"
+        print(f"✓ Hot celebs returned {len(hot_celebs)} celebrities")
         
         # Check if Taylor Swift is in hot celebs
         taylor_in_hot = None
-        for celeb in data:
+        for celeb in hot_celebs:
             if "taylor swift" in celeb.get("name", "").lower():
                 taylor_in_hot = celeb
                 break
@@ -72,8 +72,6 @@ class TestPriceConsistency:
             assert taylor_in_hot.get("tier") == "A", f"Hot celebs Taylor Swift should be A-LIST"
         else:
             print("ℹ Taylor Swift not currently in hot celebs (this is OK - hot celebs are based on news)")
-        
-        return data
 
 
 class TestRoyalsCategory:
@@ -85,16 +83,14 @@ class TestRoyalsCategory:
         assert response.status_code == 200
         data = response.json()
         
-        assert isinstance(data, list), "Category endpoint should return a list"
-        print(f"✓ Royals category returned {len(data)} celebrities")
+        # Category endpoint returns {"celebrities": [...]}
+        celebrities = data.get("celebrities", [])
+        assert isinstance(celebrities, list), "Category endpoint should return a list"
+        print(f"✓ Royals category returned {len(celebrities)} celebrities")
         
         # Get all names
-        names = [c.get("name", "").lower() for c in data]
-        print(f"  Royals found: {[c.get('name') for c in data]}")
-        
-        # Note: The endpoint returns 8 random samples, so we may need multiple requests
-        # to verify all royals are in the pool
-        return data
+        names = [c.get("name", "").lower() for c in celebrities]
+        print(f"  Royals found: {[c.get('name') for c in celebrities]}")
     
     def test_royals_multiple_requests(self):
         """Make multiple requests to verify royals pool contains expected members"""
@@ -105,7 +101,8 @@ class TestRoyalsCategory:
             response = requests.get(f"{BASE_URL}/api/celebrities/category/royals")
             if response.status_code == 200:
                 data = response.json()
-                for celeb in data:
+                celebrities = data.get("celebrities", [])
+                for celeb in celebrities:
                     all_royals.add(celeb.get("name", "").lower())
         
         print(f"✓ Found {len(all_royals)} unique royals across 5 requests:")
@@ -136,13 +133,13 @@ class TestTVPersonalities:
         assert response.status_code == 200
         data = response.json()
         
-        assert isinstance(data, list), "Category endpoint should return a list"
-        print(f"✓ TV Personalities category returned {len(data)} celebrities")
+        # Category endpoint returns {"celebrities": [...]}
+        celebrities = data.get("celebrities", [])
+        assert isinstance(celebrities, list), "Category endpoint should return a list"
+        print(f"✓ TV Personalities category returned {len(celebrities)} celebrities")
         
-        names = [c.get("name", "").lower() for c in data]
-        print(f"  TV Personalities found: {[c.get('name') for c in data]}")
-        
-        return data
+        names = [c.get("name", "").lower() for c in celebrities]
+        print(f"  TV Personalities found: {[c.get('name') for c in celebrities]}")
     
     def test_tv_personalities_multiple_requests(self):
         """Make multiple requests to verify TV personalities pool"""
@@ -152,7 +149,8 @@ class TestTVPersonalities:
             response = requests.get(f"{BASE_URL}/api/celebrities/category/tv_personalities")
             if response.status_code == 200:
                 data = response.json()
-                for celeb in data:
+                celebrities = data.get("celebrities", [])
+                for celeb in celebrities:
                     all_presenters.add(celeb.get("name", "").lower())
         
         print(f"✓ Found {len(all_presenters)} unique TV personalities across 5 requests:")
@@ -249,7 +247,8 @@ class TestCelebrityCategorization:
             response = requests.get(f"{BASE_URL}/api/celebrities/category/athletes")
             if response.status_code == 200:
                 data = response.json()
-                for celeb in data:
+                celebrities = data.get("celebrities", [])
+                for celeb in celebrities:
                     all_athletes.add(celeb.get("name", "").lower())
         
         print(f"✓ Found {len(all_athletes)} unique athletes across 5 requests")
@@ -284,7 +283,8 @@ class TestCelebrityCategorization:
             response = requests.get(f"{BASE_URL}/api/celebrities/category/musicians")
             if response.status_code == 200:
                 data = response.json()
-                for celeb in data:
+                celebrities = data.get("celebrities", [])
+                for celeb in celebrities:
                     all_musicians.add(celeb.get("name", "").lower())
         
         print(f"✓ Found {len(all_musicians)} unique musicians across 5 requests")
@@ -324,7 +324,8 @@ class TestSearchConsistency:
                 response = requests.get(f"{BASE_URL}/api/celebrities/category/musicians")
                 if response.status_code == 200:
                     data = response.json()
-                    for celeb in data:
+                    celebrities = data.get("celebrities", [])
+                    for celeb in celebrities:
                         if "ed sheeran" in celeb.get("name", "").lower():
                             cat_price = celeb.get("price")
                             cat_tier = celeb.get("tier")
