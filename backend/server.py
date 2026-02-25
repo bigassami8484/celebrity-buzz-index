@@ -8884,6 +8884,161 @@ async def admin_refresh_hot_celebs():
         }
 
 
+# Banned celebrities (streamers, YouTubers, non-people)
+BANNED_CELEBRITIES = [
+    "ninja", "pewdiepie", "shroud", "callux", "ksi", "logan paul", "jake paul",
+    "mr beast", "mrbeast", "markiplier", "jacksepticeye", "pokimane", "xqc",
+    "dream", "technoblade", "tommyinnit", "tubbo", "ranboo", "georgenotfound"
+]
+
+
+@api_router.post("/admin/remove-celebrity")
+async def admin_remove_celebrity(name: str):
+    """Remove a celebrity from the database by name"""
+    try:
+        result = await db.celebrities.delete_many(
+            {"name": {"$regex": f"^{name}$", "$options": "i"}}
+        )
+        return {
+            "success": True,
+            "deleted_count": result.deleted_count,
+            "message": f"Removed {result.deleted_count} entries matching '{name}'"
+        }
+    except Exception as e:
+        return {"success": False, "message": str(e)}
+
+
+@api_router.post("/admin/remove-streamers")
+async def admin_remove_streamers():
+    """Remove all streamers/YouTubers from the database"""
+    results = []
+    for name in BANNED_CELEBRITIES:
+        result = await db.celebrities.delete_many(
+            {"name": {"$regex": name, "$options": "i"}}
+        )
+        if result.deleted_count > 0:
+            results.append({"name": name, "deleted": result.deleted_count})
+    
+    return {
+        "success": True,
+        "removed": results,
+        "total_removed": sum(r["deleted"] for r in results)
+    }
+
+
+@api_router.post("/admin/move-category")
+async def admin_move_category(name: str, new_category: str):
+    """Move a celebrity to a different category"""
+    try:
+        result = await db.celebrities.update_many(
+            {"name": {"$regex": f"^{name}$", "$options": "i"}},
+            {"$set": {"category": new_category}}
+        )
+        return {
+            "success": True,
+            "matched": result.matched_count,
+            "modified": result.modified_count,
+            "message": f"Moved '{name}' to '{new_category}'"
+        }
+    except Exception as e:
+        return {"success": False, "message": str(e)}
+
+
+@api_router.post("/admin/add-celebrities-bulk")
+async def admin_add_celebrities_bulk(celebrities: list, category: str):
+    """
+    Add multiple celebrities to a category in bulk.
+    Each celebrity should be a dict with 'name' and optionally 'search' (Wikipedia search term).
+    """
+    results = []
+    for celeb in celebrities:
+        try:
+            search_term = celeb.get("search", celeb.get("name", ""))
+            name = celeb.get("name", search_term)
+            
+            # Fetch Wikipedia info
+            wiki_info = await fetch_wikipedia_info(search_term)
+            
+            if not wiki_info or not wiki_info.get("name"):
+                results.append({"name": name, "success": False, "reason": "Wikipedia not found"})
+                continue
+            
+            actual_name = wiki_info.get("name")
+            bio = wiki_info.get("bio", "")[:500]
+            image = wiki_info.get("image", "")
+            
+            # Check if placeholder image
+            if not image or "ui-avatars" in image:
+                results.append({"name": actual_name, "success": False, "reason": "No real image"})
+                continue
+            
+            # Get tier and price
+            tier, price, lang_count = await get_tier_and_price_from_wikidata(actual_name, bio)
+            
+            # Extract age
+            birth_year = extract_birth_year_from_bio(bio)
+            age = calculate_age(birth_year) if birth_year else 0
+            
+            # Check if exists
+            existing = await db.celebrities.find_one(
+                {"name": {"$regex": f"^{actual_name}$", "$options": "i"}}
+            )
+            
+            celeb_id = existing.get("id") if existing else str(uuid.uuid4())
+            
+            celeb_data = {
+                "id": celeb_id,
+                "name": actual_name,
+                "bio": bio,
+                "image": image,
+                "category": category,
+                "tier": tier,
+                "price": price,
+                "recognition_score": lang_count,
+                "wiki_url": wiki_info.get("wiki_url", f"https://en.wikipedia.org/wiki/{actual_name.replace(' ', '_')}"),
+                "buzz_score": 50,
+                "birth_year": birth_year,
+                "age": age,
+                "is_deceased": False,
+                "times_picked": existing.get("times_picked", 0) if existing else 0,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+            
+            if existing:
+                await db.celebrities.update_one({"id": celeb_id}, {"$set": celeb_data})
+                action = "updated"
+            else:
+                celeb_data["created_at"] = datetime.now(timezone.utc).isoformat()
+                await db.celebrities.insert_one(celeb_data)
+                action = "created"
+            
+            results.append({
+                "name": actual_name,
+                "success": True,
+                "action": action,
+                "tier": tier,
+                "price": price,
+                "image": "real"
+            })
+            
+            # Small delay to avoid rate limiting
+            await asyncio.sleep(0.5)
+            
+        except Exception as e:
+            results.append({"name": celeb.get("name", "unknown"), "success": False, "reason": str(e)[:50]})
+    
+    successful = [r for r in results if r.get("success")]
+    failed = [r for r in results if not r.get("success")]
+    
+    return {
+        "success": True,
+        "category": category,
+        "added": len(successful),
+        "failed": len(failed),
+        "results": results
+    }
+
+
 # ==================== PERIODIC BIO UPDATES ====================
 
 async def update_celebrity_bios_batch(batch_size: int = 10, delay: float = 1.0):
