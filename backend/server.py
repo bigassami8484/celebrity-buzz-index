@@ -4508,7 +4508,7 @@ async def get_price_history_by_name(name: str, limit: int = 30):
 async def get_celebrities_by_category(category: str, response: Response):
     """Get 8 random celebrities by category using MongoDB $sample for true randomness.
     Only includes celebrities with valid Wikipedia data (bio and wiki_url).
-    Recalculates tier/price using SINGLE SOURCE OF TRUTH.
+    Uses stored tier/price from DB (already calculated correctly).
     """
     import random
     
@@ -4519,13 +4519,13 @@ async def get_celebrities_by_category(category: str, response: Response):
     
     # Get random sample from ALL celebrities in this category
     # MongoDB $sample provides true randomness from the entire collection
-    # FILTER: Get random celebrities from the category
-    # Prioritize those with Wikipedia images, but include all valid celebs
+    # FILTER: Get random celebrities from the category with valid recognition scores
     pipeline = [
         {"$match": {
             "category": category,
             "name": {"$ne": None, "$exists": True},
-            "wiki_url": {"$exists": True, "$ne": ""}
+            "wiki_url": {"$exists": True, "$ne": ""},
+            "recognition_score": {"$gte": 10}  # Only well-known celebs
         }},
         {"$sample": {"size": 8}},  # Random sample of exactly 8
         {"$project": {"_id": 0}}
@@ -4533,15 +4533,8 @@ async def get_celebrities_by_category(category: str, response: Response):
     
     selected = await db.celebrities.aggregate(pipeline).to_list(8)
     
-    # SINGLE SOURCE OF TRUTH: Recalculate tier/price for each celebrity
-    for celeb in selected:
-        name = celeb.get("name", "")
-        bio = celeb.get("bio", "")
-        tier, price, lang_count = await get_tier_and_price_from_wikidata(name, bio)
-        celeb["tier"] = tier
-        celeb["price"] = round(price, 1)
-        celeb["recognition_score"] = lang_count
-    
+    # Use stored tier/price from DB (already calculated correctly)
+    # No need to re-fetch from Wikidata
     return {"celebrities": selected[:8]}
 
 @api_router.get("/stats")
