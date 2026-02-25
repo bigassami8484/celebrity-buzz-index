@@ -4684,6 +4684,12 @@ async def get_hot_celebs():
         # Love Island / UK Reality
         "Molly-Mae Hague", "Tommy Fury", "Olivia Attwood", "Chris Hughes", "Kem Cetinay",
         "Dani Dyer", "Jack Fincham", "Amber Davies", "Georgia Steel", "Megan Barton-Hanson",
+        # More UK celebs for news coverage
+        "Ant McPartlin", "Declan Donnelly", "Bear Grylls", "Gordon Ramsay", "Jamie Oliver",
+        "Jeremy Clarkson", "Richard Hammond", "James May", "Gary Lineker", "Rio Ferdinand",
+        "David Attenborough", "Louis Theroux", "Ross Kemp", "Danny Dyer", "Vinnie Jones",
+        "Robbie Williams", "Liam Gallagher", "Noel Gallagher", "Dua Lipa", "Lewis Capaldi",
+        "Elton John", "Rod Stewart", "Mick Jagger", "Ozzy Osbourne", "Sharon Osbourne",
     ]
     
     # RSS feeds to scan for hot celebs - expanded list
