@@ -3451,7 +3451,9 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
                             'paul', 'mark', 'steve', 'chris', 'daniel', 'robert', 'william',
                             'george', 'thomas', 'charles', 'richard', 'jason', 'brian', 'kevin',
                             'jennifer', 'jessica', 'sarah', 'emily', 'emma', 'anna', 'kate',
-                            'mary', 'elizabeth', 'victoria', 'charlotte', 'sophie', 'amy'
+                            'mary', 'elizabeth', 'victoria', 'charlotte', 'sophie', 'amy',
+                            'demi', 'katie', 'price', 'moore', 'smith', 'jones', 'brown', 'taylor',
+                            'wilson', 'johnson', 'white', 'martin', 'anderson', 'clark', 'lewis'
                         }
                         
                         # Method 1: EXACT full name match with word boundaries (REQUIRED for all)
