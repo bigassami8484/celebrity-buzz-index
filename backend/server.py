@@ -3976,12 +3976,15 @@ async def autocomplete_search(q: str):
     
     all_suggestions = unique_suggestions
     
-    # Filter out banned celebrities (streamers, YouTubers, removed royals, etc.)
+    # Filter out banned celebrities (streamers, YouTubers, removed royals, bands, etc.)
     banned_names = ["ninja", "pewdiepie", "shroud", "callux", "ksi", "logan paul", "jake paul",
                     "mr beast", "mrbeast", "markiplier", "jacksepticeye", "pokimane", "xqc",
                     "dream", "technoblade", "tommyinnit", "tubbo", "ranboo", "georgenotfound",
                     "earl of snowdon", "james ogilvy", "lady gabriella kingston", "jwoww",
-                    "lady gabriella windsor", "danny pintauro", "princess theodora of greece"]
+                    "lady gabriella windsor", "princess theodora of greece",
+                    "danny pintauro", "dana plato", "tony little", "caylee anthony",
+                    "right said fred", "jedward", "kevin federline", "milli vanilli",
+                    "tiffany", "puck", "john bobbitt", "lorena bobbitt", "bobbitt"]
     all_suggestions = [s for s in all_suggestions 
                        if not any(banned in s.get("name", "").lower() for banned in banned_names)]
     
