@@ -8182,10 +8182,6 @@ async def admin_recalculate_recognition_scores(limit: int = None):
 # Auth routes are now in /routes/auth.py
 
 
-# Include routers
-app.include_router(api_router)
-app.include_router(auth_router)
-
 # ==================== SCHEDULED TASKS ====================
 
 # Initialize the scheduler
