@@ -8893,11 +8893,12 @@ async def admin_refresh_hot_celebs():
         }
 
 
-# Banned celebrities (streamers, YouTubers, non-people)
+# Banned celebrities (streamers, YouTubers, non-people, removed royals)
 BANNED_CELEBRITIES = [
     "ninja", "pewdiepie", "shroud", "callux", "ksi", "logan paul", "jake paul",
     "mr beast", "mrbeast", "markiplier", "jacksepticeye", "pokimane", "xqc",
-    "dream", "technoblade", "tommyinnit", "tubbo", "ranboo", "georgenotfound"
+    "dream", "technoblade", "tommyinnit", "tubbo", "ranboo", "georgenotfound",
+    "earl of snowdon", "james ogilvy", "lady gabriella kingston", "jwoww"
 ]
 
 
