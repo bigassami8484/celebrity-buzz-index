@@ -1430,15 +1430,15 @@ CATEGORIES = [
 
 # Pre-defined trending celebrities per category (UK & International mix)
 TRENDING_CELEBRITIES = {
-    "movie_stars": ["Tom Holland", "Florence Pugh", "Idris Elba", "Emily Blunt", "Dev Patel"],
-    "tv_actors": ["Jenna Coleman", "Jodie Comer", "Richard Madden", "Ncuti Gatwa", "Olivia Colman"],
-    "tv_personalities": ["Graham Norton", "Holly Willoughby", "Ant McPartlin", "Dec Donnelly", "Phillip Schofield"],
-    "musicians": ["Dua Lipa", "Ed Sheeran", "Adele", "Harry Styles", "Stormzy"],
-    "athletes": ["Harry Kane", "Marcus Rashford", "Emma Raducanu", "Lewis Hamilton", "Raheem Sterling"],
-    "royals": ["Prince William", "Kate Middleton", "Prince Harry", "Meghan Markle", "Prince Andrew"],
-    "reality_tv": ["Katie Price", "Gemma Collins", "Pete Wicks", "Joey Essex", "Sam Faiers"],
+    "movie_stars": ["Tom Holland", "Florence Pugh", "Idris Elba", "Emily Blunt", "Dev Patel", "Johnny Depp", "Margot Robbie"],
+    "tv_actors": ["Jenna Coleman", "Jodie Comer", "Richard Madden", "Ncuti Gatwa", "Olivia Colman", "David Tennant"],
+    "tv_personalities": ["Graham Norton", "Holly Willoughby", "Ant McPartlin", "Dec Donnelly", "Phillip Schofield", "Piers Morgan", "James Corden"],
+    "musicians": ["Dua Lipa", "Ed Sheeran", "Adele", "Harry Styles", "Stormzy", "Robbie Williams", "Lewis Capaldi"],
+    "athletes": ["Harry Kane", "Marcus Rashford", "Emma Raducanu", "Lewis Hamilton", "Raheem Sterling", "David Beckham", "Tyson Fury"],
+    "royals": ["Prince William", "Kate Middleton", "Prince Harry", "Meghan Markle", "Prince Andrew", "King Charles", "Princess Diana"],
+    "reality_tv": ["Katie Price", "Gemma Collins", "Pete Wicks", "Joey Essex", "Sam Faiers", "Molly-Mae Hague", "Tommy Fury"],
     "public_figure": ["Elon Musk", "Donald Trump", "Boris Johnson", "Greta Thunberg", "Alexandria Ocasio-Cortez", "Joe Rogan", "Andrew Tate", "Jordan Peterson", "Nigel Farage", "Rishi Sunak"],
-    "other": ["Gordon Ramsay", "Bear Grylls", "Jeremy Clarkson", "Jamie Oliver", "Nigella Lawson"],
+    "other": ["Gordon Ramsay", "Bear Grylls", "Jeremy Clarkson", "Jamie Oliver", "Nigella Lawson", "Simon Cowell", "David Attenborough"],
 }
 
 # LARGE CELEBRITY POOLS - 50+ celebrities per category to pull from
