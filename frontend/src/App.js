@@ -717,7 +717,7 @@ function App() {
         <HowItWorks onShowMethodology={() => setShowMethodology(true)} />
       </div>
       
-      <HotCelebsBanner celebs={hotCelebs} onSelect={handleCelebSearch} />
+      <HotCelebsBanner celebs={hotCelebs} onSelect={handleCelebSearch} onAdd={addFromHotCelebs} />
       
       <div className="max-w-7xl mx-auto px-4 py-8">
         <SearchBar 
