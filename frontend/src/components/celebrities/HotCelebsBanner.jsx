@@ -1,12 +1,19 @@
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, Plus } from "lucide-react";
 import TierBadge from "../common/TierBadge";
 
-const HotCelebsBanner = ({ celebs, onSelect }) => {
+const HotCelebsBanner = ({ celebs, onSelect, onAdd }) => {
   // Always show the banner container, even if loading
   const hasCelebs = celebs && celebs.length > 0;
   
   // Double the celebs for infinite scroll effect
   const doubledCelebs = hasCelebs ? [...celebs, ...celebs] : [];
+  
+  const handleAdd = (e, celeb) => {
+    e.stopPropagation(); // Prevent triggering onSelect
+    if (onAdd) {
+      onAdd(celeb);
+    }
+  };
   
   return (
     <div className="bg-gradient-to-r from-[#FF0099]/30 via-[#0A0A0A] to-[#00F0FF]/30 border-b border-[#FF0099]/50 p-4 overflow-hidden" data-testid="hot-celebs-banner">
@@ -34,7 +41,7 @@ const HotCelebsBanner = ({ celebs, onSelect }) => {
                 <div 
                   key={idx}
                   onClick={() => onSelect(celeb.name)}
-                  className="flex-shrink-0 w-28 bg-[#1A1A1A] border border-[#262626] p-2 cursor-pointer hover:border-[#FF0099] transition-colors group"
+                  className="flex-shrink-0 w-28 bg-[#1A1A1A] border border-[#262626] p-2 cursor-pointer hover:border-[#FF0099] transition-colors group relative"
                 >
                   <div className="relative mb-1">
                     <img 
@@ -63,10 +70,19 @@ const HotCelebsBanner = ({ celebs, onSelect }) => {
                       <TrendingUp className="w-3 h-3 text-[#00FF00] flex-shrink-0" />
                     )}
                   </div>
-                  <p className={`text-[10px] font-bold ${celeb.news_premium ? 'text-[#00FF00]' : 'text-[#00FF00]'}`}>
-                    £{celeb.price}M
-                    {celeb.news_premium && <span className="text-[8px] ml-1 text-[#00FF00]">▲</span>}
-                  </p>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className={`text-[10px] font-bold ${celeb.news_premium ? 'text-[#00FF00]' : 'text-[#00FF00]'}`}>
+                      £{celeb.price}M
+                    </p>
+                    <button
+                      onClick={(e) => handleAdd(e, celeb)}
+                      className="bg-[#FF0099] hover:bg-[#FF0099]/80 text-white text-[9px] px-2 py-0.5 rounded flex items-center gap-0.5 transition-colors"
+                      data-testid={`add-hot-celeb-${idx}`}
+                    >
+                      <Plus className="w-3 h-3" />
+                      Add
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
