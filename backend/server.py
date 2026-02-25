@@ -8718,6 +8718,27 @@ async def admin_add_celebrity(name: str, category: str = "other", force_update: 
         bio = wiki_info.get("bio", "")[:500]
         image = wiki_info.get("image", "")
         
+        # Check if deceased - reject adding dead celebrities
+        bio_lower = bio.lower()
+        death_indicators = ["was a", "was an", "died", "death", "passed away", "deceased", 
+                           "1900–", "1910–", "1920–", "1930–", "1940–", "1950–", "1960–", 
+                           "1970–", "1980–", "1990–", "2000–", "2010–", "2020–",
+                           " – ", "–2", "−2"]  # Date ranges indicating death
+        
+        is_deceased = any(indicator in bio_lower for indicator in death_indicators)
+        
+        # Also check for death year pattern like "(1950-2020)" or "born 1950, died 2020"
+        import re
+        death_year_pattern = re.search(r'\b(19|20)\d{2}\s*[–\-−]\s*(19|20)\d{2}\b', bio)
+        if death_year_pattern:
+            is_deceased = True
+        
+        if is_deceased:
+            return {
+                "success": False,
+                "message": f"Cannot add '{actual_name}' - they appear to be deceased. Only living celebrities can be added."
+            }
+        
         # Get tier and price from Wikidata (SINGLE SOURCE OF TRUTH)
         tier, price, lang_count = await get_tier_and_price_from_wikidata(actual_name, bio)
         
