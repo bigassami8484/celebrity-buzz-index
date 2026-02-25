@@ -28,22 +28,48 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Prince Harry, Duke of Sussex (A-LIST, £11M, real photo)
 - Charles III (A-LIST, £15M, real photo)
 - William, Prince of Wales (A-LIST, £13M, real photo)
-**Implementation**:
-- Created `/api/admin/add-royals` endpoint
-- All royals now appear in the Royals category with correct tier/price
-- Fixed `wiki_url` field to ensure celebrities appear in category views
+- Plus 14 more royals: Princess Anne, Prince Edward, Sophie Duchess of Edinburgh, Sarah Ferguson, Mike Tindall, Lady Louise Windsor, Princess Mary of Denmark, Crown Princess Victoria, King Felipe VI, Queen Letizia, Queen Maxima, etc.
+**Total Royals**: ~20 celebrities
+
+### NEW: TV Presenters Moved to tv_personalities (Feb 25, 2026)
+**Moved from "Other"**:
+- Phillip Schofield, Alan Carr, Rylan Clark, Graham Norton, Davina McCall
+- Dermot O'Leary, Ant McPartlin, Declan Donnelly, Jonathan Ross, Holly Willoughby
+
+### NEW: Category Corrections (Feb 25, 2026)
+- Gary Lineker → athletes
+- Victoria Beckham → musicians
+
+### NEW: Added to "Other" Category (Feb 25, 2026)
+- Volodymyr Zelenskyy, Tony Blair, Barack Obama, Joe Biden
+- Boris Johnson, Rishi Sunak, Keir Starmer, Nigel Farage
+- Elon Musk, Jeff Bezos, Mark Zuckerberg, Bill Gates
+
+### NEW: Banned Streamers/YouTubers (Feb 25, 2026)
+**Removed from search results**:
+- Ninja, PewDiePie, Shroud, Callux, KSI, Logan Paul, Jake Paul, MrBeast, etc.
+**Filter active in**: `/api/autocomplete` endpoint
+
+### NEW: FAQ About Deceased Celebrities (Feb 25, 2026)
+**Added FAQ item**: "Why are deceased celebrities still in the game?"
+- Explains posthumous scandals, documentaries, estate drama
+- Mentions Brown Bread Bonus (+100 points)
 
 ### NEW: Periodic Bio Updates from Wikipedia (Feb 25, 2026)
 **Feature**: Automatic celebrity bio updates from Wikipedia
 - Created `/api/admin/update-bios` endpoint for manual batch updates
 - Added scheduled task running daily at 4 AM UTC
-- Throttled API calls (1 second delay) to avoid rate limiting
+- Throttled API calls (0.5-1 second delay) to avoid rate limiting
 - Updates celebrities with short/generic bios with real Wikipedia intros
-**Status**: 30 bios updated, 228 remaining to process
+**Progress**: 140+ bios updated, ~200 remaining
 
 ### Admin Endpoints Added (Feb 25, 2026)
 - `POST /api/admin/add-celebrity` - Add any celebrity with proper tier/price/image
 - `POST /api/admin/add-royals` - Add Prince Harry, King Charles, Prince William
+- `POST /api/admin/add-celebrities-bulk` - Add multiple celebrities to a category
+- `POST /api/admin/move-category` - Move celebrity to different category
+- `POST /api/admin/remove-celebrity` - Remove a celebrity by name
+- `POST /api/admin/remove-streamers` - Remove all banned streamers/YouTubers
 - `POST /api/admin/update-bios` - Batch update celebrity bios from Wikipedia
 - `POST /api/admin/refresh-hot-celebs` - Force refresh hot celebs cache
 
