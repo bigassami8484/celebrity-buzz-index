@@ -1175,7 +1175,25 @@ function App() {
               </div>
             </details>
             
-            {/* FAQ Item 8 - Beta Notice */}
+            {/* FAQ Item 8 - Deceased Celebrities */}
+            <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
+              <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
+                Why are deceased celebrities still in the game? 💀
+                <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
+                <p>Because scandals can <strong className="text-white">come from the grave!</strong> 🪦</p>
+                <p>Think about it - posthumous albums, unreleased footage, estate drama, documentary revelations... dead celebs can still hit the headlines!</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>💀 <strong className="text-white">Brown Bread Bonus</strong>: +100 points if a celeb in your team passes away</li>
+                  <li>📰 Legacy news still counts towards buzz points</li>
+                  <li>🎬 Documentaries and tributes = headline gold</li>
+                </ul>
+                <p className="text-[#FFD700] font-bold mt-2">The ultimate long-term investment strategy? 👀</p>
+              </div>
+            </details>
+            
+            {/* FAQ Item 9 - Beta Notice */}
             <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
               <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
                 Why is [celebrity] in the wrong category or priced weirdly?
