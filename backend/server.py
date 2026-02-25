@@ -9011,6 +9011,22 @@ async def admin_add_celebrities_bulk(celebrities: list, category: str):
                 results.append({"name": actual_name, "success": False, "reason": "No real image"})
                 continue
             
+            # Check if deceased - skip dead celebrities
+            bio_lower = bio.lower()
+            death_indicators = ["was a", "was an", "died", "death", "passed away", "deceased",
+                               " – ", "–2", "−2"]
+            is_deceased = any(indicator in bio_lower for indicator in death_indicators)
+            
+            # Also check for death year pattern
+            import re
+            death_year_pattern = re.search(r'\b(19|20)\d{2}\s*[–\-−]\s*(19|20)\d{2}\b', bio)
+            if death_year_pattern:
+                is_deceased = True
+            
+            if is_deceased:
+                results.append({"name": actual_name, "success": False, "reason": "Deceased - cannot add"})
+                continue
+            
             # Get tier and price
             tier, price, lang_count = await get_tier_and_price_from_wikidata(actual_name, bio)
             
