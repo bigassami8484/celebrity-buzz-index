@@ -1423,8 +1423,8 @@ CATEGORIES = [
     {"id": "tv_personalities", "name": "TV Personalities", "icon": "video"},
     {"id": "musicians", "name": "Musicians", "icon": "music"},
     {"id": "athletes", "name": "Athletes", "icon": "trophy"},
+    {"id": "royals", "name": "Royals", "icon": "crown"},
     {"id": "reality_tv", "name": "Reality TV", "icon": "star"},
-    {"id": "public_figure", "name": "Public Figure", "icon": "megaphone"},
     {"id": "other", "name": "Other", "icon": "users"},
 ]
 
