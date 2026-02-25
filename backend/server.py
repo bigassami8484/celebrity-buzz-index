@@ -4867,16 +4867,10 @@ async def get_hot_celebs():
                             tier, base_price = calculate_tier_and_price(language_count, bio)
                             category = get_category_from_bio(bio, actual_name)
                         
-                        # Apply small NEWS PREMIUM based on mention count (max 20% boost)
+                        # USE BASE PRICE DIRECTLY - NO NEWS PREMIUM
+                        # This ensures price consistency across Hot Celebs, Search, and Categories
                         mention_count = data["count"]
-                        if mention_count >= 5:
-                            news_multiplier = 1.15  # 5+ mentions = 15% price boost
-                        elif mention_count >= 3:
-                            news_multiplier = 1.10  # 3-4 mentions = 10% price boost
-                        else:
-                            news_multiplier = 1.05  # Small boost for being in news
-                        
-                        price = round(base_price * news_multiplier, 1)
+                        price = round(base_price, 1)
                         
                         # Enforce £15M price cap
                         if price > 15:
