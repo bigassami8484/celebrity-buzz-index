@@ -1,0 +1,178 @@
+<analysis>**original_problem_statement:**
+The user wants to build a Celebrity Buzz Index game. This is a full-stack web application where users act as a fantasy league manager, drafting a team of celebrities with a starting budget. Points are awarded based on the celebrities' real-world media presence, sourced from Wikipedia and various news outlets.
+
+**PRODUCT REQUIREMENTS:**
+-   **Application**: Full-stack web app with a React frontend and a FastAPI backend.
+-   **Data**: Real-time celebrity data from the Wikipedia API and news from RSS feeds.
+-   **Gameplay**:
+    -   Users draft a team of 10 celebrities with a starting budget of £50M.
+    -   A weekly transfer window opens every Sunday, allowing 3 transfers.
+    -   A daily points system based on news mentions.
+    -   A Submit Team button that locks the team.
+-   **Authentication**: Guest mode, with a prompt to sign up/login (Google social login) to save progress.
+-   **Friends Leagues**: Users can create or join private leagues.
+-   **Features**:
+    -   Autocomplete search bar.
+    -   Hot Celebs This Week banner.
+    -   Brown Bread Watch for elderly celebrities.
+    -   Most Picked list.
+    -   Hot Streaks feature.
+    -   Disambiguation for names with multiple famous people.
+-   **UI/UX**: The application must have a mobile-first design and a proper favicon.
+-   **Data Integrity & Content**:
+    -   A multi-layer tiering/pricing system (A, B, C, D) must be the single source of truth.
+    -   Celebrity bios should be the first few lines from their real Wikipedia entry.
+    -   Each category must be populated: 70+ for major categories (Movie Stars, Musicians, TV, Athletes), 50 for Reality TV, and 25 for Royals.
+    -   Broadcasters, journalists, and presenters should be in the Other category.
+    -   All celebrities must have a profile picture. No duplicates, bands, or non-people entities.
+    -   Tiers and prices must be consistent across all UI components (search, categories, hot celebs, etc.).
+
+**User's preferred language**: English
+
+**what currently exists?**
+A full-stack React/FastAPI/MongoDB application for the Celebrity Buzz Index game. The agent has just completed a massive data seeding and cleanup operation, addressing numerous user complaints about data quality and missing features. This included fixing critical search bugs, restoring missing UI sections (Hot Streaks, Brown Bread Watch), and populating the database with approximately 500 celebrities across all required categories. However, this has introduced new issues related to API rate-limiting and data consistency. The core logic remains in a monolithic  and .
+
+**Last working item**:
+-   **Last item agent was working**: The user's most recent request was to ensure that prices and tiers for a given celebrity are identical across all parts of the application (Hot Celebs banner, search results, category pages, etc.). The agent was also in the middle of a long-running task to update all celebrity descriptions with the first few lines of their real Wikipedia bios, a task hampered by API rate-limiting.
+-   **Status**: IN PROGRESS
+-   **Agent Testing Done**: Y
+-   **Which testing method agent to use?**: backend testing agent
+-   **User Testing Done**: N
+
+**All Pending/In progress Issue list**:
+-   **Issue 1: Price and Tier Inconsistency Across UI Components (P0)**
+    -   **Description**: A celebrity's price and tier are different depending on where they appear in the UI. For example, Hot Celebs might show Eric Dane as a B-List celebrity for £7.2M, while the Movie Stars category shows him for £6.9M. This is a critical data integrity bug.
+    -   **Attempted fixes**: The agent has tried clearing caches, manually updating DB entries, and refactoring tier calculation logic. The problem persists because different endpoints use different data sources (stale DB entries, stale caches, or live API calls that may be rate-limited).
+    -   **Next debug checklist**:
+        1.  Create a single, unified function  in  that will become the sole source of truth for fetching a celebrity's details (tier, price, bio, image, etc.).
+        2.  This function should intelligently cache data, fetching fresh from Wikipedia/Wikidata only if the database record is missing or stale (e.g., older than 24 hours).
+        3.  Refactor all relevant endpoints (, , , ) to use this new unified function exclusively. This will eliminate logic duplication and guarantee data consistency.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is the most critical bug. Fixing it will ensure users see consistent and trustworthy data, which is fundamental to the game's fairness and user experience.
+    -   **Status**: IN PROGRESS
+    -   **Is recurring issue?**: Y
+    -   **Should Test frontend/backend/both after fix?**: Backend
+    -   **Blocked on other issue**: None
+
+-   **Issue 2: Production Mobile View is Broken (P1)**
+    -   **Description**: A recurring user report that the live production site does not render correctly on mobile devices.
+    -   **Attempted fixes**: This has been identified as a production-only issue likely related to caching or deployment configuration, which is not reproducible in the agent's environment.
+    -   **Next debug checklist**: Advise the user to contact **Emergent Support** to investigate their production environment's caching, CDN, and deployment settings.
+    -   **Status**: BLOCKED
+    -   **Is recurring issue?**: Y
+    -   **Should Test frontend/backend/both after fix?**: Frontend
+    -   **Blocked on other issue**: User action required (contacting support).
+
+**In progress Task List**:
+-   **Task 1: Update All Celebrity Bios with Real Wikipedia Intros (P1)**
+    -   **Where to resume**: The process of updating the  field for all celebrities with their Wikipedia bio summary was started but failed due to API rate-limiting.
+    -   **What will be achieved with this?**: Fulfills the user's request for more accurate and engaging celebrity descriptions, moving away from generic placeholders.
+    -   **Status**: IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?**: Frontend
+    -   **Blocked on something**: Severe API rate-limiting from Wikipedia. The fix will require a slow, throttled background script with significant delays between API calls.
+
+**Upcoming and Future Tasks**
+-   **Upcoming Tasks**:
+    -   **P1**: Implement browser push notifications for Hot Streaks.
+    -   **P1**: Verify the Link Guest Team on Sign-in functionality.
+-   **Future Tasks**:
+    -   **P2**: Backend Refactoring (Phase 2): Create , , and  and migrate logic from .
+    -   **P2**: Add a Celebrity Comparison Feature.
+    -   **P2**: Implement head-to-head matchups within leagues.
+    -   **P2**: Expand the badge system and Hall of Fame page.
+
+**Completed work in this session**
+-   **Critical Search Bug Fixes**:
+    -   Resolved an issue where a trailing space was required in the search bar to get correct celebrity data.
+    -   Fixed filtering logic that incorrectly removed celebrities with cf in their name (e.g., McFadden).
+    -   Implemented disambiguation to show multiple results for names like James Morrison.
+    -   Added fuzzy search to handle common misspellings (e.g., Steven for Stephen).
+-   **Massive Data Seeding & Cleanup**:
+    -   Populated all categories to meet user-specified targets (70+ for major, 50 for reality TV, 25 for royals), totaling ~500 celebrities.
+    -   Removed duplicates, non-people entities (bands, movie titles), and celebrities without images.
+    -   Corrected celebrity ages and removed deceased individuals from the Brown Bread Watch.
+    -   Moved broadcasters/journalists to the Other category as requested.
+-   **Feature Restoration & UI Fixes**:
+    -   Restored the Hot Streaks, Brown Bread Watch, and Most Picked sections by seeding the necessary data and clearing stale caches.
+    -   Fixed missing images on the Brown Bread Watch component, ensuring faces now appear.
+    -   Re-enabled the Royals category in the UI after it was accidentally hidden.
+
+**Earlier issues found/mentioned but not fixed**
+-   The Production Mobile View is Broken issue remains blocked.
+
+**Known issue recurrence from previous fork**
+-   **Inconsistent Tiers and Prices**: This was the primary issue in the previous fork and has recurred. The core problem lies in having multiple data fetching/caching strategies across different endpoints, leading to inconsistencies.
+-   **Production Mobile View is Broken**: Remains blocked and requires user action.
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+-   **API Rate Limiting**: Heavy reliance on Wikipedia/Wikidata APIs for data seeding and bio updates has led to frequent HTTP 429/403 errors, blocking progress. Future data operations must be throttled.
+-   **Data Source Inconsistency**: The root of the main P0 bug. Different endpoints use different combinations of stale database records, multiple independent caches, and direct API calls, resulting in conflicting data presented to the user.
+-   **Monolithic Architecture**: The single  file has become unmanageable and is the source of frequent, hard-to-debug issues.
+
+**key DB schema**
+-   **celebrities**: 
+-   **news_cache**, **hot_streaks_cache_v4**, **brown_bread_cache**, **top_picked_cache**, **hot_celebs_from_news_v7**: Various caches for different features. These have been a source of stale data.
+
+**changes in tech stack**
+-   None.
+
+**All files of reference**
+-   : The focus of the entire session. All business logic, API endpoints, data seeding, and bug fixes occurred here.
+-   : Modified to render the restored UI components.
+-   : Updated with the latest fixes and requirements.
+
+**Areas that need refactoring**:
+-   **Critical**: . This file must be broken down. A  layer with a unified  is urgently needed to solve the data consistency crisis.
+-   **High**: . This file is oversized and should be broken into smaller, more manageable components with dedicated state management hooks.
+
+**key api endpoints**
+-   : Heavily modified to support disambiguation, fuzzy search, and fix bugs. Still contributes to data inconsistency.
+-   : Modified to read from the DB to avoid rate limits, but this can serve stale data if not managed correctly.
+-   , , : These were non-functional and have been restored.
+-   : Endpoint that provides the list of categories for the UI.
+
+**Critical Info for New Agent**
+-   **Your #1 priority is to fix the data consistency issue (P0).** Users see different prices/tiers for the same celebrity in different parts of the app. The definitive solution is to create a single, unified data-fetching function in the backend () and refactor all endpoints (, , etc.) to use it. This will establish a single source of truth.
+-   **Beware of API rate limiting.** Any task involving numerous calls to Wikipedia (like updating all bios) must be done slowly, with a delay (e.g., ) between each call to avoid being blocked.
+-   **Complete the bio update task.** The user wants celebrity bios to be the first few lines from Wikipedia. This is an IN PROGRESS task that was blocked by rate limiting. It should be implemented as a slow background process.
+-   The Production Mobile View Broken issue is out of your control. Advise the user to contact Emergent Support if they bring it up again.
+
+**documents and test reports created in this job**
+-    (updated)
+
+**Last 10 User Messages and any pending HUMAN messages**
+-   **User**:  (**Status: IN PROGRESS**)
+-   **User**:  (**Status: IN PROGRESS**)
+-   **User**:  (**Status: RESOLVED**)
+-   **User**:  (**Status: RESOLVED**)
+-   **User**:  (**Status: RESOLVED**)
+-   **User**:  (**Status: RESOLVED**)
+-   **User**:  (**Status: RESOLVED**)
+-   **User**:  (**Status: RESOLVED**)
+-   **User**:  (**Status: PARTIALLY RESOLVED**)
+-   **User**:  (**Status: PARTIALLY RESOLVED**)
+
+**Project Health Check:**
+-   **Broken**: Core data integrity is compromised. The same celebrity shows different prices and tiers in different UI components, which is a critical gameplay issue.
+-   **Mocked**: None.
+
+**3rd Party Integrations**
+-   **OpenAI GPT-4o**: Used for minor background tasks (Uses Emergent LLM Key).
+-   **Emergent-managed Google Auth**: Used for user login.
+-   **Wikipedia API / Wikidata API**: Heavily used for all celebrity data. Prone to severe rate-limiting.
+-   **Public RSS Feeds**: For news data.
+-   **APScheduler**: For backend scheduled jobs.
+
+**Testing status**
+-   **Testing agent used after significant changes**: NO
+-   **Troubleshoot agent used after agent stuck in loop**: NO
+-   **Test files created**: None.
+-   **Known regressions**: None identified, but the data consistency issue is a major functional bug.
+
+**Credentials to test flow:**
+-   None required. Authentication uses the Emergent-managed Google login flow.
+
+**What agent forgot to execute**
+-   The agent did not fully resolve the P0 data consistency issue, which was the user's most recent and persistent complaint. The task to update all celebrity bios also remains incomplete due to technical hurdles (rate-limiting).</analysis>
