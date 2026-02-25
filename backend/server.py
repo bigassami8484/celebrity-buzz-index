@@ -8859,6 +8859,33 @@ async def admin_add_royals():
     }
 
 
+@api_router.post("/admin/refresh-hot-celebs")
+async def admin_refresh_hot_celebs():
+    """
+    Admin endpoint to force refresh the hot celebs cache.
+    Deletes the existing cache entry, forcing the next request to rebuild it.
+    """
+    try:
+        # Delete the existing cache
+        result = await db.news_cache.delete_one({"type": "hot_celebs_from_news_v7"})
+        
+        if result.deleted_count > 0:
+            return {
+                "success": True,
+                "message": "Hot celebs cache cleared. Next /api/hot-celebs request will rebuild the cache with consistent pricing."
+            }
+        else:
+            return {
+                "success": True,
+                "message": "No cache found to clear. Hot celebs cache will be built fresh on next request."
+            }
+    except Exception as e:
+        return {
+            "success": False,
+            "message": str(e)
+        }
+
+
 # ==================== PERIODIC BIO UPDATES ====================
 
 async def update_celebrity_bios_batch(batch_size: int = 10, delay: float = 1.0):
