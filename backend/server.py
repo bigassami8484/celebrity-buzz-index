@@ -8747,7 +8747,7 @@ scheduler.add_job(
 # ==================== ADMIN: ADD SPECIFIC CELEBRITIES ====================
 
 @api_router.post("/admin/add-celebrity")
-async def admin_add_celebrity(name: str, category: str = "other", force_update: bool = False):
+async def admin_add_celebrity(name: str, category: str = "other", force_update: bool = False, allow_deceased: bool = False):
     """
     Admin endpoint to add a specific celebrity to the database with proper data.
     Fetches Wikipedia info, calculates tier/price from Wikidata, and stores in DB.
@@ -8756,6 +8756,7 @@ async def admin_add_celebrity(name: str, category: str = "other", force_update: 
         name: The celebrity name (or Wikipedia search term)
         category: The category to assign (movie_stars, musicians, royals, etc.)
         force_update: If True, updates even if celebrity already exists
+        allow_deceased: If True, allows adding deceased celebrities (for special cases like Princess Diana)
     """
     try:
         # Check if already exists
