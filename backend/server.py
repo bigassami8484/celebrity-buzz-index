@@ -3909,7 +3909,10 @@ async def search_wikipedia_people(query: str, limit: int = 5) -> list:
                                             "rapper", "comedian", "politician", "athlete",
                                             "businessman", "businesswoman", "entrepreneur",
                                             "director", "producer", "writer", "journalist",
-                                            "chef", "designer", "host", "personality"]
+                                            "chef", "designer", "host", "personality",
+                                            "founder", "creator", "executive", "ceo",
+                                            "player", "manager", "coach", "artist",
+                                            "dancer", "choreographer", "influencer"]
                         
                         # Skip if clearly not a person
                         non_person_indicators = ["is a film", "is a song", "is a television",
