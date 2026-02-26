@@ -8804,10 +8804,10 @@ async def admin_add_celebrity(name: str, category: str = "other", force_update: 
         if death_year_pattern:
             is_deceased = True
         
-        if is_deceased:
+        if is_deceased and not allow_deceased:
             return {
                 "success": False,
-                "message": f"Cannot add '{actual_name}' - they appear to be deceased. Only living celebrities can be added."
+                "message": f"Cannot add '{actual_name}' - they appear to be deceased. Use allow_deceased=true to override."
             }
         
         # Check for serial killers - reject them
