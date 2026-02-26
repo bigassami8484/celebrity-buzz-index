@@ -39,6 +39,19 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Returns celebrities from athletes, movie_stars, musicians, royals, tv_actors, etc. ✅
 - Different results on each refresh ✅
 
+### NEW: "I'm Feeling Lucky!" Button (Feb 26, 2026)
+**User Request**: Auto-draft a random celebrity to the team
+**Implementation**:
+- Added `GET /api/feeling-lucky/{team_id}` endpoint
+- Returns a random affordable celebrity not already in team
+- Frontend button with dice icon and pink-to-gold gradient
+- Clicking auto-searches and adds the celebrity to team
+**Features**:
+- Respects budget (only shows celebs you can afford)
+- Won't duplicate (skips celebs already in team)
+- Won't overflow (disabled when team is full - 10 players)
+- Shows toast notification with result
+
 ---
 
 ## Previous Updates (Feb 25, 2026 - Session 6)
