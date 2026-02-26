@@ -4647,52 +4647,49 @@ async def get_trending_celebs():
         # Get trending searches for US  
         trending_us = pytrends.trending_searches(pn='united_states')
         
-        # Combine and look for celebrity names
+        # Combine all trending terms
         all_trending = list(trending_uk[0].values) + list(trending_us[0].values)
         
-        # Filter for likely celebrity names (contains space, proper case, etc.)
         celebrity_trends = []
-        for term in all_trending[:50]:  # Check top 50
-            term_str = str(term)
-            # Basic heuristic: likely a person if it has 2+ words and title case
-            words = term_str.split()
-            if len(words) >= 2 and term_str.istitle():
-                # Check if this person is in our database
-                celeb = await db.celebrities.find_one(
-                    {"name": {"$regex": f"^{re.escape(term_str)}$", "$options": "i"}},
-                    {"_id": 0, "name": 1, "tier": 1, "price": 1, "image": 1, "category": 1}
-                )
-                if celeb:
-                    celebrity_trends.append({
-                        "name": celeb.get("name"),
-                        "tier": celeb.get("tier"),
-                        "price": celeb.get("price"),
-                        "image": celeb.get("image"),
-                        "category": celeb.get("category"),
-                        "trending_source": "Google Trends"
-                    })
-                else:
-                    # Not in our DB but might be a celebrity
-                    celebrity_trends.append({
-                        "name": term_str,
-                        "trending_source": "Google Trends",
-                        "not_in_db": True
-                    })
+        checked_names = set()
+        
+        for term in all_trending[:100]:  # Check top 100
+            term_str = str(term).strip()
+            if term_str.lower() in checked_names:
+                continue
+            checked_names.add(term_str.lower())
+            
+            # Check if this term matches anyone in our database (fuzzy match)
+            celeb = await db.celebrities.find_one(
+                {"name": {"$regex": re.escape(term_str), "$options": "i"}},
+                {"_id": 0, "name": 1, "tier": 1, "price": 1, "image": 1, "category": 1}
+            )
+            
+            if celeb:
+                celebrity_trends.append({
+                    "name": celeb.get("name"),
+                    "tier": celeb.get("tier"),
+                    "price": celeb.get("price"),
+                    "image": celeb.get("image"),
+                    "category": celeb.get("category"),
+                    "search_term": term_str,
+                    "trending_source": "Google Trends"
+                })
         
         # Cache the results
         await db.news_cache.update_one(
             {"type": "google_trends_celebs"},
             {
                 "$set": {
-                    "trending": celebrity_trends[:20],
+                    "trending": celebrity_trends[:15],
                     "updated_at": datetime.now(timezone.utc).isoformat()
                 }
             },
             upsert=True
         )
         
-        logger.info(f"Google Trends: Found {len(celebrity_trends)} potential celebrity trends")
-        return {"trending": celebrity_trends[:20], "source": "Google Trends"}
+        logger.info(f"Google Trends: Found {len(celebrity_trends)} celebrity trends")
+        return {"trending": celebrity_trends[:15], "source": "Google Trends"}
         
     except Exception as e:
         logger.error(f"Google Trends error: {e}")
