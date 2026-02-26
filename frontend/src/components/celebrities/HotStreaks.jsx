@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { Flame, TrendingUp } from "lucide-react";
+import { Flame, TrendingUp, Plus } from "lucide-react";
 import TierBadge from "../common/TierBadge";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-const HotStreaks = ({ streaks: propStreaks, onCelebClick }) => {
+const HotStreaks = ({ streaks: propStreaks, onCelebClick, onAdd }) => {
   const [streaks, setStreaks] = useState(propStreaks || []);
   const [loading, setLoading] = useState(!propStreaks);
   const [showAlert, setShowAlert] = useState(false);
