@@ -3789,8 +3789,12 @@ async def autocomplete_search(q: str):
             "sia": "Sia",
             "drake": "Drake (musician)",
             "eminem": "Eminem",
-            "prince": "Prince (musician)",
+            "prince": "Prince",
             "usher": "Usher (singer)",
+            "notorious": "The Notorious B.I.G.",
+            "biggie": "The Notorious B.I.G.",
+            "notorious b.i.g": "The Notorious B.I.G.",
+            "notorious b.i.g.": "The Notorious B.I.G.",
         }
         
         if query_lower in single_name_celebs:
