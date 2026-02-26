@@ -995,8 +995,8 @@ function App() {
         <div className="mt-6 md:mt-8">
           {/* Desktop: Show all in grid */}
           <div className="hidden md:grid grid-cols-3 gap-6">
-            <BrownBreadWatch watchList={brownBreadWatch} onSelect={searchCelebrity} />
-            <TopPickedCelebs celebs={topPicked} onSelect={searchCelebrity} />
+            <BrownBreadWatch watchList={brownBreadWatch} onSelect={searchCelebrity} onAdd={addFromHotCelebs} />
+            <TopPickedCelebs celebs={topPicked} onSelect={searchCelebrity} onAdd={addFromHotCelebs} />
             <Leaderboard entries={leaderboard} />
           </div>
           
