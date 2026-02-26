@@ -9431,6 +9431,235 @@ async def scheduled_bio_update():
             "status": "failed"
         })
 
+# ==================== AUTO-DISCOVER CELEBRITIES ====================
+
+async def auto_discover_celebrities():
+    """
+    Automatically discover and add new celebrities from news headlines.
+    Scans RSS feeds, extracts potential celebrity names, validates via Wikipedia,
+    and adds them to the database if they're real people with Wikipedia pages.
+    """
+    logger.info("🔍 Starting auto-discover scan for new celebrities...")
+    
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+    
+    # Key entertainment RSS feeds for discovery
+    discovery_feeds = [
+        ("https://www.dailymail.co.uk/tvshowbiz/index.rss", "Daily Mail UK"),
+        ("https://www.thesun.co.uk/tvandshowbiz/feed/", "The Sun"),
+        ("https://people.com/feed/", "People"),
+        ("https://www.tmz.com/rss.xml", "TMZ"),
+        ("https://pagesix.com/feed/", "Page Six"),
+        ("https://variety.com/feed/", "Variety"),
+        ("https://www.hollywoodreporter.com/feed/", "Hollywood Reporter"),
+        ("https://www.eonline.com/syndication/feeds/rssfeeds/topstories.xml", "E! News"),
+        ("https://www.billboard.com/feed/", "Billboard"),
+    ]
+    
+    discovered_names = set()
+    
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            for feed_url, source in discovery_feeds:
+                try:
+                    response = await client.get(feed_url, headers=headers, follow_redirects=True)
+                    if response.status_code != 200:
+                        continue
+                    
+                    content = response.text
+                    items = content.split("<item>")[1:30]  # First 30 items per feed
+                    
+                    for item in items:
+                        # Extract title
+                        title_start = item.find("<title>") + 7
+                        title_end = item.find("</title>")
+                        if title_start < 7 or title_end < 0:
+                            continue
+                        title = item[title_start:title_end].replace("<![CDATA[", "").replace("]]>", "").strip()
+                        title = decode_html_entities(title)
+                        
+                        # Extract potential celebrity names from title
+                        # Pattern: Capitalized words that could be names (2-3 word sequences)
+                        import re
+                        # Match patterns like "First Last" or "First Middle Last"
+                        name_pattern = r'\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})\b'
+                        potential_names = re.findall(name_pattern, title)
+                        
+                        for name in potential_names:
+                            # Skip common non-name phrases
+                            skip_phrases = [
+                                'The Sun', 'Daily Mail', 'New York', 'Los Angeles', 'United States',
+                                'White House', 'Super Bowl', 'Grammy Awards', 'Oscar Awards', 'Golden Globes',
+                                'Academy Awards', 'Emmy Awards', 'Tony Awards', 'Met Gala', 'Fashion Week',
+                                'World Cup', 'Premier League', 'Champions League', 'Breaking News',
+                                'Just Jared', 'Page Six', 'Access Hollywood', 'Entertainment Tonight',
+                                'Read More', 'Click Here', 'Find Out', 'Watch Now', 'See Photos',
+                                'Social Media', 'Red Carpet', 'Photo Gallery', 'First Look',
+                            ]
+                            if name in skip_phrases:
+                                continue
+                            
+                            # Skip if too short or too long
+                            if len(name) < 5 or len(name) > 35:
+                                continue
+                            
+                            discovered_names.add(name)
+                            
+                except Exception as e:
+                    logger.debug(f"Error fetching {source}: {e}")
+                    continue
+        
+        logger.info(f"🔍 Found {len(discovered_names)} potential celebrity names in headlines")
+        
+        # Now validate and add new celebrities
+        added_count = 0
+        checked_count = 0
+        max_to_add = 20  # Limit per run to avoid overload
+        
+        for name in list(discovered_names)[:100]:  # Check up to 100 names
+            checked_count += 1
+            
+            if added_count >= max_to_add:
+                break
+            
+            # Check if already in database
+            existing = await db.celebrities.find_one(
+                {"name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}}
+            )
+            if existing:
+                continue
+            
+            # Check if it's a real person with Wikipedia page
+            try:
+                wiki_info = await fetch_wikipedia_info(name)
+                
+                # Must have a valid Wikipedia page
+                if not wiki_info.get("wiki_url") or wiki_info.get("bio") == "Celebrity profile":
+                    continue
+                
+                bio = wiki_info.get("bio", "").lower()
+                
+                # Verify it's a PERSON (not a band, company, movie, etc.)
+                person_indicators = [
+                    "is a ", "is an ", "was a ", "was an ",
+                    "born ", "actress", "actor", "singer", "musician",
+                    "footballer", "athlete", "presenter", "host", "comedian",
+                    "model", "influencer", "rapper", "politician", "royal",
+                    "businessman", "businesswoman", "entrepreneur", "director",
+                    "writer", "author", "journalist", "chef", "designer"
+                ]
+                
+                is_person = any(indicator in bio for indicator in person_indicators)
+                
+                # Skip bands/groups
+                band_indicators = ["band", "group", "duo", "trio", "quartet", "ensemble", "orchestra"]
+                is_band = any(indicator in bio for indicator in band_indicators)
+                
+                if not is_person or is_band:
+                    continue
+                
+                # Determine category from bio
+                category = detect_category_from_bio(bio, name)
+                
+                # Get tier and price
+                tier, base_price, lang_count = await get_tier_and_price_from_wikidata(name, bio)
+                
+                # Skip if too obscure (less than 10 language links)
+                if lang_count < 10:
+                    continue
+                
+                # Fetch news for this celebrity
+                news = await generate_celebrity_news(name, category)
+                
+                # Calculate age
+                birth_year = wiki_info.get("birth_year", 0)
+                if not birth_year:
+                    birth_year = extract_birth_year_from_bio(bio)
+                age = calculate_age(birth_year)
+                
+                # Check deceased status
+                is_deceased = wiki_info.get("is_deceased", False)
+                
+                # Get image
+                celebrity_image = wiki_info.get("image", "")
+                if not celebrity_image:
+                    clean_name = name.replace(' ', '+')
+                    celebrity_image = f"https://ui-avatars.com/api/?name={clean_name}&size=400&background=1a1a1a&color=FF0099&bold=true&format=png"
+                
+                # Create celebrity record
+                celebrity = Celebrity(
+                    name=wiki_info.get("name", name),
+                    bio=wiki_info.get("bio", "")[:500],
+                    image=celebrity_image,
+                    category=category,
+                    wiki_url=wiki_info.get("wiki_url", ""),
+                    buzz_score=0,
+                    price=base_price,
+                    tier=tier,
+                    news=news,
+                    is_deceased=is_deceased,
+                    birth_year=birth_year,
+                    age=age,
+                    times_picked=0
+                )
+                
+                # Save to database
+                doc = celebrity.model_dump()
+                doc['created_at'] = doc['created_at'].isoformat()
+                doc['auto_discovered'] = True
+                doc['discovered_at'] = datetime.now(timezone.utc).isoformat()
+                doc['recognition_score'] = lang_count
+                
+                await db.celebrities.insert_one(doc)
+                added_count += 1
+                logger.info(f"✨ Auto-discovered: {name} ({tier}-list, {category})")
+                
+                # Small delay to avoid rate limiting
+                await asyncio.sleep(0.5)
+                
+            except Exception as e:
+                logger.debug(f"Could not add {name}: {e}")
+                continue
+        
+        logger.info(f"🎉 Auto-discover complete: Checked {checked_count}, Added {added_count} new celebrities")
+        
+        # Log the task
+        await db.scheduled_tasks.insert_one({
+            "task": "auto_discover",
+            "executed_at": datetime.now(timezone.utc).isoformat(),
+            "names_found": len(discovered_names),
+            "checked": checked_count,
+            "added": added_count,
+            "status": "completed"
+        })
+        
+        return {"checked": checked_count, "added": added_count}
+        
+    except Exception as e:
+        logger.error(f"❌ Auto-discover failed: {e}")
+        await db.scheduled_tasks.insert_one({
+            "task": "auto_discover",
+            "executed_at": datetime.now(timezone.utc).isoformat(),
+            "error": str(e),
+            "status": "failed"
+        })
+        return {"error": str(e)}
+
+# API endpoint to manually trigger auto-discover
+@api_router.post("/admin/auto-discover")
+async def trigger_auto_discover():
+    """Manually trigger celebrity auto-discovery"""
+    result = await auto_discover_celebrities()
+    return {"message": "Auto-discover completed", "result": result}
+
+# Schedule auto-discover every 4 hours
+scheduler.add_job(
+    auto_discover_celebrities,
+    CronTrigger(hour='*/4', minute=30),  # Every 4 hours at :30
+    id='auto_discover_celebrities',
+    name='Auto-discover celebrities from news',
+    replace_existing=True
+)
 # Schedule daily bio updates at 4 AM UTC
 scheduler.add_job(
     scheduled_bio_update,
