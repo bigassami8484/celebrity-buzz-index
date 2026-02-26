@@ -30,26 +30,30 @@ const SearchBar = ({ onSearch, onQuickAdd, loading, team }) => {
       return;
     }
     
-    // Store the query we're fetching for
-    const currentQuery = searchQuery;
+    // Track this as the latest query
+    latestQueryRef.current = searchQuery;
     
     setLoadingSuggestions(true);
     try {
       const results = await fetchAutocomplete(searchQuery);
-      // CRITICAL: Only update if this is still the current query in the input
+      // CRITICAL: Only update if this query is still the latest one
       // This prevents race conditions where old responses overwrite new ones
-      if (query === currentQuery || query.trim() === currentQuery.trim()) {
+      if (latestQueryRef.current === searchQuery) {
         setSuggestions(results);
       }
     } catch (e) {
       console.error("Autocomplete error:", e);
-      setSuggestions([]);
+      if (latestQueryRef.current === searchQuery) {
+        setSuggestions([]);
+      }
     } finally {
-      setLoadingSuggestions(false);
+      if (latestQueryRef.current === searchQuery) {
+        setLoadingSuggestions(false);
+      }
     }
   };
   
-  // Debounced search - increased to 300ms to prevent race conditions
+  // Debounced search - 300ms to let user finish typing
   const handleInputChange = (e) => {
     const value = e.target.value;
     setQuery(value);
@@ -60,6 +64,7 @@ const SearchBar = ({ onSearch, onQuickAdd, loading, team }) => {
     
     // Don't search if query too short
     if (value.length < 2) {
+      latestQueryRef.current = "";
       return;
     }
     
