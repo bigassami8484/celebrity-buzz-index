@@ -4623,11 +4623,11 @@ async def get_pricing_info():
 
 @api_router.get("/trending-celebs")
 async def get_trending_celebs():
-    """Get trending celebrities from Google Trends"""
+    """Get trending celebrities - combines Google Trends with hot news mentions"""
     
     # Check cache first (2 hour cache)
     cached = await db.news_cache.find_one(
-        {"type": "google_trends_celebs"},
+        {"type": "google_trends_celebs_v2"},
         {"_id": 0}
     )
     
@@ -4635,31 +4635,28 @@ async def get_trending_celebs():
         cache_time = datetime.fromisoformat(cached["updated_at"])
         cache_age = datetime.now(timezone.utc) - cache_time
         if cache_age.total_seconds() < 7200:  # 2 hour cache
-            return {"trending": cached.get("trending", []), "source": "Google Trends"}
+            return {"trending": cached.get("trending", []), "source": cached.get("source", "Celebrity Buzz Index")}
     
+    celebrity_trends = []
+    source = "Celebrity Buzz Index"
+    
+    # Try Google Trends first
     try:
-        # Initialize pytrends
-        pytrends = TrendReq(hl='en-GB', tz=0)
+        pytrends = TrendReq(hl='en-GB', tz=0, timeout=(10, 25))
         
-        # Get trending searches for UK
+        # Get trending searches
         trending_uk = pytrends.trending_searches(pn='united_kingdom')
-        
-        # Get trending searches for US  
         trending_us = pytrends.trending_searches(pn='united_states')
         
-        # Combine all trending terms
         all_trending = list(trending_uk[0].values) + list(trending_us[0].values)
-        
-        celebrity_trends = []
         checked_names = set()
         
-        for term in all_trending[:100]:  # Check top 100
+        for term in all_trending[:100]:
             term_str = str(term).strip()
             if term_str.lower() in checked_names:
                 continue
             checked_names.add(term_str.lower())
             
-            # Check if this term matches anyone in our database (fuzzy match)
             celeb = await db.celebrities.find_one(
                 {"name": {"$regex": re.escape(term_str), "$options": "i"}},
                 {"_id": 0, "name": 1, "tier": 1, "price": 1, "image": 1, "category": 1}
@@ -4676,27 +4673,50 @@ async def get_trending_celebs():
                     "trending_source": "Google Trends"
                 })
         
-        # Cache the results
-        await db.news_cache.update_one(
-            {"type": "google_trends_celebs"},
-            {
-                "$set": {
-                    "trending": celebrity_trends[:15],
-                    "updated_at": datetime.now(timezone.utc).isoformat()
-                }
-            },
-            upsert=True
+        if celebrity_trends:
+            source = "Google Trends + News"
+            logger.info(f"Google Trends: Found {len(celebrity_trends)} celebrity trends")
+            
+    except Exception as e:
+        logger.warning(f"Google Trends unavailable: {e}")
+    
+    # If Google Trends didn't return results, use our hot celebs as trending
+    if len(celebrity_trends) < 5:
+        # Get celebrities with recent news mentions
+        hot_cache = await db.news_cache.find_one(
+            {"type": "hot_celebs_from_news_v7"},
+            {"_id": 0, "hot_celebs": 1}
         )
         
-        logger.info(f"Google Trends: Found {len(celebrity_trends)} celebrity trends")
-        return {"trending": celebrity_trends[:15], "source": "Google Trends"}
+        if hot_cache and hot_cache.get("hot_celebs"):
+            for hc in hot_cache["hot_celebs"][:15]:
+                if not any(t.get("name") == hc.get("name") for t in celebrity_trends):
+                    celebrity_trends.append({
+                        "name": hc.get("name"),
+                        "tier": hc.get("tier"),
+                        "price": hc.get("price"),
+                        "image": hc.get("image"),
+                        "category": hc.get("category"),
+                        "news_count": hc.get("news_count", 0),
+                        "trending_source": "News Mentions"
+                    })
         
-    except Exception as e:
-        logger.error(f"Google Trends error: {e}")
-        # Return cached data if available, even if stale
-        if cached:
-            return {"trending": cached.get("trending", []), "source": "Google Trends (cached)"}
-        return {"trending": [], "source": "Google Trends", "error": str(e)}
+        source = "News Mentions"
+    
+    # Cache the results
+    await db.news_cache.update_one(
+        {"type": "google_trends_celebs_v2"},
+        {
+            "$set": {
+                "trending": celebrity_trends[:15],
+                "source": source,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+        },
+        upsert=True
+    )
+    
+    return {"trending": celebrity_trends[:15], "source": source}
 
 @api_router.get("/hot-celebs")
 async def get_hot_celebs():
