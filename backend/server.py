@@ -3860,6 +3860,7 @@ async def search_wikipedia_people(query: str, limit: int = 5) -> list:
     Returns multiple results for disambiguation.
     """
     results = []
+    headers = {"User-Agent": "CelebrityBuzzIndex/1.0 (https://celebrity-buzz.com)"}
     
     try:
         # Use Wikipedia's search API to find matching articles
@@ -3867,36 +3868,31 @@ async def search_wikipedia_people(query: str, limit: int = 5) -> list:
         params = {
             "action": "query",
             "list": "search",
-            "srsearch": f"{query} person OR singer OR actor OR actress OR musician OR footballer",
-            "srlimit": limit * 2,  # Get extra to filter
+            "srsearch": f"{query}",
+            "srlimit": limit * 3,  # Get extra to filter
             "format": "json",
             "utf8": 1
         }
         
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with httpx.AsyncClient(timeout=10.0, headers=headers) as client:
             response = await client.get(search_url, params=params)
             if response.status_code != 200:
+                logger.warning(f"Wikipedia search returned {response.status_code}")
                 return []
             
             data = response.json()
             search_results = data.get("query", {}).get("search", [])
             
-            for result in search_results[:limit * 2]:
+            logger.info(f"Wikipedia search for '{query}' returned {len(search_results)} results")
+            
+            for result in search_results:
                 title = result.get("title", "")
-                snippet = result.get("snippet", "").lower()
                 
-                # Skip disambiguation pages
-                if "(disambiguation)" in title.lower():
+                # Skip disambiguation pages, discographies, songs, albums
+                skip_patterns = ["(disambiguation)", "discography", "(song)", "(album)", 
+                                "(film)", "(TV series)", "(band)", "List of"]
+                if any(pattern.lower() in title.lower() for pattern in skip_patterns):
                     continue
-                
-                # Skip if clearly not a person
-                non_person_words = ["film", "album", "song", "band", "group", "tv series", 
-                                   "television series", "book", "novel", "company"]
-                if any(word in snippet for word in non_person_words):
-                    # But allow if also contains person indicators
-                    person_words = ["born", "actor", "actress", "singer", "musician", "footballer"]
-                    if not any(word in snippet for word in person_words):
-                        continue
                 
                 # Fetch full info for this person
                 try:
@@ -3904,10 +3900,20 @@ async def search_wikipedia_people(query: str, limit: int = 5) -> list:
                     if wiki_info and wiki_info.get("name"):
                         bio = wiki_info.get("bio", "").lower()
                         
-                        # Verify it's a person
+                        # Verify it's a person (has birth info or profession)
                         person_indicators = [" is a ", " is an ", " was a ", " was an ", 
-                                            "born ", "(born ", "actor", "actress", "singer"]
-                        if not any(ind in bio for ind in person_indicators):
+                                            "born ", "(born ", "actor", "actress", "singer",
+                                            "musician", "footballer", "presenter", "model",
+                                            "rapper", "comedian", "politician", "athlete"]
+                        
+                        # Skip if clearly not a person
+                        non_person_indicators = ["is a film", "is a song", "is a television",
+                                                "is a band", "is a group", "is an album"]
+                        
+                        is_person = any(ind in bio for ind in person_indicators)
+                        is_not_person = any(ind in bio for ind in non_person_indicators)
+                        
+                        if not is_person or is_not_person:
                             continue
                         
                         tier, price, lang_count = await get_tier_and_price_from_wikidata(
@@ -3924,6 +3930,8 @@ async def search_wikipedia_people(query: str, limit: int = 5) -> list:
                             "recognition_score": lang_count,
                             "wiki_url": wiki_info.get("wiki_url", "")
                         })
+                        
+                        logger.info(f"Found Wikipedia person: {wiki_info['name']}")
                         
                         if len(results) >= limit:
                             break
