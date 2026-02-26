@@ -762,7 +762,25 @@ function App() {
       <Header />
       
       <div className="max-w-7xl mx-auto px-4">
-        <HowItWorks onShowMethodology={() => setShowMethodology(true)} />
+        {/* How It Works - Collapsed by default with toggle button */}
+        <div className="mb-4">
+          <button
+            onClick={() => setShowHowItWorks(!showHowItWorks)}
+            className="flex items-center gap-2 mx-auto bg-[#1A1A1A] hover:bg-[#262626] border border-[#333] px-4 py-2 rounded-full transition-all"
+            data-testid="how-it-works-toggle"
+          >
+            <Info className="w-4 h-4 text-[#FFD700]" />
+            <span className="text-sm font-medium text-white">How It Works</span>
+            {showHowItWorks ? (
+              <ChevronUp className="w-4 h-4 text-[#A1A1AA]" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-[#A1A1AA]" />
+            )}
+          </button>
+        </div>
+        {showHowItWorks && (
+          <HowItWorks onShowMethodology={() => setShowMethodology(true)} />
+        )}
       </div>
       
       <HotCelebsBanner celebs={hotCelebs} onSelect={handleCelebSearch} onAdd={addFromHotCelebs} />
