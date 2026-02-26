@@ -31,7 +31,8 @@ import {
   joinLeagueAPI,
   fetchLeagueLeaderboard,
   checkAuthStatus,
-  logoutAPI
+  logoutAPI,
+  feelingLucky
 } from "./api";
 
 // Components
