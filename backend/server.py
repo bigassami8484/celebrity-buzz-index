@@ -3901,41 +3901,58 @@ async def autocomplete_search(q: str):
     # If query exactly matches a celebrity name, return ONLY that one result
     has_exact_name_match = any(
         normalize_text(s.get("name", "")) == normalize_text(q) or
+        s.get("name", "").lower() == query_lower or
         s.get("is_exact_match") or
         s.get("is_alias_match")
         for s in priority_suggestions
     )
     
-    # Only return single result for full name queries or known celebs
-    should_return_single = (is_full_name_query or is_known_single_name) and has_exact_name_match
+    # STRICT MATCHING: Only show results when name matches exactly
+    # No more fuzzy/similar name suggestions
+    should_return_single = has_exact_name_match
     
     logger.info(f"Autocomplete '{q}': found_exact_alias={found_exact_alias}, has_exact_name_match={has_exact_name_match}, should_return_single={should_return_single}, priority_count={len(priority_suggestions)}")
     
-    # If we have an exact match for a full name query, return ONLY that
+    # If we have an exact match, return ONLY that - no Wikipedia suggestions
     if should_return_single and len(priority_suggestions) >= 1:
-        # Return only the first (best) match
-        all_suggestions = [priority_suggestions[0]]
+        # Return only the exact match(es)
+        exact_matches = [s for s in priority_suggestions if 
+                        normalize_text(s.get("name", "")) == normalize_text(q) or
+                        s.get("name", "").lower() == query_lower or
+                        s.get("is_exact_match") or
+                        s.get("is_alias_match")]
+        all_suggestions = exact_matches if exact_matches else [priority_suggestions[0]]
     elif not found_exact_alias:
-        # Get Wikipedia autocomplete suggestions
+        # Only fetch from Wikipedia if we have NO matches yet
+        # And ONLY return exact matches from Wikipedia
         suggestions = await fetch_wikipedia_autocomplete(q)
         
-        # Filter out any duplicates from Wikipedia results that are already in priority suggestions
-        priority_names = {s["name"].lower() for s in priority_suggestions}
-        filtered_suggestions = [s for s in suggestions if s.get("name", "").lower() not in priority_names]
+        # STRICT: Only keep Wikipedia results that EXACTLY match the query
+        exact_wiki_matches = []
+        for s in suggestions:
+            wiki_name = s.get("name", "").lower()
+            # Only include if the name matches exactly OR starts with query and query is the full first/last name
+            if wiki_name == query_lower or normalize_text(s.get("name", "")) == normalize_text(q):
+                exact_wiki_matches.append(s)
         
-        # CHECK FOR EXACT FULL NAME MATCH - if first result matches query exactly, return only that
-        # e.g., "richard gere" should return only "Richard Gere", not other Richards
-        if filtered_suggestions and is_full_name_query:
-            first_result_name = filtered_suggestions[0].get("name", "").lower()
-            # Check if query is an exact match (case-insensitive)
-            if first_result_name == query_lower:
-                # Return only the exact match
-                all_suggestions = [filtered_suggestions[0]]
-            else:
-                # Combine: priority first, then Wikipedia results
-                all_suggestions = priority_suggestions + filtered_suggestions
+        # If we found exact matches, use those. Otherwise, check if query is complete name
+        if exact_wiki_matches:
+            all_suggestions = exact_wiki_matches
+        elif len(suggestions) > 0 and suggestions[0].get("name", "").lower() == query_lower:
+            # First Wikipedia result is exact match
+            all_suggestions = [suggestions[0]]
         else:
-            all_suggestions = priority_suggestions + filtered_suggestions
+            # No exact matches - only show results if query matches a single-name celeb
+            single_name_celebs = ["shakira", "beyonce", "rihanna", "adele", "madonna", "cher", "prince", 
+                                 "bono", "sting", "seal", "beck", "moby", "pink", "kesha", "lorde",
+                                 "zendaya", "lizzo", "doja", "sia"]
+            if query_lower in single_name_celebs:
+                # Find the matching single-name celeb
+                matching = [s for s in suggestions if s.get("name", "").lower() == query_lower]
+                all_suggestions = matching if matching else []
+            else:
+                # No suggestions for partial/fuzzy matches
+                all_suggestions = priority_suggestions
     else:
         # Exact alias match found - return only priority suggestions
         all_suggestions = priority_suggestions
