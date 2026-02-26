@@ -30,7 +30,7 @@ const BrownBreadWatch = ({ watchList, onSelect, onAdd }) => {
       <div className="space-y-2">
         {displayList.map((celeb, idx) => (
           <div 
-            key={celeb.id} 
+            key={celeb.id || `brownbread-${idx}`} 
             className={`flex items-center gap-2 p-2 hover:bg-[#1A1A1A] group ${celeb.is_premium ? 'border-l-2 border-[#FFD700] bg-[#FFD700]/5' : ''}`}
           >
             <span className="text-lg" title={`Risk: ${celeb.risk_level}`}>
