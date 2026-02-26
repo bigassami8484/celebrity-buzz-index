@@ -4122,6 +4122,16 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     logger.info(f"Search for '{name}': existing in DB = {existing is not None}")
     
     if existing:
+        # Ensure celebrity has an ID - generate one if missing
+        if not existing.get("id"):
+            new_id = str(uuid.uuid4())
+            await db.celebrities.update_one(
+                {"name": existing.get("name")},
+                {"$set": {"id": new_id}}
+            )
+            existing["id"] = new_id
+            logger.info(f"Generated missing ID for {existing.get('name')}: {new_id}")
+        
         # Check if this is a guaranteed A-lister (mega-star override)
         celeb_name = existing.get("name", name)
         is_mega_star = celeb_name.lower() in GUARANTEED_A_LIST
