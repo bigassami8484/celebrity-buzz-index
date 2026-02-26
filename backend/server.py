@@ -3864,6 +3864,20 @@ async def autocomplete_search(q: str):
     suggestions = [s for s in suggestions 
                    if not any(banned in s.get("name", "").lower() for banned in banned_names)]
     
+    # Filter out Wikipedia disambiguation pages and non-person results
+    disambiguation_phrases = [
+        "may refer to", "can refer to", "could refer to",
+        "is a common", "is a name", "is a surname", "is a given name",
+        "means", "is the name of", "disambiguation", 
+        "list of", "index of"
+    ]
+    suggestions = [s for s in suggestions 
+                   if not any(phrase in (s.get("bio", "") or "").lower() for phrase in disambiguation_phrases)]
+    
+    # Also filter out results where the name itself suggests disambiguation
+    suggestions = [s for s in suggestions 
+                   if "(disambiguation)" not in s.get("name", "").lower()]
+    
     # Add is_deceased flag to each suggestion
     for suggestion in suggestions:
         bio = (suggestion.get("bio", "") or "").lower()
