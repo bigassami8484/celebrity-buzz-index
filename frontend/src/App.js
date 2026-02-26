@@ -769,6 +769,19 @@ function App() {
           team={team}
         />
         
+        {/* Feeling Lucky Button */}
+        <div className="flex justify-center mb-4">
+          <button
+            onClick={handleFeelingLucky}
+            disabled={feelingLuckyLoading || !team || team.celebrities?.length >= 10}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#FF0099] to-[#FFD700] hover:from-[#e6008a] hover:to-[#e6c200] text-white font-bold rounded-full transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+            data-testid="feeling-lucky-btn"
+          >
+            <Dice6 className={`w-5 h-5 ${feelingLuckyLoading ? 'animate-spin' : ''}`} />
+            {feelingLuckyLoading ? 'Rolling...' : "I'm Feeling Lucky!"}
+          </button>
+        </div>
+        
         {/* Floating Search Result Card */}
         {searchedCeleb && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSearchedCeleb(null)}>
