@@ -8812,8 +8812,15 @@ async def admin_add_celebrity(name: str, category: str = "other", force_update: 
         # Check for serial killers - reject them
         serial_killer_indicators = ["serial killer", "serial murderer", "mass murderer", "murdered", 
                                     "killed", "victims", "convicted of murder", "death row",
-                                    "executed", "life imprisonment for murder", "multiple murders"]
+                                    "executed", "life imprisonment for murder", "multiple murders",
+                                    "child killer", "baby killer", "infanticide"]
         is_serial_killer = any(indicator in bio_lower for indicator in serial_killer_indicators)
+        
+        # Known killers/criminals to block
+        blocked_names = ["lucy letby", "harold shipman", "ted bundy", "jeffrey dahmer", 
+                        "fred west", "rose west", "myra hindley", "ian brady"]
+        if any(blocked in actual_name.lower() for blocked in blocked_names):
+            is_serial_killer = True
         
         if is_serial_killer:
             return {
