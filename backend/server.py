@@ -6041,7 +6041,7 @@ async def add_to_team(data: AddToTeam):
         raise HTTPException(status_code=400, detail="Insufficient budget")
     
     # Calculate points including brown bread bonus (100 points for deceased)
-    celeb_points = celebrity["buzz_score"]
+    celeb_points = celebrity.get("buzz_score", 0)
     brown_bread_bonus = 0
     if celebrity.get("is_deceased"):
         brown_bread_bonus = 100.0  # 100 points for dead celebs!
