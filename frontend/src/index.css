@@ -118,7 +118,8 @@ code {
         @apply border-border;
     }
     body {
-        @apply bg-background text-foreground;
+        background: #050505 !important;
+        color: #FFFFFF;
     }
 }
 
