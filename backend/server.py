@@ -3888,9 +3888,10 @@ async def search_wikipedia_people(query: str, limit: int = 5) -> list:
             for result in search_results:
                 title = result.get("title", "")
                 
-                # Skip disambiguation pages, discographies, songs, albums
+                # Skip disambiguation pages, discographies, songs, albums, etc.
                 skip_patterns = ["(disambiguation)", "discography", "(song)", "(album)", 
-                                "(film)", "(TV series)", "(band)", "List of"]
+                                "(film)", "(TV series)", "(band)", "List of", "(surname)",
+                                "(given name)", "(name)", "University of", "Festival"]
                 if any(pattern.lower() in title.lower() for pattern in skip_patterns):
                     continue
                 
