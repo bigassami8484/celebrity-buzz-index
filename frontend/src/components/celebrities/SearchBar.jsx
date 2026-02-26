@@ -51,15 +51,18 @@ const SearchBar = ({ onSearch, onQuickAdd, loading, team }) => {
     }
   };
   
-  // Debounced search - reduced to 150ms for faster response
+  // Debounced search - reduced to 100ms for faster response
   const handleInputChange = (e) => {
     const value = e.target.value;
     setQuery(value);
     setShowSuggestions(true);
     
-    // Clear suggestions immediately when query changes to prevent stale results
+    // Clear suggestions immediately when typing to prevent stale results showing
+    setSuggestions([]);
+    
+    // Don't search if query too short
     if (value.length < 2) {
-      setSuggestions([]);
+      return;
     }
     
     // Clear previous timeout
@@ -67,10 +70,15 @@ const SearchBar = ({ onSearch, onQuickAdd, loading, team }) => {
       clearTimeout(debounceRef.current);
     }
     
-    // Set new timeout for debounced search - fast 150ms debounce
+    // Cancel any pending API request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    // Set new timeout for debounced search - fast 100ms debounce
     debounceRef.current = setTimeout(() => {
       fetchSuggestions(value);
-    }, 150);
+    }, 100);
   };
   
   const handleSelectSuggestion = (suggestion) => {
