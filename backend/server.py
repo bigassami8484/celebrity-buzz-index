@@ -8852,7 +8852,7 @@ async def admin_add_celebrity(name: str, category: str = "other", force_update: 
             "buzz_score": 50,
             "birth_year": birth_year,
             "age": age,
-            "is_deceased": False,
+            "is_deceased": is_deceased if allow_deceased else False,
             "times_picked": existing.get("times_picked", 0) if existing else 0,
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
