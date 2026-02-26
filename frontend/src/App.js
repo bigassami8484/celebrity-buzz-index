@@ -970,13 +970,88 @@ function App() {
           <HotStreaks streaks={hotStreaks} onCelebClick={searchCelebrity} />
         </div>
         
-        {/* Brown Bread, Most Picked, Leaderboard - Show on ALL screen sizes */}
+        {/* Brown Bread, Most Picked, Leaderboard */}
         <div className="mt-6 md:mt-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-            {/* On mobile, show condensed versions */}
+          {/* Desktop: Show all in grid */}
+          <div className="hidden md:grid grid-cols-3 gap-6">
             <BrownBreadWatch watchList={brownBreadWatch} onSelect={searchCelebrity} />
-            <TopPickedCelebs celebs={isMobile ? topPicked.slice(0, 3) : topPicked} onSelect={searchCelebrity} />
+            <TopPickedCelebs celebs={topPicked} onSelect={searchCelebrity} />
             <Leaderboard entries={leaderboard} />
+          </div>
+          
+          {/* Mobile: Collapsible tabs */}
+          <div className="md:hidden space-y-3">
+            {/* Brown Bread Watch Tab */}
+            <div className="bg-[#0A0A0A] border border-[#262626] rounded-lg overflow-hidden">
+              <button
+                onClick={() => setMobileExpandedTab(mobileExpandedTab === 'brownbread' ? null : 'brownbread')}
+                className="w-full flex items-center justify-between p-4 text-left"
+                data-testid="mobile-brownbread-tab"
+              >
+                <span className="flex items-center gap-2 font-bold text-white">
+                  <span className="text-xl">💀</span> Brown Bread Watch
+                  <span className="text-xs bg-[#FF0099] px-2 py-0.5 rounded-full">{brownBreadWatch.length}</span>
+                </span>
+                {mobileExpandedTab === 'brownbread' ? (
+                  <ChevronUp className="w-5 h-5 text-[#FF0099]" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-[#A1A1AA]" />
+                )}
+              </button>
+              {mobileExpandedTab === 'brownbread' && (
+                <div className="border-t border-[#262626]">
+                  <BrownBreadWatch watchList={brownBreadWatch} onSelect={searchCelebrity} />
+                </div>
+              )}
+            </div>
+            
+            {/* Most Picked Tab */}
+            <div className="bg-[#0A0A0A] border border-[#262626] rounded-lg overflow-hidden">
+              <button
+                onClick={() => setMobileExpandedTab(mobileExpandedTab === 'mostpicked' ? null : 'mostpicked')}
+                className="w-full flex items-center justify-between p-4 text-left"
+                data-testid="mobile-mostpicked-tab"
+              >
+                <span className="flex items-center gap-2 font-bold text-white">
+                  <span className="text-xl">🔥</span> Most Picked
+                  <span className="text-xs bg-[#FFD700] text-black px-2 py-0.5 rounded-full">{topPicked.length}</span>
+                </span>
+                {mobileExpandedTab === 'mostpicked' ? (
+                  <ChevronUp className="w-5 h-5 text-[#FFD700]" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-[#A1A1AA]" />
+                )}
+              </button>
+              {mobileExpandedTab === 'mostpicked' && (
+                <div className="border-t border-[#262626]">
+                  <TopPickedCelebs celebs={topPicked.slice(0, 5)} onSelect={searchCelebrity} />
+                </div>
+              )}
+            </div>
+            
+            {/* Leaderboard Tab */}
+            <div className="bg-[#0A0A0A] border border-[#262626] rounded-lg overflow-hidden">
+              <button
+                onClick={() => setMobileExpandedTab(mobileExpandedTab === 'leaderboard' ? null : 'leaderboard')}
+                className="w-full flex items-center justify-between p-4 text-left"
+                data-testid="mobile-leaderboard-tab"
+              >
+                <span className="flex items-center gap-2 font-bold text-white">
+                  <span className="text-xl">🏆</span> Leaderboard
+                  <span className="text-xs bg-[#00D4FF] text-black px-2 py-0.5 rounded-full">{leaderboard.length}</span>
+                </span>
+                {mobileExpandedTab === 'leaderboard' ? (
+                  <ChevronUp className="w-5 h-5 text-[#00D4FF]" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-[#A1A1AA]" />
+                )}
+              </button>
+              {mobileExpandedTab === 'leaderboard' && (
+                <div className="border-t border-[#262626]">
+                  <Leaderboard entries={leaderboard} />
+                </div>
+              )}
+            </div>
           </div>
         </div>
         
