@@ -10,7 +10,7 @@ const SearchBar = ({ onSearch, onQuickAdd, loading, team }) => {
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const searchRef = useRef(null);
   const debounceRef = useRef(null);
-  const abortControllerRef = useRef(null);
+  const latestQueryRef = useRef("");
   
   // Check if celebrity is already in team
   const isInTeam = (name) => {
