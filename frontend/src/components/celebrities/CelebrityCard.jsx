@@ -175,6 +175,7 @@ const CelebrityCard = ({ celebrity, onAdd, onRemove, isInTeam, canAfford, onShow
           </div>
           <h3 className="font-anton text-xl uppercase tracking-tight leading-tight">
             {celebrity.name}
+            {celebrity.is_deceased && <span className="ml-2 text-[#A1A1AA]" title="Deceased">💀</span>}
           </h3>
           {/* Global Recognition Score */}
           {celebrity.recognition_score !== undefined && (
