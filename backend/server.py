@@ -5144,16 +5144,25 @@ async def get_price_alerts(team_id: str):
         )
         if celeb:
             current_price = celeb.get("price", 0)
-            buzz_score = celeb.get("buzz_score", 5)
+            buzz_score = celeb.get("buzz_score", 0)
             tier = celeb.get("tier", "D")
+            news_count = len(celeb.get("news", []))
             
             # Calculate what the new dynamic price would be
             new_price = get_dynamic_price(tier, buzz_score, celeb.get("name", ""))
             price_change = new_price - current_price
             
-            # Only alert if significant change (>= £0.5M)
+            # Only alert if significant change (>= £0.5M) AND has actual news
+            # Don't show "high media buzz" for celebs with no news
             if abs(price_change) >= 0.5:
                 alert_type = "rising" if price_change > 0 else "falling"
+                
+                # Only show "high media buzz" if they actually have news articles
+                if alert_type == "rising" and news_count == 0:
+                    continue  # Skip - no actual news to justify "high buzz"
+                
+                reason = f"High media buzz ({news_count} articles)" if alert_type == "rising" else "Low media coverage"
+                
                 alerts.append({
                     "celebrity_id": celeb.get("id"),
                     "name": celeb.get("name"),
@@ -5163,7 +5172,8 @@ async def get_price_alerts(team_id: str):
                     "projected_price": new_price,
                     "change": round(price_change, 1),
                     "alert_type": alert_type,
-                    "reason": f"High media buzz" if alert_type == "rising" else "Low media coverage"
+                    "reason": reason,
+                    "news_count": news_count
                 })
     
     # Sort by biggest changes first
