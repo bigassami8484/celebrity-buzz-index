@@ -1021,7 +1021,7 @@ function App() {
               </button>
               {mobileExpandedTab === 'brownbread' && (
                 <div className="border-t border-[#262626]">
-                  <BrownBreadWatch watchList={brownBreadWatch} onSelect={searchCelebrity} />
+                  <BrownBreadWatch watchList={brownBreadWatch} onSelect={searchCelebrity} onAdd={addFromHotCelebs} />
                 </div>
               )}
             </div>
