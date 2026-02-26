@@ -549,7 +549,11 @@ function App() {
         fetchStats();
       }
     } catch (e) {
-      toast.error(e.response?.data?.detail || "Failed to add celebrity");
+      const errorDetail = e.response?.data?.detail;
+      const errorMsg = typeof errorDetail === 'string' ? errorDetail : 
+                       Array.isArray(errorDetail) ? errorDetail[0]?.msg || "Failed to add celebrity" :
+                       errorDetail?.msg || "Failed to add celebrity";
+      toast.error(errorMsg);
     }
   };
 
