@@ -3293,6 +3293,16 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
         ("https://www.closer.co.uk/feed/", "Closer Magazine"),
         ("https://www.glamourmagazine.co.uk/feed/celebrity", "Glamour UK"),
         ("https://www.cosmopolitan.com/uk/entertainment/feed/", "Cosmopolitan UK"),
+        ("https://www.standard.co.uk/showbiz/rss", "Evening Standard"),
+        ("https://www.dailystar.co.uk/showbiz/feed/", "Daily Star"),
+        ("https://www.dailyrecord.co.uk/entertainment/celebrity/feed/", "Daily Record"),
+        ("https://www.telegraph.co.uk/rss/entertainment.xml", "The Telegraph"),
+        ("https://www.itv.com/news/entertainment/feed.rss", "ITV News"),
+        ("https://www.heatworld.com/feed/", "Heat Magazine"),
+        ("https://graziadaily.co.uk/feed/", "Grazia UK"),
+        ("https://www.marieclaire.co.uk/entertainment/feed", "Marie Claire UK"),
+        ("https://www.manchestereveningnews.co.uk/whats-on/rss.xml", "Manchester Evening News"),
+        ("https://www.liverpoolecho.co.uk/whats-on/rss.xml", "Liverpool Echo"),
         
         # US ENTERTAINMENT & GOSSIP
         ("https://www.tmz.com/rss.xml", "TMZ"),
