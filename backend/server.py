@@ -4624,6 +4624,7 @@ async def get_celebrities_by_category(category: str, response: Response):
     """Get 8 random celebrities by category using MongoDB $sample for true randomness.
     Only includes celebrities with valid Wikipedia data (bio and wiki_url).
     Uses stored tier/price from DB (already calculated correctly).
+    Special case: 'random' category returns celebs from ALL categories.
     """
     import random
     
@@ -4632,16 +4633,27 @@ async def get_celebrities_by_category(category: str, response: Response):
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     
-    # Get random sample from ALL celebrities in this category
-    # MongoDB $sample provides true randomness from the entire collection
-    # FILTER: Get random celebrities from the category with valid recognition scores
-    pipeline = [
-        {"$match": {
+    # Build match criteria
+    if category == "random":
+        # Random category - get from ALL categories
+        match_criteria = {
+            "name": {"$ne": None, "$exists": True},
+            "wiki_url": {"$exists": True, "$ne": ""},
+            "recognition_score": {"$gte": 10}  # Only well-known celebs
+        }
+    else:
+        # Specific category
+        match_criteria = {
             "category": category,
             "name": {"$ne": None, "$exists": True},
             "wiki_url": {"$exists": True, "$ne": ""},
             "recognition_score": {"$gte": 10}  # Only well-known celebs
-        }},
+        }
+    
+    # Get random sample from ALL celebrities in this category
+    # MongoDB $sample provides true randomness from the entire collection
+    pipeline = [
+        {"$match": match_criteria},
         {"$sample": {"size": 8}},  # Random sample of exactly 8
         {"$project": {"_id": 0}}
     ]
