@@ -946,9 +946,9 @@ function App() {
             </div>
           ) : celebrities.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4" data-testid="celebrity-grid">
-              {(isMobile ? celebrities.slice(0, 6) : celebrities).map(celeb => (
+              {(isMobile ? celebrities.slice(0, 6) : celebrities).map((celeb, idx) => (
                 <CelebrityCard
-                  key={celeb.id}
+                  key={celeb.id || `celeb-${idx}`}
                   celebrity={celeb}
                   onAdd={addToTeam}
                   onRemove={removeFromTeam}
