@@ -3610,14 +3610,32 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
     """
     Fetch REAL news only from RSS feeds.
     No AI-generated news - only real articles with clickable links.
+    Includes validation to ensure news actually mentions the celebrity.
     """
     # Fetch REAL news from RSS feeds
     logger.info(f"Fetching real news for {name}...")
     real_news = await fetch_real_celebrity_news(name, max_articles=10)
     
     if real_news:
-        logger.info(f"Found {len(real_news)} real news articles for {name}")
-        return real_news[:5]
+        # VALIDATION: Double-check that news actually mentions this celebrity
+        name_lower = name.lower()
+        name_parts = name_lower.split()
+        last_name = name_parts[-1] if len(name_parts) > 1 else name_lower
+        
+        validated_news = []
+        for article in real_news:
+            title_lower = article.get('title', '').lower()
+            # Accept if full name or last name is in title
+            if name_lower in title_lower or last_name in title_lower:
+                validated_news.append(article)
+            else:
+                logger.warning(f"Filtered out mismatched news for {name}: {article.get('title', '')[:50]}")
+        
+        if validated_news:
+            logger.info(f"Found {len(validated_news)} validated news articles for {name}")
+            return validated_news[:5]
+        else:
+            logger.warning(f"All news for {name} was filtered out - none actually mentioned them")
     
     # No real news found - return empty list (no AI generation)
     logger.info(f"No real news found for {name}")
