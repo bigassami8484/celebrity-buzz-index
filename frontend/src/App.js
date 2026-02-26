@@ -3,6 +3,16 @@ import "@/App.css";
 import { Toaster, toast } from "sonner";
 import { UserPlus, X, Users, Search, Newspaper, TrendingUp, TrendingDown, Minus, ExternalLink, Dice6, ChevronDown, ChevronUp, Info } from "lucide-react";
 
+// Helper to extract error message from API errors
+const getErrorMessage = (e, fallback = "Something went wrong") => {
+  const detail = e?.response?.data?.detail;
+  if (!detail) return fallback;
+  if (typeof detail === 'string') return detail;
+  if (Array.isArray(detail)) return detail[0]?.msg || fallback;
+  if (typeof detail === 'object') return detail.msg || fallback;
+  return fallback;
+};
+
 // API
 import {
   API,
