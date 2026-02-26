@@ -3992,7 +3992,8 @@ async def autocomplete_search(q: str):
                     "myra hindley", "ian brady", "dennis nilsen", "levi bellfield", "steve wright",
                     "joanna dennehy", "aileen wuornos", "andrei chikatilo", "luis garavito",
                     "pedro lopez", "gary ridgway", "green river killer", "samuel little",
-                    "h. h. holmes", "albert fish", "edmund kemper", "david berkowitz", "son of sam"]
+                    "h. h. holmes", "albert fish", "edmund kemper", "david berkowitz", "son of sam",
+                    "lucy letby"]  # Child killer nurse
     all_suggestions = [s for s in all_suggestions 
                        if not any(banned in s.get("name", "").lower() for banned in banned_names)]
     
