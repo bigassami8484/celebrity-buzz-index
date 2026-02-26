@@ -4009,11 +4009,21 @@ async def autocomplete_search(q: str):
         bio = suggestion.get("bio", "").lower()
         bio_original = suggestion.get("bio", "")
         name_lower = suggestion.get("name", "").lower()
+        celeb_name = suggestion.get("name", "")
         
         # Check for deceased indicators in bio
-        deceased_keywords = ["was a ", "was an ", " died", "passed away", "deceased", 
+        deceased_keywords = [" died", "passed away", "deceased", 
                             ") was a", ") was an", "who died", "death of", "late "]
         is_deceased = any(keyword in bio for keyword in deceased_keywords)
+        
+        # Check if bio starts with "Name was a/an" pattern (indicating past tense = deceased)
+        first_name = celeb_name.split()[0] if celeb_name else ""
+        last_name = celeb_name.split()[-1] if celeb_name else ""
+        if first_name and (bio.startswith(f"{first_name.lower()} was ") or 
+                          bio.startswith(f"{celeb_name.lower()} was ") or
+                          f"{last_name.lower()} was a" in bio[:100] or
+                          f"{last_name.lower()} was an" in bio[:100]):
+            is_deceased = True
         
         # Check for death date pattern like "(1972 – February 19, 2026)" or "(1950-2020)" or "born 1950, died 2020"
         import re
