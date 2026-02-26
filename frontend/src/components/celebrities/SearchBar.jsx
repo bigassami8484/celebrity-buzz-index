@@ -30,28 +30,26 @@ const SearchBar = ({ onSearch, onQuickAdd, loading, team }) => {
       return;
     }
     
-    // Cancel previous request
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    abortControllerRef.current = new AbortController();
+    // Store the query we're fetching for
+    const currentQuery = searchQuery;
     
     setLoadingSuggestions(true);
     try {
       const results = await fetchAutocomplete(searchQuery);
-      // Only update if this is still the current query
-      setSuggestions(results);
-    } catch (e) {
-      if (e.name !== 'AbortError') {
-        console.error("Autocomplete error:", e);
-        setSuggestions([]);
+      // CRITICAL: Only update if this is still the current query in the input
+      // This prevents race conditions where old responses overwrite new ones
+      if (query === currentQuery || query.trim() === currentQuery.trim()) {
+        setSuggestions(results);
       }
+    } catch (e) {
+      console.error("Autocomplete error:", e);
+      setSuggestions([]);
     } finally {
       setLoadingSuggestions(false);
     }
   };
   
-  // Debounced search - reduced to 100ms for faster response
+  // Debounced search - increased to 300ms to prevent race conditions
   const handleInputChange = (e) => {
     const value = e.target.value;
     setQuery(value);
@@ -70,15 +68,10 @@ const SearchBar = ({ onSearch, onQuickAdd, loading, team }) => {
       clearTimeout(debounceRef.current);
     }
     
-    // Cancel any pending API request
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    
-    // Set new timeout for debounced search - fast 100ms debounce
+    // Set new timeout for debounced search - 300ms to let user finish typing
     debounceRef.current = setTimeout(() => {
       fetchSuggestions(value);
-    }, 100);
+    }, 300);
   };
   
   const handleSelectSuggestion = (suggestion) => {
