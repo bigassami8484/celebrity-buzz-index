@@ -1374,7 +1374,23 @@ function App() {
               </div>
             </details>
             
-            {/* FAQ Item 9 - Beta Notice */}
+            {/* FAQ Item 9 - News Sources */}
+            <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
+              <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
+                Where does the news come from? 📰
+                <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
+                <p>We scour <strong className="text-[#FFD700]">58+ major news sources</strong> across the UK and US! 🌍</p>
+                <p className="font-bold text-white">UK Sources (27):</p>
+                <p className="text-xs">Daily Mail, The Sun, Daily Mirror, Metro, Express, BBC News, The Guardian, The Independent, OK! Magazine, Hello!, Sky News, Digital Spy, Radio Times, Closer, Glamour UK, Cosmopolitan UK, Evening Standard, Daily Star, Daily Record, The Telegraph, ITV News, Heat Magazine, Grazia UK, Marie Claire UK, Manchester Evening News, Liverpool Echo, NME</p>
+                <p className="font-bold text-white mt-2">US Sources (28):</p>
+                <p className="text-xs">TMZ, People, Us Weekly, Page Six, E! News, Entertainment Tonight, Just Jared, BuzzFeed, HuffPost, Yahoo News, National Enquirer, Access Hollywood, Extra TV, Inside Edition, Daily Beast, Vulture, Refinery29, Variety, Hollywood Reporter, Deadline, Vanity Fair, Billboard, Rolling Stone, Pitchfork, CNN, Fox News, CBS News, ABC News</p>
+                <p className="text-[#00F0FF] font-bold mt-2">Every headline counts towards your team's buzz score! 🔥</p>
+              </div>
+            </details>
+            
+            {/* FAQ Item 10 - Beta Notice */}
             <details className="bg-[#1A1A1A] rounded-lg border border-[#262626] group">
               <summary className="flex justify-between items-center p-4 cursor-pointer text-white font-medium hover:text-[#FF0099] transition-colors">
                 Why is [celebrity] in the wrong category or priced weirdly?
