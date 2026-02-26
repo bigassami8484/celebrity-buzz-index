@@ -65,7 +65,7 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess, mode = "login" }) =>
         <p className="text-[#A1A1AA] text-sm mb-6">
           {mode === "signup" 
             ? "Save your team and access it from any device"
-            : "Access your Celebrity Buzz team"
+            : "Sign in with Google to access your team"
           }
         </p>
         
