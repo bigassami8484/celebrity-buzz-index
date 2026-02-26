@@ -496,12 +496,27 @@ function App() {
     if (!team) return;
     
     try {
-      const result = await addToTeamAPI(team.id, celebrity.id);
+      let celebId = celebrity.id;
+      let celebName = celebrity.name;
+      
+      // If no ID, search for the celebrity first to get an ID
+      if (!celebId) {
+        const searchedCeleb = await searchCelebrityAPI(celebrity.name);
+        if (searchedCeleb) {
+          celebId = searchedCeleb.id;
+          celebName = searchedCeleb.name;
+        } else {
+          toast.error("Celebrity not found");
+          return;
+        }
+      }
+      
+      const result = await addToTeamAPI(team.id, celebId);
       setTeam(result.team);
       if (result.brown_bread_bonus) {
-        toast.success(`Added ${celebrity.name} + 💀 Brown Bread Bonus!`, { duration: 5000 });
+        toast.success(`Added ${celebName} + 💀 Brown Bread Bonus!`, { duration: 5000 });
       } else {
-        toast.success(`Added ${celebrity.name} to your team!`);
+        toast.success(`Added ${celebName} to your team!`);
       }
       fetchLeaderboard();
       fetchTopPicked();
