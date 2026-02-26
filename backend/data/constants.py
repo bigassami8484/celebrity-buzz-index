@@ -76,6 +76,7 @@ TEAM_COLORS = [
 
 # Categories
 CATEGORIES = [
+    "random",
     "movie_stars",
     "tv_actors", 
     "musicians",

@@ -1,6 +1,7 @@
-import { Film, Tv, Music, Trophy, Crown, Star, Users, Megaphone, Video } from "lucide-react";
+import { Film, Tv, Music, Trophy, Crown, Star, Users, Megaphone, Video, Shuffle } from "lucide-react";
 
 const categoryIcons = {
+  random: Shuffle,
   movie_stars: Film,
   tv_actors: Tv,
   tv_personalities: Video,
