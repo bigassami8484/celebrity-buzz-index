@@ -3704,298 +3704,126 @@ async def get_points_methodology():
 
 @api_router.get("/autocomplete")
 async def autocomplete_search(q: str):
-    """Get Wikipedia autocomplete suggestions for celebrity search"""
+    """
+    STRICT EXACT-MATCH autocomplete - only returns results when full celebrity name is typed.
+    No partial matching, no fuzzy suggestions, no Wikipedia autocomplete.
+    """
     if len(q) < 2:
         return {"suggestions": []}
     
     query_lower = q.lower().strip()
+    query_normalized = normalize_text(q)
     
-    # Get hot celebs from the CORRECT cache type (same as celebrity/search uses)
-    hot_celebs_cache = await db.news_cache.find_one(
-        {"type": "hot_celebs_from_news_v7"},
-        {"_id": 0}
-    )
-    hot_celebs_list = hot_celebs_cache.get("hot_celebs", []) if hot_celebs_cache else []
+    logger.info(f"STRICT autocomplete search for: '{q}'")
     
-    def get_hot_celeb_price(name):
-        """Check if celeb is in hot list and return their premium price"""
-        for hc in hot_celebs_list:
-            hc_name = hc.get("name", "").lower()
-            if hc_name == name.lower():
-                return hc.get("price"), hc.get("tier"), True
-            # Also check using are_same_celebrity for aliases
-            if are_same_celebrity(hc.get("name", ""), name):
-                return hc.get("price"), hc.get("tier"), True
-        return None, None, False
-    
-    # PRIORITY 1: Skip database lookup - ALWAYS fetch fresh from Wikipedia
-    # This ensures tier/price is always based on current Wikipedia language count
-    exact_match = None  # Don't use cached DB data
-    
-    priority_suggestions = []
-    
-    # PRIORITY 2: Check if query matches a known alias (BEFORE partial DB matches)
-    # This ensures "mario" returns Mario (American singer) not Mario Lopez
+    # Check known celebrity aliases first (e.g., "the rock" -> "Dwayne Johnson")
+    canonical_name = None
     if query_lower in CELEBRITY_ALIASES:
         canonical_name = CELEBRITY_ALIASES[query_lower]
-        logger.info(f"ALIAS MATCH: '{query_lower}' -> '{canonical_name}'")
-        # Use normalize_text to handle accented characters (e.g., "Zoe Saldana" vs "Zoe Saldaña")
-        canonical_normalized = normalize_text(canonical_name)
-        
-        # Check if we already have this celebrity from DB match (might be stale data)
-        existing_idx = None
-        for idx, s in enumerate(priority_suggestions):
-            if normalize_text(s.get("name", "")) == canonical_normalized:
-                existing_idx = idx
-                break
-        
-        # Fetch fresh data from Wikipedia
+        logger.info(f"Alias match: '{query_lower}' -> '{canonical_name}'")
+    
+    # Search database for EXACT name match only
+    # Case-insensitive but must match the full name exactly
+    search_name = canonical_name if canonical_name else q
+    
+    # Try exact match first (case-insensitive)
+    exact_match = await db.celebrities.find_one(
+        {"name": {"$regex": f"^{re.escape(search_name)}$", "$options": "i"}},
+        {"_id": 0}
+    )
+    
+    suggestions = []
+    
+    if exact_match:
+        logger.info(f"Found exact DB match for '{search_name}': {exact_match.get('name')}")
+        suggestions.append(exact_match)
+    elif canonical_name:
+        # If alias was matched but not in DB, fetch from Wikipedia
         wiki_info = await fetch_wikipedia_info(canonical_name)
         if wiki_info and wiki_info.get("name"):
-            logger.info(f"ALIAS: Fetched wiki for '{canonical_name}': name={wiki_info.get('name')}")
-            # Use SINGLE SOURCE OF TRUTH for tier/price calculation
             tier, price, lang_count = await get_tier_and_price_from_wikidata(
                 wiki_info["name"], 
                 wiki_info.get("bio", "")
             )
-            
-            new_suggestion = {
+            suggestions.append({
                 "name": wiki_info["name"],
-                "bio": wiki_info.get("bio", "")[:100] + "...",
+                "bio": wiki_info.get("bio", "")[:200] + "..." if wiki_info.get("bio") else "",
+                "description": wiki_info.get("bio", "")[:100] + "..." if wiki_info.get("bio") else "",
                 "image": wiki_info.get("image", ""),
                 "tier": tier,
                 "price": round(price, 1),
                 "estimated_price": round(price, 1),
-                "recognition_score": lang_count,
-                "is_alias_match": True
-            }
-            
-            if existing_idx is not None:
-                # Replace existing entry if alias data is better (higher recognition score)
-                # OR if we have a fresh image from Wikipedia (DB images can become stale)
-                existing_score = priority_suggestions[existing_idx].get("recognition_score", 0)
-                existing_image = priority_suggestions[existing_idx].get("image", "")
-                new_image = wiki_info.get("image", "")
-                
-                # Always prefer fresh Wikipedia data for aliases - DB data may have stale images
-                # Replace if: better score, OR new has fresh Wikidata image
-                should_replace = (
-                    lang_count > existing_score or
-                    (new_image and "commons.wikimedia.org" in new_image)  # Fresh Wikidata image is more reliable
-                )
-                
-                if should_replace:
-                    logger.info(f"ALIAS REPLACE: Replacing '{priority_suggestions[existing_idx].get('name')}' (score={existing_score}) with '{wiki_info['name']}' (score={lang_count}, fresh_image={bool(new_image)})")
-                    priority_suggestions[existing_idx] = new_suggestion
-            else:
-                priority_suggestions.append(new_suggestion)
+                "recognition_score": lang_count
+            })
     
-    # PRIORITY 3: Check database for partial matches (starts with query)
-    # Only check DB partial matches if query is at least 3 chars to avoid too many irrelevant results
-    # SKIP DB matches with recognition_score == 0 - they have stale/corrupt data
-    if not exact_match and len(q) >= 3:
-        partial_matches = await db.celebrities.find(
-            {
-                "name": {"$regex": f"^{q}", "$options": "i"},
-                "recognition_score": {"$gt": 10}  # Only trust DB entries with valid recognition scores
-            },
-            {"_id": 0}
-        ).limit(3).to_list(3)  # Reduced from 5 to 3 to prioritize Wikipedia results
+    # If no exact match found in DB, check Wikipedia for exact name (not autocomplete)
+    if not suggestions:
+        # Check for single-name celebrities that need exact match
+        single_name_celebs = {
+            "shakira": "Shakira",
+            "beyonce": "Beyoncé", 
+            "rihanna": "Rihanna",
+            "adele": "Adele",
+            "madonna": "Madonna",
+            "cher": "Cher",
+            "bono": "Bono",
+            "sting": "Sting",
+            "seal": "Seal",
+            "beck": "Beck",
+            "moby": "Moby",
+            "pink": "Pink (singer)",
+            "kesha": "Kesha",
+            "lorde": "Lorde",
+            "zendaya": "Zendaya",
+            "lizzo": "Lizzo",
+            "sia": "Sia",
+            "drake": "Drake (musician)",
+            "eminem": "Eminem",
+            "prince": "Prince (musician)",
+            "usher": "Usher (singer)",
+        }
         
-        logger.info(f"DB partial matches for '{q}': {[m.get('name') for m in partial_matches]}")
-        
-        for match in partial_matches:
-            if not any(s.get("name") == match["name"] for s in priority_suggestions):
-                bio = match.get("bio", "")
-                recognition_metrics = match.get("recognition_metrics", {})
-                
-                # Get language count - fetch fresh if missing
-                language_count = recognition_metrics.get("languages", {}).get("count", 0)
-                if language_count == 0:
-                    try:
-                        headers = {"User-Agent": "CelebrityBuzzIndex/1.0"}
-                        async with httpx.AsyncClient() as client:
-                            wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={match['name'].replace(' ', '_')}&props=sitelinks&format=json"
-                            response = await client.get(wikidata_url, timeout=5.0, headers=headers)
-                            if response.status_code == 200:
-                                data = response.json()
-                                for entity in data.get("entities", {}).values():
-                                    sitelinks = entity.get("sitelinks", {})
-                                    language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
-                    except:
-                        pass
-                
-                # SINGLE CALCULATION for tier AND price
-                tier, price = calculate_tier_and_price(language_count, bio, match["name"])
-                
-                # Check if in hot celebs (for display purposes only - NO price premium)
-                _, _, is_hot = get_hot_celeb_price(match["name"])
-                
-                priority_suggestions.append({
-                    "name": match["name"],
-                    "bio": bio[:100] + "..." if bio else "",
-                    "full_bio": bio,  # Store full bio for deceased detection
-                    "image": match.get("image", ""),
+        if query_lower in single_name_celebs:
+            wiki_name = single_name_celebs[query_lower]
+            wiki_info = await fetch_wikipedia_info(wiki_name)
+            if wiki_info and wiki_info.get("name"):
+                tier, price, lang_count = await get_tier_and_price_from_wikidata(
+                    wiki_info["name"], 
+                    wiki_info.get("bio", "")
+                )
+                suggestions.append({
+                    "name": wiki_info["name"],
+                    "bio": wiki_info.get("bio", "")[:200] + "..." if wiki_info.get("bio") else "",
+                    "description": wiki_info.get("bio", "")[:100] + "..." if wiki_info.get("bio") else "",
+                    "image": wiki_info.get("image", ""),
                     "tier": tier,
                     "price": round(price, 1),
                     "estimated_price": round(price, 1),
-                    "recognition_score": language_count,
-                    "is_db_match": True,
-                    "is_hot": is_hot
+                    "recognition_score": lang_count
                 })
-    
-    # Also check partial matches for common search terms (aliases with partial matching)
-    alias_partial_matches = {
-        "prince william": "William, Prince of Wales",
-        "prince harry": "Prince Harry, Duke of Sussex", 
-        "kate middleton": "Catherine, Princess of Wales",
-        "king charles": "Charles III",
-        "meghan markle": "Meghan, Duchess of Sussex",
-        "the rock": "Dwayne Johnson",
-        # Royal Children - William's kids
-        "prince george": "Prince George of Wales",
-        "george": "Prince George of Wales",
-        "princess charlotte": "Princess Charlotte of Wales",
-        "charlotte": "Princess Charlotte of Wales",
-        "prince louis": "Prince Louis of Wales",
-        "louis": "Prince Louis of Wales",
-        # Royal Children - Harry's kids
-        "prince archie": "Prince Archie of Sussex",
-        "archie": "Prince Archie of Sussex",
-        "princess lilibet": "Princess Lilibet of Sussex",
-        "lilibet": "Princess Lilibet of Sussex",
-    }
-    
-    for alias, canonical in alias_partial_matches.items():
-        # Only match if alias STARTS with query (not just contains)
-        if alias.startswith(query_lower):
-            # Check if already in priority suggestions
-            if not any(s.get("name") == canonical for s in priority_suggestions):
-                wiki_info = await fetch_wikipedia_info(canonical)
-                if wiki_info and wiki_info.get("name"):
-                    # Use SINGLE SOURCE OF TRUTH for tier/price calculation
+        else:
+            # Try Wikipedia exact search as last resort
+            wiki_info = await fetch_wikipedia_info(q)
+            if wiki_info and wiki_info.get("name"):
+                # Only use if name matches closely (avoid false positives)
+                wiki_name_lower = wiki_info["name"].lower()
+                if wiki_name_lower == query_lower or normalize_text(wiki_info["name"]) == query_normalized:
                     tier, price, lang_count = await get_tier_and_price_from_wikidata(
                         wiki_info["name"], 
                         wiki_info.get("bio", "")
                     )
-                    priority_suggestions.append({
+                    suggestions.append({
                         "name": wiki_info["name"],
-                        "bio": wiki_info.get("bio", "")[:100] + "...",
+                        "bio": wiki_info.get("bio", "")[:200] + "..." if wiki_info.get("bio") else "",
+                        "description": wiki_info.get("bio", "")[:100] + "..." if wiki_info.get("bio") else "",
                         "image": wiki_info.get("image", ""),
                         "tier": tier,
                         "price": round(price, 1),
                         "estimated_price": round(price, 1),
-                        "recognition_score": lang_count,
-                        "is_alias_match": True
+                        "recognition_score": lang_count
                     })
     
-    # Track if we found an exact alias match - if so, skip Wikipedia autocomplete
-    # This prevents "diddy" from returning "Diddy TV", "Diddy Wah Diddy" etc
-    found_exact_alias = query_lower in CELEBRITY_ALIASES and len(priority_suggestions) > 0
-    
-    # Check if query looks like a full name (has 2+ words) or is a known single-word celeb
-    query_words = q.strip().split()
-    is_full_name_query = len(query_words) >= 2
-    is_known_single_name = query_lower in CELEBRITY_ALIASES or query_lower in GUARANTEED_A_LIST
-    
-    # Check if we have a single exact match from priority suggestions
-    # If query exactly matches a celebrity name, return ONLY that one result
-    has_exact_name_match = any(
-        normalize_text(s.get("name", "")) == normalize_text(q) or
-        s.get("name", "").lower() == query_lower or
-        s.get("is_exact_match") or
-        s.get("is_alias_match")
-        for s in priority_suggestions
-    )
-    
-    # STRICT MATCHING: Only show results when name matches exactly
-    # No more fuzzy/similar name suggestions
-    should_return_single = has_exact_name_match
-    
-    logger.info(f"Autocomplete '{q}': found_exact_alias={found_exact_alias}, has_exact_name_match={has_exact_name_match}, should_return_single={should_return_single}, priority_count={len(priority_suggestions)}")
-    
-    # If we have an exact match, return ONLY that - no Wikipedia suggestions
-    if should_return_single and len(priority_suggestions) >= 1:
-        # Return only the exact match(es)
-        exact_matches = [s for s in priority_suggestions if 
-                        normalize_text(s.get("name", "")) == normalize_text(q) or
-                        s.get("name", "").lower() == query_lower or
-                        s.get("is_exact_match") or
-                        s.get("is_alias_match")]
-        all_suggestions = exact_matches if exact_matches else [priority_suggestions[0]]
-    elif not found_exact_alias:
-        # Only fetch from Wikipedia if we have NO matches yet
-        # And ONLY return exact matches from Wikipedia
-        suggestions = await fetch_wikipedia_autocomplete(q)
-        
-        # STRICT: Only keep Wikipedia results that EXACTLY match the query
-        exact_wiki_matches = []
-        for s in suggestions:
-            wiki_name = s.get("name", "").lower()
-            # Only include if the name matches exactly OR starts with query and query is the full first/last name
-            if wiki_name == query_lower or normalize_text(s.get("name", "")) == normalize_text(q):
-                exact_wiki_matches.append(s)
-        
-        # If we found exact matches, use those. Otherwise, check if query is complete name
-        if exact_wiki_matches:
-            all_suggestions = exact_wiki_matches
-        elif len(suggestions) > 0 and suggestions[0].get("name", "").lower() == query_lower:
-            # First Wikipedia result is exact match
-            all_suggestions = [suggestions[0]]
-        else:
-            # No exact matches - only show results if query matches a single-name celeb
-            single_name_celebs = ["shakira", "beyonce", "rihanna", "adele", "madonna", "cher", "prince", 
-                                 "bono", "sting", "seal", "beck", "moby", "pink", "kesha", "lorde",
-                                 "zendaya", "lizzo", "doja", "sia"]
-            if query_lower in single_name_celebs:
-                # Find the matching single-name celeb
-                matching = [s for s in suggestions if s.get("name", "").lower() == query_lower]
-                all_suggestions = matching if matching else []
-            else:
-                # No suggestions for partial/fuzzy matches
-                all_suggestions = priority_suggestions
-    else:
-        # Exact alias match found - return only priority suggestions
-        all_suggestions = priority_suggestions
-    
-    # Build a mapping of canonical names for duplicate detection
-    # This helps us identify when "Kate Middleton" and "Catherine, Princess of Wales" are the same person
-    def get_canonical_for_dedup(name):
-        """Get canonical name for deduplication, checking aliases"""
-        name_lower = name.lower().strip()
-        # Check if this name is an alias
-        if name_lower in CELEBRITY_ALIASES:
-            return normalize_text(CELEBRITY_ALIASES[name_lower])
-        # Check if this name IS a canonical name that others alias to
-        for alias, canonical in CELEBRITY_ALIASES.items():
-            if normalize_text(canonical) == normalize_text(name):
-                return normalize_text(canonical)
-        return normalize_text(name)
-    
-    # REMOVE DUPLICATES - check by canonical name (handles aliases like Kate Middleton = Catherine, Princess of Wales)
-    seen_canonical = set()
-    unique_suggestions = []
-    for suggestion in all_suggestions:
-        name = suggestion.get("name", "")
-        canonical = get_canonical_for_dedup(name)
-        
-        if canonical not in seen_canonical:
-            seen_canonical.add(canonical)
-            unique_suggestions.append(suggestion)
-        else:
-            # This is a duplicate - keep the one with better data (higher recognition score)
-            # Find the existing entry and compare
-            for i, existing in enumerate(unique_suggestions):
-                if get_canonical_for_dedup(existing.get("name", "")) == canonical:
-                    existing_score = existing.get("recognition_score", 0)
-                    new_score = suggestion.get("recognition_score", 0)
-                    if new_score > existing_score:
-                        unique_suggestions[i] = suggestion
-                    break
-    
-    all_suggestions = unique_suggestions
-    
-    # Filter out banned celebrities (streamers, YouTubers, removed royals, bands, serial killers, etc.)
+    # Filter out banned celebrities
     banned_names = ["ninja", "pewdiepie", "shroud", "callux", "ksi", "logan paul", "jake paul",
                     "mr beast", "mrbeast", "markiplier", "jacksepticeye", "pokimane", "xqc",
                     "dream", "technoblade", "tommyinnit", "tubbo", "ranboo", "georgenotfound",
@@ -4004,7 +3832,6 @@ async def autocomplete_search(q: str):
                     "danny pintauro", "dana plato", "tony little", "caylee anthony",
                     "right said fred", "jedward", "kevin federline", "milli vanilli",
                     "tiffany", "puck", "john bobbitt", "lorena bobbitt", "bobbitt",
-                    # Serial killers - banned
                     "ted bundy", "jeffrey dahmer", "john wayne gacy", "charles manson",
                     "ed gein", "richard ramirez", "dennis rader", "btk killer", "zodiac killer",
                     "harold shipman", "fred west", "rose west", "peter sutcliffe", "yorkshire ripper",
@@ -4013,56 +3840,20 @@ async def autocomplete_search(q: str):
                     "pedro lopez", "gary ridgway", "green river killer", "samuel little",
                     "h. h. holmes", "albert fish", "edmund kemper", "david berkowitz", "son of sam",
                     "lucy letby", "lady marina windsor"]
-    all_suggestions = [s for s in all_suggestions 
-                       if not any(banned in s.get("name", "").lower() for banned in banned_names)]
+    suggestions = [s for s in suggestions 
+                   if not any(banned in s.get("name", "").lower() for banned in banned_names)]
     
-    # Check for Brown Bread premium pricing on each suggestion
-    for suggestion in all_suggestions:
-        premium_price = await get_brown_bread_premium_by_name(suggestion.get("name", ""))
-        if premium_price > 0:
-            suggestion["estimated_price"] = premium_price
-            suggestion["is_brown_bread_premium"] = True
-    
-    # Add is_deceased flag to each suggestion based on bio analysis
-    for suggestion in all_suggestions:
-        # Use full_bio if available for better detection, otherwise use bio
-        full_bio = suggestion.get("full_bio", suggestion.get("bio", ""))
-        bio = full_bio.lower()
-        bio_original = full_bio
+    # Add is_deceased flag to each suggestion
+    for suggestion in suggestions:
+        bio = (suggestion.get("bio", "") or "").lower()
         name_lower = suggestion.get("name", "").lower()
-        celeb_name = suggestion.get("name", "")
         
-        # Remove full_bio from response (don't send to frontend)
-        if "full_bio" in suggestion:
-            del suggestion["full_bio"]
-        
-        # Check for deceased indicators in bio
+        # Check for deceased indicators
         deceased_keywords = [" died", "passed away", "deceased", 
                             ") was a", ") was an", "who died", "death of", "late "]
         is_deceased = any(keyword in bio for keyword in deceased_keywords)
         
-        # Check if bio starts with "Name was a/an" pattern (indicating past tense = deceased)
-        first_name = celeb_name.split()[0] if celeb_name else ""
-        last_name = celeb_name.split()[-1] if celeb_name else ""
-        if first_name and (bio.startswith(f"{first_name.lower()} was ") or 
-                          bio.startswith(f"{celeb_name.lower()} was ") or
-                          f"{last_name.lower()} was a" in bio[:100] or
-                          f"{last_name.lower()} was an" in bio[:100]):
-            is_deceased = True
-        
-        # Check for death date pattern like "(1972 – February 19, 2026)" or "(1950-2020)" or "born 1950, died 2020"
-        import re
-        # Match patterns like "– February 19, 2026" or "- 2020" at end of life dates
-        death_date_pattern = re.search(r'[–\-−]\s*(?:January|February|March|April|May|June|July|August|September|October|November|December)?\s*\d{1,2}?,?\s*(?:19|20)\d{2}\)', bio_original)
-        if death_date_pattern:
-            is_deceased = True
-        
-        # Also check for year range pattern like "(1950-2020)" or "(1950 – 2020)"
-        year_range_pattern = re.search(r'\(\s*(?:born\s*)?(19|20)\d{2}\s*[–\-−]\s*(19|20)\d{2}\s*\)', bio_original)
-        if year_range_pattern:
-            is_deceased = True
-        
-        # Known deceased celebrities - definitive list
+        # Known deceased celebrities
         known_deceased = [
             "amy winehouse", "michael jackson", "prince", "david bowie", "whitney houston",
             "robin williams", "heath ledger", "paul walker", "chadwick boseman", "kobe bryant",
@@ -4077,13 +3868,13 @@ async def autocomplete_search(q: str):
             "matthew perry", "lisa marie presley", "tina turner", "sinead o'connor", 
             "tony bennett", "olivia newton-john", "ray liotta", "bob saget", "betty white",
             "jade goody", "cory monteith", "natalie wood", "lucille ball", "johnny cash",
-            "eric dane", "prince philip", "sean connery", "chadwick boseman", "alex trebek",
+            "eric dane", "prince philip", "sean connery", "alex trebek",
             "james van der beek", "diana, princess of wales", "ozzy osbourne"
         ]
         if any(known in name_lower for known in known_deceased):
             is_deceased = True
         
-        # Known living celebrities - override false positives (these people are ALIVE)
+        # Known living celebrities - override
         known_living = [
             "dolly parton", "cher", "mick jagger", 
             "keith richards", "paul mccartney", "ringo starr", "bob dylan", "elton john",
@@ -4097,12 +3888,13 @@ async def autocomplete_search(q: str):
             is_deceased = False
         
         suggestion["is_deceased"] = is_deceased
+        
+        # Ensure description field exists for frontend
+        if not suggestion.get("description") and suggestion.get("bio"):
+            suggestion["description"] = suggestion["bio"][:100] + "..."
     
-    # Return up to 5 results for disambiguation cases, otherwise 1 for clean UX
-    # Disambiguation = names with parentheses like "James Morrison (singer)"
-    has_disambiguation = any("(" in s.get("name", "") for s in all_suggestions)
-    max_return = 5 if has_disambiguation else 1
-    return {"suggestions": all_suggestions[:max_return]}
+    logger.info(f"STRICT autocomplete returning {len(suggestions)} results for '{q}'")
+    return {"suggestions": suggestions}
 
 @api_router.post("/seed")
 async def seed_initial_data():
