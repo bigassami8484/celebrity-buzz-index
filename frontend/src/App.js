@@ -559,11 +559,7 @@ function App() {
         fetchStats();
       }
     } catch (e) {
-      const errorDetail = e.response?.data?.detail;
-      const errorMsg = typeof errorDetail === 'string' ? errorDetail : 
-                       Array.isArray(errorDetail) ? errorDetail[0]?.msg || "Failed to add celebrity" :
-                       errorDetail?.msg || "Failed to add celebrity";
-      toast.error(errorMsg);
+      toast.error(getErrorMessage(e, "Failed to add celebrity"));
     }
   };
 
