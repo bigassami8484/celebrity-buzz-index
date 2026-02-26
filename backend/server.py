@@ -3306,6 +3306,12 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
         ("https://www.huffpost.com/section/entertainment/feed", "HuffPost"),
         ("https://news.yahoo.com/rss/entertainment", "Yahoo News"),
         ("https://www.nationalenquirer.com/feed/", "National Enquirer"),
+        ("https://www.accesshollywood.com/feed/", "Access Hollywood"),
+        ("https://extratv.com/feed/", "Extra TV"),
+        ("https://www.insideedition.com/rss", "Inside Edition"),
+        ("https://www.dailybeast.com/obsessed.rss", "Daily Beast"),
+        ("https://www.vulture.com/feed/rss/index.xml", "Vulture"),
+        ("https://www.refinery29.com/en-us/entertainment/rss.xml", "Refinery29"),
         
         # HOLLYWOOD TRADE
         ("https://variety.com/feed/", "Variety"),
