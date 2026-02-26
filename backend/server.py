@@ -4003,6 +4003,50 @@ async def autocomplete_search(q: str):
             suggestion["estimated_price"] = premium_price
             suggestion["is_brown_bread_premium"] = True
     
+    # Add is_deceased flag to each suggestion based on bio analysis
+    for suggestion in all_suggestions:
+        bio = suggestion.get("bio", "").lower()
+        name_lower = suggestion.get("name", "").lower()
+        
+        # Check for deceased indicators in bio
+        deceased_patterns = ["was a ", "was an ", "died", "passed away", "deceased", " – ", "–2", "−2"]
+        is_deceased = any(pattern in bio for pattern in deceased_patterns)
+        
+        # Check for death year range pattern like "(1950-2020)"
+        import re
+        if re.search(r'\b(19|20)\d{2}\s*[–\-−]\s*(19|20)\d{2}\b', suggestion.get("bio", "")):
+            is_deceased = True
+        
+        # Known deceased celebrities
+        known_deceased = [
+            "amy winehouse", "michael jackson", "prince", "david bowie", "whitney houston",
+            "robin williams", "heath ledger", "paul walker", "chadwick boseman", "kobe bryant",
+            "aretha franklin", "elvis presley", "marilyn monroe", "john lennon", "george michael",
+            "carrie fisher", "alan rickman", "princess diana", "freddie mercury", "bob marley",
+            "tupac", "notorious b.i.g.", "mac miller", "juice wrld", "xxxtentacion",
+            "avicii", "chester bennington", "chris cornell", "kurt cobain", "jimi hendrix",
+            "janis joplin", "jim morrison", "philip seymour hoffman", "brittany murphy",
+            "james dean", "audrey hepburn", "grace kelly", "elizabeth taylor", "marlon brando",
+            "frank sinatra", "dean martin", "gene wilder", "stan lee", "stephen hawking",
+            "nelson mandela", "muhammad ali", "diego maradona", "pele", "queen elizabeth",
+            "matthew perry", "lisa marie presley", "tina turner", "sinead o'connor", 
+            "tony bennett", "olivia newton-john", "ray liotta", "bob saget", "betty white",
+            "jade goody", "cory monteith", "natalie wood", "lucille ball", "johnny cash"
+        ]
+        if any(known in name_lower for known in known_deceased):
+            is_deceased = True
+        
+        # Known living celebrities - override false positives
+        known_living = [
+            "ozzy osbourne", "eric dane", "dolly parton", "cher", "mick jagger", 
+            "keith richards", "paul mccartney", "ringo starr", "bob dylan", "elton john",
+            "taylor swift", "beyonce", "rihanna", "madonna", "barbra streisand"
+        ]
+        if any(known in name_lower for known in known_living):
+            is_deceased = False
+        
+        suggestion["is_deceased"] = is_deceased
+    
     # Return up to 5 results for disambiguation cases, otherwise 1 for clean UX
     # Disambiguation = names with parentheses like "James Morrison (singer)"
     has_disambiguation = any("(" in s.get("name", "") for s in all_suggestions)
