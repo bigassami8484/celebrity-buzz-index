@@ -4007,10 +4007,16 @@ async def autocomplete_search(q: str):
     
     # Add is_deceased flag to each suggestion based on bio analysis
     for suggestion in all_suggestions:
-        bio = suggestion.get("bio", "").lower()
-        bio_original = suggestion.get("bio", "")
+        # Use full_bio if available for better detection, otherwise use bio
+        full_bio = suggestion.get("full_bio", suggestion.get("bio", ""))
+        bio = full_bio.lower()
+        bio_original = full_bio
         name_lower = suggestion.get("name", "").lower()
         celeb_name = suggestion.get("name", "")
+        
+        # Remove full_bio from response (don't send to frontend)
+        if "full_bio" in suggestion:
+            del suggestion["full_bio"]
         
         # Check for deceased indicators in bio
         deceased_keywords = [" died", "passed away", "deceased", 
