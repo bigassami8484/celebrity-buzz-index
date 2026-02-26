@@ -4007,18 +4007,27 @@ async def autocomplete_search(q: str):
     # Add is_deceased flag to each suggestion based on bio analysis
     for suggestion in all_suggestions:
         bio = suggestion.get("bio", "").lower()
+        bio_original = suggestion.get("bio", "")
         name_lower = suggestion.get("name", "").lower()
         
         # Check for deceased indicators in bio
-        deceased_patterns = ["was a ", "was an ", "died", "passed away", "deceased", " – ", "–2", "−2"]
-        is_deceased = any(pattern in bio for pattern in deceased_patterns)
+        deceased_keywords = ["was a ", "was an ", " died", "passed away", "deceased", 
+                            ") was a", ") was an", "who died", "death of", "late "]
+        is_deceased = any(keyword in bio for keyword in deceased_keywords)
         
-        # Check for death year range pattern like "(1950-2020)"
+        # Check for death date pattern like "(1972 – February 19, 2026)" or "(1950-2020)" or "born 1950, died 2020"
         import re
-        if re.search(r'\b(19|20)\d{2}\s*[–\-−]\s*(19|20)\d{2}\b', suggestion.get("bio", "")):
+        # Match patterns like "– February 19, 2026" or "- 2020" at end of life dates
+        death_date_pattern = re.search(r'[–\-−]\s*(?:January|February|March|April|May|June|July|August|September|October|November|December)?\s*\d{1,2}?,?\s*(?:19|20)\d{2}\)', bio_original)
+        if death_date_pattern:
             is_deceased = True
         
-        # Known deceased celebrities
+        # Also check for year range pattern like "(1950-2020)" or "(1950 – 2020)"
+        year_range_pattern = re.search(r'\(\s*(?:born\s*)?(19|20)\d{2}\s*[–\-−]\s*(19|20)\d{2}\s*\)', bio_original)
+        if year_range_pattern:
+            is_deceased = True
+        
+        # Known deceased celebrities - definitive list
         known_deceased = [
             "amy winehouse", "michael jackson", "prince", "david bowie", "whitney houston",
             "robin williams", "heath ledger", "paul walker", "chadwick boseman", "kobe bryant",
@@ -4032,16 +4041,21 @@ async def autocomplete_search(q: str):
             "nelson mandela", "muhammad ali", "diego maradona", "pele", "queen elizabeth",
             "matthew perry", "lisa marie presley", "tina turner", "sinead o'connor", 
             "tony bennett", "olivia newton-john", "ray liotta", "bob saget", "betty white",
-            "jade goody", "cory monteith", "natalie wood", "lucille ball", "johnny cash"
+            "jade goody", "cory monteith", "natalie wood", "lucille ball", "johnny cash",
+            "eric dane", "prince philip", "sean connery", "chadwick boseman", "alex trebek"
         ]
         if any(known in name_lower for known in known_deceased):
             is_deceased = True
         
-        # Known living celebrities - override false positives
+        # Known living celebrities - override false positives (these people are ALIVE)
         known_living = [
-            "ozzy osbourne", "eric dane", "dolly parton", "cher", "mick jagger", 
+            "ozzy osbourne", "dolly parton", "cher", "mick jagger", 
             "keith richards", "paul mccartney", "ringo starr", "bob dylan", "elton john",
-            "taylor swift", "beyonce", "rihanna", "madonna", "barbra streisand"
+            "taylor swift", "beyonce", "rihanna", "madonna", "barbra streisand",
+            "clint eastwood", "harrison ford", "al pacino", "robert de niro",
+            "sylvester stallone", "arnold schwarzenegger", "tom hanks", "meryl streep",
+            "jack nicholson", "morgan freeman", "anthony hopkins", "michael caine",
+            "warren beatty", "dustin hoffman", "gene hackman", "robert redford"
         ]
         if any(known in name_lower for known in known_living):
             is_deceased = False
