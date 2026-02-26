@@ -285,23 +285,18 @@
             </div>
         </noscript>
         
-        <!-- React app root - will replace prerender content when hydrated -->
+        <!-- React app root -->
         <div id="root"></div>
         
-        <!-- Hide prerender content when React loads -->
+        <!-- Show prerender only if JS fails after 3 seconds -->
         <script>
-            document.getElementById('root').addEventListener('DOMNodeInserted', function() {
-                var prerender = document.getElementById('prerender-content');
-                if (prerender) prerender.style.display = 'none';
-            }, { once: true });
-            // Fallback: hide after short delay
             setTimeout(function() {
-                var prerender = document.getElementById('prerender-content');
                 var root = document.getElementById('root');
-                if (prerender && root && root.children.length > 0) {
-                    prerender.style.display = 'none';
+                var prerender = document.getElementById('prerender-content');
+                if (root && root.children.length === 0 && prerender) {
+                    prerender.style.display = 'flex';
                 }
-            }, 1000);
+            }, 3000);
         </script>
         
         <script>
