@@ -4060,7 +4060,7 @@ async def autocomplete_search(q: str):
         
         # Known living celebrities - override false positives (these people are ALIVE)
         known_living = [
-            "ozzy osbourne", "dolly parton", "cher", "mick jagger", 
+            "dolly parton", "cher", "mick jagger", 
             "keith richards", "paul mccartney", "ringo starr", "bob dylan", "elton john",
             "taylor swift", "beyonce", "rihanna", "madonna", "barbra streisand",
             "clint eastwood", "harrison ford", "al pacino", "robert de niro",
