@@ -3802,26 +3802,34 @@ async def autocomplete_search(q: str):
                     "recognition_score": lang_count
                 })
         else:
-            # Try Wikipedia exact search as last resort
-            wiki_info = await fetch_wikipedia_info(q)
-            if wiki_info and wiki_info.get("name"):
-                # Only use if name matches closely (avoid false positives)
-                wiki_name_lower = wiki_info["name"].lower()
-                if wiki_name_lower == query_lower or normalize_text(wiki_info["name"]) == query_normalized:
-                    tier, price, lang_count = await get_tier_and_price_from_wikidata(
-                        wiki_info["name"], 
-                        wiki_info.get("bio", "")
-                    )
-                    suggestions.append({
-                        "name": wiki_info["name"],
-                        "bio": wiki_info.get("bio", "")[:200] + "..." if wiki_info.get("bio") else "",
-                        "description": wiki_info.get("bio", "")[:100] + "..." if wiki_info.get("bio") else "",
-                        "image": wiki_info.get("image", ""),
-                        "tier": tier,
-                        "price": round(price, 1),
-                        "estimated_price": round(price, 1),
-                        "recognition_score": lang_count
-                    })
+            # Only search Wikipedia if query is long enough to be a full name
+            # (at least 5 chars for single names, or contains a space for full names)
+            is_likely_full_name = len(q.strip()) >= 5 or " " in q.strip()
+            
+            if is_likely_full_name:
+                # Try Wikipedia exact search as last resort
+                wiki_info = await fetch_wikipedia_info(q)
+                if wiki_info and wiki_info.get("name"):
+                    # Only use if name matches closely (avoid false positives)
+                    wiki_name_lower = wiki_info["name"].lower()
+                    if wiki_name_lower == query_lower or normalize_text(wiki_info["name"]) == query_normalized:
+                        # Additional check: must be a reasonable celebrity name (not just a random short word)
+                        # Skip if the returned name is too short (like "Tom" or "Shak")
+                        if len(wiki_info["name"]) >= 5 or wiki_info["name"].lower() in single_name_celebs:
+                            tier, price, lang_count = await get_tier_and_price_from_wikidata(
+                                wiki_info["name"], 
+                                wiki_info.get("bio", "")
+                            )
+                            suggestions.append({
+                                "name": wiki_info["name"],
+                                "bio": wiki_info.get("bio", "")[:200] + "..." if wiki_info.get("bio") else "",
+                                "description": wiki_info.get("bio", "")[:100] + "..." if wiki_info.get("bio") else "",
+                                "image": wiki_info.get("image", ""),
+                                "tier": tier,
+                                "price": round(price, 1),
+                                "estimated_price": round(price, 1),
+                                "recognition_score": lang_count
+                            })
     
     # Filter out banned celebrities
     banned_names = ["ninja", "pewdiepie", "shroud", "callux", "ksi", "logan paul", "jake paul",
