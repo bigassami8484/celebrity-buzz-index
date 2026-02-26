@@ -361,7 +361,7 @@ function App() {
       toast.success("Team customized! 🎨");
       setShowCustomize(false);
     } catch (e) {
-      toast.error(getErrorMessage(e, "Failed to customize team");
+      toast.error(getErrorMessage(e, "Failed to customize team"));
     }
   };
 
@@ -373,7 +373,7 @@ function App() {
       setLeagues(prev => [...prev, newLeague]);
       toast.success(`League "${name}" created! Share code: ${newLeague.code}`);
     } catch (e) {
-      toast.error(getErrorMessage(e, "Failed to create league");
+      toast.error(getErrorMessage(e, "Failed to create league"));
     }
   };
 
@@ -385,7 +385,7 @@ function App() {
       setLeagues(prev => [...prev, result.league]);
       toast.success(result.message);
     } catch (e) {
-      toast.error(getErrorMessage(e, "Failed to join league");
+      toast.error(getErrorMessage(e, "Failed to join league"));
     }
   };
 
@@ -507,7 +507,7 @@ function App() {
       fetchTopPicked();
       fetchStats();
     } catch (e) {
-      toast.error(getErrorMessage(e, "Failed to add celebrity");
+      toast.error(getErrorMessage(e, "Failed to add celebrity"));
     }
   };
 
@@ -532,7 +532,7 @@ function App() {
         fetchStats();
       }
     } catch (e) {
-      toast.error(getErrorMessage(e, "Failed to add celebrity");
+      toast.error(getErrorMessage(e, "Failed to add celebrity"));
     }
   };
 
@@ -602,7 +602,7 @@ function App() {
         fetchStats();
       }
     } catch (e) {
-      toast.error(getErrorMessage(e, "No luck this time! Try again.");
+      toast.error(getErrorMessage(e, "No luck this time! Try again."));
     } finally {
       setFeelingLuckyLoading(false);
     }
