@@ -1381,12 +1381,14 @@ function App() {
                 <span className="text-[#FF0099] group-open:rotate-180 transition-transform">▼</span>
               </summary>
               <div className="px-4 pb-4 text-[#A1A1AA] text-sm space-y-2">
-                <p>We scour <strong className="text-[#FFD700]">58+ major news sources</strong> across the UK and US! 🌍</p>
+                <p>We scour <strong className="text-[#FFD700]">58+ major news sources</strong> plus <strong className="text-[#00F0FF]">Google Trends</strong> across the UK and US! 🌍</p>
                 <p className="font-bold text-white">UK Sources (27):</p>
                 <p className="text-xs">Daily Mail, The Sun, Daily Mirror, Metro, Express, BBC News, The Guardian, The Independent, OK! Magazine, Hello!, Sky News, Digital Spy, Radio Times, Closer, Glamour UK, Cosmopolitan UK, Evening Standard, Daily Star, Daily Record, The Telegraph, ITV News, Heat Magazine, Grazia UK, Marie Claire UK, Manchester Evening News, Liverpool Echo, NME</p>
                 <p className="font-bold text-white mt-2">US Sources (28):</p>
                 <p className="text-xs">TMZ, People, Us Weekly, Page Six, E! News, Entertainment Tonight, Just Jared, BuzzFeed, HuffPost, Yahoo News, National Enquirer, Access Hollywood, Extra TV, Inside Edition, Daily Beast, Vulture, Refinery29, Variety, Hollywood Reporter, Deadline, Vanity Fair, Billboard, Rolling Stone, Pitchfork, CNN, Fox News, CBS News, ABC News</p>
-                <p className="text-[#00F0FF] font-bold mt-2">Every headline counts towards your team's buzz score! 🔥</p>
+                <p className="font-bold text-white mt-2">Trending Data:</p>
+                <p className="text-xs">📈 <strong className="text-[#00F0FF]">Google Trends</strong> - Real-time trending searches from UK & US to spot rising celebrities</p>
+                <p className="text-[#00F0FF] font-bold mt-2">Every headline and trending search counts towards your team's buzz score! 🔥</p>
               </div>
             </details>
             
