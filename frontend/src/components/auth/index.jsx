@@ -74,7 +74,7 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess, mode = "login" }) =>
             {/* Google Login Button - Primary */}
             <button
               onClick={handleGoogleLogin}
-              className="w-full bg-white text-black py-3 px-4 font-medium flex items-center justify-center gap-3 hover:bg-gray-100 transition-colors mb-6"
+              className="w-full bg-white text-black py-3 px-4 font-medium flex items-center justify-center gap-3 hover:bg-gray-100 transition-colors mb-4"
               data-testid="google-login-btn"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -85,38 +85,7 @@ export const AuthModal = ({ isOpen, onClose, onAuthSuccess, mode = "login" }) =>
               </svg>
               Continue with Google
             </button>
-            
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex-1 h-px bg-[#333]"></div>
-              <span className="text-[#666] text-sm">or use email</span>
-              <div className="flex-1 h-px bg-[#333]"></div>
-            </div>
-            
-            {/* Magic Link Form */}
-            <form onSubmit={handleMagicLink}>
-              <label className="block text-sm text-[#A1A1AA] mb-2">Email Address</label>
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="flex-1 bg-[#1A1A1A] border border-[#333] text-white px-4 py-3 focus:border-[#FF0099] outline-none"
-                  data-testid="magic-link-email"
-                  required
-                />
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="bg-gradient-to-r from-[#FF0099] to-[#FF0099]/80 text-white px-6 py-3 font-bold disabled:opacity-50 flex items-center gap-2"
-                  data-testid="send-magic-link-btn"
-                >
-                  <Mail className="w-4 h-4" />
-                  {loading ? "..." : "Send"}
-                </button>
-              </div>
-              <p className="text-xs text-[#666] mt-2">We'll send you a magic link to sign in - no password needed!</p>
-            </form>
+            <p className="text-xs text-[#666] text-center">Quick and secure sign-in with your Google account</p>
           </>
         ) : (
           <div className="text-center py-8">
