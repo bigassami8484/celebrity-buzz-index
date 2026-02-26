@@ -127,6 +127,9 @@ function App() {
   // Mobile collapsible tabs state
   const [mobileExpandedTab, setMobileExpandedTab] = useState(null);
   
+  // How It Works collapsed state
+  const [showHowItWorks, setShowHowItWorks] = useState(false);
+  
   // Hall of Fame state
   const [showHallOfFame, setShowHallOfFame] = useState(false);
   const [hallOfFame, setHallOfFame] = useState([]);
