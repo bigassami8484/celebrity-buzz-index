@@ -9540,22 +9540,36 @@ async def auto_discover_celebrities():
                 bio = wiki_info.get("bio", "").lower()
                 
                 # Verify it's a PERSON (not a band, company, movie, etc.)
+                # Must contain clear person indicators
                 person_indicators = [
-                    "is a ", "is an ", "was a ", "was an ",
-                    "born ", "actress", "actor", "singer", "musician",
+                    " is a ", " is an ", " was a ", " was an ",
+                    "born ", "(born ", "actress", "actor", "singer", "musician",
                     "footballer", "athlete", "presenter", "host", "comedian",
                     "model", "influencer", "rapper", "politician", "royal",
-                    "businessman", "businesswoman", "entrepreneur", "director",
-                    "writer", "author", "journalist", "chef", "designer"
+                    "businessman", "businesswoman", "entrepreneur", "film director",
+                    "writer", "author", "journalist", "chef", "fashion designer",
+                    "television personality", "social media personality",
+                    "professional wrestler", "boxer", "tennis player", "golfer"
                 ]
                 
                 is_person = any(indicator in bio for indicator in person_indicators)
                 
-                # Skip bands/groups
-                band_indicators = ["band", "group", "duo", "trio", "quartet", "ensemble", "orchestra"]
-                is_band = any(indicator in bio for indicator in band_indicators)
+                # Skip non-person entities (movies, shows, bands, companies, etc.)
+                non_person_indicators = [
+                    "is a film", "is a movie", "is a television", "is a tv ", "is a series",
+                    "is a song", "is a album", "is a book", "is a novel", "is a video game",
+                    "is a band", "is a group", "is a duo", "is a trio", "is a company",
+                    "is a brand", "is a product", "is a place", "is a city", "is a country",
+                    "is a musical", "is a play", "is a show", "is a sitcom", "is a drama",
+                    "is a comedy", "is a thriller", "is a horror", "is a documentary",
+                    "american film", "british film", "comedy film", "drama film",
+                    "television series", "tv series", "web series", "reality show",
+                    "band", "group", "duo", "trio", "quartet", "ensemble", "orchestra",
+                    "record label", "production company", "entertainment company"
+                ]
+                is_non_person = any(indicator in bio for indicator in non_person_indicators)
                 
-                if not is_person or is_band:
+                if not is_person or is_non_person:
                     continue
                 
                 # Determine category from bio
