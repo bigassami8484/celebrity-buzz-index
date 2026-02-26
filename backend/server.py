@@ -3724,13 +3724,20 @@ async def autocomplete_search(q: str):
     
     # Search database for EXACT name match only
     # Case-insensitive but must match the full name exactly
-    search_name = canonical_name if canonical_name else q
+    search_name = canonical_name if canonical_name else q.strip()
     
-    # Try exact match first (case-insensitive)
+    # Try exact match first (case-insensitive) - also try with trimmed whitespace
     exact_match = await db.celebrities.find_one(
-        {"name": {"$regex": f"^{re.escape(search_name)}$", "$options": "i"}},
+        {"name": {"$regex": f"^{re.escape(search_name.strip())}$", "$options": "i"}},
         {"_id": 0}
     )
+    
+    # If no exact match, try a more flexible search (contains the full name)
+    if not exact_match:
+        exact_match = await db.celebrities.find_one(
+            {"name": {"$regex": f"^{re.escape(search_name.strip())}( |$)", "$options": "i"}},
+            {"_id": 0}
+        )
     
     suggestions = []
     
@@ -3739,22 +3746,25 @@ async def autocomplete_search(q: str):
         suggestions.append(exact_match)
     elif canonical_name:
         # If alias was matched but not in DB, fetch from Wikipedia
-        wiki_info = await fetch_wikipedia_info(canonical_name)
-        if wiki_info and wiki_info.get("name"):
-            tier, price, lang_count = await get_tier_and_price_from_wikidata(
-                wiki_info["name"], 
-                wiki_info.get("bio", "")
-            )
-            suggestions.append({
-                "name": wiki_info["name"],
-                "bio": wiki_info.get("bio", "")[:200] + "..." if wiki_info.get("bio") else "",
-                "description": wiki_info.get("bio", "")[:100] + "..." if wiki_info.get("bio") else "",
-                "image": wiki_info.get("image", ""),
-                "tier": tier,
-                "price": round(price, 1),
-                "estimated_price": round(price, 1),
-                "recognition_score": lang_count
-            })
+        try:
+            wiki_info = await fetch_wikipedia_info(canonical_name)
+            if wiki_info and wiki_info.get("name"):
+                tier, price, lang_count = await get_tier_and_price_from_wikidata(
+                    wiki_info["name"], 
+                    wiki_info.get("bio", "")
+                )
+                suggestions.append({
+                    "name": wiki_info["name"],
+                    "bio": wiki_info.get("bio", "")[:200] + "..." if wiki_info.get("bio") else "",
+                    "description": wiki_info.get("bio", "")[:100] + "..." if wiki_info.get("bio") else "",
+                    "image": wiki_info.get("image", ""),
+                    "tier": tier,
+                    "price": round(price, 1),
+                    "estimated_price": round(price, 1),
+                    "recognition_score": lang_count
+                })
+        except Exception as e:
+            logger.warning(f"Wikipedia fetch failed for alias '{canonical_name}': {e}")
     
     # If no exact match found in DB, check Wikipedia for exact name (not autocomplete)
     if not suggestions:
