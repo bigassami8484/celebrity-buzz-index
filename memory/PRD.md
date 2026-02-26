@@ -9,7 +9,39 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Compete on leaderboards with friends
 - Social sharing (Twitter/X, Facebook, WhatsApp)
 
-## Latest Updates (Feb 25, 2026 - Session 6)
+## Latest Updates (Feb 26, 2026 - Session 7)
+
+### NEW: Strict Exact-Match Search (Feb 26, 2026)
+**User Request**: No partial matches - celebrity should only appear when full name is typed
+**Problem Solved**: Typing "shak" would show irrelevant suggestions like "William Shakespeare" or "Shawn Mendes"
+**Implementation**:
+- Completely rewrote `/api/autocomplete` endpoint to be strict exact-match only
+- No fuzzy matching, no Wikipedia autocomplete suggestions
+- Single-name celebrities (shakira, adele, beyonce, etc.) handled via explicit dictionary
+- Only returns results when full celebrity name is typed exactly
+**Verified Results**:
+- "shak" → 0 results ✅
+- "tom" → 0 results ✅
+- "shakira" → 1 result (Shakira, A-LIST, £15M) ✅
+- "tom hanks" → 1 result (Tom Hanks, A-LIST, £13M) ✅
+- "adele" → 1 result (Adele) ✅
+- Case insensitive: "SHAKIRA" works same as "shakira" ✅
+
+### NEW: Random Category (Feb 26, 2026)
+**User Request**: Add a category that pulls celebrities from ALL existing categories
+**Implementation**:
+- Added "Random" to CATEGORIES list with shuffle icon
+- Modified `/api/celebrities/category/{category}` to handle `random` category
+- Uses MongoDB $sample for true randomness
+- Returns 8 celebrities from mixed categories on each request
+**Verified Results**:
+- Random category appears in UI with shuffle icon ✅
+- Returns celebrities from athletes, movie_stars, musicians, royals, tv_actors, etc. ✅
+- Different results on each refresh ✅
+
+---
+
+## Previous Updates (Feb 25, 2026 - Session 6)
 
 ### CRITICAL FIX: Price/Tier Consistency Across All UI Components (Feb 25, 2026)
 **Problem**: Celebrities showed different prices in Hot Celebs banner, Search results, and Category pages. For example, Taylor Swift showed £14.3M in Hot Celebs but £14.9M in Search.
