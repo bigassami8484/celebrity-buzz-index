@@ -12,7 +12,7 @@ const TopPickedCelebs = ({ celebs, onSelect, onAdd }) => {
       <div className="space-y-2">
         {celebs.slice(0, 5).map((celeb, idx) => (
           <div 
-            key={celeb.id} 
+            key={celeb.id || `picked-${idx}`} 
             className="flex items-center gap-2 p-2 hover:bg-[#1A1A1A] group"
           >
             <span className="text-[#FFD700] font-bold w-5 text-sm">#{idx + 1}</span>
