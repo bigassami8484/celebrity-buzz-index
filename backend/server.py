@@ -4477,6 +4477,56 @@ async def get_stats():
         "transfer_window": transfer_window
     }
 
+@api_router.get("/feeling-lucky/{team_id}")
+async def feeling_lucky(team_id: str):
+    """
+    Get a random affordable celebrity for the team.
+    Returns a celebrity the team can afford and doesn't already have.
+    """
+    # Get the team
+    team = await db.teams.find_one({"id": team_id}, {"_id": 0})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    budget_remaining = team.get("budget_remaining", 0)
+    
+    # Get IDs of celebrities already in team
+    team_celeb_ids = [c.get("id") for c in team.get("celebrities", [])]
+    
+    # Check if team is full
+    if len(team_celeb_ids) >= MAX_TEAM_SIZE:
+        raise HTTPException(status_code=400, detail="Team is full! Remove a celebrity first.")
+    
+    # Find affordable celebrities not already in team
+    pipeline = [
+        {
+            "$match": {
+                "price": {"$lte": budget_remaining},
+                "id": {"$nin": team_celeb_ids},
+                "name": {"$ne": None, "$exists": True},
+                "wiki_url": {"$exists": True, "$ne": ""},
+                "recognition_score": {"$gte": 10}
+            }
+        },
+        {"$sample": {"size": 1}},
+        {"$project": {"_id": 0}}
+    ]
+    
+    results = await db.celebrities.aggregate(pipeline).to_list(1)
+    
+    if not results:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"No affordable celebrities found! Budget: £{budget_remaining}M"
+        )
+    
+    celebrity = results[0]
+    
+    return {
+        "celebrity": celebrity,
+        "message": f"🎲 Feeling lucky? Add {celebrity['name']} for £{celebrity['price']}M!"
+    }
+
 @api_router.get("/pricing-info")
 async def get_pricing_info():
     """Get pricing tier information for the game"""
