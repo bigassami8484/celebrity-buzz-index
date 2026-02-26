@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import "@/App.css";
 import { Toaster, toast } from "sonner";
-import { UserPlus, X, Users, Search, Newspaper, TrendingUp, TrendingDown, Minus, ExternalLink, Dice6 } from "lucide-react";
+import { UserPlus, X, Users, Search, Newspaper, TrendingUp, TrendingDown, Minus, ExternalLink, Dice6, ChevronDown, ChevronUp } from "lucide-react";
 
 // API
 import {
