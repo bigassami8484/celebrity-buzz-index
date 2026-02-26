@@ -3901,23 +3901,32 @@ async def search_wikipedia_people(query: str, limit: int = 5) -> list:
                     if wiki_info and wiki_info.get("name"):
                         bio = wiki_info.get("bio", "").lower()
                         
-                        # Verify it's a person (has birth info or profession)
+                        # Verify it's a person (MUST have birth info or clear profession)
                         person_indicators = [" is a ", " is an ", " was a ", " was an ", 
-                                            "born ", "(born ", "actor", "actress", "singer",
+                                            "born ", "(born "]
+                        profession_indicators = ["actor", "actress", "singer",
                                             "musician", "footballer", "presenter", "model",
-                                            "rapper", "comedian", "politician", "athlete"]
+                                            "rapper", "comedian", "politician", "athlete",
+                                            "businessman", "businesswoman", "entrepreneur",
+                                            "director", "producer", "writer", "journalist",
+                                            "chef", "designer", "host", "personality"]
                         
                         # Skip if clearly not a person
                         non_person_indicators = ["is a film", "is a song", "is a television",
                                                 "is a band", "is a group", "is an album",
                                                 "is a website", "is a company", "is a database",
                                                 "is a university", "is a festival", "is a surname",
-                                                "is a given name", "may refer to"]
+                                                "is a given name", "may refer to", "is a city",
+                                                "is a town", "is a village", "is a place",
+                                                "is a district", "is a region", "is a movie",
+                                                "is an area", "is a suburb", "is a neighbourhood"]
                         
-                        is_person = any(ind in bio for ind in person_indicators)
+                        # Must have BOTH a person indicator AND a profession indicator
+                        has_person_indicator = any(ind in bio for ind in person_indicators)
+                        has_profession = any(ind in bio for ind in profession_indicators)
                         is_not_person = any(ind in bio for ind in non_person_indicators)
                         
-                        if not is_person or is_not_person:
+                        if not (has_person_indicator and has_profession) or is_not_person:
                             continue
                         
                         tier, price, lang_count = await get_tier_and_price_from_wikidata(
