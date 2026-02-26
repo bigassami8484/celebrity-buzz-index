@@ -3909,7 +3909,10 @@ async def search_wikipedia_people(query: str, limit: int = 5) -> list:
                         
                         # Skip if clearly not a person
                         non_person_indicators = ["is a film", "is a song", "is a television",
-                                                "is a band", "is a group", "is an album"]
+                                                "is a band", "is a group", "is an album",
+                                                "is a website", "is a company", "is a database",
+                                                "is a university", "is a festival", "is a surname",
+                                                "is a given name", "may refer to"]
                         
                         is_person = any(ind in bio for ind in person_indicators)
                         is_not_person = any(ind in bio for ind in non_person_indicators)
