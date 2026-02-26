@@ -3890,7 +3890,9 @@ async def autocomplete_search(q: str):
             "tony bennett", "olivia newton-john", "ray liotta", "bob saget", "betty white",
             "jade goody", "cory monteith", "natalie wood", "lucille ball", "johnny cash",
             "eric dane", "prince philip", "sean connery", "alex trebek",
-            "james van der beek", "diana, princess of wales", "ozzy osbourne"
+            "james van der beek", "diana, princess of wales", "ozzy osbourne",
+            "aaron carter", "dustin diamond", "coolio", "richard simmons", "verne troyer",
+            "gary coleman", "richard hatch"
         ]
         if any(known in name_lower for known in known_deceased):
             is_deceased = True
