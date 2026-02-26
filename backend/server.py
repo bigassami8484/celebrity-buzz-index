@@ -3833,6 +3833,7 @@ async def autocomplete_search(q: str):
                 priority_suggestions.append({
                     "name": match["name"],
                     "bio": bio[:100] + "..." if bio else "",
+                    "full_bio": bio,  # Store full bio for deceased detection
                     "image": match.get("image", ""),
                     "tier": tier,
                     "price": round(price, 1),
