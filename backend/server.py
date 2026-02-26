@@ -23,6 +23,7 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from pytrends.request import TrendReq
 
 # Import from modular structure
 from utils.helpers import normalize_text, decode_html_entities, sanitize_team_name
