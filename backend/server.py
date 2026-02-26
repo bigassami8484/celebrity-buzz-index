@@ -3915,7 +3915,7 @@ async def autocomplete_search(q: str):
             "eric dane", "prince philip", "sean connery", "alex trebek",
             "james van der beek", "diana, princess of wales", "ozzy osbourne",
             "aaron carter", "dustin diamond", "coolio", "richard simmons", "verne troyer",
-            "gary coleman", "richard hatch"
+            "gary coleman", "richard hatch", "anna nicole smith"
         ]
         if any(known in name_lower for known in known_deceased):
             is_deceased = True
