@@ -547,6 +547,47 @@ function App() {
     }
   };
 
+  // Feeling Lucky - auto-draft a random affordable celebrity
+  const [feelingLuckyLoading, setFeelingLuckyLoading] = useState(false);
+  
+  const handleFeelingLucky = async () => {
+    if (!team) {
+      toast.error("Create a team first!");
+      return;
+    }
+    
+    if (team.celebrities?.length >= 10) {
+      toast.error("Team is full! Remove a celebrity first.");
+      return;
+    }
+    
+    setFeelingLuckyLoading(true);
+    try {
+      // Get a random affordable celebrity
+      const { celebrity } = await feelingLucky(team.id);
+      
+      if (celebrity) {
+        // Add to team
+        const result = await addToTeamAPI(team.id, celebrity.id);
+        setTeam(result.team);
+        
+        if (result.brown_bread_bonus) {
+          toast.success(`🎲 Lucky pick: ${celebrity.name} + 💀 Brown Bread Bonus!`, { duration: 5000 });
+        } else {
+          toast.success(`🎲 Lucky pick: ${celebrity.name} added for £${celebrity.price}M!`);
+        }
+        
+        fetchLeaderboard();
+        fetchTopPicked();
+        fetchStats();
+      }
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "No luck this time! Try again.");
+    } finally {
+      setFeelingLuckyLoading(false);
+    }
+  };
+
   // Remove celebrity from team
   const removeFromTeam = async (celebrityId) => {
     if (!team) return;
