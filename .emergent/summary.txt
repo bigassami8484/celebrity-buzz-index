@@ -29,168 +29,143 @@ The user wants to build a Celebrity Buzz Index game. This is a full-stack web ap
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack React/FastAPI/MongoDB application for the Celebrity Buzz Index game. The previous session involved extensive data manipulation and feature implementation. Key achievements include resolving a critical price inconsistency bug, adding/removing/categorizing hundreds of celebrities based on user requests, implementing a feature to flag deceased celebrities with a skull emoji (💀), adding an Add button to the Hot Celebs banner, and creating numerous admin endpoints to manage the celebrity database. The backend logic remains in a monolithic  and the frontend in . The agent was last working on making the search functionality stricter and adding a Random Celeb category.
+A full-stack React/FastAPI/MongoDB application for the Celebrity Buzz Index game. The application has core features like celebrity drafting, a news-based point system, and user authentication via Google. The last session focused heavily on user-driven data population (adding dozens of celebrities), fixing search functionality, improving mobile UI with collapsible sections, expanding news sources to over 58 outlets, and integrating Google Trends. Several UI components like Most Picked, Brown Bread Watch, and Hot Streaks now have Add buttons. The user's primary concerns are now related to the performance of the live production site.
 
 **Last working item**:
--   **Last item agent was working**: The agent was addressing a user request to make the search functionality much stricter and faster. The user wants the celebrity to appear only when their full name is typed, eliminating fuzzy matching and suggestions for similar but incorrect names (e.g., typing Shakira should not suggest William Shakespeare). The agent was also implementing a new Random Celeb category that pulls existing celebrities from other categories.
--   **Status**: IN PROGRESS
--   **Agent Testing Done**: N
--   **Which testing method agent to use?**: both
+-   **Last item agent was working**: The user reported multiple performance issues on the live production site, including slow celebrity card loading and a flash of unstyled content on page load. The agent correctly identified these as platform/infrastructure issues (CDN caching, server performance) that require intervention from Emergent Support. Concurrently, the agent addressed several smaller UI requests in the development environment: fixing an inconsistent price for a celebrity, adding Add buttons to several UI components, and cleaning up the login modal to remove confusing magic link text.
+-   **Status**: BLOCKED (The main performance issue is blocked on Emergent Support).
+-   **Agent Testing Done**: Y (For the UI changes made in the dev environment).
+-   **Which testing method agent to use?**: N/A (The primary issue is on the production site, which the agent cannot test).
 -   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: Search is not strict enough and shows previous results (P0)**
-    -   **Description**: The user is frustrated that the search is too slow, provides incorrect suggestions (fuzzy matching), and sometimes shows results from a previous query. The goal is to only show a result when the query is an exact match for a celebrity's name, and for the UI to be fast and responsive.
-    -   **Attempted fixes**: The agent started refactoring the  endpoint in  to use a much stricter, exact-match logic against the database, bypassing the fuzzy Wikipedia autocomplete. On the frontend, the debounce time in  was reduced, and logic was added to clear previous suggestions.
-    -   **Next debug checklist**:
-        1.  Finalize and test the new exact-match logic in the  endpoint in .
-        2.  Verify that typing a full name (e.g., Shakira) returns only that celebrity and does not require a trailing space.
-        3.  Verify that incomplete or misspelled names do not return incorrect results.
-        4.  Test the frontend  to confirm it feels responsive and does not display stale results.
-    -   **Why fix this issue and what will be achieved with the fix?**: This is a direct user request to improve a core user experience feature. A fast, accurate search is crucial for gameplay.
-    -   **Status**: IN PROGRESS
-    -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: Both
-    -   **Blocked on other issue**: None
-
--   **Issue 2: Production Mobile View is Broken (P1)**
-    -   **Description**: A recurring user report that the live production site does not render correctly on mobile devices.
-    -   **Attempted fixes**: The agent confirmed that in the preview environment, both mobile and desktop user agents receive the same server response and build files, suggesting the issue is not server-side.
-    -   **Next debug checklist**: Advise the user to contact **Emergent Support** to investigate their production environment's caching, CDN, and deployment settings, or offer to do a deeper dive into client-side CSS and responsive breakpoints if the issue persists.
+-   **Issue 1: Live Site Performance is Poor (P0)**
+    -   **Description**: The user is experiencing significant performance problems on the live production site, including slow loading of celebrity cards after a search, and a flash of unstyled content on initial page load.
+    -   **Attempted fixes**: The agent has correctly identified this as a platform-level issue (CDN, server performance) and has repeatedly advised the user to contact Emergent Support. Fixes were implemented in the dev environment for related but separate issues (e.g., search race conditions), but these have not resolved the core infrastructure problem on the live site.
+    -   **Next debug checklist**: The next agent must advise the user again to contact Emergent Support for their production environment issues. Do not attempt to fix this in the code, as the root cause is outside the agent's control.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is the user's primary frustration and severely impacts the usability of the live application.
     -   **Status**: BLOCKED
     -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: Frontend
-    -   **Blocked on other issue**: User action required (contacting support).
+    -   **Should Test frontend/backend/both after fix?**: N/A (Requires support intervention).
+    -   **Blocked on other issue**: Blocked on action from Emergent Support.
 
 **In progress Task List**:
--   **Task 1: Add Random Celeb Category (P0)**
-    -   **Where to resume**: The agent added Random to the category list constant and started modifying the  endpoint in  to handle the case where .
-    -   **What will be achieved with this?**: Fulfills a direct user request for a new way to discover celebrities.
-    -   **Status**: IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?**: Both
-    -   **Blocked on something**: Blocked on finishing the Strict Search issue first, as it was part of the same user request.
+-   None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks**:
-    -   **P1**: Populate All Celebrity Bios: The background task to update all celebrity bios from Wikipedia is still in progress. Many bios are still empty, which affects the accuracy of the deceased celebrity detection. This needs to be run to completion.
-    -   **P1**: Populate categories to meet user-specified targets (70+ for major, 50 for reality TV, etc.). The current counts are still below the user's original request.
-    -   **P1**: Implement browser push notifications for Hot Streaks.
-    -   **P1**: Verify the Link Guest Team on Sign-in functionality.
+    -   **P0**: Add Trending Section to UI: The backend endpoint  has been created, but it is not being used by the frontend. A new UI component is needed to display these trending celebrities.
+    -   **P1**: Populate All Celebrity Bios: This background task is still incomplete. Many celebrity bios are empty, which affects the accuracy of the deceased celebrity detection.
+    -   **P1**: Populate Categories: Fill categories to meet user-specified targets (70+ for major categories, 50 for reality TV, etc.).
+    -   **P1**: Implement Browser Push Notifications: Add push notifications for Hot Streaks.
 -   **Future Tasks**:
-    -   **P2**: Backend Refactoring (Phase 2): Create , , , and , and migrate the monolithic logic from . This is becoming more critical as more admin endpoints are added.
-    -   **P2**: Add a Celebrity Comparison Feature.
-    -   **P2**: Implement head-to-head matchups within leagues.
-    -   **P2**: Expand the badge system and Hall of Fame page.
+    -   **P2**: Backend Refactoring: The  file is now over 9,400 lines and is a critical liability. It must be broken down into a proper routed structure (e.g., , ).
+    -   **P2**: Add Celebrity Comparison Feature.
+    -   **P2**: Implement Head-to-Head Matchups within leagues.
+    -   **P2**: Expand Badge System and Hall of Fame.
+    -   **P2**: Add a streak counter for consecutive lucky picks.
 
 **Completed work in this session**
--   **Data Integrity & Consistency Fixes**:
-    -   Resolved the critical P0 bug where celebrity prices were inconsistent across the UI (Hot Celebs, search, categories).
-    -   Implemented robust deceased celebrity detection with a 💀 emoji in the UI, with overrides for specific cases (Ozzy Osbourne, James Van Der Beek).
-    -   Created a system to block the addition of deceased celebrities and known serial killers.
--   **Extensive Data Management**:
-    -   Added, moved, and removed hundreds of celebrities across all categories per specific user requests.
-    -   Added specific Royals (Prince Harry, William, Charles, Diana) and ensured they have images and correct categories.
-    -   Created and used a banned celebrities list to permanently filter unwanted names (streamers, bands, duplicates) from search.
+-   **Strict Search Refactor**: Re-implemented the  endpoint for exact-match database lookups, filtering out disambiguation pages, and correctly handling single-name celebrities (e.g., Prince).
+-   **Feeling Lucky Button**: Added a button to instantly add a random, affordable celebrity to the user's team.
+-   **Mobile UI Improvements**: Created collapsible tabs for the Brown Bread Watch, Most Picked, and Leaderboard sections to reduce scrolling on mobile devices.
+-   **News & Trends Integration**:
+    -   Expanded the number of news sources to over 58 UK and US outlets.
+    -   Integrated Google Trends via a new  endpoint with a fallback to news mentions.
+    -   Added a new FAQ section detailing the news sources.
 -   **UI/UX Enhancements**:
-    -   Added an + Add button to each card in the Hot Celebs banner for quick drafting.
-    -   Removed the article count from the Hot Streaks component.
-    -   Added a new FAQ item about deceased celebrities.
--   **Backend Development**:
-    -   Created multiple admin endpoints in  to manage the database:
-        -   , , 
-        -   , 
-        -   , 
-    -   Fixed a critical bug where new API routes were not being registered by moving  to the end of .
-    -   The Hot Celebs endpoint was updated to be based on actual news mentions from RSS feeds.
+    -   Added hover-to-show Add buttons on the Most Picked, Brown Bread Watch, and Hot Streaks lists.
+    -   Converted the How It Works section into a collapsible button to prevent content flash on load.
+    -   Removed the Made with Emergent badge from the site footer.
+    -   Simplified the login modal to focus exclusively on Google Sign-In, removing confusing magic link text.
+-   **Data Integrity and Fixes**:
+    -   Continuously added and removed dozens of celebrities as requested by the user.
+    -   Corrected numerous deceased statuses (e.g., Neve Campbell, Aaron Carter, Jade Goody) and improved the detection logic.
+    -   Added skull emojis (💀) to celebrity cards for deceased individuals.
+    -   Fixed an inconsistent price bug for a celebrity (Dick Van Dyke).
 
 **Earlier issues found/mentioned but not fixed**
--   The Production Mobile View is Broken issue remains blocked and requires user/support intervention.
+-   The core issue of poor performance on the production mobile/desktop site remains, as it is a platform-level issue blocked on Emergent Support.
 
 **Known issue recurrence from previous fork**
--   **Inconsistent Tiers and Prices**: This was resolved in the current session.
--   **Production Mobile View is Broken**: This is a recurring issue that remains blocked.
+-   **Production Mobile View is Broken**: This recurring issue is now understood to be part of a larger live site performance problem that is blocked on Emergent Support.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Monolithic Architecture**: The  file is now extremely large and complex, containing all API endpoints, data processing, caching logic, and a growing number of admin functions. Refactoring is urgently needed.
--   **Data Caching**: The application relies heavily on caching for performance (, etc.). The agent had to add an admin endpoint to manually bust the cache to see changes, highlighting the brittleness of the current implementation.
--   **Strict vs. Fuzzy Search**: The user has explicitly requested moving away from fuzzy/autocomplete search towards a strict, exact-match search to improve accuracy and performance.
--   **Dynamic Data Seeding**: The agent created multiple admin endpoints and one-off scripts to perform massive data operations (adding, removing, moving celebrities) in response to user requests.
+-   **Monolithic Architecture**: Both the backend () and frontend () have become dangerously large and complex. This is a major source of technical debt and risk.
+-   **Production vs. Development Environment**: There is a critical distinction between the two. The user's main complaints relate to the live production environment, which the agent cannot access or modify. The agent must guide the user to contact Emergent Support for these issues.
+-   **API Rate Limiting**: The Google Trends integration () is unreliable and required implementing a fallback to news-based trending data.
 
 **key DB schema**
--   **celebrities**:  (The  flag is now actively populated and used).
+-   **celebrities**: 
 
 **changes in tech stack**
--   None.
+-   Added  to the backend for Google Trends integration.
 
 **All files of reference**
--   : Heavily modified with new admin endpoints, search logic changes, deceased celebrity detection, and fixes for caching and routing.
--   : Modified to add a handler for the new Add button on the Hot Celebs banner and add a new FAQ item.
--   : UI updated to include an Add button on each celebrity card.
--   : UI updated to add a skull icon (💀) for deceased celebrities and search performance tweaks.
--   : UI updated to remove the news article count.
--   : Updated to reflect completed work.
-
-**Areas that need refactoring**:
--   **Critical**: . The file is now over 9400 lines long and is unmanageable. The numerous admin endpoints should be moved to a separate  router. The core celebrity, news, and search logic should be broken out into service modules.
--   **High**: . This file remains oversized. State management for team, search, and user should be extracted into custom hooks.
-
-**key api endpoints**
--   : Undergoing a major refactor to switch from fuzzy Wikipedia search to a strict, exact-match DB search.
--   : Being modified to handle a new random category.
--   **/api/admin/...** (New):
-    -   : Now includes checks to block deceased people and serial killers.
-    -   
-    -   
-    -   
-    -   
-    -   
-    -   
-
-**Critical Info for New Agent**
--   **Your #1 priority is to complete the search refactor.** The user wants a fast, exact-match search. The logic in  in  needs to be finalized and tested thoroughly to ensure it meets the user's no suggestions, only exact match requirement.
--   **Your #2 priority is to finish the Random Celeb category.** This involves completing the backend logic in the  endpoint.
--   **The celebrity database is still a work in progress.** The user has repeatedly asked for more celebrities in various categories and for all bios to be filled. The bio update task needs to be run to completion, as empty bios are breaking the deceased celebrity detection. Category counts are still below the user's original goals.
--   **The  monolith is a major source of risk.** Be extremely careful when editing it. A key bug was introduced and fixed because new routes were added *after* the router was included by the app. All new routes must be defined *before* the  line.
-
-**documents and test reports created in this job**
--    (updated)
+-   
+-   
+-   
+-   
+-   
+-   
+-   
+-   
+-   
 -   
 
+**Areas that need refactoring**:
+-   **CRITICAL**: . This 9400+ line monolith must be broken down into a proper routed structure with services and models.
+-   **CRITICAL**: . This 1400+ line component should have its state and logic extracted into custom hooks and smaller, more manageable components.
+
+**key api endpoints**
+-   : Refactored for strict, database-first searching.
+-   : Returns a random affordable celebrity for the Feeling Lucky button.
+-   : New endpoint to get trending celebrities, using Google Trends with a news-based fallback.
+
+**Critical Info for New Agent**
+-   **DO NOT ATTEMPT TO FIX THE LIVE SITE PERFORMANCE.** The user's primary complaints (slow loading, style flashes) are on the production site. This is an infrastructure issue for Emergent Support. Your role is to politely but firmly guide the user to contact support. Do not get sidetracked trying to optimize dev code for this.
+-   **The backend and frontend are large monoliths.** Be extremely cautious when making edits. Prioritize refactoring them into smaller modules as soon as the user's immediate feature requests are handled.
+-   **The user frequently requests data management tasks** (adding/removing/categorizing celebrities). Be prepared to use the existing admin endpoints and database scripts.
+-   **The new  endpoint needs a frontend component.** This is a high-priority upcoming task that was left unfinished.
+
+**documents and test reports created in this job**
+-   
+-    (updated)
+
 **Last 10 User Messages and any pending HUMAN messages**
--   **User**:  (**Status: IN PROGRESS**)
--   **User**:  (**Status: RESOLVED**)
--   **User**:  (**Status: PARTIALLY RESOLVED**, search lag is still being worked on)
--   **User**:  (**Status: RESOLVED**)
--   **User**:  (**Status: RESOLVED**)
--   **User**:  (**Status: RESOLVED**)
--   **User**:  (**Status: RESOLVED**)
--   **User**:  (**Status: RESOLVED**)
--   **User**:  (**Status: RESOLVED**)
--   **User**:  (**Status: RESOLVED**)
+1.  **User**: why is it still so slow when clicking a celeb to view their card? -> **Status**: BLOCKED (Live site issue).
+2.  **User**: can you remove the bigs that say emergent when logging in via google -> **Status**: BLOCKED (Platform issue, requires Emergent Support).
+3.  **User**: when i go to sign in it says it will send me a magic link but it doesn't -> **Status**: RESOLVED (Agent simplified the login modal).
+4.  **User**: please remove 'made with emergent' tag and link from my website -> **Status**: RESOLVED.
+5.  **User**: yes also please remove 'made with emergent' tag... -> **Status**: RESOLVED.
+6.  **User**: live site is too slow -> **Status**: BLOCKED (Live site issue).
+7.  **User**: jade goody celeb card needs a skull and its too slow brining up a celeb card -> **Status**: PARTIALLY RESOLVED (Skull added; slowness is a live site issue).
+8.  **User**: put an add button next to the hot streaks too -> **Status**: RESOLVED.
+9.  **User**: live site takes too long when searching, dick van dyke price is wrong, I want add buttons on most picked/brown bread watch -> **Status**: PARTIALLY RESOLVED (UI changes made; slowness is a live site issue).
+10. **User**: why when i click the link does it load looking completely different before it settles -> **Status**: BLOCKED (Live site issue).
 
 **Project Health Check:**
--   **Broken**: The search functionality is currently in a broken state from the user's perspective due to slowness and incorrect fuzzy matching. This is the highest priority fix.
+-   **Broken**: The live production application is considered broken from a performance and UX standpoint by the user. The development environment is functional.
 -   **Mocked**: None.
 
 **3rd Party Integrations**
--   **OpenAI GPT-4o**: Used for minor background tasks (Uses Emergent LLM Key).
+-   **pytrends**: Used for Google Trends data (unreliable, has a fallback).
 -   **Emergent-managed Google Auth**: Used for user login.
--   **Wikipedia API / Wikidata API**: Heavily used for all celebrity data. Prone to severe rate-limiting.
--   **Public RSS Feeds**: For news data.
--   **APScheduler**: For backend scheduled jobs.
+-   **Wikipedia API / Wikidata API**: Used for celebrity data.
+-   **Public RSS Feeds**: 58+ sources for news data.
+-   **APScheduler**: Used for backend scheduled jobs.
 
 **Testing status**
--   **Testing agent used after significant changes**: YES
+-   **Testing agent used after significant changes**: YES (for search feature).
 -   **Troubleshoot agent used after agent stuck in loop**: NO
 -   **Test files created**: None.
--   **Known regressions**: None.
+-   **Known regressions**: The primary user complaint is the poor performance of the live site, which may be a regression from an earlier state or an emergent issue due to increased complexity.
 
 **Credentials to test flow:**
 -   None required. Authentication uses the Emergent-managed Google login flow.
 
 **What agent forgot to execute**
--   The user's original request to populate categories with 70+ celebrities for major categories has not been fully met. The latest counts are still in the 50s-60s. This should be addressed after the current high-priority tasks are completed.
--   The task to update all celebrity bios is incomplete. Many celebrities still have empty bios, which impacts the accuracy of the deceased feature. This task needs to be run to completion.</analysis>
+-   The new  endpoint was created on the backend, but no corresponding UI component was built on the frontend to display the trending celebrities. This feature is incomplete.</analysis>
