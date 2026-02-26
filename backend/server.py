@@ -9499,8 +9499,21 @@ async def auto_discover_celebrities():
                             if name in skip_phrases:
                                 continue
                             
+                            # Skip names starting with "The" (usually titles, not people)
+                            if name.startswith('The '):
+                                continue
+                            
+                            # Skip common article/title patterns
+                            skip_patterns = ['What ', 'Why ', 'How ', 'When ', 'Where ', 'Which ']
+                            if any(name.startswith(p) for p in skip_patterns):
+                                continue
+                            
                             # Skip if too short or too long
                             if len(name) < 5 or len(name) > 35:
+                                continue
+                            
+                            # Must have at least 2 words (first and last name)
+                            if len(name.split()) < 2:
                                 continue
                             
                             discovered_names.add(name)
