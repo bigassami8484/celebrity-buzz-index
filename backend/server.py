@@ -9660,14 +9660,6 @@ scheduler.add_job(
     name='Auto-discover celebrities from news',
     replace_existing=True
 )
-# Schedule daily bio updates at 4 AM UTC
-scheduler.add_job(
-    scheduled_bio_update,
-    CronTrigger(hour=4, minute=0),
-    id='daily_bio_update',
-    name='Daily Celebrity Bio Update',
-    replace_existing=True
-)
 
 # Include routers (MUST be after all routes are defined)
 app.include_router(api_router)
