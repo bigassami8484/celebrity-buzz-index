@@ -9578,7 +9578,11 @@ async def auto_discover_celebrities():
                     "american film", "british film", "comedy film", "drama film",
                     "television series", "tv series", "web series", "reality show",
                     "band", "group", "duo", "trio", "quartet", "ensemble", "orchestra",
-                    "record label", "production company", "entertainment company"
+                    "record label", "production company", "entertainment company",
+                    "animated series", "anime", "cartoon", "video game", "chess opening",
+                    "sporting event", "competition", "tournament", "championship",
+                    "fashion week", "music festival", "awards ceremony", "olympic",
+                    "is an event", "is a festival", "is a week", "is a game"
                 ]
                 is_non_person = any(indicator in bio for indicator in non_person_indicators)
                 
