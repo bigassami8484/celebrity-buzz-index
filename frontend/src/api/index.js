@@ -226,3 +226,8 @@ export const getTriggeredWatches = async (teamId) => {
   const res = await axios.get(`${API}/price-watch/${teamId}/triggered`);
   return res.data;
 };
+
+export const feelingLucky = async (teamId) => {
+  const res = await axios.get(`${API}/feeling-lucky/${teamId}`);
+  return res.data;
+};
