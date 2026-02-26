@@ -3747,7 +3747,7 @@ async def autocomplete_search(q: str):
     """
     Enhanced autocomplete that searches BOTH database AND Wikipedia.
     Any celebrity with a Wikipedia page can be found.
-    Handles disambiguation by returning multiple options.
+    Prioritizes exact name matches over related people.
     """
     if len(q) < 2:
         return {"suggestions": []}
@@ -3764,27 +3764,43 @@ async def autocomplete_search(q: str):
     canonical_name = CELEBRITY_ALIASES.get(query_lower)
     search_name = canonical_name if canonical_name else q.strip()
     
-    # 1. ALWAYS search database first for exact and partial matches
-    db_cursor = db.celebrities.find(
-        {"name": {"$regex": f".*{re.escape(search_name)}.*", "$options": "i"}},
+    # 1. First check for EXACT match in database
+    exact_match = await db.celebrities.find_one(
+        {"name": {"$regex": f"^{re.escape(search_name)}$", "$options": "i"}},
         {"_id": 0}
-    ).limit(5)
+    )
     
-    async for celeb in db_cursor:
-        if celeb.get("name") and celeb["name"].lower() not in seen_names:
-            suggestions.append(celeb)
-            seen_names.add(celeb["name"].lower())
+    if exact_match:
+        suggestions.append(exact_match)
+        seen_names.add(exact_match["name"].lower())
+        logger.info(f"Found exact DB match: {exact_match['name']}")
+    
+    # 2. If no exact match, search database for partial matches
+    if not exact_match:
+        db_cursor = db.celebrities.find(
+            {"name": {"$regex": f".*{re.escape(search_name)}.*", "$options": "i"}},
+            {"_id": 0}
+        ).limit(3)
+        
+        async for celeb in db_cursor:
+            if celeb.get("name") and celeb["name"].lower() not in seen_names:
+                suggestions.append(celeb)
+                seen_names.add(celeb["name"].lower())
     
     logger.info(f"Found {len(suggestions)} matches in database")
     
-    # 2. ALWAYS search Wikipedia (even if found in DB) - this finds new celebrities
-    if len(q.strip()) >= 3:
+    # 3. Search Wikipedia - but only if we don't have an exact match OR query might be ambiguous
+    if len(q.strip()) >= 3 and not exact_match:
         try:
-            wiki_suggestions = await search_wikipedia_people(search_name)
+            wiki_suggestions = await search_wikipedia_people(search_name, limit=3)
             for wiki_person in wiki_suggestions:
                 name_lower = wiki_person.get("name", "").lower()
                 if name_lower and name_lower not in seen_names:
-                    suggestions.append(wiki_person)
+                    # Prioritize if name matches query closely
+                    if search_name.lower() in name_lower or name_lower in search_name.lower():
+                        suggestions.insert(0, wiki_person)  # Add to front
+                    else:
+                        suggestions.append(wiki_person)
                     seen_names.add(name_lower)
         except Exception as e:
             logger.debug(f"Wikipedia search failed for '{q}': {e}")
