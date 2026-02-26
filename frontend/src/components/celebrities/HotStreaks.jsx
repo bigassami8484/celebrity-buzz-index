@@ -130,8 +130,7 @@ const HotStreaks = ({ streaks: propStreaks, onCelebClick, onAdd }) => {
           {streaks.map((streak, idx) => (
             <div
               key={idx}
-              onClick={() => onCelebClick?.(streak.name)}
-              className="flex items-center gap-2 p-2 bg-[#1A1A1A] rounded hover:bg-[#252525] cursor-pointer transition-colors"
+              className="flex items-center gap-2 p-2 bg-[#1A1A1A] rounded hover:bg-[#252525] group transition-colors"
               data-testid={`streak-item-${idx}`}
             >
               {/* Streak indicator */}
@@ -143,16 +142,17 @@ const HotStreaks = ({ streaks: propStreaks, onCelebClick, onAdd }) => {
               <img
                 src={streak.image || `https://ui-avatars.com/api/?name=${streak.name}&size=32&background=FF0099&color=fff`}
                 alt={streak.name}
-                className="w-8 h-8 rounded-full object-cover"
+                className="w-8 h-8 rounded-full object-cover cursor-pointer"
+                onClick={() => onCelebClick?.(streak.name)}
                 onError={(e) => {
                   e.target.src = `https://ui-avatars.com/api/?name=${streak.name}&size=32&background=FF0099&color=fff`;
                 }}
               />
               
               {/* Name and tier */}
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 cursor-pointer" onClick={() => onCelebClick?.(streak.name)}>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-white text-sm font-medium truncate">{streak.name}</span>
+                  <span className="text-white text-sm font-medium truncate hover:text-[#FF0099]">{streak.name}</span>
                   <TierBadge tier={streak.tier} size="xs" />
                 </div>
                 <div className="text-xs text-[#A1A1AA]">
@@ -168,6 +168,18 @@ const HotStreaks = ({ streaks: propStreaks, onCelebClick, onAdd }) => {
                   <span>Hot</span>
                 </div>
               </div>
+              
+              {/* Add button */}
+              {onAdd && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onAdd(streak); }}
+                  className="opacity-0 group-hover:opacity-100 bg-[#FF0099] hover:bg-[#e6008a] text-white text-xs px-2 py-1 rounded transition-all"
+                  title={`Add ${streak.name}`}
+                  data-testid={`add-streak-${idx}`}
+                >
+                  <Plus className="w-3 h-3" />
+                </button>
+              )}
             </div>
           ))}
         </div>
