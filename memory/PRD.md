@@ -9,7 +9,41 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Compete on leaderboards with friends
 - Social sharing (Twitter/X, Facebook, WhatsApp)
 
-## Latest Updates (Feb 26, 2026 - Session 7)
+## Latest Updates (Feb 26, 2026 - Session 8)
+
+### Refactoring & Bug Fixes (Feb 26, 2026)
+**User Request**: Refactor frontend and backend, fix "site going black" issue
+
+**BACKEND REFACTORING - Phase 1**:
+- Created `/app/backend/services/` module with business logic:
+  - `celebrity_service.py`: Celebrity search, fetch, management
+  - `team_service.py`: Team creation, management, leaderboards
+  - `league_service.py`: Private league operations
+- Services are properly exported via `__init__.py`
+- Backend still uses `server.py` (9400 lines) but services are ready for gradual migration
+
+**FRONTEND REFACTORING - Phase 1**:
+- Created custom hooks in `/app/frontend/src/hooks/`:
+  - `useTeam.js`: Team management state and logic
+  - `useAuth.js`: Authentication state and logic
+  - `useCelebrities.js`: Celebrity data fetching
+  - `useLeagues.js`: League management
+- Hooks are exported via `index.js`
+- App.js still uses direct state but hooks are ready for gradual migration
+
+**BUG FIXES**:
+- Added `ErrorBoundary` component to catch and display JavaScript errors gracefully
+- Fixed CSS causing black screen flash: set `background: #050505 !important` in `index.css` and `index.html`
+- Fixed React key warnings in `BrownBreadWatch.jsx`, `TopPickedCelebs.jsx`, and `App.js`
+
+**Technical Details**:
+- Error boundary wraps entire app in `index.js`
+- Critical CSS in HTML ensures dark background before React hydrates
+- All list renders now use fallback keys: `key={celeb.id || \`fallback-${idx}\`}`
+
+---
+
+## Previous Updates (Feb 26, 2026 - Session 7)
 
 ### NEW: Strict Exact-Match Search (Feb 26, 2026)
 **User Request**: No partial matches - celebrity should only appear when full name is typed
