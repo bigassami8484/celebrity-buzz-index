@@ -3887,9 +3887,10 @@ async def autocomplete_search(q: str):
         bio = (suggestion.get("bio", "") or "").lower()
         name_lower = suggestion.get("name", "").lower()
         
-        # Check for deceased indicators
-        deceased_keywords = [" died", "passed away", "deceased", 
-                            ") was a", ") was an", "who died", "death of", "late "]
+        # Check for deceased indicators - be specific to avoid false positives like "late 1990s"
+        deceased_keywords = [" died ", " died.", "passed away", "deceased", 
+                            ") was a", ") was an", "who died", "death of", 
+                            "the late actor", "the late singer", "the late musician"]
         is_deceased = any(keyword in bio for keyword in deceased_keywords)
         
         # Known deceased celebrities
