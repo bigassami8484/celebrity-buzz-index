@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Skull, ChevronDown, ChevronUp } from "lucide-react";
+import { Skull, ChevronDown, ChevronUp, Plus } from "lucide-react";
 
-const BrownBreadWatch = ({ watchList, onSelect }) => {
+const BrownBreadWatch = ({ watchList, onSelect, onAdd }) => {
   const [expanded, setExpanded] = useState(false);
   
   if (!watchList || watchList.length === 0) return null;
@@ -31,8 +31,7 @@ const BrownBreadWatch = ({ watchList, onSelect }) => {
         {displayList.map((celeb, idx) => (
           <div 
             key={celeb.id} 
-            className={`flex items-center gap-3 p-2 hover:bg-[#1A1A1A] cursor-pointer ${celeb.is_premium ? 'border-l-2 border-[#FFD700] bg-[#FFD700]/5' : ''}`}
-            onClick={() => onSelect(celeb.name)}
+            className={`flex items-center gap-2 p-2 hover:bg-[#1A1A1A] group ${celeb.is_premium ? 'border-l-2 border-[#FFD700] bg-[#FFD700]/5' : ''}`}
           >
             <span className="text-lg" title={`Risk: ${celeb.risk_level}`}>
               {getRiskEmoji(celeb.risk_level)}
@@ -40,19 +39,29 @@ const BrownBreadWatch = ({ watchList, onSelect }) => {
             <img 
               src={celeb.image} 
               alt={celeb.name}
-              className="w-8 h-8 rounded-full object-cover grayscale"
+              className="w-8 h-8 rounded-full object-cover grayscale cursor-pointer"
+              onClick={() => onSelect(celeb.name)}
               onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${celeb.name}&size=32&background=666&color=fff`; }}
             />
-            <div className="flex-1 min-w-0">
-              <span className="text-sm truncate block">
+            <div className="flex-1 min-w-0 cursor-pointer" onClick={() => onSelect(celeb.name)}>
+              <span className="text-sm truncate block hover:text-[#FF0099]">
                 {celeb.name} <span className="text-[#666]">({celeb.age})</span>
               </span>
             </div>
-            <div className="text-right">
+            <div className="text-right flex items-center gap-2">
               <span className={`text-sm font-bold ${celeb.is_premium ? 'text-[#FFD700]' : 'text-[#A1A1AA]'}`}>
                 £{celeb.price}M
               </span>
-              {celeb.is_premium && <span className="block text-[8px] text-[#FFD700]">PREMIUM</span>}
+              {onAdd && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onAdd(celeb); }}
+                  className="opacity-0 group-hover:opacity-100 bg-[#FF0099] hover:bg-[#e6008a] text-white text-xs px-2 py-1 rounded transition-all"
+                  title={`Add ${celeb.name}`}
+                  data-testid={`add-brownbread-${idx}`}
+                >
+                  <Plus className="w-3 h-3" />
+                </button>
+              )}
             </div>
           </div>
         ))}
