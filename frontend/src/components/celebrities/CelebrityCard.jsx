@@ -65,7 +65,10 @@ const CelebrityCard = ({ celebrity, onAdd, onRemove, isInTeam, canAfford, onShow
             <TierBadge tier={celebrity.tier || "D"} />
           </div>
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-2">
-            <h3 className="font-bold text-white text-xs truncate">{celebrity.name}</h3>
+            <h3 className="font-bold text-white text-xs truncate">
+              {celebrity.name}
+              {celebrity.is_deceased && <span className="ml-1" title="Deceased">💀</span>}
+            </h3>
           </div>
         </div>
         <div className="p-2">
