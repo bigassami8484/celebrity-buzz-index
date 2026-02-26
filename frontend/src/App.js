@@ -1045,7 +1045,7 @@ function App() {
               </button>
               {mobileExpandedTab === 'mostpicked' && (
                 <div className="border-t border-[#262626]">
-                  <TopPickedCelebs celebs={topPicked.slice(0, 5)} onSelect={searchCelebrity} />
+                  <TopPickedCelebs celebs={topPicked.slice(0, 5)} onSelect={searchCelebrity} onAdd={addFromHotCelebs} />
                 </div>
               )}
             </div>
