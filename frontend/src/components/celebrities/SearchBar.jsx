@@ -162,6 +162,7 @@ const SearchBar = ({ onSearch, onQuickAdd, loading, team }) => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-white truncate">{suggestion.name}</span>
+                      {suggestion.is_deceased && <span title="Deceased">💀</span>}
                       <TierBadge tier={suggestion.tier || suggestion.estimated_tier} />
                       {suggestion.recognition_score !== undefined && (
                         <span 
