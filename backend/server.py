@@ -1426,6 +1426,7 @@ CATEGORIES = [
     {"id": "royals", "name": "Royals", "icon": "crown"},
     {"id": "reality_tv", "name": "Reality TV", "icon": "star"},
     {"id": "other", "name": "Other", "icon": "users"},
+    {"id": "random", "name": "Random", "icon": "shuffle"},
 ]
 
 # Pre-defined trending celebrities per category (UK & International mix)
