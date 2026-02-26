@@ -3288,6 +3288,11 @@ async def fetch_real_celebrity_news(name: str, max_articles: int = 10) -> List[d
         ("https://www.ok.co.uk/celebrity-news/feed", "OK! Magazine"),
         ("https://www.hellomagazine.com/celebrities/rss/", "Hello!"),
         ("https://news.sky.com/feeds/rss/entertainment.xml", "Sky News"),
+        ("https://www.digitalspy.com/feed/", "Digital Spy"),
+        ("https://www.radiotimes.com/feed/", "Radio Times"),
+        ("https://www.closer.co.uk/feed/", "Closer Magazine"),
+        ("https://www.glamourmagazine.co.uk/feed/celebrity", "Glamour UK"),
+        ("https://www.cosmopolitan.com/uk/entertainment/feed/", "Cosmopolitan UK"),
         
         # US ENTERTAINMENT & GOSSIP
         ("https://www.tmz.com/rss.xml", "TMZ"),
