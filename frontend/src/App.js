@@ -988,7 +988,7 @@ function App() {
         
         {/* Hot Streaks - Full width */}
         <div className="mt-8">
-          <HotStreaks streaks={hotStreaks} onCelebClick={searchCelebrity} />
+          <HotStreaks streaks={hotStreaks} onCelebClick={searchCelebrity} onAdd={addFromHotCelebs} />
         </div>
         
         {/* Brown Bread, Most Picked, Leaderboard */}
