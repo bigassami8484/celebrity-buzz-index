@@ -3745,8 +3745,9 @@ async def get_points_methodology():
 @api_router.get("/autocomplete")
 async def autocomplete_search(q: str):
     """
-    STRICT EXACT-MATCH autocomplete - only returns results when full celebrity name is typed.
-    No partial matching, no fuzzy suggestions, no Wikipedia autocomplete.
+    Enhanced autocomplete that searches BOTH database AND Wikipedia.
+    Any celebrity with a Wikipedia page can be found.
+    Handles disambiguation by returning multiple options.
     """
     if len(q) < 2:
         return {"suggestions": []}
@@ -3754,96 +3755,59 @@ async def autocomplete_search(q: str):
     query_lower = q.lower().strip()
     query_normalized = normalize_text(q)
     
-    logger.info(f"STRICT autocomplete search for: '{q}'")
-    
-    # Check known celebrity aliases first (e.g., "the rock" -> "Dwayne Johnson")
-    canonical_name = None
-    if query_lower in CELEBRITY_ALIASES:
-        canonical_name = CELEBRITY_ALIASES[query_lower]
-        logger.info(f"Alias match: '{query_lower}' -> '{canonical_name}'")
-    
-    # Search database for EXACT name match only
-    # Case-insensitive but must match the full name exactly
-    search_name = canonical_name if canonical_name else q.strip()
-    
-    # Try exact match first (case-insensitive) - also try with trimmed whitespace
-    exact_match = await db.celebrities.find_one(
-        {"name": {"$regex": f"^{re.escape(search_name.strip())}$", "$options": "i"}},
-        {"_id": 0}
-    )
-    
-    # If no exact match, try a more flexible search (contains the full name)
-    if not exact_match:
-        exact_match = await db.celebrities.find_one(
-            {"name": {"$regex": f"^{re.escape(search_name.strip())}( |$)", "$options": "i"}},
-            {"_id": 0}
-        )
+    logger.info(f"Enhanced autocomplete search for: '{q}'")
     
     suggestions = []
+    seen_names = set()
     
-    if exact_match:
-        logger.info(f"Found exact DB match for '{search_name}': {exact_match.get('name')}")
-        suggestions.append(exact_match)
-    elif canonical_name:
-        # If alias was matched but not in DB, fetch from Wikipedia
+    # Check known celebrity aliases first (e.g., "the rock" -> "Dwayne Johnson")
+    canonical_name = CELEBRITY_ALIASES.get(query_lower)
+    search_name = canonical_name if canonical_name else q.strip()
+    
+    # 1. ALWAYS search database first for exact and partial matches
+    db_cursor = db.celebrities.find(
+        {"name": {"$regex": f".*{re.escape(search_name)}.*", "$options": "i"}},
+        {"_id": 0}
+    ).limit(5)
+    
+    async for celeb in db_cursor:
+        if celeb.get("name") and celeb["name"].lower() not in seen_names:
+            suggestions.append(celeb)
+            seen_names.add(celeb["name"].lower())
+    
+    logger.info(f"Found {len(suggestions)} matches in database")
+    
+    # 2. ALWAYS search Wikipedia (even if found in DB) - this finds new celebrities
+    if len(q.strip()) >= 3:
         try:
-            wiki_info = await fetch_wikipedia_info(canonical_name)
-            if wiki_info and wiki_info.get("name"):
-                tier, price, lang_count = await get_tier_and_price_from_wikidata(
-                    wiki_info["name"], 
-                    wiki_info.get("bio", "")
-                )
-                suggestions.append({
-                    "name": wiki_info["name"],
-                    "bio": wiki_info.get("bio", "")[:200] + "..." if wiki_info.get("bio") else "",
-                    "description": wiki_info.get("bio", "")[:100] + "..." if wiki_info.get("bio") else "",
-                    "image": wiki_info.get("image", ""),
-                    "tier": tier,
-                    "price": round(price, 1),
-                    "estimated_price": round(price, 1),
-                    "recognition_score": lang_count
-                })
+            wiki_suggestions = await search_wikipedia_people(search_name)
+            for wiki_person in wiki_suggestions:
+                name_lower = wiki_person.get("name", "").lower()
+                if name_lower and name_lower not in seen_names:
+                    suggestions.append(wiki_person)
+                    seen_names.add(name_lower)
         except Exception as e:
-            logger.warning(f"Wikipedia fetch failed for alias '{canonical_name}': {e}")
+            logger.debug(f"Wikipedia search failed for '{q}': {e}")
     
-    # If no exact match found in DB, check Wikipedia for exact name (not autocomplete)
-    if not suggestions:
-        # Check for single-name celebrities that need exact match
-        single_name_celebs = {
-            "shakira": "Shakira",
-            "beyonce": "Beyoncé", 
-            "rihanna": "Rihanna",
-            "adele": "Adele",
-            "madonna": "Madonna",
-            "cher": "Cher",
-            "bono": "Bono",
-            "sting": "Sting",
-            "seal": "Seal",
-            "beck": "Beck",
-            "moby": "Moby",
-            "pink": "Pink (singer)",
-            "kesha": "Kesha",
-            "lorde": "Lorde",
-            "zendaya": "Zendaya",
-            "lizzo": "Lizzo",
-            "sia": "Sia",
-            "drake": "Drake (musician)",
-            "eminem": "Eminem",
-            "prince": "Prince",
-            "usher": "Usher (singer)",
-            "notorious": "The Notorious B.I.G.",
-            "biggie": "The Notorious B.I.G.",
-            "notorious b.i.g": "The Notorious B.I.G.",
-            "notorious b.i.g.": "The Notorious B.I.G.",
-        }
-        
-        if query_lower in single_name_celebs:
-            wiki_name = single_name_celebs[query_lower]
+    # 3. Handle single-name celebrities
+    single_name_celebs = {
+        "shakira": "Shakira", "beyonce": "Beyoncé", "rihanna": "Rihanna",
+        "adele": "Adele", "madonna": "Madonna", "cher": "Cher", "bono": "Bono",
+        "sting": "Sting", "seal": "Seal", "beck": "Beck", "moby": "Moby",
+        "pink": "Pink (singer)", "kesha": "Kesha", "lorde": "Lorde",
+        "zendaya": "Zendaya", "lizzo": "Lizzo", "sia": "Sia",
+        "drake": "Drake (musician)", "eminem": "Eminem", "prince": "Prince",
+        "usher": "Usher (singer)", "notorious": "The Notorious B.I.G.",
+        "biggie": "The Notorious B.I.G.", "notorious b.i.g": "The Notorious B.I.G."
+    }
+    
+    if query_lower in single_name_celebs and query_lower not in seen_names:
+        wiki_name = single_name_celebs[query_lower]
+        try:
             wiki_info = await fetch_wikipedia_info(wiki_name)
             if wiki_info and wiki_info.get("name"):
                 tier, price, lang_count = await get_tier_and_price_from_wikidata(
-                    wiki_info["name"], 
-                    wiki_info.get("bio", "")
+                    wiki_info["name"], wiki_info.get("bio", "")
                 )
                 suggestions.append({
                     "name": wiki_info["name"],
@@ -3852,135 +3816,126 @@ async def autocomplete_search(q: str):
                     "image": wiki_info.get("image", ""),
                     "tier": tier,
                     "price": round(price, 1),
-                    "estimated_price": round(price, 1),
                     "recognition_score": lang_count
                 })
-        else:
-            # Only search Wikipedia if query is long enough to be a full name
-            # (at least 5 chars for single names, or contains a space for full names)
-            is_likely_full_name = len(q.strip()) >= 5 or " " in q.strip()
-            
-            if is_likely_full_name:
-                # Try Wikipedia exact search as last resort
-                try:
-                    wiki_info = await fetch_wikipedia_info(q)
-                    if wiki_info and wiki_info.get("name"):
-                        # Only use if name matches closely (avoid false positives)
-                        wiki_name_lower = wiki_info["name"].lower()
-                        if wiki_name_lower == query_lower or normalize_text(wiki_info["name"]) == query_normalized:
-                            # Additional check: must be a reasonable celebrity name (not just a random short word)
-                            # Skip if the returned name is too short (like "Tom" or "Shak")
-                            if len(wiki_info["name"]) >= 5 or wiki_info["name"].lower() in single_name_celebs:
-                                tier, price, lang_count = await get_tier_and_price_from_wikidata(
-                                    wiki_info["name"], 
-                                    wiki_info.get("bio", "")
-                                )
-                                suggestions.append({
-                                    "name": wiki_info["name"],
-                                    "bio": wiki_info.get("bio", "")[:200] + "..." if wiki_info.get("bio") else "",
-                                    "description": wiki_info.get("bio", "")[:100] + "..." if wiki_info.get("bio") else "",
-                                    "image": wiki_info.get("image", ""),
-                                    "tier": tier,
-                                    "price": round(price, 1),
-                                    "estimated_price": round(price, 1),
-                                    "recognition_score": lang_count
-                                })
-                except Exception as e:
-                    logger.debug(f"Wikipedia lookup failed for '{q}': {e}")
+                seen_names.add(wiki_info["name"].lower())
+        except Exception as e:
+            logger.debug(f"Single name lookup failed: {e}")
     
     # Filter out banned celebrities
     banned_names = ["ninja", "pewdiepie", "shroud", "callux", "ksi", "logan paul", "jake paul",
                     "mr beast", "mrbeast", "markiplier", "jacksepticeye", "pokimane", "xqc",
-                    "dream", "technoblade", "tommyinnit", "tubbo", "ranboo", "georgenotfound",
-                    "earl of snowdon", "james ogilvy", "lady gabriella kingston", "jwoww",
-                    "lady gabriella windsor", "princess theodora of greece",
-                    "danny pintauro", "dana plato", "tony little", "caylee anthony",
-                    "right said fred", "jedward", "kevin federline", "milli vanilli",
-                    "tiffany", "puck", "john bobbitt", "lorena bobbitt", "bobbitt",
                     "ted bundy", "jeffrey dahmer", "john wayne gacy", "charles manson",
-                    "ed gein", "richard ramirez", "dennis rader", "btk killer", "zodiac killer",
-                    "harold shipman", "fred west", "rose west", "peter sutcliffe", "yorkshire ripper",
-                    "myra hindley", "ian brady", "dennis nilsen", "levi bellfield", "steve wright",
-                    "joanna dennehy", "aileen wuornos", "andrei chikatilo", "luis garavito",
-                    "pedro lopez", "gary ridgway", "green river killer", "samuel little",
-                    "h. h. holmes", "albert fish", "edmund kemper", "david berkowitz", "son of sam",
-                    "lucy letby", "lady marina windsor"]
+                    "harold shipman", "fred west", "rose west", "peter sutcliffe",
+                    "myra hindley", "ian brady", "lucy letby"]
     suggestions = [s for s in suggestions 
                    if not any(banned in s.get("name", "").lower() for banned in banned_names)]
     
-    # Filter out Wikipedia disambiguation pages and non-person results
-    disambiguation_phrases = [
-        "may refer to", "can refer to", "could refer to",
-        "is a common", "is a name", "is a surname", "is a given name",
-        "means", "is the name of", "disambiguation", 
-        "list of", "index of"
-    ]
+    # Filter out disambiguation pages (but keep them if they're actual people)
+    disambiguation_phrases = ["may refer to", "can refer to", "is a common name", 
+                             "is a surname", "is a given name", "disambiguation"]
     suggestions = [s for s in suggestions 
-                   if not any(phrase in (s.get("bio", "") or "").lower() for phrase in disambiguation_phrases)]
+                   if not any(phrase in (s.get("bio", "") or "").lower() for phrase in disambiguation_phrases)
+                   or "(disambiguation)" not in s.get("name", "").lower()]
     
-    # Also filter out results where the name itself suggests disambiguation
-    suggestions = [s for s in suggestions 
-                   if "(disambiguation)" not in s.get("name", "").lower()]
-    
-    # Add is_deceased flag to each suggestion
+    # Add is_deceased flag
     for suggestion in suggestions:
-        bio = (suggestion.get("bio", "") or "").lower()
-        name_lower = suggestion.get("name", "").lower()
-        
-        # First check if DB already has is_deceased set
-        if suggestion.get("is_deceased") is not None:
-            is_deceased = suggestion.get("is_deceased")
-        else:
-            # Check for deceased indicators - be specific to avoid false positives like "late 1990s"
+        if suggestion.get("is_deceased") is None:
+            bio = (suggestion.get("bio", "") or "").lower()
             deceased_keywords = [" died ", " died.", "passed away", "deceased", 
-                                ") was a", ") was an", "who died", "death of", 
-                                "the late actor", "the late singer", "the late musician"]
-            is_deceased = any(keyword in bio for keyword in deceased_keywords)
+                                ") was a", ") was an", "who died"]
+            suggestion["is_deceased"] = any(keyword in bio for keyword in deceased_keywords)
         
-        # Known deceased celebrities
-        known_deceased = [
-            "amy winehouse", "michael jackson", "prince", "david bowie", "whitney houston",
-            "robin williams", "heath ledger", "paul walker", "chadwick boseman", "kobe bryant",
-            "aretha franklin", "elvis presley", "marilyn monroe", "john lennon", "george michael",
-            "carrie fisher", "alan rickman", "princess diana", "freddie mercury", "bob marley",
-            "tupac", "notorious b.i.g.", "mac miller", "juice wrld", "xxxtentacion",
-            "avicii", "chester bennington", "chris cornell", "kurt cobain", "jimi hendrix",
-            "janis joplin", "jim morrison", "philip seymour hoffman", "brittany murphy",
-            "james dean", "audrey hepburn", "grace kelly", "elizabeth taylor", "marlon brando",
-            "frank sinatra", "dean martin", "gene wilder", "stan lee", "stephen hawking",
-            "nelson mandela", "muhammad ali", "diego maradona", "pele", "queen elizabeth",
-            "matthew perry", "lisa marie presley", "tina turner", "sinead o'connor", 
-            "tony bennett", "olivia newton-john", "ray liotta", "bob saget", "betty white",
-            "jade goody", "cory monteith", "natalie wood", "lucille ball", "johnny cash",
-            "eric dane", "prince philip", "sean connery", "alex trebek",
-            "james van der beek", "diana, princess of wales", "ozzy osbourne",
-            "aaron carter", "dustin diamond", "coolio", "richard simmons", "verne troyer",
-            "gary coleman", "richard hatch", "anna nicole smith"
-        ]
-        if any(known in name_lower for known in known_deceased):
-            is_deceased = True
-        
-        # Known living celebrities - override
-        known_living = [
-            "dolly parton", "cher", "mick jagger", 
-            "keith richards", "paul mccartney", "ringo starr", "bob dylan", "elton john",
-            "taylor swift", "beyonce", "rihanna", "madonna", "barbra streisand",
-            "clint eastwood", "harrison ford", "al pacino", "robert de niro",
-            "sylvester stallone", "arnold schwarzenegger", "tom hanks", "meryl streep",
-            "jack nicholson", "morgan freeman", "anthony hopkins", "michael caine",
-            "warren beatty", "dustin hoffman", "gene hackman", "robert redford"
-        ]
-        if any(known in name_lower for known in known_living):
-            is_deceased = False
-        
-        suggestion["is_deceased"] = is_deceased
-        
-        # Ensure description field exists for frontend
+        # Ensure description field exists
         if not suggestion.get("description") and suggestion.get("bio"):
             suggestion["description"] = suggestion["bio"][:100] + "..."
     
-    logger.info(f"STRICT autocomplete returning {len(suggestions)} results for '{q}'")
+    logger.info(f"Enhanced autocomplete returning {len(suggestions)} results for '{q}'")
     return {"suggestions": suggestions}
+
+
+async def search_wikipedia_people(query: str, limit: int = 5) -> list:
+    """
+    Search Wikipedia for people matching the query.
+    Returns multiple results for disambiguation.
+    """
+    results = []
+    
+    try:
+        # Use Wikipedia's search API to find matching articles
+        search_url = "https://en.wikipedia.org/w/api.php"
+        params = {
+            "action": "query",
+            "list": "search",
+            "srsearch": f"{query} person OR singer OR actor OR actress OR musician OR footballer",
+            "srlimit": limit * 2,  # Get extra to filter
+            "format": "json",
+            "utf8": 1
+        }
+        
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(search_url, params=params)
+            if response.status_code != 200:
+                return []
+            
+            data = response.json()
+            search_results = data.get("query", {}).get("search", [])
+            
+            for result in search_results[:limit * 2]:
+                title = result.get("title", "")
+                snippet = result.get("snippet", "").lower()
+                
+                # Skip disambiguation pages
+                if "(disambiguation)" in title.lower():
+                    continue
+                
+                # Skip if clearly not a person
+                non_person_words = ["film", "album", "song", "band", "group", "tv series", 
+                                   "television series", "book", "novel", "company"]
+                if any(word in snippet for word in non_person_words):
+                    # But allow if also contains person indicators
+                    person_words = ["born", "actor", "actress", "singer", "musician", "footballer"]
+                    if not any(word in snippet for word in person_words):
+                        continue
+                
+                # Fetch full info for this person
+                try:
+                    wiki_info = await fetch_wikipedia_info(title)
+                    if wiki_info and wiki_info.get("name"):
+                        bio = wiki_info.get("bio", "").lower()
+                        
+                        # Verify it's a person
+                        person_indicators = [" is a ", " is an ", " was a ", " was an ", 
+                                            "born ", "(born ", "actor", "actress", "singer"]
+                        if not any(ind in bio for ind in person_indicators):
+                            continue
+                        
+                        tier, price, lang_count = await get_tier_and_price_from_wikidata(
+                            wiki_info["name"], wiki_info.get("bio", "")
+                        )
+                        
+                        results.append({
+                            "name": wiki_info["name"],
+                            "bio": wiki_info.get("bio", "")[:200] + "..." if wiki_info.get("bio") else "",
+                            "description": wiki_info.get("bio", "")[:100] + "..." if wiki_info.get("bio") else "",
+                            "image": wiki_info.get("image", ""),
+                            "tier": tier,
+                            "price": round(price, 1),
+                            "recognition_score": lang_count,
+                            "wiki_url": wiki_info.get("wiki_url", "")
+                        })
+                        
+                        if len(results) >= limit:
+                            break
+                            
+                except Exception as e:
+                    logger.debug(f"Failed to fetch wiki info for {title}: {e}")
+                    continue
+                    
+    except Exception as e:
+        logger.error(f"Wikipedia search failed: {e}")
+    
+    return results
 
 @api_router.post("/seed")
 async def seed_initial_data():
