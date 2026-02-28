@@ -79,6 +79,6 @@
       "/api/auth/magic-link/send": "Sends magic link email (requires RESEND_API_KEY)",
       "/api/auth/magic-link/verify": "Verifies magic link token"
     },
-    "google_oauth_redirect": "https://auth.emergentagent.com/?redirect=https://fame-fantasy-1.preview.emergentagent.com"
+    "google_oauth_redirect": "https://auth.emergentagent.com/?redirect=https://buzz-league-game.preview.emergentagent.com"
   }
 }
