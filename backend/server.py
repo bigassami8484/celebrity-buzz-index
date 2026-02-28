@@ -4838,7 +4838,25 @@ async def get_hot_celebs():
         "David Attenborough", "Louis Theroux", "Ross Kemp", "Danny Dyer", "Vinnie Jones",
         "Robbie Williams", "Liam Gallagher", "Noel Gallagher", "Dua Lipa", "Lewis Capaldi",
         "Elton John", "Rod Stewart", "Mick Jagger", "Ozzy Osbourne", "Sharon Osbourne",
+        # Classic Musicians / Legends (for obituary coverage)
+        "Neil Sedaka", "Barry Manilow", "Barbra Streisand", "Tony Bennett", "Paul Anka",
+        "Dionne Warwick", "Dolly Parton", "Willie Nelson", "Bob Dylan", "Paul Simon",
+        "Art Garfunkel", "Carole King", "James Taylor", "Stevie Wonder", "Diana Ross",
+        "Cher", "Tina Turner", "Aretha Franklin", "Smokey Robinson", "Lionel Richie",
+        "Quincy Jones", "Burt Bacharach", "Glen Campbell", "Kenny Rogers", "Loretta Lynn",
+        "Dick Van Dyke", "Jerry Lee Lewis", "Little Richard", "Chuck Berry", "BB King",
+        "Eric Clapton", "Jimmy Page", "Robert Plant", "Roger Daltrey", "Pete Townshend",
+        "Phil Collins", "Peter Gabriel", "Sting", "Bryan Adams", "Billy Joel", "Bruce Springsteen",
+        "Stevie Nicks", "Fleetwood Mac", "Pat Benatar", "Cyndi Lauper", "Debbie Harry",
+        "Cliff Richard", "Tom Jones", "Engelbert Humperdinck", "Des O'Connor",
     ]
+    
+    # ALSO: Get all celebrities from database to check against news
+    db_celebs = await db.celebrities.find({}, {"name": 1}).to_list(2000)
+    db_celeb_names = [c.get("name") for c in db_celebs if c.get("name")]
+    
+    # Combine known list with database celebrities (remove duplicates)
+    all_celebs_to_check = list(set(KNOWN_CELEBRITIES + db_celeb_names))
     
     # RSS feeds to scan for hot celebs - expanded list
     rss_sources = [
