@@ -4930,11 +4930,12 @@ async def get_hot_celebs():
                 logger.error(f"Error fetching RSS from {source_name}: {e}")
                 continue
         
-        # Check which known celebrities appear in headlines from PAST 7 DAYS
+        # Check which celebrities appear in headlines from PAST 7 DAYS
+        # Now checks BOTH known celebrities AND all database celebrities
         celeb_mentions = {}
         all_text = " ".join([h["title"].lower() for h in all_headlines])
         
-        for celeb_name in KNOWN_CELEBRITIES:
+        for celeb_name in all_celebs_to_check:
             name_lower = celeb_name.lower()
             # Check for full name or last name (for unique last names)
             name_parts = name_lower.split()
