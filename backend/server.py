@@ -2899,6 +2899,9 @@ def detect_category_from_bio(bio: str, name: str) -> str:
         "tyreek hill": "athletes",
         "simone biles": "athletes",
         "lebron james": "athletes",
+        
+        # TV Personalities - presenters, journalists, documentary makers
+        "ross kemp": "tv_personalities",  # Documentary maker, journalist
     }
     
     for override_name, override_category in category_overrides.items():
@@ -5024,9 +5027,9 @@ async def get_hot_celebs():
             if name.lower() == "michael jordan":
                 continue
             
-            # SKIP celebs with fewer than 2 actual headlines (requirement: minimum 2 news articles)
+            # SKIP celebs with fewer than 3 actual headlines (requirement: minimum 3 news articles)
             actual_headlines = data.get("headlines", [])
-            if len(actual_headlines) < 2:
+            if len(actual_headlines) < 3:
                 continue
             
             try:
@@ -5167,13 +5170,26 @@ async def get_hot_celebs():
         # Sort by mention count and deduplicate
         hot_list.sort(key=lambda x: x.get("mention_count", 0), reverse=True)
         
-        # Deduplicate by name (case-insensitive)
+        # Deduplicate by name (case-insensitive with normalization for accents and variations)
         seen_names = set()
         deduplicated_list = []
         for celeb in hot_list:
-            name_lower = celeb.get("name", "").lower()
-            if name_lower not in seen_names:
-                seen_names.add(name_lower)
+            name = celeb.get("name", "")
+            # Normalize: lowercase, remove accents, handle common name variations
+            name_normalized = normalize_text(name.lower().strip())
+            # Also remove common suffixes like "Jr.", "Sr.", etc.
+            name_normalized = name_normalized.replace("jr.", "").replace("sr.", "").replace(" jr", "").replace(" sr", "").strip()
+            
+            # Check if we've already seen this name (or very similar)
+            is_duplicate = False
+            for seen in seen_names:
+                # Check for exact match or substring match (handles "Shia LaBeouf" vs "Shia Labeouf")
+                if name_normalized == seen or name_normalized in seen or seen in name_normalized:
+                    is_duplicate = True
+                    break
+            
+            if not is_duplicate:
+                seen_names.add(name_normalized)
                 deduplicated_list.append(celeb)
         
         hot_list = deduplicated_list[:15]  # Top 15
