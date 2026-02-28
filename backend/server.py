@@ -9698,6 +9698,37 @@ scheduler.add_job(
     replace_existing=True
 )
 
+# ==================== SCHEDULED HOT CELEBS REFRESH ====================
+async def scheduled_refresh_hot_celebs():
+    """
+    Refresh hot celebs cache every 2 hours.
+    This ensures celebs without news are removed and new trending celebs are added.
+    """
+    logger.info("🔥 Scheduled hot celebs refresh starting...")
+    try:
+        # Clear existing cache
+        await db.news_cache.delete_one({"type": "hot_celebs_from_news_v7"})
+        logger.info("🔥 Hot celebs cache cleared - will rebuild on next request")
+        
+        # Also update celebs that have no news - mark them as quiet
+        celebs_with_no_news = await db.celebrities.update_many(
+            {"news": {"$size": 0}},
+            {"$set": {"buzz_score": 0}}
+        )
+        logger.info(f"🔥 Reset buzz score for {celebs_with_no_news.modified_count} celebs with no news")
+        
+    except Exception as e:
+        logger.error(f"🔥 Hot celebs refresh failed: {e}")
+
+# Schedule hot celebs refresh every 2 hours
+scheduler.add_job(
+    scheduled_refresh_hot_celebs,
+    CronTrigger(hour='*/2', minute=0),  # Every 2 hours on the hour
+    id='refresh_hot_celebs',
+    name='Refresh hot celebs cache',
+    replace_existing=True
+)
+
 # Include routers (MUST be after all routes are defined)
 app.include_router(api_router)
 app.include_router(auth_router)
