@@ -5138,6 +5138,20 @@ async def get_hot_celebs():
                 logger.error(f"Error fetching {name}: {e}")
                 continue
         
+        # Sort by mention count and deduplicate
+        hot_list.sort(key=lambda x: x.get("mention_count", 0), reverse=True)
+        
+        # Deduplicate by name (case-insensitive)
+        seen_names = set()
+        deduplicated_list = []
+        for celeb in hot_list:
+            name_lower = celeb.get("name", "").lower()
+            if name_lower not in seen_names:
+                seen_names.add(name_lower)
+                deduplicated_list.append(celeb)
+        
+        hot_list = deduplicated_list[:15]  # Top 15
+        
         # NO FALLBACK TO STATIC LIST - Only show celebrities who are ACTUALLY in the news
         # If we don't have enough, that's fine - better to show fewer real results than fake ones
         # The frontend will handle showing a message if the list is empty
