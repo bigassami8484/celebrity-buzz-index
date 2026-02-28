@@ -5296,8 +5296,8 @@ async def get_price_alerts(team_id: str):
     """Get price change alerts for a team's celebrities
     
     Shows which celebrities have significant price changes coming:
-    - Hot celebs (rising in news) = price likely to increase
-    - Quiet celebs (out of news) = price likely to decrease
+    - Hot celebs (in the news with articles) = price likely to increase
+    - Quiet celebs (NO news articles) = price likely to decrease
     """
     team = await db.teams.find_one({"id": team_id}, {"_id": 0})
     if not team:
@@ -5311,24 +5311,35 @@ async def get_price_alerts(team_id: str):
         )
         if celeb:
             current_price = celeb.get("price", 0)
-            buzz_score = celeb.get("buzz_score", 0)
             tier = celeb.get("tier", "D")
-            news_count = len(celeb.get("news", []))
+            news = celeb.get("news", [])
+            news_count = len(news)
             
-            # Calculate what the new dynamic price would be
-            new_price = get_dynamic_price(tier, buzz_score, celeb.get("name", ""))
+            # Calculate buzz based on ACTUAL news presence
+            # If no news, buzz should be 0 = price falls
+            # If has news, buzz is high = price rises
+            actual_buzz = news_count * 15 if news_count > 0 else 0  # 15 points per article
+            
+            # Calculate projected price based on actual buzz
+            new_price = get_dynamic_price(tier, actual_buzz, celeb.get("name", ""))
             price_change = new_price - current_price
             
-            # Only alert if significant change (>= £0.5M) AND has actual news
-            # Don't show "high media buzz" for celebs with no news
-            if abs(price_change) >= 0.5:
-                alert_type = "rising" if price_change > 0 else "falling"
-                
-                # Only show "high media buzz" if they actually have news articles
-                if alert_type == "rising" and news_count == 0:
-                    continue  # Skip - no actual news to justify "high buzz"
-                
-                reason = f"High media buzz ({news_count} articles)" if alert_type == "rising" else "Low media coverage"
+            # Only alert if significant change (>= £0.3M)
+            if abs(price_change) >= 0.3:
+                # RISING = has news articles (buzz > 0)
+                # FALLING = no news articles (buzz = 0)
+                if news_count > 0 and price_change > 0:
+                    alert_type = "rising"
+                    reason = f"High media buzz ({news_count} articles)"
+                elif news_count == 0 and price_change < 0:
+                    alert_type = "falling"
+                    reason = "No recent media coverage"
+                elif price_change > 0:
+                    alert_type = "rising"
+                    reason = f"Media coverage ({news_count} articles)"
+                else:
+                    alert_type = "falling"
+                    reason = "Low media coverage"
                 
                 alerts.append({
                     "celebrity_id": celeb.get("id"),
