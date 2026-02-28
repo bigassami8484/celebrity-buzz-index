@@ -6172,19 +6172,11 @@ async def add_to_team(data: AddToTeam):
         if are_same_celebrity(existing_name, celeb_name):
             raise HTTPException(status_code=400, detail=f"This celebrity is already in your team as '{existing_name}'")
     
-    # SINGLE SOURCE OF TRUTH: Recalculate tier/price from Wikidata
-    # This ensures consistency with autocomplete and search endpoints
-    bio = celebrity.get("bio", "")
-    tier, base_price, lang_count = await get_tier_and_price_from_wikidata(celeb_name, bio)
-    
-    # Apply buzz score modifier
-    default_buzz = celebrity.get("buzz_score", 50)
-    price = get_dynamic_price(tier, default_buzz, celeb_name)
-    
-    # Update the celebrity record in DB with correct tier/price
-    celebrity["tier"] = tier
-    celebrity["price"] = price
-    celebrity["recognition_score"] = lang_count
+    # USE STORED DATABASE VALUES - these have been manually corrected
+    # Don't recalculate - use what's in the DB as single source of truth
+    tier = celebrity.get("tier", "D")
+    price = celebrity.get("price", 1.0)
+    lang_count = celebrity.get("recognition_score", 0)
     
     if team.get("budget_remaining", 0) < price:
         raise HTTPException(status_code=400, detail="Insufficient budget")
