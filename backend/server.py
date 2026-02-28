@@ -5037,14 +5037,17 @@ async def get_hot_celebs():
                         logger.debug(f"Skipping non-person: {name}")
                         continue
                     
-                    # FILTER: Must have person indicators
+                    # FILTER: Must have person indicators (born, profession, etc.)
                     person_indicators = [
                         " is a ", " is an ", " was a ", " was an ",
                         "born ", "(born ", "singer", "actor", "actress",
                         "musician", "songwriter", "footballer", "athlete"
                     ]
                     
-                    if not any(indicator in bio for indicator in person_indicators):
+                    # ADDITIONAL CHECK: Must have "born" somewhere or be deceased (was a/an)
+                    has_birth_info = "born" in bio or "was a " in bio or "was an " in bio
+                    
+                    if not has_birth_info and not any(indicator in bio for indicator in person_indicators):
                         logger.debug(f"No person indicators for: {name}")
                         continue
                     
