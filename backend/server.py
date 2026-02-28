@@ -6017,6 +6017,41 @@ async def get_team(team_id: str):
     # Set total_points to weekly_points for display
     team["total_points"] = team.get("weekly_points", 0)
     
+    # Calculate weekly points for each celebrity based on their news
+    total_weekly_points = 0
+    enriched_celebs = []
+    
+    for celeb_data in team.get("celebrities", []):
+        # Get current celebrity data from DB
+        celeb = await db.celebrities.find_one({"id": celeb_data.get("celebrity_id")}, {"_id": 0})
+        if celeb:
+            # Points based on news articles (10 points per article)
+            news_count = len(celeb.get("news", []))
+            weekly_points = news_count * 10
+            
+            # Brown bread bonus (100 points for deceased)
+            if celeb.get("is_deceased"):
+                weekly_points += 100
+            
+            celeb_data["weekly_points"] = weekly_points
+            celeb_data["news_count"] = news_count
+            celeb_data["is_deceased"] = celeb.get("is_deceased", False)
+            
+            # Update image if DB has better one
+            if celeb.get("image") and not celeb.get("image", "").startswith("https://ui-avatars"):
+                celeb_data["image"] = celeb.get("image")
+            
+            total_weekly_points += weekly_points
+        else:
+            celeb_data["weekly_points"] = 0
+            celeb_data["news_count"] = 0
+        
+        enriched_celebs.append(celeb_data)
+    
+    team["celebrities"] = enriched_celebs
+    team["weekly_points"] = total_weekly_points
+    team["total_points"] = total_weekly_points
+    
     return {"team": team}
 
 @api_router.post("/team/add")
