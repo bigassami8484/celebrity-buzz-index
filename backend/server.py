@@ -4935,6 +4935,27 @@ async def get_hot_celebs():
         celeb_mentions = {}
         all_text = " ".join([h["title"].lower() for h in all_headlines])
         
+        # DYNAMIC DISCOVERY: Extract potential celebrity names from headlines
+        # Pattern: Capitalized words that could be names (2-3 word sequences)
+        import re
+        potential_names = set()
+        for headline in all_headlines:
+            title = headline["title"]
+            # Match patterns like "First Last" or "First Middle Last"
+            name_pattern = r'\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})\b'
+            found_names = re.findall(name_pattern, title)
+            for name in found_names:
+                # Skip common non-name phrases
+                skip_phrases = ['The Sun', 'Daily Mail', 'New York', 'Los Angeles', 'Breaking News',
+                               'Read More', 'Just Jared', 'Super Bowl', 'Grammy Awards', 'Oscar']
+                if name not in skip_phrases and len(name) >= 5 and len(name.split()) >= 2:
+                    potential_names.add(name)
+        
+        logger.info(f"Found {len(potential_names)} potential celebrity names from headlines")
+        
+        # Combine all sources: Known list + Database celebs + Dynamically extracted names
+        all_celebs_to_check = list(set(all_celebs_to_check) | potential_names)
+        
         for celeb_name in all_celebs_to_check:
             name_lower = celeb_name.lower()
             # Check for full name or last name (for unique last names)
