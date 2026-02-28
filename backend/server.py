@@ -5017,6 +5017,33 @@ async def get_hot_celebs():
                 if response.status_code == 200:
                     wiki_data = response.json()
                     image = wiki_data.get("thumbnail", {}).get("source", "")
+                    bio = wiki_data.get("extract", "").lower()
+                    
+                    # FILTER: Skip non-people (companies, events, awards, etc.)
+                    non_person_indicators = [
+                        "is a film", "is a movie", "is a television", "is a series",
+                        "is a song", "is an album", "is a band", "is a group",
+                        "is a company", "is a corporation", "is an organization",
+                        "is an annual", "is a ceremony", "is an award", "is a prize",
+                        "is a guild", "is a union", "is a studio", "is a production",
+                        "is a disappearance", "is a murder", "is a crime", "is a case",
+                        "is a city", "is a town", "is a country", "is a region"
+                    ]
+                    
+                    if any(indicator in bio for indicator in non_person_indicators):
+                        logger.debug(f"Skipping non-person: {name}")
+                        continue
+                    
+                    # FILTER: Must have person indicators
+                    person_indicators = [
+                        " is a ", " is an ", " was a ", " was an ",
+                        "born ", "(born ", "singer", "actor", "actress",
+                        "musician", "songwriter", "footballer", "athlete"
+                    ]
+                    
+                    if not any(indicator in bio for indicator in person_indicators):
+                        logger.debug(f"No person indicators for: {name}")
+                        continue
                     
                     # ONLY include if they have a real photo
                     if image and "wikipedia" in image.lower():
