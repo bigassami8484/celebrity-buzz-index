@@ -4989,28 +4989,11 @@ async def get_hot_celebs():
                         )
                         
                         if db_celeb:
-                            # Get bio and language count for tier calculation
-                            celeb_bio = db_celeb.get("bio", bio)
-                            recognition_metrics = db_celeb.get("recognition_metrics", {})
-                            language_count = recognition_metrics.get("languages", {}).get("count", 0)
-                            
-                            # Fetch fresh language count if missing
-                            if language_count == 0:
-                                try:
-                                    await asyncio.sleep(0.2)
-                                    wikidata_url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={actual_name.replace(' ', '_')}&props=sitelinks&format=json"
-                                    wd_response = await client.get(wikidata_url, timeout=5.0, headers=headers)
-                                    if wd_response.status_code == 200:
-                                        wd_data = wd_response.json()
-                                        for entity in wd_data.get("entities", {}).values():
-                                            sitelinks = entity.get("sitelinks", {})
-                                            language_count = len([k for k in sitelinks.keys() if k.endswith('wiki') and not any(x in k for x in ['quote', 'source', 'books', 'news', 'versity'])])
-                                except:
-                                    pass
-                            
-                            # SINGLE CALCULATION for tier AND price
-                            tier, base_price = calculate_tier_and_price(language_count, celeb_bio)
+                            # USE DATABASE VALUES - these are manually set/corrected
+                            tier = db_celeb.get("tier", "D")
+                            base_price = db_celeb.get("price", 1.0)
                             category = db_celeb.get("category", "other")
+                            image = db_celeb.get("image", image)  # Use DB image if available
                         else:
                             # New celeb - fetch Wikidata
                             language_count = 0
