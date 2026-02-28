@@ -3625,6 +3625,25 @@ async def generate_celebrity_news(name: str, category: str, real_news_context: s
         validated_news = []
         for article in real_news:
             title_lower = article.get('title', '').lower()
+            
+            # SPECIAL HANDLING: Single-name celebrities that conflict with common words
+            # For "Prince" (singer), filter out royal family news
+            if name_lower == "prince":
+                royal_keywords = ["prince harry", "prince william", "prince andrew", 
+                                 "prince george", "prince edward", "prince charles",
+                                 "princess", "royal family", "duke of", "duchess",
+                                 "windsor", "buckingham", "monarchy"]
+                if any(rk in title_lower for rk in royal_keywords):
+                    logger.debug(f"Filtered royal news from Prince (singer): {article.get('title', '')[:50]}")
+                    continue
+            
+            # For "Pink" (singer), be more specific
+            if name_lower == "pink" or name_lower == "pink (singer)":
+                # Must contain "Pink" as a proper noun, not color reference
+                if "singer pink" in title_lower or "p!nk" in title_lower or "pink performs" in title_lower or "pink tour" in title_lower:
+                    validated_news.append(article)
+                continue
+            
             # Accept if full name or last name is in title
             if name_lower in title_lower or last_name in title_lower:
                 validated_news.append(article)
