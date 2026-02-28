@@ -4766,9 +4766,9 @@ async def get_hot_celebs():
         cache_age = now - cache_time
         
         # Use cache if: 
-        # 1. Less than 1 hour old AND
+        # 1. Less than 6 hours old AND
         # 2. From the same week (cache invalidates every Monday)
-        if cache_age.total_seconds() < 3600 and cache_week_start >= current_week_start:
+        if cache_age.total_seconds() < 21600 and cache_week_start >= current_week_start:  # 6 hours = 21600 seconds
             return {"hot_celebs": cached.get("hot_celebs", [])}
     
     headers = {
