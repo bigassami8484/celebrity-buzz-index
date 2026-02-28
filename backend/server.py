@@ -9722,10 +9722,10 @@ async def scheduled_refresh_hot_celebs():
     except Exception as e:
         logger.error(f"🔥 Hot celebs refresh failed: {e}")
 
-# Schedule hot celebs refresh every 2 hours
+# Schedule hot celebs refresh every 6 hours
 scheduler.add_job(
     scheduled_refresh_hot_celebs,
-    CronTrigger(hour='*/2', minute=0),  # Every 2 hours on the hour
+    CronTrigger(hour='*/6', minute=0),  # Every 6 hours on the hour
     id='refresh_hot_celebs',
     name='Refresh hot celebs cache',
     replace_existing=True
