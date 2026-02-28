@@ -5030,7 +5030,8 @@ async def get_hot_celebs():
                         "is a city", "is a town", "is a country", "is a region",
                         "is a brand", "is an archipelago", "is an island", "is a building",
                         "honorary society", "organization of", "entertainment company",
-                        "mass media", "conglomerate", "headquartered"
+                        "mass media", "conglomerate", "headquartered",
+                        "is a place", "tickets are sold", "box office"
                     ]
                     
                     if any(indicator in bio for indicator in non_person_indicators):
