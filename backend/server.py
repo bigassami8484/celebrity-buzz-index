@@ -4377,19 +4377,26 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     # REJECT non-person entities (locations, objects, books, TV shows, phrases, etc.)
     bio_lower = wiki_info.get("bio", "").lower()
     non_person_indicators = [
-        # Locations
+        # Locations - expanded patterns
         "is a city", "is a town", "is a village", "is a place",
         "is a district", "is a region", "is an area", "is a suburb",
         "is a neighbourhood", "is a country", "is a state", "is a province",
         "is a county", "is a municipality", "is an island", "is a beach",
         "is a mountain", "is a river", "is a lake", "is located in",
         "is the capital", "is a metropolitan", "is a port", "is a peninsula",
-        # Media/Entertainment (non-person)
+        "greek island", "spanish island", "italian island", "caribbean island",
+        "in the aegean", "in the mediterranean", "in the pacific",
+        # Media/Entertainment (non-person) - expanded patterns
         "is a film", "is a movie", "is a song", "is a television",
         "is a band", "is a group", "is an album", "is a series",
         "is a tv show", "is a sitcom", "is a drama series", "is a comedy series",
         "is a documentary", "is a video game", "is a game",
         "is a podcast", "is a radio show", "is a web series",
+        "television sitcom", "television series", "tv series", "sitcom created",
+        "mockumentary sitcom", "comedy series", "drama series",
+        "american television", "british television", "american sitcom",
+        "which aired on", "aired from", "lasting ten seasons",
+        "the title of several", "based on a british series",
         # Books/Publications
         "is a book", "is a novel", "is a magazine", "is a newspaper",
         "is a publication", "is a comic", "is a manga", "is an article",
