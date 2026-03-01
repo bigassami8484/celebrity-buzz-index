@@ -5115,7 +5115,7 @@ async def get_hot_celebs():
                 celeb_mentions[celeb_name] = {
                     "count": mention_count,
                     "headline": headline,
-                    "headlines": [h["title"] for h in all_headlines if name_lower in h["title"].lower()][:5]  # Store up to 5 headlines
+                    "headlines": [{"title": h["title"], "source": h.get("source", ""), "date": str(h.get("date", "")) if h.get("date") else ""} for h in all_headlines if name_lower in h["title"].lower()][:5]  # Store up to 5 headlines as dicts
                 }
         
         # Sort by mention count - ONLY include celebrities with 1+ mentions (lowered for more coverage)
