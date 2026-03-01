@@ -4331,10 +4331,18 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     is_deceased = any(pattern in bio_lower for pattern in deceased_patterns)
     
     # Also check for date range pattern like "(1950 – 2020)" or "(1950-2020)"
+    # But ONLY if it looks like a birth-death range (reasonable age: 20-120 years)
     import re
-    date_range_pattern = r'\(\d{4}\s*[–—-]\s*\d{4}\)'
-    if re.search(date_range_pattern, wiki_info.get("bio", "")):
-        is_deceased = True
+    date_range_pattern = r'\((\d{4})\s*[–—-]\s*(\d{4})\)'
+    date_match = re.search(date_range_pattern, wiki_info.get("bio", ""))
+    if date_match:
+        birth_year = int(date_match.group(1))
+        death_year = int(date_match.group(2))
+        age_at_death = death_year - birth_year
+        # Only consider deceased if age at death is plausible (20-120 years)
+        # TV show ranges like (2001-2003) would be 2 years, not plausible
+        if 20 <= age_at_death <= 120:
+            is_deceased = True
     
     # MOST RELIABLE: Use Wikidata P570 (date of death) if available
     if wiki_info.get("is_deceased"):
