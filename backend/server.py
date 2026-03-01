@@ -6277,7 +6277,7 @@ async def add_to_team(data: AddToTeam):
         {"id": data.celebrity_id},
         {
             "$inc": {"times_picked": 1},
-            "$set": {"tier": tier, "price": base_price, "recognition_score": lang_count}
+            "$set": {"tier": tier, "price": price, "recognition_score": lang_count}
         }
     )
     
