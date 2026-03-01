@@ -5041,7 +5041,7 @@ async def get_hot_celebs():
                     image = wiki_data.get("thumbnail", {}).get("source", "")
                     bio = wiki_data.get("extract", "").lower()
                     
-                    # FILTER: Skip non-people (companies, events, awards, etc.)
+                    # FILTER: Skip non-people (companies, events, awards, locations, concepts, etc.)
                     non_person_indicators = [
                         "is a film", "is a movie", "is a television", "is a series",
                         "is a song", "is an album", "is a band", "is a group",
@@ -5053,8 +5053,28 @@ async def get_hot_celebs():
                         "is a brand", "is an archipelago", "is an island", "is a building",
                         "honorary society", "organization of", "entertainment company",
                         "mass media", "conglomerate", "headquartered",
-                        "is a place", "tickets are sold", "box office"
+                        "is a place", "tickets are sold", "box office",
+                        # Additional filters for common false positives
+                        "is a term", "is a concept", "is a phrase", "is a rivalry",
+                        "is an event", "is a game", "is a match", "is a sport",
+                        "is a tournament", "is a championship", "is a competition",
+                        "is a metropolitan", "is a consolidated", "is a parish",
+                        "is a state", "is a province", "is a territory",
+                        "major city", "largest city", "capital of", "located in",
+                        "population of", "square miles", "square kilometers"
                     ]
+                    
+                    # EXPLICIT BLOCKLIST for known non-person names that slip through
+                    blocked_names = [
+                        "new orleans", "los angeles", "new york", "box office",
+                        "heated rivalry", "super bowl", "world cup", "grand slam",
+                        "grammy awards", "oscar", "emmy awards", "golden globes",
+                        "billboard", "rolling stone", "the sun", "daily mail"
+                    ]
+                    
+                    if name.lower() in blocked_names:
+                        logger.debug(f"Skipping blocked name: {name}")
+                        continue
                     
                     if any(indicator in bio for indicator in non_person_indicators):
                         logger.debug(f"Skipping non-person: {name}")
