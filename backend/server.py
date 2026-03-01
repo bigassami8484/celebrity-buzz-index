@@ -5079,7 +5079,10 @@ async def get_hot_celebs():
                         "new orleans", "los angeles", "new york", "box office",
                         "heated rivalry", "super bowl", "world cup", "grand slam",
                         "grammy awards", "oscar", "emmy awards", "golden globes",
-                        "billboard", "rolling stone", "the sun", "daily mail"
+                        "billboard", "rolling stone", "the sun", "daily mail",
+                        "tanning dependence", "sun exposure", "skin cancer",
+                        "syndrome", "disorder", "disease", "condition",
+                        "championship", "tournament", "league", "cup final"
                     ]
                     
                     if name.lower() in blocked_names:
