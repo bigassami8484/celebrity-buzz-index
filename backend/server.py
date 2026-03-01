@@ -4378,7 +4378,8 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         "david baddiel", "rob brydon", "james corden", "greg davies", "alex horne",
         "jonathan ross", "graham norton", "alan carr", "david walliams", "matt lucas",
         "harry styles", "shia labeouf", "dua lipa", "noel gallagher", "robbie williams",
-        "jack whitehall", "maya jama", "olivia attwood", "kelly osbourne"
+        "jack whitehall", "maya jama", "olivia attwood", "kelly osbourne",
+        "russell brand", "bruce willis", "michael j. fox"
     ]
     if any(known in celeb_name_lower for known in known_living):
         is_deceased = False
