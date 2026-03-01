@@ -93,11 +93,19 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize, onSubmitTeam, isTrans
           </div>
         </div>
         <div className="text-right">
-          <div className="budget-display" data-testid="budget-display">
+          {/* Weekly Points Total */}
+          <div className="flex items-center justify-end gap-1 mb-1">
+            <Zap className={`w-5 h-5 ${(team.weekly_points || 0) > 0 ? 'text-[#00F0FF]' : 'text-[#666]'}`} />
+            <span className={`font-anton text-xl ${(team.weekly_points || 0) > 0 ? 'text-[#00F0FF]' : 'text-[#666]'}`}>
+              {team.weekly_points || 0}
+            </span>
+            <span className="text-xs text-[#A1A1AA] ml-1">pts</span>
+          </div>
+          <p className="text-xs text-[#A1A1AA] uppercase tracking-wider">This Week</p>
+          <div className="budget-display mt-2" data-testid="budget-display">
             £{team.budget_remaining}M
           </div>
-          <p className="text-xs text-[#A1A1AA] uppercase tracking-wider">Budget Left</p>
-          <p className="text-xs text-[#666] mt-1">{team.celebrities?.length || 0}/10 players</p>
+          <p className="text-xs text-[#666]">Budget Left</p>
         </div>
       </div>
       
