@@ -4479,6 +4479,7 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     # Save to database
     doc = celebrity.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
+    doc['cached_at'] = datetime.now(timezone.utc).isoformat()  # Set cache timestamp for 30-day caching
     
     # Add tier metrics from classification
     if tier_result:
