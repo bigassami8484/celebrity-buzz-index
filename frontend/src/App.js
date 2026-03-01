@@ -296,6 +296,22 @@ function App() {
       const celebs = await fetchHotCelebsAPI();
       console.log("Hot celebs received:", celebs?.length || 0);
       setHotCelebs(celebs || []);
+      
+      // Preload images for instant display
+      if (celebs && celebs.length > 0) {
+        preloadImages(celebs.map(c => c.image).filter(Boolean));
+        
+        // Cache celebrity data for instant popups
+        const celebIds = celebs.map(c => c.id).filter(Boolean);
+        if (celebIds.length > 0) {
+          try {
+            const cached = await preloadCelebritiesAPI(celebIds);
+            setCelebrityCache(prev => ({ ...prev, ...cached }));
+          } catch (e) {
+            console.log("Preload cache error (non-critical):", e);
+          }
+        }
+      }
     } catch (e) {
       console.error("Error fetching hot celebs:", e);
       setHotCelebs([]);
