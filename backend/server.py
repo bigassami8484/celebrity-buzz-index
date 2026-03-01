@@ -4289,10 +4289,21 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
             real_news_context = hot_celeb_match.get("hot_reason") if hot_celeb_match else None
             news = await generate_celebrity_news(celeb_name, category, real_news_context)
             existing["news"] = news
-            # Update in database with timestamp
+            # Update in database with timestamp and refresh cache timestamp
             await db.celebrities.update_one(
                 {"id": existing.get("id")},
-                {"$set": {"news": news, "news_updated_at": datetime.now(timezone.utc).isoformat()}}
+                {"$set": {
+                    "news": news, 
+                    "news_updated_at": datetime.now(timezone.utc).isoformat(),
+                    "cached_at": datetime.now(timezone.utc).isoformat()  # Refresh 30-day cache
+                }}
+            )
+        
+        # Update cached_at if cache was stale (refreshing Wikipedia data)
+        if not cache_is_fresh:
+            await db.celebrities.update_one(
+                {"id": existing.get("id")},
+                {"$set": {"cached_at": datetime.now(timezone.utc).isoformat()}}
             )
         
         # Record price history
