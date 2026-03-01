@@ -63,15 +63,30 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize, onSubmitTeam, isTrans
         <div className="flex items-center gap-3">
           {/* Team Icon */}
           <div 
-            className="w-12 h-12 rounded-full flex items-center justify-center text-xl cursor-pointer hover:scale-110 transition-transform"
+            className="w-12 h-12 rounded-full flex items-center justify-center text-xl cursor-pointer hover:scale-110 transition-transform relative group"
             style={{ backgroundColor: teamColorHex }}
             onClick={onCustomize}
-            title="Customize Team"
+            title="Click to customize team name & colors"
+            data-testid="team-customize-btn"
           >
             {teamIconEmoji}
+            {/* Tooltip hint */}
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#FF0099] text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              Click to customize!
+            </div>
           </div>
           <div>
-            <h3 className="font-anton text-2xl uppercase tracking-tight">{team.team_name}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-anton text-2xl uppercase tracking-tight">{team.team_name}</h3>
+              <button 
+                onClick={onCustomize}
+                className="text-[#00F0FF] hover:text-[#FF0099] text-xs font-bold transition-colors"
+                title="Rename your team"
+                data-testid="edit-team-name-btn"
+              >
+                ✏️ Edit
+              </button>
+            </div>
             <p className="text-sm text-[#A1A1AA] font-space">
               {team.celebrities?.length || 0}/10 celebrities • £{(team.budget_remaining || 50).toFixed(1)}M remaining
             </p>
