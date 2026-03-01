@@ -4376,53 +4376,59 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     
     # REJECT non-person entities (locations, objects, books, TV shows, phrases, etc.)
     bio_lower = wiki_info.get("bio", "").lower()
+    
+    # First check: Is this clearly a person? Look for person indicators at start of bio
+    person_start_patterns = [
+        " is an american ", " is a british ", " is an english ", " is an australian ",
+        " is a canadian ", " is an irish ", " is a scottish ", " is a welsh ",
+        " is a french ", " is a german ", " is an italian ", " is a spanish ",
+        " is an actor", " is an actress", " is a singer", " is a musician",
+        " is a comedian", " is a presenter", " is a journalist", " is a writer",
+        " is a director", " is a producer", " is a rapper", " is a model",
+        " is a footballer", " is an athlete", " is a politician", " is a businessman",
+        " was an american ", " was a british ", " was an english ",
+    ]
+    
+    # Check first 150 chars for person indicators (where "X is a..." pattern appears)
+    bio_start = bio_lower[:150]
+    is_clearly_person = any(pattern in bio_start for pattern in person_start_patterns)
+    
+    # Non-person indicators - only check if NOT clearly a person
     non_person_indicators = [
-        # Locations - expanded patterns
+        # These patterns indicate the entity itself IS a non-person thing
         "is a city", "is a town", "is a village", "is a place",
         "is a district", "is a region", "is an area", "is a suburb",
         "is a neighbourhood", "is a country", "is a state", "is a province",
         "is a county", "is a municipality", "is an island", "is a beach",
-        "is a mountain", "is a river", "is a lake", "is located in",
+        "is a mountain", "is a river", "is a lake",
         "is the capital", "is a metropolitan", "is a port", "is a peninsula",
         "greek island", "spanish island", "italian island", "caribbean island",
-        "in the aegean", "in the mediterranean", "in the pacific",
-        # Media/Entertainment (non-person) - expanded patterns
-        "is a film", "is a movie", "is a song", "is a television",
-        "is a band", "is a group", "is an album", "is a series",
-        "is a tv show", "is a sitcom", "is a drama series", "is a comedy series",
-        "is a documentary", "is a video game", "is a game",
+        # Media - these indicate the entity IS a show/film/etc
+        "is a film", "is a movie", "is a television series", "is a tv series",
+        "is a band", "is a group", "is an album", "is a sitcom",
+        "is a tv show", "is a drama series", "is a comedy series",
+        "is a documentary film", "is a video game",
         "is a podcast", "is a radio show", "is a web series",
-        "television sitcom", "television series", "tv series", "sitcom created",
-        "mockumentary sitcom", "comedy series", "drama series",
-        "american television", "british television", "american sitcom",
-        "which aired on", "aired from", "lasting ten seasons",
-        "the title of several", "based on a british series",
+        "is the title of", "television sitcom created", "sitcom created by",
+        "mockumentary sitcom", "american television sitcom",
         # Books/Publications
         "is a book", "is a novel", "is a magazine", "is a newspaper",
-        "is a publication", "is a comic", "is a manga", "is an article",
-        # Organizations/Companies
-        "is a website", "is a company", "is a database",
+        "is a publication", "is a comic book", "is a manga",
+        # Organizations/Companies  
+        "is a website", "is a company", "is a corporation",
         "is a university", "is a school", "is a college",
         "is a festival", "is an organization", "is an institution",
-        "is a charity", "is a foundation", "is a corporation",
-        "is a brand", "is a product", "is a service",
         # Generic/Abstract
         "is a surname", "is a given name", "may refer to",
-        "is a term", "is a phrase", "is a concept", "is a word",
-        "is a type of", "is a form of", "is a style of",
+        "is a term", "is a phrase", "is a concept",
         "is an award", "is a prize", "is a ceremony",
-        "is a holiday", "is a tradition", "is an event",
         "is a disease", "is a condition", "is a syndrome",
-        "is a species", "is a breed", "is an animal",
-        # Objects/Things
-        "is a vehicle", "is a car", "is a ship", "is a building",
-        "is a structure", "is a monument", "is a statue",
-        "is a food", "is a dish", "is a drink", "is a beverage",
-        "is a tool", "is a device", "is a machine",
+        "is a species", "is a breed",
         "refers to", "can refer to", "commonly refers"
     ]
     
-    if any(indicator in bio_lower for indicator in non_person_indicators):
+    # Only reject if it matches non-person patterns AND is not clearly a person
+    if not is_clearly_person and any(indicator in bio_lower for indicator in non_person_indicators):
         raise HTTPException(
             status_code=400,
             detail=f"'{search.name}' is not a person. This game is for individual celebrities only - not locations, TV shows, books, or other entities."
