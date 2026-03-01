@@ -120,7 +120,8 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize, onSubmitTeam, isTrans
         <>
           {team.celebrities.map((celeb) => {
             const priceChange = getPriceChange(celeb.price, celeb.previous_week_price);
-            const dailyPoints = celeb.daily_points || 0;
+            const weeklyPoints = celeb.weekly_points || 0;
+            const newsCount = celeb.news_count || 0;
             return (
             <div key={celeb.celebrity_id} className={`team-celeb ${isTeamLocked ? 'opacity-80' : ''}`} data-testid={`team-celeb-${celeb.celebrity_id}`}>
               <img 
@@ -132,14 +133,8 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize, onSubmitTeam, isTrans
                 <div className="flex items-center gap-2">
                   <p className="font-bold">
                     {celeb.name}
-                    {celeb.is_deceased && <span className="ml-1" title="Deceased">💀</span>}
+                    {celeb.is_deceased && <span className="ml-1" title="Deceased - Brown Bread Bonus!">💀</span>}
                   </p>
-                  {dailyPoints > 0 && (
-                    <span className="flex items-center gap-1 text-xs font-bold text-[#00F0FF] bg-[#00F0FF]/10 px-2 py-0.5 rounded-full">
-                      <Zap className="w-3 h-3" />
-                      +{dailyPoints.toFixed(1)}
-                    </span>
-                  )}
                 </div>
                 <p className="text-sm text-[#A1A1AA] flex items-center gap-2">
                   <span className="text-[#FFD700]">£{celeb.price}M</span>
@@ -154,6 +149,16 @@ const TeamPanel = ({ team, onRemove, onShare, onCustomize, onSubmitTeam, isTrans
                     </span>
                   )}
                 </p>
+              </div>
+              {/* Weekly Points Display */}
+              <div className="flex flex-col items-end mr-2">
+                <div className={`flex items-center gap-1 text-sm font-bold ${weeklyPoints > 0 ? 'text-[#00F0FF]' : 'text-[#666]'}`}>
+                  <Zap className={`w-4 h-4 ${weeklyPoints > 0 ? 'text-[#00F0FF]' : 'text-[#666]'}`} />
+                  <span>{weeklyPoints > 0 ? `+${weeklyPoints}` : '0'}</span>
+                </div>
+                <span className="text-[10px] text-[#666]">
+                  {newsCount > 0 ? `${newsCount} article${newsCount !== 1 ? 's' : ''}` : 'no news'}
+                </span>
               </div>
               {canEdit ? (
                 <button 
