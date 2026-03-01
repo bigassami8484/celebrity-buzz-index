@@ -1,0 +1,805 @@
+/* Celebrity Buzz Index - Electric Tabloid Theme */
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap');
+
+/* CSS Variables */
+:root {
+  --bg-main: #050505;
+  --bg-card: #0A0A0A;
+  --bg-muted: #1A1A1A;
+  --text-primary: #FFFFFF;
+  --text-muted: #A1A1AA;
+  --accent-pink: #FF0099;
+  --accent-cyan: #00F0FF;
+  --accent-gold: #FFD700;
+  --border-color: #262626;
+}
+
+/* Base Styles */
+.App {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-main);
+  min-height: 100vh;
+  color: var(--text-primary);
+  position: relative;
+}
+
+/* Noise Texture Overlay */
+.noise-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('https://grainy-gradients.vercel.app/noise.svg');
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Typography */
+.font-anton {
+  font-family: 'Anton', sans-serif;
+}
+
+.font-space {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Header Title Animation */
+.header-title span {
+  display: inline-block;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.header-title span:hover {
+  color: var(--accent-gold);
+  transform: scale(1.1);
+}
+
+/* Trending Ticker */
+.ticker-container {
+  background: linear-gradient(90deg, var(--accent-pink) 0%, var(--accent-cyan) 100%);
+  overflow: hidden;
+  padding: 12px 0;
+}
+
+/* Hot Celebs Scrolling Ticker - Horizontal Auto-scroll */
+.hot-celebs-scroll-container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.hot-celebs-scroll-container::before,
+.hot-celebs-scroll-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 60px;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.hot-celebs-scroll-container::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(10,10,10,0.9), transparent);
+}
+
+.hot-celebs-scroll-container::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(10,10,10,0.9), transparent);
+}
+
+.hot-celebs-scroll-content {
+  display: flex;
+  gap: 12px;
+  animation: hot-celebs-scroll 25s linear infinite;
+  width: fit-content;
+}
+
+.hot-celebs-scroll-content:hover {
+  animation-play-state: paused;
+}
+
+@keyframes hot-celebs-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-content {
+  display: flex;
+  animation: ticker 30s linear infinite;
+  white-space: nowrap;
+}
+
+.ticker-content:hover {
+  animation-play-state: paused;
+}
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-item {
+  padding: 0 40px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* Category Pills */
+.category-pill {
+  padding: 8px 20px;
+  border: 2px solid var(--border-color);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-pill:hover {
+  border-color: var(--accent-pink);
+  color: var(--accent-pink);
+}
+
+.category-pill.active {
+  background: var(--accent-pink);
+  border-color: var(--accent-pink);
+  color: #000;
+}
+
+/* Celebrity Cards */
+.celebrity-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  position: relative;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.celebrity-card:hover {
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 40px -10px rgba(255, 0, 153, 0.4);
+}
+
+.celebrity-card-image {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  filter: grayscale(20%);
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.celebrity-card:hover .celebrity-card-image {
+  filter: grayscale(0%);
+  transform: scale(1.05);
+}
+
+.celebrity-card-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent 0%, rgba(0, 0, 0, 0.7) 30%, rgba(0, 0, 0, 0.9) 100%);
+  padding: 40px 12px 12px;
+}
+
+/* Buzz Score Badge */
+.buzz-score {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, var(--accent-pink), #FF5E00);
+  padding: 8px 16px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #fff;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 153, 0.5); }
+  50% { box-shadow: 0 0 30px rgba(255, 0, 153, 0.8); }
+}
+
+/* Slide up animation for prompts */
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+@keyframes slide-up {
+  0% { 
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Price Tag */
+.price-tag {
+  background: var(--accent-gold);
+  color: #000;
+  padding: 4px 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* Category Badge */
+.category-badge {
+  background: var(--bg-muted);
+  color: var(--accent-cyan);
+  padding: 4px 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* News Panel */
+.news-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 60px;
+  background: rgba(0, 0, 0, 0.95);
+  padding: 20px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  overflow-y: auto;
+  z-index: 5;
+}
+
+.celebrity-card:hover .news-panel {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.news-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.news-item:last-child {
+  border-bottom: none;
+}
+
+.news-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.news-source {
+  font-size: 11px;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Add Button */
+.add-button {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 2px solid var(--accent-pink);
+  color: var(--accent-pink);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  position: relative;
+  z-index: 20;
+}
+
+.add-button:hover {
+  background: var(--accent-pink);
+  color: #000;
+  transform: scale(1.02);
+}
+
+.add-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.add-button:disabled:hover {
+  background: transparent;
+  color: var(--accent-pink);
+  transform: none;
+}
+
+/* Team Panel */
+.team-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 24px;
+}
+
+.team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.budget-display {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-gold), #B8860B);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.team-celeb {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-muted);
+  margin-bottom: 8px;
+  transition: background 0.2s ease;
+}
+
+.team-celeb:hover {
+  background: #252525;
+}
+
+.team-celeb-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+}
+
+.remove-btn {
+  background: transparent;
+  border: none;
+  color: #ff4444;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s ease;
+}
+
+.remove-btn:hover {
+  color: #ff6666;
+}
+
+/* Leaderboard */
+.leaderboard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 24px;
+}
+
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.2s ease;
+}
+
+.leaderboard-row:hover {
+  background: var(--bg-muted);
+}
+
+.leaderboard-rank {
+  font-family: 'Anton', sans-serif;
+  font-size: 28px;
+  width: 50px;
+  text-align: center;
+}
+
+.leaderboard-rank.gold { color: var(--accent-gold); }
+.leaderboard-rank.silver { color: #C0C0C0; }
+.leaderboard-rank.bronze { color: #CD7F32; }
+
+/* Search Bar */
+.search-container {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-input {
+  width: 100%;
+  padding: 16px 60px 16px 24px;
+  background: var(--bg-muted);
+  border: 2px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 16px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 0 4px rgba(255, 0, 153, 0.2);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--accent-pink);
+  border: none;
+  padding: 12px 20px;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.search-button:hover {
+  background: #e6008a;
+}
+
+/* Share Modal */
+.share-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 32px;
+  max-width: 500px;
+  width: 90%;
+}
+
+.share-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 16px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  margin-bottom: 12px;
+}
+
+.share-twitter {
+  background: #1DA1F2;
+  color: #fff;
+}
+
+.share-twitter:hover {
+  background: #1a8cd8;
+}
+
+.share-copy {
+  background: var(--bg-muted);
+  border: 2px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.share-copy:hover {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+/* Loading Skeleton */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-muted) 25%, var(--bg-card) 50%, var(--bg-muted) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ticker-item {
+    padding: 0 20px;
+    font-size: 12px;
+  }
+  
+  .celebrity-card-image {
+    height: 200px;
+  }
+  
+  .budget-display {
+    font-size: 24px;
+  }
+  
+  /* Mobile Header - Larger title for mobile */
+  header h1 {
+    font-size: 3.25rem !important;
+    line-height: 0.85 !important;
+  }
+  
+  header p {
+    font-size: 10px !important;
+    letter-spacing: 2px !important;
+  }
+  
+  /* Mobile Search */
+  .search-container {
+    padding: 0 8px !important;
+  }
+  
+  .search-input {
+    padding: 12px 50px 12px 16px;
+    font-size: 14px;
+  }
+  
+  .search-button {
+    padding: 10px 14px;
+  }
+  
+  /* Mobile Category Pills */
+  .category-pill {
+    padding: 6px 12px;
+    font-size: 10px;
+  }
+  
+  /* Mobile Cards */
+  .celebrity-card-overlay {
+    padding: 30px 10px 10px;
+  }
+  
+  .celebrity-card-overlay h3 {
+    font-size: 1.2rem !important;
+  }
+  
+  /* Mobile Team Panel */
+  .team-panel {
+    padding: 16px;
+  }
+  
+  .team-header {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+  
+  .team-header > div:last-child {
+    text-align: center;
+  }
+  
+  /* Mobile Leaderboard */
+  .leaderboard {
+    padding: 16px;
+  }
+  
+  .leaderboard-row {
+    padding: 12px 8px;
+  }
+  
+  .leaderboard-rank {
+    font-size: 20px;
+    width: 35px;
+  }
+  
+  /* Mobile Share Modal */
+  .share-modal {
+    padding: 20px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  /* Mobile News Panel */
+  .news-panel {
+    padding: 12px;
+  }
+  
+  .news-title {
+    font-size: 12px;
+  }
+}
+
+/* Extra Small Mobile - 480px and below */
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 2.75rem !important;
+    line-height: 0.85 !important;
+  }
+  
+  .ticker-container {
+    padding: 8px 0;
+  }
+  
+  .ticker-item {
+    padding: 0 12px;
+    font-size: 10px;
+  }
+  
+  .buzz-score {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+  
+  .price-tag {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+  
+  .category-badge {
+    font-size: 9px;
+    padding: 3px 8px;
+  }
+  
+  .add-button {
+    padding: 10px;
+    font-size: 11px;
+    min-height: 44px; /* Touch-friendly */
+  }
+  
+  .team-celeb {
+    padding: 8px;
+    gap: 8px;
+  }
+  
+  .team-celeb-image {
+    width: 40px;
+    height: 40px;
+  }
+  
+  /* Mobile Team Panel - Compact */
+  .team-panel {
+    padding: 12px;
+  }
+  
+  .team-header {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+  
+  .team-header > div:first-child {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .team-header > div:last-child {
+    text-align: center;
+    width: 100%;
+  }
+  
+  .budget-display {
+    font-size: 24px;
+  }
+  
+  /* Ensure buttons are touch-friendly */
+  button, .btn, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Stack grids vertically */
+  .grid {
+    gap: 12px !important;
+  }
+  
+  /* Compact cards */
+  .leaderboard, .news-panel {
+    padding: 12px;
+  }
+  
+  /* Touch-friendly remove button */
+  .remove-btn {
+    padding: 8px 12px;
+  }
+  
+  /* Mobile main container spacing */
+  main.container {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  
+  /* Hide long text on mobile */
+  .hide-mobile-text {
+    display: none;
+  }
+}
+
+/* League Card Styles */
+.league-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s ease;
+}
+
+.league-card:hover {
+  border-color: var(--accent-cyan);
+}
+
+.league-code {
+  font-family: 'Space Grotesk', monospace;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 4px;
+  color: var(--accent-gold);
+  background: var(--bg-muted);
+  padding: 8px 16px;
+  text-align: center;
+}
+
+/* Mini Game Styles */
+.bet-card {
+  background: var(--bg-muted);
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bet-card.won {
+  border-color: var(--accent-gold);
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.bet-card.pending {
+  border-color: var(--accent-cyan);
+}
+
+/* Bottom Navigation for Mobile - DISABLED */
+/* Mobile nav has been removed per user request */
+
+/* Hot streak animations */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+

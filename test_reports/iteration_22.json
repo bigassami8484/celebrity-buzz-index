@@ -1,0 +1,95 @@
+{
+  "summary": "Iteration 22 - Tier/Price Consistency Testing. The fix was PARTIALLY applied. Autocomplete endpoint correctly uses get_tier_and_price_from_wikidata() and returns correct tier/price. However, the /api/celebrity/search endpoint still uses stale DB values for existing celebrities, causing tier/price mismatch.",
+  
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "POST /api/celebrity/search",
+        "issue": "Returns incorrect tier/price for existing DB celebrities. Pink (singer) returns D-list/£0.6M instead of A-list/£12M. Daniel Radcliffe returns B-list/£6M instead of A-list/£12M.",
+        "priority": "HIGH",
+        "root_cause": "Lines 3702-3712 in server.py use stored DB values (existing.get('tier'), existing.get('price')) instead of recalculating using get_tier_and_price_from_wikidata()",
+        "fix_location": "/app/backend/server.py lines 3702-3712"
+      }
+    ],
+    "minor": []
+  },
+  
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  
+  "passed_tests": [
+    "GET /api/ - API health check",
+    "GET /api/autocomplete?q=Daniel%20Radcliffe - Returns A-list, £12M (CORRECT)",
+    "GET /api/autocomplete?q=Rochelle%20Humes - Returns C-list, £2.5M (CORRECT)",
+    "GET /api/autocomplete?q=pink - Returns Pink (singer) with A-list, £12M (CORRECT)",
+    "GET /api/autocomplete - Tier/price consistency for Taylor Swift, Ed Sheeran, Tom Holland, Adele",
+    "GET /api/hot-celebs - Returns 13 celebrities with consistent tier/price",
+    "Hot celebs tier/price consistency - All 13 celebrities have matching base prices for their tiers",
+    "Pink alias mapping - Searching 'pink' returns Pink (singer) in autocomplete",
+    "Frontend loads correctly with Hot Celebs banner"
+  ],
+  
+  "failed_tests": [
+    {
+      "test": "POST /api/celebrity/search - Pink (singer)",
+      "expected": "tier=A, price>=£12M",
+      "actual": "tier=D, price=£0.6M",
+      "reason": "DB has stale tier/price, endpoint doesn't recalculate"
+    },
+    {
+      "test": "POST /api/celebrity/search - Daniel Radcliffe",
+      "expected": "tier=A, price>=£12M",
+      "actual": "tier=B, price=£6M",
+      "reason": "DB has stale tier/price, endpoint doesn't recalculate"
+    }
+  ],
+  
+  "test_report_links": [
+    "/app/backend/tests/test_iteration_22_tier_price_consistency.py",
+    "/app/test_reports/pytest/iteration_22_results.xml"
+  ],
+  
+  "action_items": [
+    "FIX REQUIRED: In /api/celebrity/search endpoint (server.py lines 3702-3712), replace the code that uses stored DB tier/price with a call to get_tier_and_price_from_wikidata() for existing celebrities",
+    "The fix should be similar to what was done in the autocomplete endpoint - use the unified tier/price calculation function",
+    "Consider also updating the DB records with correct tier/price after recalculation to avoid repeated API calls"
+  ],
+  
+  "critical_code_review_comments": [
+    "The fix was applied to /api/autocomplete endpoint but NOT to /api/celebrity/search endpoint",
+    "Lines 3702-3712 in server.py still use existing.get('tier', 'D') and existing.get('price', 3.0) for DB-cached celebrities",
+    "This causes inconsistency: autocomplete shows correct tier/price, but clicking to add shows incorrect values",
+    "DB has stale data: Pink (singer) stored as D-list/£0.6M, Daniel Radcliffe stored as B-list/£6M despite having 100 language count"
+  ],
+  
+  "updated_files": [
+    "/app/backend/tests/test_iteration_22_tier_price_consistency.py - Created comprehensive test suite"
+  ],
+  
+  "success_rate": {
+    "backend": "82% (9/11 tests passed)",
+    "frontend": "100%"
+  },
+  
+  "seed_data_creation": "None",
+  
+  "retest_needed": true,
+  
+  "should_main_agent_self_test": false,
+  
+  "context_for_next_testing_agent": "The tier/price consistency fix was PARTIALLY applied. Autocomplete endpoint works correctly. The /api/celebrity/search endpoint needs the same fix applied - it should use get_tier_and_price_from_wikidata() instead of stored DB values for existing celebrities. Test cases are in test_iteration_22_tier_price_consistency.py.",
+  
+  "rca_of_the_issue": {
+    "issue": "Tier/price mismatch between autocomplete and celebrity/search endpoints",
+    "root_cause": "The fix to use get_tier_and_price_from_wikidata() was applied to autocomplete endpoint but not to celebrity/search endpoint. The celebrity/search endpoint (lines 3702-3712) still uses stored DB values which are stale/incorrect.",
+    "reproduction_steps": [
+      "1. Search for 'Daniel Radcliffe' in autocomplete - shows A-list, £12M (correct)",
+      "2. Click on Daniel Radcliffe to view details via /api/celebrity/search - shows B-list, £6M (incorrect)",
+      "3. Same issue with Pink (singer) - autocomplete shows A-list, search shows D-list"
+    ],
+    "mitigation": "Apply the same fix to /api/celebrity/search endpoint: replace lines 3702-3712 with a call to get_tier_and_price_from_wikidata() to recalculate tier/price for existing DB celebrities"
+  }
+}

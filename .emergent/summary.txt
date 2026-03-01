@@ -1,0 +1,260 @@
+<analysis>**original_problem_statement:**
+The user wants to build a Celebrity Buzz Index game. This is a full-stack web application where users act as a fantasy league manager, drafting a team of celebrities with a starting budget. Points are awarded based on the celebrities' real-world media presence, sourced from Wikipedia and various news outlets.
+
+**PRODUCT REQUIREMENTS:**
+-   **Application**: Full-stack web app with a React frontend and a FastAPI backend.
+-   **Data**: Real-time celebrity data from the Wikipedia API and news from RSS feeds.
+-   **Gameplay**:
+    -   Users draft a team of 10 celebrities with a starting budget of £50M.
+    -   A weekly transfer window opens every Sunday, allowing 3 transfers.
+    -   A daily points system based on news mentions.
+    -   A Submit Team button that locks the team.
+-   **Authentication**: Guest mode, with a prompt to sign up/login (Google social login) to save progress.
+-   **Friends Leagues**: Users can create or join private leagues.
+-   **Features**:
+    -   Autocomplete search bar that can find any celebrity on Wikipedia.
+    -   Hot Celebs This Week banner, updated dynamically from news.
+    -   Auto-discover feature to automatically add new newsworthy celebrities to the database.
+    -   Brown Bread Watch for elderly celebrities.
+    -   Most Picked list.
+    -   Hot Streaks feature.
+    -   Disambiguation for names with multiple famous people.
+-   **UI/UX**: The application must have a mobile-first design and a proper favicon.
+-   **Data Integrity & Content**:
+    -   A multi-layer tiering/pricing system (A, B, C, D) must be the single source of truth.
+    -   Celebrity bios should be the first few lines from their real Wikipedia entry.
+    -   All celebrities must have a profile picture. No duplicates, bands, or non-people entities.
+    -   Tiers and prices must be consistent across all UI components.
+
+**User's preferred language**: English
+
+**what currently exists?**
+A full-stack React/FastAPI/MongoDB application for the Celebrity Buzz Index game. The core features are implemented. The last session focused on fixing a black screen rendering issue, addressing numerous data integrity bugs reported by the user (incorrect pricing, mismatched news), and implementing significant new features like an auto-discover function to populate the celebrity database from news headlines and a completely overhauled search that can find any celebrity on Wikipedia. A major refactoring of the monolithic backend and frontend has also been started by creating the necessary directory structures (, ).
+
+**Last working item**:
+-   **Last item agent was working**: The user reported several issues at once: Shia LaBeouf being duplicated and having an inconsistent price, the singer Prince getting news for the royal family, and a new requirement that hot celebs should have at least 3 news articles. The agent fixed the price inconsistency in the  endpoint and added specific filtering to prevent Prince from matching royal news.
+-   **Status**: IN PROGRESS
+-   **Agent Testing Done**: N
+-   **Which testing method agent to use?**: backend testing agent. Test the  endpoint to confirm price consistency for Shia LaBeouf. Test the  endpoint to verify the new filtering logic for Prince and to implement/verify the 3 article minimum rule.
+-   **User Testing Done**: N
+
+**All Pending/In progress Issue list**:
+-   **Issue 1: Shia LaBeouf duplicated on hot celebs (P0)**
+    -   **Description**: The user reported Shia LaBeouf appears twice in the Hot Celebs list.
+    -   **Attempted fixes**: The agent added some deduplication logic, but it was insufficient.
+    -   **Next debug checklist**:
+        -   Inspect the response from the  endpoint to confirm if the duplication originates from the backend.
+        -   Review the  function in . The deduplication logic needs to be more robust, possibly by using a BASH=/bin/bash
+BASHOPTS=checkwinsize:cmdhist:complete_fullquote:extquote:force_fignore:globasciiranges:globskipdots:hostcomplete:interactive_comments:patsub_replacement:progcomp:promptvars:sourcepath
+BASH_ALIASES=()
+BASH_ARGC=()
+BASH_ARGV=()
+BASH_CMDS=()
+BASH_EXECUTION_STRING=$'mkdir -p /app/.emergent && echo "<analysis>**original_problem_statement:**\nThe user wants to build a "Celebrity Buzz Index" game. This is a full-stack web application where users act as a fantasy league manager, drafting a team of celebrities with a starting budget. Points are awarded based on the celebrities\' real-world media presence, sourced from Wikipedia and various news outlets.\n\n**PRODUCT REQUIREMENTS:**\n-   **Application**: Full-stack web app with a React frontend and a FastAPI backend.\n-   **Data**: Real-time celebrity data from the Wikipedia API and news from RSS feeds.\n-   **Gameplay**:\n    -   Users draft a team of 10 celebrities with a starting budget of £50M.\n    -   A weekly transfer window opens every Sunday, allowing 3 transfers.\n    -   A daily points system based on news mentions.\n    -   A "Submit Team" button that locks the team.\n-   **Authentication**: Guest mode, with a prompt to sign up/login (Google social login) to save progress.\n-   **Friends Leagues**: Users can create or join private leagues.\n-   **Features**:\n    -   Autocomplete search bar that can find any celebrity on Wikipedia.\n    -   "Hot Celebs This Week" banner, updated dynamically from news.\n    -   "Auto-discover" feature to automatically add new newsworthy celebrities to the database.\n    -   "Brown Bread Watch" for elderly celebrities.\n    -   "Most Picked" list.\n    -   "Hot Streaks" feature.\n    -   Disambiguation for names with multiple famous people.\n-   **UI/UX**: The application must have a mobile-first design and a proper favicon.\n-   **Data Integrity & Content**:\n    -   A multi-layer tiering/pricing system (A, B, C, D) must be the single source of truth.\n    -   Celebrity bios should be the first few lines from their real Wikipedia entry.\n    -   All celebrities must have a profile picture. No duplicates, bands, or non-people entities.\n    -   Tiers and prices must be consistent across all UI components.\n\n**User\'s preferred language**: English\n\n**what currently exists?**\nA full-stack React/FastAPI/MongoDB application for the "Celebrity Buzz Index" game. The core features are implemented. The last session focused on fixing a "black screen" rendering issue, addressing numerous data integrity bugs reported by the user (incorrect pricing, mismatched news), and implementing significant new features like an "auto-discover" function to populate the celebrity database from news headlines and a completely overhauled search that can find any celebrity on Wikipedia. A major refactoring of the monolithic backend and frontend has also been started by creating the necessary directory structures (`services`, `hooks`).\n\n**Last working item**:\n-   **Last item agent was working**: The user reported several issues at once: Shia LaBeouf being duplicated and having an inconsistent price, the singer Prince getting news for the royal family, and a new requirement that "hot celebs" should have at least 3 news articles. The agent fixed the price inconsistency in the `add_to_team` endpoint and added specific filtering to prevent Prince from matching royal news.\n-   **Status**: IN PROGRESS\n-   **Agent Testing Done**: N\n-   **Which testing method agent to use?**: backend testing agent. Test the `add_to_team` endpoint to confirm price consistency for Shia LaBeouf. Test the `/api/hot-celebs` endpoint to verify the new filtering logic for "Prince" and to implement/verify the "3 article minimum" rule.\n-   **User Testing Done**: N\n\n**All Pending/In progress Issue list**:\n-   **Issue 1: Shia LaBeouf duplicated on hot celebs (P0)**\n    -   **Description**: The user reported Shia LaBeouf appears twice in the "Hot Celebs" list.\n    -   **Attempted fixes**: The agent added some deduplication logic, but it was insufficient.\n    -   **Next debug checklist**:\n        -   Inspect the response from the `/api/hot-celebs` endpoint to confirm if the duplication originates from the backend.\n        -   Review the `generate_hot_celebs_from_news` function in `backend/server.py`. The deduplication logic needs to be more robust, possibly by using a `set` of celebrity IDs or names to track who has already been added to the list.\n        -   Check if different variations of the name (e.g., "Shia LaBeouf" vs "Shia Labeouf") are being treated as separate entities during processing.\n    -   **Status**: IN PROGRESS\n    -   **Is recurring issue?**: N\n    -   **Should Test frontend/backend/both after fix?**: backend\n-   **Issue 2: Price inconsistencies across UI components (P1)**\n    -   **Description**: The user has repeatedly reported that a celebrity\'s price differs between the search results, hot celebs list, and their team view (e.g., Dick Van Dyke, Olivia Attwood, Shia LaBeouf).\n    -   **Attempted fixes**: Agent fixed the `add_to_team` endpoint to use the stored DB price instead of recalculating it. This was a major source of the problem.\n    -   **Next debug checklist**:\n        -   Systematically review all endpoints that return celebrity data: `/api/autocomplete`, `/api/hot-celebs`, `/api/celebrities/category/{category}`, `/api/top-picked`, and `/api/brown-bread-watch`.\n        -   Ensure that **every single one** of these endpoints fetches the celebrity\'s price directly from the database document and does not perform any on-the-fly recalculations. The database must be the single source of truth for pricing.\n    -   **Status**: IN PROGRESS\n    -   **Is recurring issue?**: Y\n    -   **Should Test frontend/backend/both after fix?**: backend\n-   **Issue 3: Live Site Performance is Poor (P2)**\n    -   **Description**: The user\'s live production site is slow, with a "flash of unstyled content".\n    -   **Attempted fixes**: The agent identified this as a platform/infrastructure issue (CDN caching, server performance) outside of code control and advised the user to contact Emergent Support. This is the correct action.\n    -   **Next debug checklist**: If the user mentions this again, politely remind them it is a production environment issue and that they should contact Emergent Support for resolution. Do not attempt to fix this in the dev environment\'s code.\n    -   **Status**: BLOCKED\n    -   **Is recurring issue?**: Y\n    -   **Should Test frontend/backend/both after fix?**: N/A\n    -   **Blocked on other issue**: Emergent Support\n\n**In progress Task List**:\n-   **Task 1: Refactor Monolithic Backend & Frontend (P0)**\n    -   **Where to resume**:\n        -   **Backend**: Start migrating endpoint logic from `server.py` into the newly created service files in `/app/backend/services/`. Begin with the celebrity-related functions (e.g., move the logic from `/api/autocomplete` into `celebrity_service.py` and have the route handler call the service).\n        -   **Frontend**: Start migrating state management logic (e.g., `useState`, `useEffect` for team and celebrity data) from `/app/frontend/src/App.js` into the corresponding custom hooks in `/app/frontend/src/hooks/`. Refactor `App.js` to use these new hooks.\n    -   **What will be achieved with this?**: It will make the codebase more maintainable, scalable, and easier to debug, significantly reducing technical debt.\n    -   **Status**: IN PROGRESS\n    -   **Should Test frontend/backend/both after fix?**: both\n-   **Task 2: Hot Celebs must have at least 3 news articles (P0)**\n    -   **Where to resume**: In `/app/backend/server.py`, modify the `generate_hot_celebs_from_news` function. Before a celebrity is added to the `hot_list`, add a filter to ensure they have 3 or more articles. The number of articles is already calculated, so this should be a simple conditional check (e.g., `if celeb.get("article_count", 0) >= 3:`).\n    -   **What will be achieved with this?**: This will improve the quality and relevance of the "Hot Celebs" section, focusing on celebrities with significant media presence.\n    -   **Status**: NOT STARTED\n    -   **Should Test frontend/backend/both after fix?**: backend\n\n**Upcoming and Future Tasks**\n-   **Upcoming Tasks**:\n    -   **P0**: Add "Trending" Section to UI: The backend endpoint `/api/trending-celebs` exists but is not used by the frontend. A new UI component is needed to display these trending celebrities.\n    -   **P1**: Fix Images for Remaining Celebrities: There are still ~39 celebrities with placeholder or missing images. A script should be run to attempt to find images for them, or a manual/AI generation fallback should be considered.\n    -   **P1**: Populate All Celebrity Bios: Many celebrity bios are still empty.\n    -   **P1**: Populate Categories: Fill categories to meet user-specified targets.\n    -   **P1**: Implement Browser Push Notifications for "Hot Streaks."\n-   **Future Tasks**:\n    -   **P2**: Add Celebrity Comparison Feature.\n    -   **P2**: Implement Head-to-Head Matchups within leagues.\n    -   **P2**: Expand Badge System and "Hall of Fame".\n    -   **P2**: Add a "streak" counter for consecutive lucky picks.\n\n**Completed work in this session**\n-   **Critical Bug Fixes**:\n    -   Resolved "black screen" and "flash of unstyled content" issues by implementing a React `ErrorBoundary`, fixing CSS loading, and cleaning `index.html`.\n    -   Fixed numerous "Add to Team" errors, including React rendering errors, missing ID issues, and a `KeyError: \'buzz_score\'` on the backend.\n-   **Data Integrity Overhaul**:\n    -   Corrected mismatched news data (e.g., Olivia Colman/Lisa Rinna) and added validation safeguards in `generate_celebrity_news`.\n    -   Fixed multiple price inconsistencies (Dick Van Dyke, Olivia Attwood) by ensuring endpoints use the database as the source of truth.\n-   **Major Feature Implementations & Enhancements**:\n    -   **Auto-Discover Feature**: Created a scheduled job (`/api/admin/auto-discover`) that scans news feeds, validates entities against Wikipedia, and automatically adds new celebrities to the database, with robust filtering for non-people.\n    -   **Enhanced Search**: The `/api/autocomplete` endpoint was rewritten to find any celebrity on Wikipedia (not just those in the DB) and handle disambiguation, with improved filtering.\n    -   **Dynamic "Hot Celebs"**: Reworked the logic to be fully dynamic, scanning the entire database and newly discovered names against news feeds, with a 6-hour refresh schedule.\n    -   **Team Points Display**: The `/api/teams/{team_id}` endpoint was updated to return `weekly_points` for each celebrity and a `total_weekly_score`.\n\n**Earlier issues found/mentioned but not fixed**\n-   The core issue of poor performance on the production mobile/desktop site remains, as it is a platform-level issue blocked on Emergent Support.\n\n**Known issue recurrence from previous fork**\n-   **Production Site Performance**: This issue is blocked on Emergent Support.\n-   **Price Inconsistency**: This is a recurring data integrity problem. While specific instances were fixed, a systemic review of all celebrity-data-returning endpoints is necessary to prevent it from happening again.\n\n**Code Architecture**\n```\n/app/\n├── backend/\n│   ├── .env\n│   ├── requirements.txt\n│   ├── server.py         # CRITICAL: Monolith, >9800 lines. Refactoring is in progress.\n│   ├── services/         # NEW: For business logic. (celebrity_service.py, etc.)\n│   ├── routes/           # Partially used.\n│   └── ...\n├── frontend/\n│   ├── public/\n│   │   └── index.html\n│   └── src/\n│       ├── App.js        # CRITICAL: Monolith, >1400 lines. Refactoring is in progress.\n│       ├── api/\n│       ├── components/\n│       │   ├── common/\n│       │   │   └── ErrorBoundary.jsx # NEW\n│       │   └── ...\n│       ├── hooks/          # NEW: For state logic. (useCelebrities.js, etc.)\n│       └── ...\n└── memory/\n    └── PRD.md\n```\n\n**Key Technical Concepts**\n-   **Monolithic Architecture**: Both the backend (`server.py`) and frontend (`App.js`) are dangerously large. Refactoring has begun by introducing a service layer (backend) and custom hooks (frontend).\n-   **Dynamic Data Ingestion**: Implemented an "auto-discover" feature that uses RSS feeds, name extraction, and Wikipedia API validation to dynamically grow the celebrity database.\n-   **Production vs. Development Environment**: There is a critical distinction. The user has a live production site (`celebritybuzzindex.com`). The agent must inquire where issues are occurring and direct the user to Emergent Support for production problems.\n\n**key DB schema**\n-   **celebrities**: `{ id: str, name: str, price: float, tier: str, description: str, image: str, category: str, is_deceased: bool, buzz_score: float, recognition_score: int, news: list, times_picked: int }`\n-   **teams**: `{ id: str, user_id: str, celebrities: list, weekly_points: dict, total_weekly_score: int }`\n\n**changes in tech stack**\n-   No new packages were added, but the use of the `wikipedia` library and string matching for news parsing became more sophisticated.\n\n**All files of reference**\n-   `/app/backend/server.py` (Heavily modified)\n-   `/app/frontend/src/App.js` (Heavily modified)\n-   `/app/frontend/public/index.html` (Modified)\n-   `/app/frontend/src/index.css` (Modified)\n-   `/app/frontend/src/components/common/ErrorBoundary.jsx` (New)\n-   `/app/backend/services/` (New directory with files)\n-   `/app/frontend/src/hooks/` (New directory with files)\n-   `/app/memory/PRD.md` (Updated)\n\n**Areas that need refactoring**:\n-   **CRITICAL**: `/app/backend/server.py`. The refactoring into the `/services/` directory has started but is less than 5% complete. This must be the top priority for technical debt reduction.\n-   **CRITICAL**: `/app/frontend/src/App.js`. The refactoring into custom hooks has started (files created) but no logic has been moved yet.\n\n**key api endpoints**\n-   `/api/admin/auto-discover` (New)\n-   `/api/teams/{team_id}` (Modified to return weekly points)\n-   `/api/autocomplete` (Rewritten for full Wikipedia search)\n-   `/api/hot-celebs` (Heavily modified for dynamic discovery)\n-   `/api/add_to_team` (Modified to fix price inconsistency)\n\n**Critical Info for New Agent**\n-   **IMPORTANT**: The user has a live production site. A system notification confirmed this. If the user reports a bug, your first question MUST be to ask if the issue is on the dev environment or the live site. You cannot fix live site issues; for those, you must guide the user to contact Emergent Support.\n-   The refactoring of the monolithic `server.py` and `App.js` is the most important long-term task and was approved by the user. You must continue this work.\n-   Data and price consistency is a recurring problem. The root cause is typically endpoints recalculating data on the fly instead of trusting the database. The `add_to_team` endpoint was fixed, but you must be vigilant for this pattern in other endpoints.\n-   The user frequently provides multiple bug reports and feature requests in a single message. Address them systematically and communicate your progress clearly on each one.\n\n**documents and test reports created in this job**\n-   `/app/memory/PRD.md` (updated)\n\n**Last 10 User Messages and any pending HUMAN messages**\n1.  **why are the celebs who are still in hot celebs with news in price alerts going down?** - Status: Investigated.\n2.  **yes and remove tv shows, movies, objects and locations...** - Status: Addressed.\n3.  **does it just pull news for those we have in the categories...** - Status: Answered, and led to auto-discover feature.\n4.  **yes auto discover** - Status: Implemented.\n5.  **why don\'t all celebs appear, becky hill the singer has a wiki...** - Status: Resolved (enhanced search).\n6.  **dick van dykes celeb card states 5.5m should be 15m** - Status: Resolved.\n7.  **when i type rachel sennott 3 people appear...** - Status: Resolved (improved search).\n8.  **I need the world language score to show in search** - Status: Verified as working.\n9.  **why isn\'t neil sedaka in hot celebs when he died this week...** - Status: Resolved (dynamic hot celebs).\n10. **in my buzz team it should be showing how many points...** - Status: Resolved (weekly points added).\n11. **shia labeouf is duplicated... prince picks up news for the royal family...** - Status: Partially resolved (Prince fixed, Shia duplication pending).\n12. **celebs in hot celebs list need at least 3 news articles** - Status: **PENDING, NOT STARTED.**\n\n**Project Health Check:**\n-   **Broken**: The user reports the live production site is slow. This is outside the agent\'s control. The dev environment is functional but contains several active bugs related to data consistency that are being worked on.\n-   **Mocked**: None.\n\n**3rd Party Integrations**\n-   **pytrends**: Used for Google Trends data.\n-   **Emergent-managed Google Auth**: Used for user login.\n-   **Wikipedia API / Wikidata API**: Used for celebrity data, search, and validation.\n-   **Public RSS Feeds**: 58+ sources for news data.\n-   **APScheduler**: Used for backend scheduled jobs (hot celebs, auto-discover).\n\n**Testing status**\n-   **Testing agent used after significant changes**: NO\n-   **Troubleshoot agent used after agent stuck in loop**: NO\n-   **Test files created**: None.\n-   **Known regressions**: Price inconsistencies are a recurring regression, though the root cause is being narrowed down.\n\n**Credentials to test flow:**\n-   None required. Authentication uses the Emergent-managed Google login flow.\n\n**What agent forgot to execute**\n-   The user\'s very last request, "celebs in hot celebs list need at least 3 news articles," was not implemented. This is a high-priority, pending task.\n-   The agent created the frontend `hooks` directory for refactoring `App.js` but did not migrate any of the state logic into them.</analysis>" > /app/.emergent/summary.txt'
+BASH_LINENO=()
+BASH_LOADABLES_PATH=/usr/local/lib/bash:/usr/lib/bash:/opt/local/lib/bash:/usr/pkg/lib/bash:/opt/pkg/lib/bash:.
+BASH_SOURCE=()
+BASH_VERSINFO=([0]="5" [1]="2" [2]="15" [3]="1" [4]="release" [5]="aarch64-unknown-linux-gnu")
+BASH_VERSION='5.2.15(1)-release'
+DEBIAN_FRONTEND=noninteractive
+DIRSTACK=()
+ENABLE_RELOAD=true
+EUID=0
+GPG_KEY=A035C8C19219BA821ECEA86B64E628F8D684696D
+GROUPS=()
+HOME=/root
+HOSTNAME=agent-env-716e936b-bb69-406e-9220-4ed6a8a2705f
+HOSTTYPE=aarch64
+IFS=$' \t\n'
+KUBERNETES_PORT=tcp://34.118.224.1:443
+KUBERNETES_PORT_443_TCP=tcp://34.118.224.1:443
+KUBERNETES_PORT_443_TCP_ADDR=34.118.224.1
+KUBERNETES_PORT_443_TCP_PORT=443
+KUBERNETES_PORT_443_TCP_PROTO=tcp
+KUBERNETES_SERVICE_HOST=34.118.224.1
+KUBERNETES_SERVICE_PORT=443
+KUBERNETES_SERVICE_PORT_HTTPS=443
+LANG=C.UTF-8
+MACHTYPE=aarch64-unknown-linux-gnu
+NEXT_TELEMETRY_DISABLED=1
+NODE_VERSION=20
+OPTERR=1
+OPTIND=1
+OSTYPE=linux-gnu
+PATH=/root/.venv/bin:/opt/plugins-venv/bin:/opt/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PIPESTATUS=([0]="0")
+PIP_NO_INPUT=1
+PLAYWRIGHT_BROWSERS_PATH=/pw-browsers
+PLUGIN_VENV_PATH=/opt/plugins-venv
+PPID=20
+PS4='+ '
+PWD=/app
+PYTHONUNBUFFERED=1
+PYTHON_SHA256=8d3ed8ec5c88c1c95f5e558612a725450d2452813ddad5e58fdb1a53b1209b78
+PYTHON_VERSION=3.11.14
+SHELL=/bin/bash
+SHELLOPTS=braceexpand:hashall:interactive-comments
+SHLVL=1
+STRIPE_API_KEY=sk_test_emergent
+TERM=dumb
+UID=0
+UV_COMPILE_BYTECODE=1
+VIRTUAL_ENV=/root/.venv
+_=/app/.emergent
+base_url=https://demobackend.emergentagent.com
+code_server_password=c33f3c3d
+integration_proxy_url=https://integrations.emergentagent.com
+monitor_polling_interval=1
+preview_endpoint=https://buzz-league-game.preview.emergentagent.com
+run_id=buzz-league-game of celebrity IDs or names to track who has already been added to the list.
+        -   Check if different variations of the name (e.g., Shia LaBeouf vs Shia Labeouf) are being treated as separate entities during processing.
+    -   **Status**: IN PROGRESS
+    -   **Is recurring issue?**: N
+    -   **Should Test frontend/backend/both after fix?**: backend
+-   **Issue 2: Price inconsistencies across UI components (P1)**
+    -   **Description**: The user has repeatedly reported that a celebrity's price differs between the search results, hot celebs list, and their team view (e.g., Dick Van Dyke, Olivia Attwood, Shia LaBeouf).
+    -   **Attempted fixes**: Agent fixed the  endpoint to use the stored DB price instead of recalculating it. This was a major source of the problem.
+    -   **Next debug checklist**:
+        -   Systematically review all endpoints that return celebrity data: , , , , and .
+        -   Ensure that **every single one** of these endpoints fetches the celebrity's price directly from the database document and does not perform any on-the-fly recalculations. The database must be the single source of truth for pricing.
+    -   **Status**: IN PROGRESS
+    -   **Is recurring issue?**: Y
+    -   **Should Test frontend/backend/both after fix?**: backend
+-   **Issue 3: Live Site Performance is Poor (P2)**
+    -   **Description**: The user's live production site is slow, with a flash of unstyled content.
+    -   **Attempted fixes**: The agent identified this as a platform/infrastructure issue (CDN caching, server performance) outside of code control and advised the user to contact Emergent Support. This is the correct action.
+    -   **Next debug checklist**: If the user mentions this again, politely remind them it is a production environment issue and that they should contact Emergent Support for resolution. Do not attempt to fix this in the dev environment's code.
+    -   **Status**: BLOCKED
+    -   **Is recurring issue?**: Y
+    -   **Should Test frontend/backend/both after fix?**: N/A
+    -   **Blocked on other issue**: Emergent Support
+
+**In progress Task List**:
+-   **Task 1: Refactor Monolithic Backend & Frontend (P0)**
+    -   **Where to resume**:
+        -   **Backend**: Start migrating endpoint logic from  into the newly created service files in . Begin with the celebrity-related functions (e.g., move the logic from  into  and have the route handler call the service).
+        -   **Frontend**: Start migrating state management logic (e.g., ,  for team and celebrity data) from  into the corresponding custom hooks in . Refactor  to use these new hooks.
+    -   **What will be achieved with this?**: It will make the codebase more maintainable, scalable, and easier to debug, significantly reducing technical debt.
+    -   **Status**: IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?**: both
+-   **Task 2: Hot Celebs must have at least 3 news articles (P0)**
+    -   **Where to resume**: In , modify the  function. Before a celebrity is added to the , add a filter to ensure they have 3 or more articles. The number of articles is already calculated, so this should be a simple conditional check (e.g., ).
+    -   **What will be achieved with this?**: This will improve the quality and relevance of the Hot Celebs section, focusing on celebrities with significant media presence.
+    -   **Status**: NOT STARTED
+    -   **Should Test frontend/backend/both after fix?**: backend
+
+**Upcoming and Future Tasks**
+-   **Upcoming Tasks**:
+    -   **P0**: Add Trending Section to UI: The backend endpoint  exists but is not used by the frontend. A new UI component is needed to display these trending celebrities.
+    -   **P1**: Fix Images for Remaining Celebrities: There are still ~39 celebrities with placeholder or missing images. A script should be run to attempt to find images for them, or a manual/AI generation fallback should be considered.
+    -   **P1**: Populate All Celebrity Bios: Many celebrity bios are still empty.
+    -   **P1**: Populate Categories: Fill categories to meet user-specified targets.
+    -   **P1**: Implement Browser Push Notifications for Hot Streaks.
+-   **Future Tasks**:
+    -   **P2**: Add Celebrity Comparison Feature.
+    -   **P2**: Implement Head-to-Head Matchups within leagues.
+    -   **P2**: Expand Badge System and Hall of Fame.
+    -   **P2**: Add a streak counter for consecutive lucky picks.
+
+**Completed work in this session**
+-   **Critical Bug Fixes**:
+    -   Resolved black screen and flash of unstyled content issues by implementing a React , fixing CSS loading, and cleaning .
+    -   Fixed numerous Add to Team errors, including React rendering errors, missing ID issues, and a  on the backend.
+-   **Data Integrity Overhaul**:
+    -   Corrected mismatched news data (e.g., Olivia Colman/Lisa Rinna) and added validation safeguards in .
+    -   Fixed multiple price inconsistencies (Dick Van Dyke, Olivia Attwood) by ensuring endpoints use the database as the source of truth.
+-   **Major Feature Implementations & Enhancements**:
+    -   **Auto-Discover Feature**: Created a scheduled job () that scans news feeds, validates entities against Wikipedia, and automatically adds new celebrities to the database, with robust filtering for non-people.
+    -   **Enhanced Search**: The  endpoint was rewritten to find any celebrity on Wikipedia (not just those in the DB) and handle disambiguation, with improved filtering.
+    -   **Dynamic Hot Celebs**: Reworked the logic to be fully dynamic, scanning the entire database and newly discovered names against news feeds, with a 6-hour refresh schedule.
+    -   **Team Points Display**: The  endpoint was updated to return  for each celebrity and a .
+
+**Earlier issues found/mentioned but not fixed**
+-   The core issue of poor performance on the production mobile/desktop site remains, as it is a platform-level issue blocked on Emergent Support.
+
+**Known issue recurrence from previous fork**
+-   **Production Site Performance**: This issue is blocked on Emergent Support.
+-   **Price Inconsistency**: This is a recurring data integrity problem. While specific instances were fixed, a systemic review of all celebrity-data-returning endpoints is necessary to prevent it from happening again.
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+-   **Monolithic Architecture**: Both the backend () and frontend () are dangerously large. Refactoring has begun by introducing a service layer (backend) and custom hooks (frontend).
+-   **Dynamic Data Ingestion**: Implemented an auto-discover feature that uses RSS feeds, name extraction, and Wikipedia API validation to dynamically grow the celebrity database.
+-   **Production vs. Development Environment**: There is a critical distinction. The user has a live production site (). The agent must inquire where issues are occurring and direct the user to Emergent Support for production problems.
+
+**key DB schema**
+-   **celebrities**: 
+-   **teams**: 
+
+**changes in tech stack**
+-   No new packages were added, but the use of the  library and string matching for news parsing became more sophisticated.
+
+**All files of reference**
+-    (Heavily modified)
+-    (Heavily modified)
+-    (Modified)
+-    (Modified)
+-    (New)
+-    (New directory with files)
+-    (New directory with files)
+-    (Updated)
+
+**Areas that need refactoring**:
+-   **CRITICAL**: . The refactoring into the  directory has started but is less than 5% complete. This must be the top priority for technical debt reduction.
+-   **CRITICAL**: . The refactoring into custom hooks has started (files created) but no logic has been moved yet.
+
+**key api endpoints**
+-    (New)
+-    (Modified to return weekly points)
+-    (Rewritten for full Wikipedia search)
+-    (Heavily modified for dynamic discovery)
+-    (Modified to fix price inconsistency)
+
+**Critical Info for New Agent**
+-   **IMPORTANT**: The user has a live production site. A system notification confirmed this. If the user reports a bug, your first question MUST be to ask if the issue is on the dev environment or the live site. You cannot fix live site issues; for those, you must guide the user to contact Emergent Support.
+-   The refactoring of the monolithic  and  is the most important long-term task and was approved by the user. You must continue this work.
+-   Data and price consistency is a recurring problem. The root cause is typically endpoints recalculating data on the fly instead of trusting the database. The  endpoint was fixed, but you must be vigilant for this pattern in other endpoints.
+-   The user frequently provides multiple bug reports and feature requests in a single message. Address them systematically and communicate your progress clearly on each one.
+
+**documents and test reports created in this job**
+-    (updated)
+
+**Last 10 User Messages and any pending HUMAN messages**
+1.  **why are the celebs who are still in hot celebs with news in price alerts going down?** - Status: Investigated.
+2.  **yes and remove tv shows, movies, objects and locations...** - Status: Addressed.
+3.  **does it just pull news for those we have in the categories...** - Status: Answered, and led to auto-discover feature.
+4.  **yes auto discover** - Status: Implemented.
+5.  **why don't all celebs appear, becky hill the singer has a wiki...** - Status: Resolved (enhanced search).
+6.  **dick van dykes celeb card states 5.5m should be 15m** - Status: Resolved.
+7.  **when i type rachel sennott 3 people appear...** - Status: Resolved (improved search).
+8.  **I need the world language score to show in search** - Status: Verified as working.
+9.  **why isn't neil sedaka in hot celebs when he died this week...** - Status: Resolved (dynamic hot celebs).
+10. **in my buzz team it should be showing how many points...** - Status: Resolved (weekly points added).
+11. **shia labeouf is duplicated... prince picks up news for the royal family...** - Status: Partially resolved (Prince fixed, Shia duplication pending).
+12. **celebs in hot celebs list need at least 3 news articles** - Status: **PENDING, NOT STARTED.**
+
+**Project Health Check:**
+-   **Broken**: The user reports the live production site is slow. This is outside the agent's control. The dev environment is functional but contains several active bugs related to data consistency that are being worked on.
+-   **Mocked**: None.
+
+**3rd Party Integrations**
+-   **pytrends**: Used for Google Trends data.
+-   **Emergent-managed Google Auth**: Used for user login.
+-   **Wikipedia API / Wikidata API**: Used for celebrity data, search, and validation.
+-   **Public RSS Feeds**: 58+ sources for news data.
+-   **APScheduler**: Used for backend scheduled jobs (hot celebs, auto-discover).
+
+**Testing status**
+-   **Testing agent used after significant changes**: NO
+-   **Troubleshoot agent used after agent stuck in loop**: NO
+-   **Test files created**: None.
+-   **Known regressions**: Price inconsistencies are a recurring regression, though the root cause is being narrowed down.
+
+**Credentials to test flow:**
+-   None required. Authentication uses the Emergent-managed Google login flow.
+
+**What agent forgot to execute**
+-   The user's very last request, celebs in hot celebs list need at least 3 news articles, was not implemented. This is a high-priority, pending task.
+-   The agent created the frontend  directory for refactoring  but did not migrate any of the state logic into them.</analysis>

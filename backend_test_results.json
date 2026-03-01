@@ -1,0 +1,1139 @@
+{
+  "timestamp": "2026-02-20T18:43:28.737654",
+  "summary": {
+    "tests_run": 17,
+    "tests_passed": 17,
+    "success_rate": 100.0
+  },
+  "results": [
+    {
+      "test": "API Health Check",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "message": "Celebrity Buzz Index API",
+        "version": "1.0"
+      }
+    },
+    {
+      "test": "Get Categories",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "categories": [
+          {
+            "id": "movie_stars",
+            "name": "Movie Stars",
+            "icon": "film"
+          },
+          {
+            "id": "tv_actors",
+            "name": "TV Actors",
+            "icon": "tv"
+          },
+          {
+            "id": "musicians",
+            "name": "Musicians",
+            "icon": "music"
+          },
+          {
+            "id": "athletes",
+            "name": "Athletes",
+            "icon": "trophy"
+          },
+          {
+            "id": "royals",
+            "name": "Royals",
+            "icon": "crown"
+          },
+          {
+            "id": "reality_tv",
+            "name": "Reality TV",
+            "icon": "star"
+          },
+          {
+            "id": "other",
+            "name": "Other",
+            "icon": "users"
+          }
+        ]
+      }
+    },
+    {
+      "test": "Get Trending",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "trending": [
+          {
+            "id": "f584fb4f-9c2e-4ddd-bb94-23610a3fbe5f",
+            "name": "Gemma Collins",
+            "bio": "Gemma Clair Collins is an English media personality and businesswoman. She came to prominence appearing on the ITV reality series The Only Way Is Essex (2011\u20132019) and went on to appear on various other reality television shows, including I'm a Celebrity...Get Me Out of Here! (2014), Celebrity Big Brother (2016), Celebs Go Dating (2018) and Dancing on Ice (2019). Known for her \"diva persona\" and alter-ego \"The GC\", she became the subject of several internet memes and a staple of the British hun ",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Gemma_Collins_by_Gemma_Collagen.jpg/330px-Gemma_Collins_by_Gemma_Collagen.jpg",
+            "category": "reality_tv",
+            "wiki_url": "https://en.wikipedia.org/wiki/Gemma_Collins",
+            "buzz_score": 24.0,
+            "price": 8,
+            "tier": "C",
+            "news": [
+              {
+                "title": "Gemma Collins Stuns on 'Dancing with the Stars'",
+                "summary": "Gemma Collins wowed audiences with an unexpected high-scoring performance on 'Dancing with the Stars', earning praise from the judges for her dramatic paso doble.",
+                "source": "Entertainment Weekly",
+                "date": "Jan 15, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Gemma Collins Opens Up About Her Engagement!",
+                "summary": "Reality TV star Gemma Collins has shared intimate details about her engagement to long-time partner Rami Hawash, describing it as a dream come true.",
+                "source": "People",
+                "date": "Jan 14, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Gemma Collins Launches Her Own Skincare Line",
+                "summary": "Adding to her entrepreneurial ventures, Gemma Collins has announced the launch of her new skincare range, GC Beauty, aiming to empower fans with affordable yet luxurious skincare products.",
+                "source": "Daily Mail",
+                "date": "Jan 13, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Gemma Collins Sparks Debate with Recent Diet Comments",
+                "summary": "Gemma Collins has sparked controversy again, this time with comments on her recent diet, leading to a mixed reaction from health experts and fans alike.",
+                "source": "BBC News",
+                "date": "Jan 12, 2026",
+                "sentiment": "neutral"
+              },
+              {
+                "title": "Gemma Collins' Paris Trip Hits Snag Due to Lost Luggage",
+                "summary": "Gemma Collins' vacation in Paris took an unexpected turn when her luggage was lost at the airport, but the star took to social media to assure fans she remains in high spirits.",
+                "source": "TMZ",
+                "date": "Jan 10, 2026",
+                "sentiment": "negative"
+              }
+            ],
+            "page_views": 0,
+            "created_at": "2026-02-20T18:25:44.321815+00:00"
+          },
+          {
+            "id": "c2eedf31-a20e-4bfa-993f-04b980a6e686",
+            "name": "David Beckham",
+            "bio": "Sir David Robert Joseph Beckham is an English former professional footballer, the president and co-owner of Inter Miami CF and co-owner of Salford City. Primarily a right midfielder and known for his range of passing, crossing ability and set-piece taking, Beckham is considered one of the best players of his generation and one of the greatest set-piece specialists of all time. He won 19 major trophies in his career, and is the only English player to win league titles in four different countries:",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/David_Beckham_UNICEF_%28cropped2%29.jpg/330px-David_Beckham_UNICEF_%28cropped2%29.jpg",
+            "category": "athletes",
+            "wiki_url": "https://en.wikipedia.org/wiki/David_Beckham",
+            "buzz_score": 24.0,
+            "price": 8,
+            "tier": "C",
+            "news": [
+              {
+                "title": "David Beckham Launches New Skincare Line for Men",
+                "summary": "Former football star David Beckham has officially launched his new line of skincare products for men, aiming to meet the growing demand for male grooming products.",
+                "source": "Entertainment Weekly",
+                "date": "Mar 28, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "David Beckham Shares Insight on Marriage with Victoria",
+                "summary": "In a recent interview, David Beckham opened up about his long-standing marriage with Victoria Beckham, discussing how they maintain their relationship amid public scrutiny.",
+                "source": "People",
+                "date": "Feb 14, 2026",
+                "sentiment": "neutral"
+              },
+              {
+                "title": "Beckham's Miami CF Signs Promising Young Talent",
+                "summary": "David Beckham's MLS team, Inter Miami CF, has signed a promising young midfielder anticipating a dynamic performance in the upcoming season.",
+                "source": "BBC News",
+                "date": "Mar 15, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "David Beckham Criticized Over New Housing Development Plans",
+                "summary": "The former footballer's plans to develop luxury housing in a historic London area have drawn criticism from local residents concerned about potential disruptions.",
+                "source": "Daily Mail",
+                "date": "Mar 9, 2026",
+                "sentiment": "negative"
+              },
+              {
+                "title": "Victoria Beckham Praises David's Doting Dad Role",
+                "summary": "Victoria Beckham shared a heartfelt post on social media praising husband David for his hands-on approach to parenting their four children.",
+                "source": "TMZ",
+                "date": "Feb 25, 2026",
+                "sentiment": "positive"
+              }
+            ],
+            "page_views": 0,
+            "created_at": "2026-02-20T18:25:20.148376+00:00"
+          },
+          {
+            "id": "d9543fd2-10a9-4124-9b00-83c7fce0b9eb",
+            "name": "Gordon Ramsay",
+            "bio": "Gordon James Ramsay is a British celebrity chef, restaurateur, television presenter, and writer. His restaurant group, Gordon Ramsay Restaurants, was founded in 1997 and has been awarded 17 Michelin stars overall and currently holds eight. His signature restaurant, Restaurant Gordon Ramsay in Chelsea, London, which he founded, has held three Michelin stars since 2001 and is currently run by chef Matt Ab\u00e9. After rising to fame on the British television miniseries Boiling Point in 1999, Ramsay bec",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Gordon_Ramsay_%28cropped%29.jpg/330px-Gordon_Ramsay_%28cropped%29.jpg",
+            "category": "other",
+            "wiki_url": "https://en.wikipedia.org/wiki/Gordon_Ramsay",
+            "buzz_score": 24.0,
+            "price": 4,
+            "tier": "D",
+            "news": [
+              {
+                "title": "Gordon Ramsay Expands Restaurant Empire with New Vegas Eatery",
+                "summary": "Celebrity chef Gordon Ramsay has announced the opening of his latest restaurant, 'Hell\u2019s Kitchen: Las Vegas', marking his eighth venture on the Strip.",
+                "source": "Daily Mail",
+                "date": "Jan 14, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Fans Thrilled as Gordon Ramsay Teases Upcoming Cookbook",
+                "summary": "Gordon Ramsay gave fans a sneak peek of his new cookbook on Instagram, featuring never-before-seen recipes from his diverse culinary adventures around the globe.",
+                "source": "Entertainment Weekly",
+                "date": "Jan 13, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Gordon Ramsay Caught in Social Media Storm Over TikTok Criticism",
+                "summary": "Some TikTok users have taken issue with Ramsay's recent comments on viral cooking trends, sparking a heated debate online about culinary standards and creativity.",
+                "source": "TMZ",
+                "date": "Jan 11, 2026",
+                "sentiment": "negative"
+              },
+              {
+                "title": "Gordon Ramsay Hosts Record-Breaking Charity Event",
+                "summary": "The celebrity chef raised over $1 million at a star-studded charity gala in London, aimed at combating child hunger globally.",
+                "source": "BBC News",
+                "date": "Jan 12, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Gordon Ramsay Sparks Collaboration Rumors with Top Pastry Chef",
+                "summary": "Speculation is rife as Ramsay was spotted dining with renowned pastry chef Dominique Ansel in New York, hinting at a possible collaboration.",
+                "source": "People",
+                "date": "Jan 10, 2026",
+                "sentiment": "neutral"
+              }
+            ],
+            "page_views": 0,
+            "created_at": "2026-02-20T18:25:36.967833+00:00"
+          },
+          {
+            "id": "bb096c66-1e5f-4ba6-8942-30387c0ff07a",
+            "name": "Tom Holland",
+            "bio": "Thomas Stanley Holland is an English actor. He is the recipient of numerous accolades, including a BAFTA Award and three Saturn Awards. Holland's films as a lead actor have grossed over $9.9\u00a0billion worldwide, making him one of the highest-grossing film actors of all time. He was featured on the Forbes 30 Under 30 Europe list of 2019.",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Tom_Holland_during_pro-am_Wentworth_golf_club_2023-2.jpg/330px-Tom_Holland_during_pro-am_Wentworth_golf_club_2023-2.jpg",
+            "category": "movie_stars",
+            "wiki_url": "https://en.wikipedia.org/wiki/Tom_Holland",
+            "buzz_score": 22.5,
+            "price": 19,
+            "tier": "A",
+            "news": [
+              {
+                "title": "Tom Holland Set to Direct His First Feature Film",
+                "summary": "Tom Holland is stepping behind the camera as he announced he's directing an upcoming indie project focusing on environmental conservation. The actor shared his excitement about this new venture with his fans on Instagram.",
+                "source": "Entertainment Weekly",
+                "date": "Nov 8, 2023",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Tom Holland and Zendaya Spotted House Hunting in New York",
+                "summary": "The Hollywood power couple was seen exploring luxury apartments in Manhattan, sparking rumors that they may be planning a move to the Big Apple.",
+                "source": "People",
+                "date": "Nov 6, 2023",
+                "sentiment": "neutral"
+              },
+              {
+                "title": "Tom Holland's Latest Film 'Unchartered Waters' Debuts to Mixed Reviews",
+                "summary": "While Tom Holland's performance was praised, critics were divided on the film's overall direction and pacing. 'Unchartered Waters' opened nationwide this weekend.",
+                "source": "Daily Mail",
+                "date": "Nov 7, 2023",
+                "sentiment": "neutral"
+              },
+              {
+                "title": "Tom Holland Honored at the British Film Awards",
+                "summary": "Tom Holland received the Rising Star Award at the British Film Awards, acknowledging his impressive contributions to cinema over the past few years.",
+                "source": "BBC News",
+                "date": "Nov 5, 2023",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Tom Holland Expresses Desire to Take a Break from Acting",
+                "summary": "Tom Holland has hinted at taking a hiatus from acting, citing a desire to focus on personal projects and spend more time with family.",
+                "source": "TMZ",
+                "date": "Nov 9, 2023",
+                "sentiment": "neutral"
+              }
+            ],
+            "page_views": 0,
+            "created_at": "2026-02-20T18:25:27.936792+00:00"
+          },
+          {
+            "id": "291d259f-225e-4737-9cbc-3a529c2d56e6",
+            "name": "Katie Price",
+            "bio": "Katrina Amy Alexandra Alexis Price is an English media personality and model. She gained recognition in the late 1990s for her glamour modelling work, including on Page 3 of the tabloid newspaper The Sun, under the pseudonym Jordan.",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Katie_Price_2024.jpg/330px-Katie_Price_2024.jpg",
+            "category": "reality_tv",
+            "wiki_url": "https://en.wikipedia.org/wiki/Katie_Price",
+            "buzz_score": 21.5,
+            "price": 4,
+            "tier": "D",
+            "news": [
+              {
+                "title": "Katie Price Announces Launch of New Eco-Friendly Skincare Line",
+                "summary": "Katie Price has ventured into the beauty industry with a new skincare line emphasizing sustainability and eco-friendliness, launching later this spring.",
+                "source": "Glamour UK",
+                "date": "Feb 25, 2024",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Katie Price Speaks Out About Recent Health Scare and Recovery",
+                "summary": "In a candid interview, Katie Price revealed details about a recent health issue that landed her in the hospital, reassuring fans about her recovery progress.",
+                "source": "Daily Mail",
+                "date": "Feb 20, 2024",
+                "sentiment": "neutral"
+              },
+              {
+                "title": "Katie Price's Make-Up Masterclass Tour Sells Out Across the UK",
+                "summary": "Katie Price's highly anticipated make-up masterclass tour has sold out nationwide, highlighting her enduring popularity in the beauty community.",
+                "source": "Hello! Magazine",
+                "date": "Feb 18, 2024",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Katie Price Addresses Family Drama in Latest Instagram Live",
+                "summary": "Katie Price took to Instagram Live to discuss recent tensions within her family, seeking to set the record straight amid swirling rumors.",
+                "source": "The Sun",
+                "date": "Feb 22, 2024",
+                "sentiment": "negative"
+              },
+              {
+                "title": "Upcoming Documentary to Explore Katie Price's Career Evolution",
+                "summary": "A new documentary promises an in-depth look at Katie Price's journey in the entertainment industry, from her early modeling days to her multifaceted career today.",
+                "source": "BBC News",
+                "date": "Feb 21, 2024",
+                "sentiment": "neutral"
+              }
+            ],
+            "page_views": 0,
+            "created_at": "2026-02-20T18:25:06.499987+00:00"
+          },
+          {
+            "id": "743c59d0-0a2e-46f0-8b44-5cacbfafed0d",
+            "name": "Adele",
+            "bio": "Adele Laurie Blue Adkins is an English singer-songwriter. Regarded as a British cultural icon, she is known for her mezzo-soprano vocals and sentimental songwriting. Her accolades include 16 Grammy Awards, 12 Brit Awards, an Academy Award, a Primetime Emmy Award, and a Golden Globe Award.",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Adele_2016.jpg/330px-Adele_2016.jpg",
+            "category": "musicians",
+            "wiki_url": "https://en.wikipedia.org/wiki/Adele",
+            "buzz_score": 20.5,
+            "price": 19,
+            "tier": "A",
+            "news": [
+              {
+                "title": "Adele's Heartfelt Speech Brings Fans to Tears at the Grammy Awards",
+                "summary": "Adele delivered an emotional acceptance speech at the Grammy Awards, expressing gratitude to her fans and dedicating her win to her late grandmother.",
+                "source": "Billboard",
+                "date": "Feb 16, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Adele Set to Headline Glastonbury Festival 2026",
+                "summary": "In a major announcement, Adele is confirmed as the headliner for this year's Glastonbury Festival, marking her return to the iconic stage after a seven-year hiatus.",
+                "source": "BBC News",
+                "date": "Feb 10, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Adele Collaborates with Harry Styles on Surprise Duet Track",
+                "summary": "Fans are buzzing as Adele unveils a surprise duet with Harry Styles, blending their unique vocals on a new track that debuted at the top of global charts.",
+                "source": "Entertainment Weekly",
+                "date": "Jan 30, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Adele Opens Up About Life After Divorce in Upcoming Documentary",
+                "summary": "In her upcoming documentary, Adele candidly discusses how she navigated life post-divorce, sharing intimate details about finding balance between career and personal life.",
+                "source": "People",
+                "date": "Feb 5, 2026",
+                "sentiment": "neutral"
+              },
+              {
+                "title": "Adele Faces Criticism Over Lyrical Content on New Album",
+                "summary": "While her latest album tops charts, some critics are calling out Adele for the repetitive themes in her lyrics, suggesting a need for more creative evolution.",
+                "source": "The Guardian",
+                "date": "Jan 20, 2026",
+                "sentiment": "negative"
+              }
+            ],
+            "page_views": 0,
+            "created_at": "2026-02-20T18:25:00.361014+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "test": "Autocomplete - Short Query",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "suggestions": []
+      }
+    },
+    {
+      "test": "Autocomplete - Celebrity Search",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "suggestions": [
+          {
+            "name": "Brad Pitt",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Brad_Pitt-69858.jpg/330px-Brad_Pitt-69858.jpg",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Pitt filmography",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Brad_Pitt_2019_by_Glenn_Francis.jpg/330px-Brad_Pitt_2019_by_Glenn_Francis.jpg",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Pitt's Cousin",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/en/0/05/Macklemore_and_Ryan_Lewis_-_Brad_Pitt%27s_Cousin.jpg",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Pitt (boxer)",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Brad_Pitt_boxing.jpg/330px-Brad_Pitt_boxing.jpg",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Pitt (song)",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/en/f/fd/M%C3%98_-_Brad_Pitt%2C_Goosebumps.png",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Pitt Cousin",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/en/4/46/This_Unruly_Mess_I%27ve_Made_%28Front_Cover%29.png",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Pitt (M\u00d8 song)",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/en/5/56/M%C3%98_-_Motordrome.png",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Pitt (disambiguation)",
+            "description": "",
+            "image": "https://ui-avatars.com/api/?name=Brad+Pitt+(disambiguation)&size=64&background=FF0099&color=fff",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Little",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Brad_Little_official_photo.jpg/330px-Brad_Little_official_photo.jpg",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          },
+          {
+            "name": "Brad Pickett",
+            "description": "",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Brad_Pickett_WEC_53.jpg",
+            "estimated_tier": "D",
+            "estimated_price": 3
+          }
+        ]
+      }
+    },
+    {
+      "test": "Get Points Methodology",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "description": "Celebrity Buzz Points are calculated based on media coverage and public interest",
+        "factors": [
+          {
+            "name": "News Mentions",
+            "description": "Each news article mentioning the celebrity",
+            "points_per_unit": 1.0,
+            "unit": "article"
+          },
+          {
+            "name": "Tabloid Coverage",
+            "description": "Coverage in tabloids (Daily Mail, The Sun, TMZ) - higher weight due to engagement",
+            "points_per_unit": 3.0,
+            "unit": "article"
+          },
+          {
+            "name": "Broadsheet Coverage",
+            "description": "Coverage in quality press (BBC, Guardian, Times)",
+            "points_per_unit": 2.0,
+            "unit": "article"
+          },
+          {
+            "name": "Controversy Bonus",
+            "description": "Negative/scandal news generates more buzz",
+            "points_per_unit": 1.0,
+            "unit": "per negative article"
+          },
+          {
+            "name": "Brown Bread Bonus \ud83d\udc80",
+            "description": "If your celebrity passes away, you receive a massive points bonus!",
+            "points_per_unit": 50.0,
+            "unit": "per deceased celebrity"
+          },
+          {
+            "name": "Social Media Trending",
+            "description": "When celebrity trends on social platforms",
+            "points_per_unit": 5.0,
+            "unit": "trending event"
+          }
+        ],
+        "tier_multipliers": {
+          "A": "1.0x (baseline - already high visibility)",
+          "B": "1.2x (needs more buzz to match A-list)",
+          "C": "1.5x (buzz matters more for rising stars)",
+          "D": "2.0x (buzz can rapidly elevate D-listers)"
+        },
+        "example": "A D-list celebrity with 10 tabloid mentions = 10 \u00d7 3.0 \u00d7 2.0 = 60 points"
+      }
+    },
+    {
+      "test": "Search Leonardo DiCaprio for Tier Test",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "celebrity": {
+          "id": "9499b007-246c-4d77-a77a-18883c60c3d7",
+          "name": "Leonardo DiCaprio",
+          "bio": "Leonardo Wilhelm DiCaprio is an American actor and film producer. Known for his work in biographical and period films, he is the recipient of numerous accolades, including an Academy Award, a British Academy Film Award, an Actor Award, a Silver Bear and three Golden Globe Awards. His films as a leading actor have grossed $7 billion worldwide, and he has been placed eight times in annual rankings of the world's highest-paid actors.",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/LeoPTABFI191125-28_%28cropped%29.jpg/330px-LeoPTABFI191125-28_%28cropped%29.jpg",
+          "category": "movie_stars",
+          "wiki_url": "https://en.wikipedia.org/wiki/Leonardo_DiCaprio",
+          "buzz_score": 22.5,
+          "price": 19,
+          "tier": "A",
+          "news": [
+            {
+              "title": "Leonardo DiCaprio to Star in New Martin Scorsese Film",
+              "summary": "Leonardo DiCaprio is set to take on a lead role in Martin Scorsese's upcoming thriller, which promises to be a gripping addition to both their filmographies.",
+              "source": "Deadline",
+              "date": "Jan 15, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "DiCaprio's Generous Donation Boosts Conservation Efforts",
+              "summary": "Leonardo DiCaprio has donated $10 million to wildlife conservation projects, further cementing his status as a leading environmental advocate.",
+              "source": "The Hollywood Reporter",
+              "date": "Jan 12, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Leonardo DiCaprio's Mystery Date Spotted in LA",
+              "summary": "Leonardo DiCaprio was seen enjoying an intimate dinner with a mystery woman at a high-end Los Angeles restaurant, sparking rumors about his dating life.",
+              "source": "TMZ",
+              "date": "Jan 13, 2026",
+              "sentiment": "neutral"
+            },
+            {
+              "title": "Behind the Scenes: DiCaprio and De Niro's Onset Rivalry",
+              "summary": "Tensions reportedly arose between Leonardo DiCaprio and Robert De Niro during the filming of their latest project, as both actors sought to outshine each other.",
+              "source": "Daily Mail",
+              "date": "Jan 14, 2026",
+              "sentiment": "negative"
+            },
+            {
+              "title": "DiCaprio-Produced Documentary Nominated for an Oscar",
+              "summary": "The documentary 'Guardians of the Reef', produced by Leonardo DiCaprio, has earned an Oscar nomination for its powerful depiction of ocean conservation.",
+              "source": "Variety",
+              "date": "Jan 14, 2026",
+              "sentiment": "positive"
+            }
+          ],
+          "page_views": 0,
+          "created_at": "2026-02-20T18:28:33.262259+00:00"
+        }
+      }
+    },
+    {
+      "test": "Search Emma Stone for Tier Test",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "celebrity": {
+          "id": "052c06b6-760e-4566-abb3-4f1c5bd6d1bd",
+          "name": "Emma Stone",
+          "bio": "Emily Jean \"Emma\" Stone is an American actress and film producer. Her accolades include two Academy Awards, two British Academy Film Awards, two Golden Globe Awards and a Volpi Cup. In 2017, she was the world's highest-paid actress and named by Time magazine as one of the 100 most influential people in the world.",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/BugoniaBFILFF101025-27_%2854848940897%29_%28cropped%29.jpg/330px-BugoniaBFILFF101025-27_%2854848940897%29_%28cropped%29.jpg",
+          "category": "movie_stars",
+          "wiki_url": "https://en.wikipedia.org/wiki/Emma_Stone",
+          "buzz_score": 22.0,
+          "price": 19,
+          "tier": "A",
+          "news": [
+            {
+              "title": "Emma Stone Stuns in New Fashion Campaign with Gucci",
+              "summary": "Emma Stone has been unveiled as the face of Gucci's latest fashion collection, captivating fans with her graceful presence and chic style in a stunning new campaign.",
+              "source": "Vogue",
+              "date": "Jan 12, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Emma Stone and Husband Welcome Second Child",
+              "summary": "Emma Stone and her husband, Dave McCary, have joyfully announced the birth of their second child, expanding their family to four and sharing delight with fans over their new addition.",
+              "source": "People",
+              "date": "Jan 14, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Emma Stone's Latest Role in 'Marble Heart' Earns Early Oscar Buzz",
+              "summary": "Critics are praising Emma Stone's powerful performance in the upcoming drama 'Marble Heart', with many predicting an Oscar nomination for her compelling role.",
+              "source": "Entertainment Weekly",
+              "date": "Jan 13, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Behind the Scenes: Emma Stone's Producing Debut in 'City Lights'",
+              "summary": "Emma Stone steps into a new role as producer for the romantic comedy 'City Lights'. Fans and industry insiders are eager to see her influence on the project coming this fall.",
+              "source": "Variety",
+              "date": "Jan 10, 2026",
+              "sentiment": "neutral"
+            },
+            {
+              "title": "Fans React to Emma Stone's Surprise Appearance at Film Festival",
+              "summary": "Emma Stone made a surprise appearance at the Sundance Film Festival, delighting attendees and sparking rumors about her latest film ventures.",
+              "source": "TMZ",
+              "date": "Jan 11, 2026",
+              "sentiment": "positive"
+            }
+          ],
+          "page_views": 0,
+          "created_at": "2026-02-20T18:28:39.920478+00:00"
+        }
+      }
+    },
+    {
+      "test": "Search Chris Pratt for Tier Test",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "celebrity": {
+          "id": "eb9d3b61-8295-4b11-8d31-0da5cb7219cd",
+          "name": "Chris Pratt",
+          "bio": "Christopher Michael Pratt is an American actor and film producer. His films as a leading actor have grossed over $14.1\u00a0billion worldwide, making him one of the highest-grossing film stars of all time. Pratt was one of the world's highest-paid actors annually from 2015 to 2017. Through starring in blockbuster franchises and big-budget films, he has established himself as one of Hollywood's most bankable stars.",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Chris_Pratt_Jurassic_World_Fallen_Kingdom_Japan_Premiere_Red_Carpet_%283x4_cropped%29.jpg/330px-Chris_Pratt_Jurassic_World_Fallen_Kingdom_Japan_Premiere_Red_Carpet_%283x4_cropped%29.jpg",
+          "category": "movie_stars",
+          "wiki_url": "https://en.wikipedia.org/wiki/Chris_Pratt",
+          "buzz_score": 24.0,
+          "price": 19,
+          "tier": "A",
+          "news": [
+            {
+              "title": "Chris Pratt Set to Star in New Sci-Fi Thriller 'Galactic Divide'",
+              "summary": "Chris Pratt has signed on to star in 'Galactic Divide', a science fiction thriller that explores the themes of time travel and parallel universes, set to release in 2026.",
+              "source": "Entertainment Weekly",
+              "date": "Jan 12, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Chris Pratt and Katherine Schwarzenegger Welcome Their Third Child",
+              "summary": "Chris Pratt and Katherine Schwarzenegger announced the arrival of their third child, a baby girl, bringing joyous news to fans around the world.",
+              "source": "People",
+              "date": "Jan 10, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Chris Pratt Faces Backlash Over Controversial Remarks at Recent Interview",
+              "summary": "Chris Pratt is under fire after making controversial comments during a promotional interview, which have sparked widespread criticism on social media.",
+              "source": "TMZ",
+              "date": "Jan 14, 2026",
+              "sentiment": "negative"
+            },
+            {
+              "title": "Chris Pratt Joins Conservation Campaign for Endangered Species",
+              "summary": "The actor and environmental advocate has partnered with a global conservation organization to raise awareness and funds for endangered species.",
+              "source": "BBC News",
+              "date": "Jan 9, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Fans Speculate Chris Pratt's Return as Star-Lord in Upcoming Marvel Project",
+              "summary": "Rumors are swirling that Chris Pratt could be reprising his role as Star-Lord in a new, yet-to-be-announced Marvel installment, thrilling fans of the Guardians of the Galaxy series.",
+              "source": "Daily Mail",
+              "date": "Jan 13, 2026",
+              "sentiment": "neutral"
+            }
+          ],
+          "page_views": 0,
+          "created_at": "2026-02-20T18:28:45.372080+00:00"
+        }
+      }
+    },
+    {
+      "test": "Search Joey Essex for Tier Test",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "celebrity": {
+          "id": "c080c382-c3b0-441f-881d-f69e8a7fcf65",
+          "name": "Joey Essex",
+          "bio": "Joey Don Essex is an English television personality. He came to prominence for his appearances on the ITV reality series The Only Way is Essex (2011\u20132013). He went on to appear on various reality shows, including Splash! (2013), I'm a Celebrity...Get Me Out of Here! (2013), The Jump (2015), Celebs Go Dating, Celebrity Ex on the Beach (2020), Dancing on Ice (2023), and Love Island (2024).",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Joey_Essex_at_Ullswater_Community_College.jpg/330px-Joey_Essex_at_Ullswater_Community_College.jpg",
+          "category": "reality_tv",
+          "wiki_url": "https://en.wikipedia.org/wiki/Joey_Essex",
+          "buzz_score": 23.0,
+          "price": 4,
+          "tier": "D",
+          "news": [
+            {
+              "title": "Joey Essex Triumphs in Celebrity Dance-off Finale!",
+              "summary": "Joey Essex wowed the judges and audience with his energetic salsa routine, securing a triumphant win in the latest celebrity dance-off competition.",
+              "source": "BBC News",
+              "date": "Jan 15, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Joey Essex Joins Forces with Fashion Giant for New Collection",
+              "summary": "The reality TV star has announced an exciting collaboration with a top fashion brand, set to release a trendy new apparel line targeting millennials and Gen Z.",
+              "source": "People",
+              "date": "Jan 10, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Joey Essex Spotted in Heated Discussion Outside London Hotspot",
+              "summary": "Joey Essex was seen in a seemingly tense conversation with a close friend, sparking rumors about possible personal drama.",
+              "source": "Daily Mail",
+              "date": "Jan 12, 2026",
+              "sentiment": "neutral"
+            },
+            {
+              "title": "Reality Star Joey Essex Denies Rumors of New Romance",
+              "summary": "Joey Essex has taken to social media to refute the swirling rumors about a potential new love interest, insisting he is currently single.",
+              "source": "TMZ",
+              "date": "Jan 14, 2026",
+              "sentiment": "neutral"
+            },
+            {
+              "title": "Joey Essex Declares New Year Resolutions on Instagram Live",
+              "summary": "Kicking off 2026, Joey Essex shared his hopes and plans with fans, focusing on personal growth and exploring new career opportunities.",
+              "source": "Entertainment Weekly",
+              "date": "Jan 9, 2026",
+              "sentiment": "positive"
+            }
+          ],
+          "page_views": 0,
+          "created_at": "2026-02-20T18:28:52.400634+00:00"
+        }
+      }
+    },
+    {
+      "test": "Search Celebrity: Taylor Swift",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "celebrity": {
+          "id": "36c228f3-29f4-4f78-bbcd-ca7affec31b3",
+          "name": "Taylor Swift",
+          "bio": "Taylor Alison Swift is an American singer-songwriter. An influential figure in popular culture, she is known for her autobiographical songwriting and artistic reinventions. Swift is the highest-grossing live music artist, the wealthiest female musician, and one of the best-selling music artists of all time.",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png/330px-Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png",
+          "category": "musicians",
+          "wiki_url": "https://en.wikipedia.org/wiki/Taylor_Swift",
+          "buzz_score": 21.5,
+          "price": 13,
+          "tier": "B",
+          "news": [
+            {
+              "title": "Taylor Swift Announces Surprise New Album Release",
+              "summary": "Taylor Swift has shocked fans by announcing the release of a new album titled 'Midnight Reflections', set to drop next week.",
+              "source": "Entertainment Weekly",
+              "date": "Jan 15, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Taylor Swift Talks About Her Passion for Directing with a New Film Project",
+              "summary": "In a recent interview, Taylor Swift expressed excitement about transitioning into film directing, with a project rumored to be in the works.",
+              "source": "Variety",
+              "date": "Jan 13, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Swift's 'Eras Tour' Sets Revenue Records with Over $1 Billion in Sales",
+              "summary": "Taylor Swift\u2019s 'Eras Tour' has surpassed $1 billion in ticket sales, marking a record-breaking milestone in her illustrious career.",
+              "source": "Billboard",
+              "date": "Jan 10, 2026",
+              "sentiment": "positive"
+            },
+            {
+              "title": "Rumors Swirl About Taylor Swift\u2019s Romantic Getaway",
+              "summary": "Photos have emerged of Taylor Swift vacationing on a private island with a mystery man, fueling speculations about her dating life.",
+              "source": "TMZ",
+              "date": "Jan 12, 2026",
+              "sentiment": "neutral"
+            },
+            {
+              "title": "Taylor Swift Addresses Fans After Social Media Feud with Fellow Artist",
+              "summary": "Taylor Swift took to Instagram to clarify her remarks following a heated online exchange with a fellow musician, urging her fandom to promote positivity.",
+              "source": "People",
+              "date": "Jan 14, 2026",
+              "sentiment": "neutral"
+            }
+          ],
+          "page_views": 0,
+          "created_at": "2026-02-20T18:27:45.004201+00:00"
+        }
+      }
+    },
+    {
+      "test": "Get Musicians Category",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "celebrities": [
+          {
+            "id": "743c59d0-0a2e-46f0-8b44-5cacbfafed0d",
+            "name": "Adele",
+            "bio": "Adele Laurie Blue Adkins is an English singer-songwriter. Regarded as a British cultural icon, she is known for her mezzo-soprano vocals and sentimental songwriting. Her accolades include 16 Grammy Awards, 12 Brit Awards, an Academy Award, a Primetime Emmy Award, and a Golden Globe Award.",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Adele_2016.jpg/330px-Adele_2016.jpg",
+            "category": "musicians",
+            "wiki_url": "https://en.wikipedia.org/wiki/Adele",
+            "buzz_score": 20.5,
+            "price": 19,
+            "tier": "A",
+            "news": [
+              {
+                "title": "Adele's Heartfelt Speech Brings Fans to Tears at the Grammy Awards",
+                "summary": "Adele delivered an emotional acceptance speech at the Grammy Awards, expressing gratitude to her fans and dedicating her win to her late grandmother.",
+                "source": "Billboard",
+                "date": "Feb 16, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Adele Set to Headline Glastonbury Festival 2026",
+                "summary": "In a major announcement, Adele is confirmed as the headliner for this year's Glastonbury Festival, marking her return to the iconic stage after a seven-year hiatus.",
+                "source": "BBC News",
+                "date": "Feb 10, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Adele Collaborates with Harry Styles on Surprise Duet Track",
+                "summary": "Fans are buzzing as Adele unveils a surprise duet with Harry Styles, blending their unique vocals on a new track that debuted at the top of global charts.",
+                "source": "Entertainment Weekly",
+                "date": "Jan 30, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Adele Opens Up About Life After Divorce in Upcoming Documentary",
+                "summary": "In her upcoming documentary, Adele candidly discusses how she navigated life post-divorce, sharing intimate details about finding balance between career and personal life.",
+                "source": "People",
+                "date": "Feb 5, 2026",
+                "sentiment": "neutral"
+              },
+              {
+                "title": "Adele Faces Criticism Over Lyrical Content on New Album",
+                "summary": "While her latest album tops charts, some critics are calling out Adele for the repetitive themes in her lyrics, suggesting a need for more creative evolution.",
+                "source": "The Guardian",
+                "date": "Jan 20, 2026",
+                "sentiment": "negative"
+              }
+            ],
+            "page_views": 0,
+            "created_at": "2026-02-20T18:25:00.361014+00:00"
+          },
+          {
+            "id": "36c228f3-29f4-4f78-bbcd-ca7affec31b3",
+            "name": "Taylor Swift",
+            "bio": "Taylor Alison Swift is an American singer-songwriter. An influential figure in popular culture, she is known for her autobiographical songwriting and artistic reinventions. Swift is the highest-grossing live music artist, the wealthiest female musician, and one of the best-selling music artists of all time.",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png/330px-Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png",
+            "category": "musicians",
+            "wiki_url": "https://en.wikipedia.org/wiki/Taylor_Swift",
+            "buzz_score": 21.5,
+            "price": 13,
+            "tier": "B",
+            "news": [
+              {
+                "title": "Taylor Swift Announces Surprise New Album Release",
+                "summary": "Taylor Swift has shocked fans by announcing the release of a new album titled 'Midnight Reflections', set to drop next week.",
+                "source": "Entertainment Weekly",
+                "date": "Jan 15, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Taylor Swift Talks About Her Passion for Directing with a New Film Project",
+                "summary": "In a recent interview, Taylor Swift expressed excitement about transitioning into film directing, with a project rumored to be in the works.",
+                "source": "Variety",
+                "date": "Jan 13, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Swift's 'Eras Tour' Sets Revenue Records with Over $1 Billion in Sales",
+                "summary": "Taylor Swift\u2019s 'Eras Tour' has surpassed $1 billion in ticket sales, marking a record-breaking milestone in her illustrious career.",
+                "source": "Billboard",
+                "date": "Jan 10, 2026",
+                "sentiment": "positive"
+              },
+              {
+                "title": "Rumors Swirl About Taylor Swift\u2019s Romantic Getaway",
+                "summary": "Photos have emerged of Taylor Swift vacationing on a private island with a mystery man, fueling speculations about her dating life.",
+                "source": "TMZ",
+                "date": "Jan 12, 2026",
+                "sentiment": "neutral"
+              },
+              {
+                "title": "Taylor Swift Addresses Fans After Social Media Feud with Fellow Artist",
+                "summary": "Taylor Swift took to Instagram to clarify her remarks following a heated online exchange with a fellow musician, urging her fandom to promote positivity.",
+                "source": "People",
+                "date": "Jan 14, 2026",
+                "sentiment": "neutral"
+              }
+            ],
+            "page_views": 0,
+            "created_at": "2026-02-20T18:27:45.004201+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "test": "Create Team",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "team": {
+          "id": "2ce3758e-1875-440a-9fb2-4026fd237e6c",
+          "team_name": "Test Buzz Team",
+          "budget_remaining": 50,
+          "total_points": 0.0,
+          "brown_bread_bonus": 0.0,
+          "celebrities": [],
+          "transfers_this_week": 0,
+          "last_transfer_reset": "2026-W8",
+          "created_at": "2026-02-20T18:43:28.152561+00:00"
+        }
+      }
+    },
+    {
+      "test": "Get Team",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "team": {
+          "id": "2ce3758e-1875-440a-9fb2-4026fd237e6c",
+          "team_name": "Test Buzz Team",
+          "budget_remaining": 50,
+          "total_points": 0.0,
+          "brown_bread_bonus": 0.0,
+          "celebrities": [],
+          "transfers_this_week": 0,
+          "last_transfer_reset": "2026-W8",
+          "created_at": "2026-02-20T18:43:28.152561+00:00"
+        }
+      }
+    },
+    {
+      "test": "Add Celebrity to Team",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "team": {
+          "id": "2ce3758e-1875-440a-9fb2-4026fd237e6c",
+          "team_name": "Test Buzz Team",
+          "budget_remaining": 37,
+          "total_points": 21.5,
+          "brown_bread_bonus": 0.0,
+          "celebrities": [
+            {
+              "celebrity_id": "36c228f3-29f4-4f78-bbcd-ca7affec31b3",
+              "name": "Taylor Swift",
+              "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png/330px-Taylor_Swift_at_the_2023_MTV_Video_Music_Awards_%283%29.png",
+              "category": "musicians",
+              "price": 13,
+              "buzz_score": 21.5,
+              "tier": "B",
+              "added_at": "2026-02-20T18:43:28.452096+00:00"
+            }
+          ],
+          "transfers_this_week": 0,
+          "last_transfer_reset": "2026-W8",
+          "created_at": "2026-02-20T18:43:28.152561+00:00"
+        },
+        "brown_bread_bonus": false
+      }
+    },
+    {
+      "test": "Remove Celebrity from Team",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "team": {
+          "id": "2ce3758e-1875-440a-9fb2-4026fd237e6c",
+          "team_name": "Test Buzz Team",
+          "budget_remaining": 50,
+          "total_points": 0,
+          "brown_bread_bonus": 0.0,
+          "celebrities": [],
+          "transfers_this_week": 0,
+          "last_transfer_reset": "2026-W8",
+          "created_at": "2026-02-20T18:43:28.152561+00:00"
+        }
+      }
+    },
+    {
+      "test": "Get Leaderboard",
+      "success": true,
+      "details": "Status: 200",
+      "response_data": {
+        "leaderboard": [
+          {
+            "team_id": "d96c6875-7fb7-42de-bf89-979ac04dd962",
+            "team_name": "Test Share Team",
+            "total_points": 23.5,
+            "celebrity_count": 1,
+            "brown_bread_bonus": 0.0
+          },
+          {
+            "team_id": "6e09aa04-dd46-46f1-b5b5-cc2fad2e0bc7",
+            "team_name": "My Buzz Team",
+            "total_points": 21.5,
+            "celebrity_count": 1,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "de02254c-98a2-4814-bde7-29dbb30b4c9a",
+            "team_name": "Test Team",
+            "total_points": 21.5,
+            "celebrity_count": 1,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "83faa5ba-ead4-4d04-8a09-c30df2996604",
+            "team_name": "My Buzz Team",
+            "total_points": 21.5,
+            "celebrity_count": 1,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "af87d29f-2cff-43d3-8efe-b607e93dffa2",
+            "team_name": "My Buzz Team",
+            "total_points": 21.0,
+            "celebrity_count": 1,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "c6a18bf4-a73b-4a02-96f1-4eeb34221d52",
+            "team_name": "My Buzz Team",
+            "total_points": 0.0,
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "a641aaab-7d77-4636-9ec0-a58b9d568f3a",
+            "team_name": "My Buzz Team",
+            "total_points": 0.0,
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "6a1ba8c8-895a-4374-b628-1e32ab32d302",
+            "team_name": "My Buzz Team",
+            "total_points": 0.0,
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "0ad40485-bb2b-4572-90a7-8d1c685187ba",
+            "team_name": "My Buzz Team",
+            "total_points": 0.0,
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "66fc04d0-7304-4f0f-8bc8-517e8debf783",
+            "team_name": "My Buzz Team",
+            "total_points": 0.0,
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "7ec5045a-cb58-45e3-97e9-506dd8d0ca6b",
+            "team_name": "My Buzz Team",
+            "total_points": 0.0,
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "1f19c310-247b-4b7c-9e33-25532faa1d47",
+            "team_name": "Test Buzz Team",
+            "total_points": 0,
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "0faedbf3-f29b-44b1-884a-81bc2ccd0d67",
+            "team_name": "My Buzz Team",
+            "total_points": 0.0,
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "b4ed6104-bc29-4133-b286-b21091a7ac89",
+            "team_name": "My Buzz Team",
+            "total_points": 0.0,
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "3e3e42a5-d8a2-462f-a50b-3efd22252f22",
+            "team_name": "My Buzz Team",
+            "total_points": 0.0,
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "2aa707f9-e9dc-4926-9981-ecfa67fbcb3a",
+            "team_name": "My Buzz Team",
+            "total_points": 0.0,
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "81c500a3-c46b-4c02-aef0-3e8f7ee01b46",
+            "team_name": "My Buzz Team",
+            "total_points": 0.0,
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "2f06ed9b-d184-4fd4-9af6-e5d9f33ef6ae",
+            "team_name": "My Buzz Team",
+            "total_points": 0.0,
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "14056c7f-c56a-4531-8de7-cf54782b2e71",
+            "team_name": "My Buzz Team",
+            "total_points": 0.0,
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
+          },
+          {
+            "team_id": "91b85b3a-083b-4484-893c-e890f1e4f8c5",
+            "team_name": "My Buzz Team",
+            "total_points": 0.0,
+            "celebrity_count": 0,
+            "brown_bread_bonus": 0
+          }
+        ]
+      }
+    }
+  ]
+}
