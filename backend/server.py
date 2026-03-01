@@ -4156,7 +4156,26 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     
     logger.info(f"Search for '{name}': existing in DB = {existing is not None}")
     
+    # CACHE FRESHNESS CHECK: 30 days for Wikipedia data
+    CACHE_DURATION_DAYS = 30
+    
     if existing:
+        # Check if cache is fresh (within 30 days)
+        cache_is_fresh = False
+        cached_at = existing.get("cached_at")
+        if cached_at:
+            try:
+                cache_time = datetime.fromisoformat(cached_at.replace("Z", "+00:00"))
+                cache_age_days = (datetime.now(timezone.utc) - cache_time).days
+                cache_is_fresh = cache_age_days < CACHE_DURATION_DAYS
+                if not cache_is_fresh:
+                    logger.info(f"Cache expired for {name}: {cache_age_days} days old (limit: {CACHE_DURATION_DAYS})")
+            except Exception as e:
+                logger.warning(f"Error parsing cached_at for {name}: {e}")
+                cache_is_fresh = False
+        
+        # If cache is fresh, return cached data immediately (fast path)
+        if cache_is_fresh:
         # Ensure celebrity has an ID - generate one if missing
         if not existing.get("id"):
             new_id = str(uuid.uuid4())
