@@ -4176,6 +4176,31 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         
         # If cache is fresh, return cached data immediately (fast path)
         if cache_is_fresh:
+            logger.info(f"Returning cached data for {name} (cache age: {cache_age_days} days)")
+            # Ensure celebrity has an ID
+            if not existing.get("id"):
+                new_id = str(uuid.uuid4())
+                await db.celebrities.update_one(
+                    {"name": existing.get("name")},
+                    {"$set": {"id": new_id}}
+                )
+                existing["id"] = new_id
+            
+            # Quick update for hot celeb pricing if needed
+            celeb_name = existing.get("name", name)
+            is_mega_star = celeb_name.lower() in GUARANTEED_A_LIST
+            is_royal = any(keyword in celeb_name.lower() for keyword in ROYAL_A_LIST_KEYWORDS)
+            
+            if hot_celeb_match:
+                existing["price"] = hot_celeb_match["price"]
+                existing["tier"] = "A" if (is_mega_star or is_royal) else hot_celeb_match.get("tier", existing.get("tier", "D"))
+                existing["news_premium"] = hot_celeb_match.get("news_premium", False)
+            
+            return {"celebrity": existing, "from_cache": True}
+        
+        # Cache is stale or missing - continue with full processing
+        logger.info(f"Cache miss or stale for {name}, refreshing Wikipedia data...")
+        
         # Ensure celebrity has an ID - generate one if missing
         if not existing.get("id"):
             new_id = str(uuid.uuid4())
