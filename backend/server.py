@@ -3953,14 +3953,44 @@ async def search_wikipedia_people(query: str, limit: int = 5) -> list:
                                             "dancer", "choreographer", "influencer"]
                         
                         # Skip if clearly not a person
-                        non_person_indicators = ["is a film", "is a song", "is a television",
-                                                "is a band", "is a group", "is an album",
-                                                "is a website", "is a company", "is a database",
-                                                "is a university", "is a festival", "is a surname",
-                                                "is a given name", "may refer to", "is a city",
-                                                "is a town", "is a village", "is a place",
-                                                "is a district", "is a region", "is a movie",
-                                                "is an area", "is a suburb", "is a neighbourhood"]
+                        non_person_indicators = [
+                            # Locations
+                            "is a city", "is a town", "is a village", "is a place",
+                            "is a district", "is a region", "is an area", "is a suburb",
+                            "is a neighbourhood", "is a country", "is a state", "is a province",
+                            "is a county", "is a municipality", "is an island", "is a beach",
+                            "is a mountain", "is a river", "is a lake", "is located in",
+                            "is the capital", "is a metropolitan", "is a port", "is a peninsula",
+                            # Media/Entertainment (non-person)
+                            "is a film", "is a movie", "is a song", "is a television",
+                            "is a band", "is a group", "is an album", "is a series",
+                            "is a tv show", "is a sitcom", "is a drama", "is a comedy",
+                            "is a documentary", "is a video game", "is a game",
+                            "is a podcast", "is a radio show", "is a web series",
+                            # Books/Publications
+                            "is a book", "is a novel", "is a magazine", "is a newspaper",
+                            "is a publication", "is a comic", "is a manga", "is an article",
+                            # Organizations/Companies
+                            "is a website", "is a company", "is a database",
+                            "is a university", "is a school", "is a college",
+                            "is a festival", "is an organization", "is an institution",
+                            "is a charity", "is a foundation", "is a corporation",
+                            "is a brand", "is a product", "is a service",
+                            # Generic/Abstract
+                            "is a surname", "is a given name", "may refer to",
+                            "is a term", "is a phrase", "is a concept", "is a word",
+                            "is a type of", "is a form of", "is a style of",
+                            "is an award", "is a prize", "is a ceremony",
+                            "is a holiday", "is a tradition", "is an event",
+                            "is a disease", "is a condition", "is a syndrome",
+                            "is a species", "is a breed", "is an animal",
+                            # Objects/Things
+                            "is a vehicle", "is a car", "is a ship", "is a building",
+                            "is a structure", "is a monument", "is a statue",
+                            "is a food", "is a dish", "is a drink", "is a beverage",
+                            "is a tool", "is a device", "is a machine",
+                            "refers to", "can refer to", "commonly refers"
+                        ]
                         
                         # Must have BOTH a person indicator AND a profession indicator
                         has_person_indicator = any(ind in bio for ind in person_indicators)
