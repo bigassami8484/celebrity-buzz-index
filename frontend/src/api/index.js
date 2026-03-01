@@ -49,6 +49,30 @@ export const searchCelebrityAPI = async (name) => {
   return res.data.celebrity;
 };
 
+// Preload celebrity data for instant popup display
+export const preloadCelebritiesAPI = async (celebrityIds) => {
+  if (!celebrityIds || celebrityIds.length === 0) return {};
+  const res = await axios.post(`${API}/celebrity/preload`, { celebrity_ids: celebrityIds });
+  return res.data.celebrities || {};
+};
+
+// Batch get celebrities by IDs
+export const batchGetCelebritiesAPI = async (ids) => {
+  if (!ids || ids.length === 0) return [];
+  const res = await axios.get(`${API}/celebrity/batch?ids=${ids.join(',')}`);
+  return res.data.celebrities || [];
+};
+
+// Preload images for instant display
+export const preloadImages = (imageUrls) => {
+  imageUrls.forEach(url => {
+    if (url && !url.includes('ui-avatars')) {
+      const img = new Image();
+      img.src = url;
+    }
+  });
+};
+
 export const fetchAutocomplete = async (query) => {
   const res = await axios.get(`${API}/autocomplete?q=${encodeURIComponent(query)}`);
   return res.data.suggestions || [];
