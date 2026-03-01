@@ -5271,6 +5271,7 @@ async def get_hot_celebs():
                             "hot_reason": hot_reason,
                             "news_headlines": actual_headlines[:3],
                             "recent_articles": actual_headlines[:5],  # Include actual articles
+                            "news": [{"title": h["title"], "source": h["source"], "date": h.get("date", ""), "url": h.get("url", "")} for h in actual_headlines[:5]],  # Frontend expects 'news' array
                             "image": image,
                             "mention_count": mention_count,
                             "article_count": len(actual_headlines)
