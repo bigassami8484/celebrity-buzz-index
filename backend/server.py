@@ -4308,11 +4308,10 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     
     # Improved deceased detection patterns
     deceased_patterns = [
-        # Past tense indicators
-        "was a ", "was an ", 
-        # Death phrases
+        # Death phrases - more specific than just "was a/an"
         "died ", "passed away", "death of", "who died", "after his death", "after her death",
         "at the time of his death", "at the time of her death",
+        "posthumously", "his death", "her death", "their death",
         # Date range patterns (birth-death years like "1950–2020")
         "1900–", "1901–", "1902–", "1903–", "1904–", "1905–", "1906–", "1907–", "1908–", "1909–",
         "1910–", "1911–", "1912–", "1913–", "1914–", "1915–", "1916–", "1917–", "1918–", "1919–",
@@ -4327,8 +4326,6 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
         "2000–", "2001–", "2002–", "2003–", "2004–", "2005–", "2006–", "2007–", "2008–", "2009–",
         "2010–", "2011–", "2012–", "2013–", "2014–", "2015–", "2016–", "2017–", "2018–", "2019–",
         "2020–", "2021–", "2022–", "2023–", "2024–", "2025–", "2026–",
-        # Alternative date formats
-        " – ", "—", # en-dash and em-dash between dates
     ]
     
     is_deceased = any(pattern in bio_lower for pattern in deceased_patterns)
@@ -4364,11 +4361,16 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
     if any(known in celeb_name_lower for known in known_deceased):
         is_deceased = True
     
-    # Known LIVING celebrities - override false positives from "was" detection
+    # Known LIVING celebrities - override false positives from deceased detection
     known_living = [
         "willie colon", "ozzy osbourne", "eric dane", "james van der beek",
         "kate garraway", "dolly parton", "cher", "mick jagger", "keith richards",
-        "paul mccartney", "ringo starr", "bob dylan", "elton john"
+        "paul mccartney", "ringo starr", "bob dylan", "elton john",
+        "stephen merchant", "ricky gervais", "karl pilkington", "warwick davis",
+        "david baddiel", "rob brydon", "james corden", "greg davies", "alex horne",
+        "jonathan ross", "graham norton", "alan carr", "david walliams", "matt lucas",
+        "harry styles", "shia labeouf", "dua lipa", "noel gallagher", "robbie williams",
+        "jack whitehall", "maya jama", "olivia attwood", "kelly osbourne"
     ]
     if any(known in celeb_name_lower for known in known_living):
         is_deceased = False
