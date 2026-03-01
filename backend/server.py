@@ -2158,9 +2158,25 @@ async def fetch_wikipedia_autocomplete(query: str) -> List[dict]:
                     "trial", "case", "murder", "death", "allegations", "controversy",
                     "scandal", "incident", "massacre", "battle", "war", "film", 
                     "album", "song", "tour", "show", "series", "episode", "racing",
-                    "game", "games", "parties", "money", "fierce"
+                    "game", "games", "parties", "money", "fierce", "book", "novel",
+                    "city", "town", "village", "county", "state", "province", "island",
+                    "beach", "mountain", "river", "lake", "street", "avenue", "road",
+                    "building", "tower", "bridge", "station", "airport", "park",
+                    "museum", "library", "hospital", "school", "university", "college",
+                    "company", "corporation", "organization", "foundation", "charity",
+                    "award", "prize", "trophy", "medal", "ceremony", "festival",
+                    "disease", "syndrome", "disorder", "virus", "bacteria"
                 ]
                 if any(title_lower.endswith(suffix) for suffix in non_person_suffixes):
+                    continue
+                
+                # Skip titles starting with common non-person prefixes
+                non_person_prefixes = [
+                    "the ", "list of ", "history of ", "battle of ", "siege of ",
+                    "university of ", "college of ", "city of ", "town of ",
+                    "island of ", "republic of ", "kingdom of ", "empire of "
+                ]
+                if any(title_lower.startswith(prefix) for prefix in non_person_prefixes):
                     continue
                 
                 # Skip if title contains "vs" or "versus" (usually events)
