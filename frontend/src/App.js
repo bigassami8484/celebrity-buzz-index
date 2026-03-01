@@ -94,6 +94,9 @@ function App() {
   const [hotStreaks, setHotStreaks] = useState([]);
   const [isTransferWindowOpen, setIsTransferWindowOpen] = useState(false);
   
+  // Celebrity data cache for instant popups (30-day cache on backend, in-memory on frontend)
+  const [celebrityCache, setCelebrityCache] = useState({});
+  
   // Mobile detection - check immediately and on mount
   const [isMobile, setIsMobile] = useState(() => {
     // Check immediately on initial render
