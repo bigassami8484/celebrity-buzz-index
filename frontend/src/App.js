@@ -21,6 +21,8 @@ import {
   fetchTrending as fetchTrendingAPI,
   fetchCelebritiesByCategory as fetchCelebritiesByCategoryAPI,
   searchCelebrityAPI,
+  preloadCelebritiesAPI,
+  preloadImages,
   fetchStats as fetchStatsAPI,
   fetchTodaysNews as fetchTodaysNewsAPI,
   fetchTopPicked as fetchTopPickedAPI,
