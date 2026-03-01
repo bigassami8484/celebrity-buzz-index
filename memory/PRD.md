@@ -20,14 +20,25 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Fixed database records for Stephen Merchant and Ricky Gervais
 
 **FIXED: Non-Person Entities in Hot Celebs**:
-- Added explicit blocklist for non-person names: "New Orleans", "Box Office", "Heated Rivalry", etc.
+- Deleted from database: "Tanning Dependence", "Box Office", "New Orleans", "Heated Rivalry"
+- Added explicit blocklist for non-person names including syndromes, disorders, championships, etc.
 - Enhanced non-person indicators to catch locations, sports events, rivalries, and concepts
 - Hot Celebs now properly filters out cities, events, and abstract concepts
+
+**FIXED: Celebrities Without Images**:
+- Removed 11 celebrities from categories who didn't have proper profile pictures
+- Includes: Edoardo Mapelli Mozzi, Jack Brooksbank, Archie/Lilibet, Fergie, etc.
 
 **ENHANCEMENT: Team Naming Clearer**:
 - Added "✏️ Edit" button next to team name in TeamPanel
 - Added hover tooltip on team icon saying "Click to customize!"
 - Users can now more easily discover they can rename their team
+
+**ENHANCEMENT: Weekly Points Display Per Celebrity**:
+- Each celebrity in team now shows their weekly points with ⚡ icon
+- Shows number of news articles contributing to points (e.g., "5 articles" or "no news")
+- Team header shows total weekly points: "⚡ 50 pts THIS WEEK"
+- Points calculation: 10 pts per news article + 100 pts brown bread bonus if deceased
 
 **FIXED: Ross Kemp Category**:
 - Moved Ross Kemp from TV Actors to TV Personalities (documentary maker/journalist)
@@ -36,6 +47,9 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 **Hot Celebs Requirements**:
 - Minimum 3 news articles required (was 2)
 - Improved deduplication with name normalization (handles accents, Jr./Sr. suffixes)
+
+**Bug Fix: Add to Team Error**:
+- Fixed NameError in `add_to_team` endpoint (`base_price` → `price`)
 
 ---
 
