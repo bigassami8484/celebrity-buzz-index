@@ -48,6 +48,20 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Minimum 3 news articles required (was 2)
 - Improved deduplication with name normalization (handles accents, Jr./Sr. suffixes)
 
+**ENHANCEMENT: 30-Day Wikipedia Cache**:
+- All Wikipedia celebrity data is now cached for 30 days
+- Cache freshness check: if within 30 days, returns instantly without re-fetching
+- New `cached_at` timestamp field tracks when data was last fetched
+- Cache is automatically refreshed when stale (>30 days old)
+- Response includes `from_cache: true` flag for fast-path returns
+
+**ENHANCEMENT: Instant Popup Preloading**:
+- New `/api/celebrity/preload` endpoint accepts list of celebrity IDs
+- Returns all cached data in one request for instant popup display
+- New `/api/celebrity/batch` endpoint for batch fetching by IDs
+- Frontend preloads images and data when celebrities are loaded
+- Images are preloaded in browser using `new Image()` technique
+
 **Bug Fix: Add to Team Error**:
 - Fixed NameError in `add_to_team` endpoint (`base_price` → `price`)
 
