@@ -4358,6 +4358,53 @@ async def search_celebrity(search: CelebritySearch, override_category: str = Non
             detail=f"'{search.name}' doesn't have a Wikipedia page. Only celebrities with Wikipedia profiles are included in the game."
         )
     
+    # REJECT non-person entities (locations, objects, books, TV shows, phrases, etc.)
+    bio_lower = wiki_info.get("bio", "").lower()
+    non_person_indicators = [
+        # Locations
+        "is a city", "is a town", "is a village", "is a place",
+        "is a district", "is a region", "is an area", "is a suburb",
+        "is a neighbourhood", "is a country", "is a state", "is a province",
+        "is a county", "is a municipality", "is an island", "is a beach",
+        "is a mountain", "is a river", "is a lake", "is located in",
+        "is the capital", "is a metropolitan", "is a port", "is a peninsula",
+        # Media/Entertainment (non-person)
+        "is a film", "is a movie", "is a song", "is a television",
+        "is a band", "is a group", "is an album", "is a series",
+        "is a tv show", "is a sitcom", "is a drama series", "is a comedy series",
+        "is a documentary", "is a video game", "is a game",
+        "is a podcast", "is a radio show", "is a web series",
+        # Books/Publications
+        "is a book", "is a novel", "is a magazine", "is a newspaper",
+        "is a publication", "is a comic", "is a manga", "is an article",
+        # Organizations/Companies
+        "is a website", "is a company", "is a database",
+        "is a university", "is a school", "is a college",
+        "is a festival", "is an organization", "is an institution",
+        "is a charity", "is a foundation", "is a corporation",
+        "is a brand", "is a product", "is a service",
+        # Generic/Abstract
+        "is a surname", "is a given name", "may refer to",
+        "is a term", "is a phrase", "is a concept", "is a word",
+        "is a type of", "is a form of", "is a style of",
+        "is an award", "is a prize", "is a ceremony",
+        "is a holiday", "is a tradition", "is an event",
+        "is a disease", "is a condition", "is a syndrome",
+        "is a species", "is a breed", "is an animal",
+        # Objects/Things
+        "is a vehicle", "is a car", "is a ship", "is a building",
+        "is a structure", "is a monument", "is a statue",
+        "is a food", "is a dish", "is a drink", "is a beverage",
+        "is a tool", "is a device", "is a machine",
+        "refers to", "can refer to", "commonly refers"
+    ]
+    
+    if any(indicator in bio_lower for indicator in non_person_indicators):
+        raise HTTPException(
+            status_code=400,
+            detail=f"'{search.name}' is not a person. This game is for individual celebrities only - not locations, TV shows, books, or other entities."
+        )
+    
     # Use override category if provided, otherwise detect from bio
     if override_category:
         category = override_category
