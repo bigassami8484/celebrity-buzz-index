@@ -4512,6 +4512,49 @@ async def get_celebrity(celebrity_id: str):
         raise HTTPException(status_code=404, detail="Celebrity not found")
     return {"celebrity": celebrity}
 
+@api_router.post("/celebrity/preload")
+async def preload_celebrities(data: dict):
+    """
+    Preload celebrity data for instant popup display.
+    Accepts a list of celebrity IDs and returns all their cached data.
+    This enables instant popups without any API calls on click.
+    """
+    celebrity_ids = data.get("celebrity_ids", [])
+    if not celebrity_ids:
+        return {"celebrities": {}}
+    
+    # Fetch all celebrities in one query
+    celebrities = await db.celebrities.find(
+        {"id": {"$in": celebrity_ids}},
+        {"_id": 0}
+    ).to_list(len(celebrity_ids))
+    
+    # Return as a dictionary keyed by ID for instant lookup
+    result = {}
+    for celeb in celebrities:
+        celeb_id = celeb.get("id")
+        if celeb_id:
+            result[celeb_id] = celeb
+    
+    return {"celebrities": result, "preloaded_count": len(result)}
+
+@api_router.get("/celebrity/batch")
+async def batch_get_celebrities(ids: str):
+    """
+    Batch get celebrities by comma-separated IDs.
+    Returns all cached data for instant display.
+    """
+    celebrity_ids = [id.strip() for id in ids.split(",") if id.strip()]
+    if not celebrity_ids:
+        return {"celebrities": []}
+    
+    celebrities = await db.celebrities.find(
+        {"id": {"$in": celebrity_ids}},
+        {"_id": 0}
+    ).to_list(len(celebrity_ids))
+    
+    return {"celebrities": celebrities}
+
 @api_router.get("/celebrity/{celebrity_id}/price-history")
 async def get_celebrity_price_history(celebrity_id: str, limit: int = 30):
     """Get price history for a celebrity"""
