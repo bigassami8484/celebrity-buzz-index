@@ -9,41 +9,37 @@ Build a Celebrity Buzz Index fantasy-league style platform where users can:
 - Compete on leaderboards with friends
 - Social sharing (Twitter/X, Facebook, WhatsApp)
 
-## Latest Updates (Feb 26, 2026 - Session 8)
+## Latest Updates (Mar 1, 2026 - Session 9)
 
-### Refactoring & Bug Fixes (Feb 26, 2026)
-**User Request**: Refactor frontend and backend, fix "site going black" issue
+### Bug Fixes & Enhancements (Mar 1, 2026)
 
-**BACKEND REFACTORING - Phase 1**:
-- Created `/app/backend/services/` module with business logic:
-  - `celebrity_service.py`: Celebrity search, fetch, management
-  - `team_service.py`: Team creation, management, leaderboards
-  - `league_service.py`: Private league operations
-- Services are properly exported via `__init__.py`
-- Backend still uses `server.py` (9400 lines) but services are ready for gradual migration
+**FIXED: Deceased Detection False Positives**:
+- Removed "was a/was an" pattern from deceased detection (too broad - triggered on TV show date ranges)
+- Fixed date range regex to only match plausible birth-death ranges (20-120 years age gap)
+- Added Stephen Merchant, Ricky Gervais, and other living celebrities to `known_living` override list
+- Fixed database records for Stephen Merchant and Ricky Gervais
 
-**FRONTEND REFACTORING - Phase 1**:
-- Created custom hooks in `/app/frontend/src/hooks/`:
-  - `useTeam.js`: Team management state and logic
-  - `useAuth.js`: Authentication state and logic
-  - `useCelebrities.js`: Celebrity data fetching
-  - `useLeagues.js`: League management
-- Hooks are exported via `index.js`
-- App.js still uses direct state but hooks are ready for gradual migration
+**FIXED: Non-Person Entities in Hot Celebs**:
+- Added explicit blocklist for non-person names: "New Orleans", "Box Office", "Heated Rivalry", etc.
+- Enhanced non-person indicators to catch locations, sports events, rivalries, and concepts
+- Hot Celebs now properly filters out cities, events, and abstract concepts
 
-**BUG FIXES**:
-- Added `ErrorBoundary` component to catch and display JavaScript errors gracefully
-- Fixed CSS causing black screen flash: set `background: #050505 !important` in `index.css` and `index.html`
-- Fixed React key warnings in `BrownBreadWatch.jsx`, `TopPickedCelebs.jsx`, and `App.js`
+**ENHANCEMENT: Team Naming Clearer**:
+- Added "✏️ Edit" button next to team name in TeamPanel
+- Added hover tooltip on team icon saying "Click to customize!"
+- Users can now more easily discover they can rename their team
 
-**Technical Details**:
-- Error boundary wraps entire app in `index.js`
-- Critical CSS in HTML ensures dark background before React hydrates
-- All list renders now use fallback keys: `key={celeb.id || \`fallback-${idx}\`}`
+**FIXED: Ross Kemp Category**:
+- Moved Ross Kemp from TV Actors to TV Personalities (documentary maker/journalist)
+- Updated category override in backend
+
+**Hot Celebs Requirements**:
+- Minimum 3 news articles required (was 2)
+- Improved deduplication with name normalization (handles accents, Jr./Sr. suffixes)
 
 ---
 
-## Previous Updates (Feb 26, 2026 - Session 7)
+## Previous Updates (Feb 26, 2026 - Session 8)
 
 ### NEW: Strict Exact-Match Search (Feb 26, 2026)
 **User Request**: No partial matches - celebrity should only appear when full name is typed
